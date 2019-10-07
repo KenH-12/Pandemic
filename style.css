@@ -889,10 +889,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	opacity: 0;
 }
 
-#forecastContainer { margin-bottom: 10px }
+#forecastContainer { padding: 5px 0; margin-bottom: 10px }
 #forecastContainer, #forecastContainer .veil { background-color: #252525 }
-#forecastContainer > p
-{
-	text-align: center;
-}
+#forecastContainer > p { text-align: center }
 #forecastContainer > p:first-of-type { margin-bottom: 5px }
