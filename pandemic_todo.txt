@@ -1,0 +1,284 @@
+BUGS
+----
+sometimes hovering over a special ability tag causes the action buttons to become visible
+
+ensure consistency of cube counts (cities have had outbreaks showing 2 cubes)
+	solved after QS outbreak issue was solved?
+	if it happens when the QS is not in the game, fix it.
+
+"hand limit reached but cards are inconsistent"
+	which possibly means cardKeys are not added/removed properly somewhere
+	this happened after share knowledge
+		ways that players can pick up / discard:
+			starting hands
+			share knowledge
+			draw cards
+				w/ or w/out epidemic(s)
+			discard
+			hand limit discard
+			charter flight
+			direct flight
+			build research station
+			discover cure
+			dispatch cf and df
+			play event card
+
+clicking "DISCARD" on the df prompt cause movementAction to promptdf again with the destination, eventType, and waitingForConfirmation = true.
+
+dispatcher played gg, medic's discard step came, and gg was in the discard prompt
+
+TO DO
+-----
+finish coding forecastDraw()
+
+see what happens when forecast is played during the discard step
+	the two forecast steps could cause unpredictable behaviour
+
+make sure discover cure becomes available after gg if the player has the cards for it
+
+the mexico city QS area shouldn't cover san francisco
+
+what if there are no cards in the infection discard pile, and someone tries to play Resilient Population?
+
+for medic auto-treat animations triggered by movements, await the pawn movement then auto-treat
+
+perhaps resetActionPrompt should not resume the current step
+	check how many calls are using the doNotResume parameter
+
+event cards!
+	forecast
+
+when government grant is prompted, the research station supply should glow.
+	unless a station needs to be relocated
+
+compare client and server side hand sizes after drawing?
+
+in the php fn moveCardsToPile, $commaSeparatedCardKeys should be an array of card keys
+
+movementAction discard animation should assign a higher z-index to the card?
+
+show outbreak symbol on outbreaking city
+
+put the role card image next to the player's name/role
+	in the player panel
+	in the step indicator or whatever the fuck that thing is called
+		rename the fucking thing
+
+fix the treat disease mouseover "X"
+make sure that all cubes of a cured disease show the "X"
+fix the cube mouseover event while animating treatdisease
+
+standardize prompt appearance / button behaviour
+
+code action buttons
+	special actions
+		plan contingency
+
+show the process of deciding who goes first
+playerpanels should be arranged in turn order
+the playerpanels should be collapsible (can't see chicago)
+
+clicking on a player's role in the player panel should pinpoint their pawn's location
+clicking on an infection card in the discard pile should pinpoint the city
+
+other actions
+
+special abilities
+
+for multiplayer games, require permission for certain actions
+	share knowledge
+	dispatch pawn
+	airlift
+
+event cards
+	if hand limit is reached, allow an event card to be played as an alternative to discarding
+
+instead of tooltips for special ability descriptions, display the role card
+
+make sure the medic's treat disease description specifies that all cubes are removed
+make sure treat disease specified that all cubes of a cured disease will be removed
+
+handle errors
+	retrieveEventHistory
+
+add tests
+
+make sure things look ok for different screen sizes
+
+highlight the active pawn in some way
+
+add tooltip for "eradicated" in discover cure and treat disease prompts
+
+disable pointer events for images and things that can't be clicked
+	auto-treat circle and cure marker
+	pinpointers
+
+TO TEST
+-------
+make sure the height limit on the expanded infection discards functions properly, including the scrolling
+
+IDEAS
+-----
+pinpointing should happen on mousover of playercards/infection cards?
+
+have an explicit rendezvous action button and prompt?
+
+concede button?
+
+perhaps the discard prompt should be in the player's hand
+
+have dragged pawns leave translucent duplicates that remain in the pawn's current location
+have an arrow between the pawn and the DestinationKeys
+	it should follow the dragged pawn's translucent image
+
+show outbreak icon on outbreaking city?
+
+display notes under infectioncard when an outbreak occurs, eg:
+	*RIYADH
+	-> OUTBREAK!
+		Affected Cities:
+		-> KARACHI
+		-> BAGHDAD (quarantined)
+		-> CARIO (quarantined)
+
+store eventTypeInfo in db?
+
+to keep the player panels from covering any cities, consider checking the bottom-right corner of the far-right panel
+	if it's past a certain top/left percentage, reduce the width of .player and/or the height of contained elements
+
+use dotted underlines with the "?" cursor and a tooltip on mouseover to explain things that may be unclear
+
+in the treat disease selection menu, replace the large cubes with actual disease icons?
+
+instead of the space-consuming title, "RESEARCH STATION SUPPLY", use the station img as the title?
+
+access epidemicsDrawn, infectionRate, and numOutbreaks from vw_disease?
+
+animate outbreakInfection cubes to the origin city first, then to the affected city. (more intuitive change in cube supply)
+
+add the "async" suffix to async function names?
+
+display checkboxes beside epidemic steps
+
+include the "play" steps from the board beside the player deck or somewhere
+
+prompt the player to draw cards instead of dealing them automatically ?
+
+include country name and population for infection cards?
+
+centralize event types in a php file?
+
+when retrieving events / eventHistory, parse events into more useful objects based on their type?
+
+animate color on buttons that are waiting to be clicked ('continue' buttons)
+
+split data.currentStep into an object containing 'next' and 'current' keys
+
+make animation effects juicier
+	disease cube size bounce when adding to or taking from the cube supply
+
+SMALL FIXES
+-----------
+reduce the number of arguments in php function definitions (pass objects instead?)
+
+there should be some message below the active role that says a request is being processed
+
+when event cards cannot be played, the epidemic infect step should happen automatically
+
+event cards' "play at any time" should have a tooltip that describes exactly when they can be played.
+
+pawns should have a data-key property instead of a cityKey class
+
+put a cancel button at the top of the action prompt?
+
+instead of counting the cubes on the board, keep a cubeCount column in the game table
+
+do steps need a procedure? perhaps they only need a single method
+
+for the valid[eventType.name]DestinationKeys methods, use camelcase eventType names.
+
+in the discard prompts (like discover cure) the card text is weirdly large and pixellated
+
+use a similar draggable approach to pawn dragging?
+
+bindDiseaseCubeEvents should be 2 separate functions -- 1 to enable and 1 to disable
+
+for any array containing only unique values, use a Set instead
+
+in the arrangePlayerCards procedure, change the way epidemic division remainders are handled
+	make it randomly choose whether to use a remainder for each division.
+
+flip pawn images horizontally to make the lighting consistent with the research stations
+
+for the epidemic infect step, make sure the card looks like it's coming from the bottom of the deck
+
+the stored procedure increment_gamephase...
+	should only work for actions 1-4
+	should be renamed to nextActionStep or similar.
+
+facedown infectioncards need to be repositioned by resizeBoard
+
+center disease color options in treat disease prompt
+
+contingency planner's color should be slightly darker to contrast the board and the white text
+dark gray background areas should be slighty lighter to contrast black cards
+
+ensure that the game initiated properly
+
+replace php associative arrays with objects
+
+discard panels should have a greater z-index than pieces (except pawns that are being dragged)
+
+implement a constant duration for panel slide up/down
+
+in php files, put $game not found and such at the top instead of nesting everything
+
+create a js function that performs data.events.push and updates the nextEventIndex
+
+include a step description in the db that can be used in the status
+
+create a function, getDuration, to handle the fast forwarding mechanic
+
+prevent pinpoint rectangles from triggering mouse events -- they mess with the discard pile hovers
+
+consider changing the color of the bottom panel -- black discards blend in
+
+use fetch instead of ajax
+
+modules
+
+contingency planner's pawn is hard to see -- make it slightly darker?
+
+use em instead of px for font sizes?
+
+use css variables for colors n stuff
+
+not enough space for initial infections at smallest screen width (playerPanel gets in the way)
+
+some city coords are not centred
+
+fix z-index of pinpointers as it relates to pawns, cubes, and stations
+
+create trigger that updates a card's index after updating its location
+in movementAction.php and drawPlayerCards.php, set the cardIndex of discarded cards
+also allow players to rearrange their hands. update cardIndex to reflect the hand order.
+
+animate cubes directly to their eventual position in the cluster
+
+check rows returned or whatever in php files
+
+private properties in objects?
+use Object.freeze() on objects that should never change?
+
+consider using a locationID instead of cityKey + gameID
+
+probably don't need getDisplayName
+
+
+
+
+
+
+
+
+

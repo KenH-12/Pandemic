@@ -1,0 +1,62 @@
+EVENT TYPE				DETAILS										LENGTH			CODE
+----------------------------------------------------------------------------------------
+Starting Hand			key1,key2,key3,key4								[19]		sh
+
+Initial Infection		key,numCubes									[6]			ii
+	
+Drive/Ferry				origin,destination								[9]			dr
+DirectFlight			origin,destination								[9]			df
+CharterFlight			origin,destination								[9]			cf
+ShuttleFlight			origin,destination								[9]			sf
+
+ChooseFlightType		N/A												N/A			ft
+
+Research Station		cityKey,relocationKey							[9]			rs
+
+Treat Disease			key,color,prevCubeCount,newCubeCount			[10]		td
+Medic Auto-Treat		cityKey,color									[6]			at
+
+Share Knowledge	Request	cardKey,giverID,recipientID						[8]			sk
+Share Knowledge Accept	y/n												[1]			sa
+
+Discover a Cure			key1,key2,key3,key4,key5						[24]		dc
+
+Eradication				diseaseColor									[1]			er
+
+Plan Contingency		cardKey											[4]			pc
+
+Dispatch Request	    rID,keyA,keyB,movementType						[14]		dp
+Dispatch Accept         y/n                         					[1]         da
+Rendezvous																			rv
+
+Operations Flight		keyA,keyB,cardKey								[14]		of
+
+Pass																	[0]			pa
+
+Card Draw				keyA,keyB										[9]			cd
+
+Discard					keyA,keyB										[9]			ds
+
+Infect City				key,preventedBy									[6]			ic
+
+Outbreak				outbreakCount,originKey,color					[8]			ob
+
+Outbreak Infection		originKey,infectedKey,color,preventionCode		[13]		oi
+
+Epidemic Increase		epCount											[1]			ec
+Epidemic Infect			bottomKey,prevCubeCount,preventionCode			[8]			ef
+Epidemic Intensify		numDiscardsShuffled								[2]			et
+
+Resilient Population    removedCardKey              					[4]         rp
+
+One Quiet Night         infectionRate               					[1]         oq
+
+Forecast Draw           k1,k2,k3,k4,k5,k6           					[29]        fd
+Forecast Placement      k1,k2,k3,k4,k5,k6           					[29]        fp
+
+Airlift Request         rID,originKey,destinationKey					[11]        ar
+Airlift Accept          y/n                         					[1]         aa
+
+Government Grant        cityKey,relocationKey          					[9]         gg
+
+Game End				reason,triggeredByEventID						[15]		ge

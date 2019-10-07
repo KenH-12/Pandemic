@@ -1,0 +1,887 @@
+*
+{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	box-sizing: border-box;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+	cursor: default;
+}
+body
+{
+	font-family: 'Electrolize', 'Oswald', sans-serif;
+	color: #fff;
+	background-color: #09154f;
+	font-size: 16px;
+	
+	position: relative;
+	
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none;   /* Chrome/Safari/Opera */
+	-khtml-user-select: none;    /* Konqueror */
+	-moz-user-select: none;      /* Firefox */
+	-ms-user-select: none;       /* Internet Explorer/Edge */
+}
+::-webkit-scrollbar {display: none;}
+#container
+{
+	min-width: 1024px;
+	max-width: 1920px;
+}
+#curtain
+{
+	position: fixed;
+	width: 100%;
+	height: 1080px;
+	z-index: 50;
+	background-color: #09154f;
+	padding: 5px;
+}
+.pinpointRect,
+.infectionRateHighlight,
+.outbreaksHighlight,
+.autoTreatCircle,
+.autoTreatCureMarker,
+#quarantineArea
+{
+	pointer-events: none;
+}
+
+.pinpointRect
+{
+	position: absolute;
+	z-index: 1;
+	border: 2px solid red;
+}
+#boardImg, #boardContainer
+{
+	position: absolute;
+	width: 80.5%;
+}
+#boardImg
+{
+	z-index: 0;
+}
+#boardContainer
+{
+	z-index: 1;
+	font-size: 0;
+	overflow: hidden;
+}
+#boardContainer > div,
+#boardContainer > .pawn,
+#boardContainer > .researchStation,
+#boardContainer > .diseaseCube
+{
+	position: absolute;
+}
+.pawn
+{
+	z-index: 4;
+	width: 1.6%;
+}
+.researchStation
+{
+	z-index: 3;
+	width: 3%;
+}
+.grantStation { z-index: 6 }
+.diseaseCube
+{
+	z-index: 5;
+	border: 2px solid #fff;
+}
+.diseaseCube:not(.y) p
+{
+	color: #fff;
+}
+.diseaseCube.y p { color: #000; font-weight: 700; }
+.hidden{display:none;}
+.y{background-color:#fded3c;color:black;}
+.u{background-color:#405fb1;}
+.b{background-color:#212121;}
+.r:not(span){background-color:#ef282a;}
+.white{background-color:#fff}
+.black{background-color:#000}
+.event {background-color: gray;}
+.event.unavailable:active { background-color: #8a181a }
+.epidemic:not(.substep), .epidemicFull {background-color: #00a94f;}
+.brightGreen { color: #00a94f }
+
+span.r {color: #ef282a}
+
+#topPanel, .bottomPanelDiv:not(#cureMarkerContainer)
+{
+	position: absolute;
+	background-color: #252525;
+}
+#topPanel > div
+{
+	display: inline-block;
+	vertical-align: top;
+}
+
+#cureMarkerContainer
+{
+	width: 20.3%;
+	left: 29.8%;
+	border: none;
+}
+#cureMarkerContainer .title
+{
+	border-bottom: 1px solid #00a94f;
+}
+.cureMarker
+{
+	position: absolute;
+	width: 6%;
+	z-index: 2;
+}
+#cureMarkerY { margin-left: 29.65% }
+#cureMarkerR { margin-left: 34.65% }
+#cureMarkerU { margin-left: 39.64% }
+#cureMarkerB { margin-left: 44.2% }
+.bottomPanelDiv
+{
+	border-top: 1px solid #fff;
+	border-left: 1px solid #fff;
+}
+#researchStationSupply
+{
+	width: 16%;
+	left: 52%;
+}
+#researchStationSupply .title
+{
+	margin-bottom: 6px;
+}
+#researchStationSupply > *:not(.title)
+{
+	vertical-align: middle;
+}
+#researchStationSupply img
+{
+	display: inline-block;
+	width: 20%;
+	margin-left: 5%;
+}
+#researchStationSupplyCount
+{
+	display: inline-block;
+	color: #fff;
+	margin-left: 31.5%;
+}
+#playerDeck
+{
+	width: 14%;
+	left: 68%;
+}
+#playerDiscard
+{
+	width: 18%;
+	left: 82%;
+	z-index: 7;
+}
+#playerDeck img
+{
+	width: 40%;
+	margin: 5px 30% 0 30%;
+}
+#topPanel
+{
+	width: 36%;
+	left: 44%;
+	overflow-y: hidden;
+}
+#topPanel > div
+{
+	padding-bottom: 2px;
+	border-bottom: 1px solid #fff;
+	border-left: 1px solid #fff;
+}
+#topPanel .title, #infectionDiscard .title, .bottomPanelDiv .title
+{
+	font-size: 16px;
+	text-align: center;
+	padding-top: 3px;
+	border-bottom: 1px solid #fff;
+}
+#cubeSupplies
+{
+	width: 56%;
+}
+.cubeSupply
+{
+	display: inline-block;
+	width: 25%;
+}
+
+.cubeSupply p, #researchStationSupplyCount
+{
+	font-family: 'B612 Mono', monospace;
+}
+.cubeSupply p
+{
+	font-size: 18px;
+	text-align: center;
+	margin-top: -3px;
+}
+.cubeSupply .diseaseCube
+{
+	width: 50%;
+	margin: 5% 25%;
+}
+#infectionDeck
+{
+	width: 44%;
+}
+#infectionDiscard
+{
+	position: absolute;
+	left: 80%;
+	width: 20%;
+	background-color: #252525;
+	border-left: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	overflow: hidden;
+	z-index: 9;
+}
+#removedInfectionCards
+{
+	margin-top: 10px;
+	border-top: 1px solid #fff;
+}
+
+#infDiscardVeil { position: absolute; background-color: #252525; z-index: 10;}
+.infDiscardCardback
+{
+	position: absolute;
+	width: 10.6%;
+	opacity: 0.1;
+}
+#imgInfectionDeck
+{
+	z-index: 4;
+	width: 36%;
+	border-radius: 100%;
+	margin: 1.5% 32% 0.5% 32%;
+}
+.drawnInfectionCard, .drawnPlayerCard {position: absolute;z-index: 10;}
+
+#infectionRateMarker
+{
+	position: absolute;
+	top: 18.4%;
+	left: 63.96%;
+	width: 3.15%;
+}
+.infectionRateHighlight, .outbreaksHighlight
+{
+	position: absolute;
+	background-color: #000;
+	z-index: 10;
+	opacity: 0.5;
+}
+.infectionRateHighlight.top
+{
+	width: 100%;
+	height: 17.8%;
+}
+.infectionRateHighlight.right
+{
+	top: 17.8%;
+	height: 9.6%;
+	left: 89.5%;
+	width: 10.5%;
+}
+.infectionRateHighlight.left
+{
+	top: 17.8%;
+	height: 9.6%;
+	width: 63.6%;
+}
+.infectionRateHighlight.bottom
+{
+	width: 100%;
+	top: 27.4%;
+	height: 72.6%;
+}
+#outbreaksMarker
+{
+	transform: rotate(45deg);
+	position: absolute;
+	top: 54.4%;
+	left: 2.8%;
+	width: 3%;
+}
+.outbreaksHighlight.top
+{
+	width: 100%;
+	height: 50.4%;
+}
+.outbreaksHighlight.right
+{
+	top: 50.4%;
+	height: 49.6%;
+	left: 10.3%;
+	width: 89.7%;
+}
+.outbreaksHighlight.bottom
+{
+	top: 95%;
+	height: 5%;
+	width: 10.3%;
+}
+
+#rightPanel, .infectionCardContents {width: 19.5%;}
+#rightPanel
+{
+	float: right;
+	overflow-y: scroll;
+	border-left: 1px solid #fff;
+}
+#indicatorContainer
+{
+	padding: 7px;
+	border-bottom: 2px solid #4ec6e1;
+	background-color: #353535;
+	border: none;
+	overflow: hidden;
+}
+#indicatorContainer span:not(.roleTag, .disabled) {margin-left: 15px;}
+#actions{background-color: #054583;}
+#indicatorContainer
+{
+	text-align: center;
+}
+#indicatorContainer > * {margin-bottom: 4px}
+#turnIndicator
+{
+	font-size: 16px;
+}
+#roleIndicator
+{
+	font-size: 20px;
+	font-weight: 700;
+}
+.action:not(.step), .destination
+{
+	display: block;
+	padding: 5px;
+	border: 1px solid #4ec6e1;
+	border-top: none;
+}
+.infectionStatus
+{
+	padding: 5px 0;
+	text-align: center;
+	background-color: #252525;
+	border-bottom: 1px solid #fff;
+	border-left: 1px solid #fff;
+}
+.infectionStatus p:first-of-type{font-size: 22px;}
+.groupInfRate
+{
+	display: inline-block;
+	width: 100%;
+	margin: 8px 0;
+	padding: 0;
+}
+.groupInfRate > div
+{
+	vertical-align: middle;
+	display: inline-block;
+	width: 7%;
+	margin-right: 3%;
+	background-color: #eee;
+	border-radius: 5px;
+}
+.infectionCard
+{
+	width: 100%;
+	margin-bottom: 5px;
+}
+#infectCitiesContainer > .infectionCard, #infectCitiesContainer > .btnContinue { margin-top: 20px }
+.infectionCardContents { position: relative }
+.infectionCard *
+{
+	position: absolute;
+}
+.infectionCardImg
+{
+	width: 100%;
+}
+.cityName
+{
+	margin-left: 20%;
+	color: #000;
+	font-weight: 700;
+}
+.veil
+{
+	width: 89.52%;
+	left: 10.48%;
+	background-color: #09154f;
+	z-index: 5;
+}
+#infectionDiscard .infectionCard
+{
+	display: block;
+	padding-left: 1%;
+	width: 100%;
+	margin-top: 2px;
+}
+#infectionDiscard .infectionCardContents { width: 100%;  }
+.epidemicFull
+{
+	width: 98%;
+	margin: 2px 1%;
+}
+.epidemicFull h2
+{
+	font-size: 20px;
+	text-align: center;
+	padding: 5px 0;
+	border-bottom: 2px solid #fff;
+}
+.epidemicFull.pending h2 { border-bottom: none; background-color: #007034;}
+.epidemicFull > div
+{
+	padding: 10px;
+	background-color: #007034;
+}
+.epidemicFull > div.highlighted
+{
+	background-color: #00a94f;
+}
+.epidemicFull h3
+{
+	font-size: 16px;
+	color: rgb(189, 189, 189);
+}
+.epidemicFull > div.highlighted h3
+{
+	color: #fff;
+}
+.epidemicFull p
+{
+	font-size: 12px;
+	font-weight: 700;
+	padding: 3px 0 0 12px;
+	color: rgb(172, 172, 1);
+}
+.epidemicFull > div.highlighted p
+{
+	color: yellow;
+}
+#playerPanelContainer
+{
+	width: 42%;
+}
+#playerPanelContainer > p
+{
+	text-align: center;
+	font-size: 20px;
+	line-height: 20px;
+	border-top: 1px solid #fff;
+	padding-top: 5px;
+}
+.playerPanel
+{
+	display: inline-block;
+	vertical-align: top;
+	width: 25%;
+	color: #fff;
+	text-align: center;
+	border: 1px solid #fff;
+	border-top: none;
+	background-color: #353535;
+	margin-left: -1px;
+}
+.name, .role
+{
+	width: 100%;
+	font-size: 14px;
+	border-bottom: 1px solid #fff;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.name
+{
+	line-height: 14px;
+}
+.role
+{
+	font-family: 'Oswald', sans-serif;
+	font-size: 14px;
+	margin-bottom: 4px;
+}
+.playerCard
+{
+	width: 98%;
+	text-align: center;
+	white-space: nowrap;
+	margin: 2px 1%;
+	border: none;
+	font-size: 14px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+#playerCards .playerCard
+{
+	width: 80%;
+	margin: 2% 10%;
+	font-size: 18px;
+	border-radius: 2px;
+}
+#cardDrawContainer .playerCard
+{
+	width: 98%;
+	height: 30px;
+	line-height: 30px;
+	margin: 20px 1%;
+	font-size: 20px;
+	font-weight: 700;
+	overflow: hidden;
+}
+.discardPrompt { border-top: 1px solid #fff; }
+.discardPrompt > div:not(.button)
+{
+	background-color: #353535;
+	border-bottom: 1px solid #fff;
+}
+.discardPrompt p
+{
+	padding: 0 5px;
+	border-bottom: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	background-color: #252525;
+}
+.discardPrompt p span
+{
+	float: right;
+	padding: 0 2px;
+}
+.discardPrompt .playerCard
+{
+	width: 76% !important;
+	margin: 3px 12% !important;
+}
+.discardSelections > p
+{
+	margin-bottom: 3px;
+}
+.discardPrompt .discardSelections
+{
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	min-height: 45px;
+	border-bottom: 1px solid #fff;
+}
+.discardPrompt .cardsToKeep
+{
+	min-height: 45px;
+}
+.btnConfirm
+{
+	margin: 5px;
+}
+.scientist
+{
+	background-color: #f6f6f7;
+	color: #000;
+}
+.researcher
+{
+	background-color: #574319;
+}
+.quarantineSpecialist
+{
+	background-color: #006951;
+}
+.operationsExpert, #btnOperationsFlight
+{
+	background-color: #8dc73f;
+}
+.medic, .autoTreatCircle
+{
+	background-color: #f68426;
+}
+.autoTreatCircle
+{
+	position: absolute;
+	clip-path: circle();
+	opacity: 0;
+	z-index: 1;
+}
+.dispatcher, #btnDispatchPawn
+{
+	background-color: #ec84b5;
+}
+.contingencyPlanner, #btnPlanContingency
+{
+	background-color: #67c8c6;
+}
+
+.button
+{
+	width: 75%;
+	font-size: 18px;
+	line-height: 18px;
+	text-align: center;
+	padding: 5px 0;
+	margin-left: 12.5%;
+	border: 1px solid #fff;
+	background-color: #0c658b;
+}
+.disabled, .btnDisabled
+{
+	color: #555;
+}
+.btnDisabled
+{
+	background-color: #0d445c;
+	border: 1px solid #555;
+}
+.actionCategory h2
+{
+	font-size: 18px;
+	margin: 10px 0 0 2px;
+}
+.actionCategory .button
+{
+	width: 100%;
+	margin: 0 0 2px 0;
+	border: none;
+	font-size: 16px;
+}
+#actionInterface > h2
+{
+	font-size: 20px;
+	margin: 10px 0 5px 0;
+	background-color: #fff;
+	color: #09154f;
+	text-align: center;
+}
+#actionInterface > .instructions { margin-bottom: 25px; }
+#actionInterface > .instructions > p
+{
+	text-align: left;
+	padding: 0 1%;
+	margin-bottom: 8px;
+}
+#actionInterface > .instructions li { margin-left: 3% }
+.actionPromptSubtitle 
+{
+	padding: 3%;
+	padding-bottom: none;
+	border-top: 1px solid #fff;
+}
+#actionPrompt .playerCard
+{
+	font-size: 18px;
+	width: 94%;
+	margin: 0 3% 5px 3%;
+}
+.discardPrompt .playerCard { margin-bottom: 5px; }
+.actionPromptOption
+{
+	width: 94%;
+	margin: 0 3% 3px 3%;
+}
+
+#btnCancelAction
+{
+	margin-top: 10px;
+	padding: 3px;
+	display: inline-block;
+	font-size: 14px;
+	border: 1px solid #fff;
+	border-left: none;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	background-color: rgb(63, 58, 58);
+}
+.actionInterfaceDivision
+{
+	text-align: center;
+	font-size: 18px;
+	padding: 20px 0 10px 0;
+	width: 100%;
+	margin: 25px 0 10px 0;
+	border: none;
+	background-color: #09154f !important;
+}
+.actionInterfaceDivisionLine
+{
+	width: 96%;
+	height: 1px;
+	background-color: #fff;
+	z-index: 1;
+	margin: 0 2% -10px 2%;
+}
+.actionInterfaceDivision p
+{
+	z-index: 2;
+	background-color: #09154f !important;
+	width: 16%;
+	margin-left: 42%;
+}
+.discardPromptDivision
+{
+	text-align: center;
+	font-size: 18px;
+	padding: 20px 0 10px 0;
+	width: 94%;
+	margin: 0 3%;
+	border: none;
+	background-color: #353535;
+}
+.discardPromptDivisionLine
+{
+	width: 96%;
+	height: 1px;
+	background-color: #fff;
+	z-index: 1;
+	margin: 0 2% -10px 2%;
+}
+.discardPromptDivision p
+{
+	z-index: 2;
+	background-color: #353535;
+	width: 16%;
+	margin-left: 42%;
+}
+.diseaseColorOption
+{
+	display: inline-block;
+	margin: 2px;
+	height: 50px;
+	width: 50px;
+	border: 2px solid #fff;
+}
+
+.discardSelections, .shareableCards
+{
+	width: 94%;
+	margin: 0 3%;
+	padding: 5px 1%;
+	background-color: #353535;
+}
+
+.shareableCards > p
+{
+	border-bottom: 1px solid #494949;
+	padding-bottom: 5px;
+	margin-bottom: 10px;
+}
+.btnRelocateStation
+{
+	width: 98%;
+	margin: 1%;
+}
+.btnRelocateStation img
+{
+	width: 20px;
+	float: left;
+	margin: -2px -30px 0 10px;
+}
+
+.shareableCards p
+{
+	text-align: center;
+	line-height: 22px;
+}
+
+.roleTag
+{
+	padding: 1px 3px;
+	border-radius: 3px;
+	white-space: nowrap;
+}
+.playerOptions { padding: 0 3%; }
+.playerOptions .roleTag
+{
+	display: block;
+	text-align: center;
+	border-radius: 0;
+	margin-bottom: 5px;
+}
+.specialAbilityTag
+{
+	text-align: center;
+	padding: 1px 3px;
+	border-radius: 3px;
+}
+.hoverInfo
+{
+	border-bottom: 1px dashed #67acc8;
+}
+.contingencyPlanner .hoverInfo
+{
+	border-bottom: 1px dashed #054583;
+}
+
+#specialEventBanner
+{
+	position: absolute;
+	z-index: 10;
+	width: 100%;
+	font-size: 36px;
+	font-weight: bold;
+	text-align: center;
+	padding: 1%;
+}
+.specialEventDetails
+{
+	font-size: 20px;
+}
+.specialEventImg
+{
+	position: absolute;
+	width: 8%;
+	left: 46%;
+	z-index: 10;
+}
+
+#turnProcedureContainer
+{
+	padding: 5px 3%;
+	font-size: 14px;
+	border: 1px solid #fff;
+	margin: 2px;
+	margin-top: 0;
+	background-color: #043d77;
+}
+#turnProcedureContainer > *
+{
+	padding: 1px 3px;
+	color: #aaa;
+}
+#turnProcedureContainer .title
+{
+	font-size: 15px;
+	border-bottom: 1px solid #fff;
+	margin-bottom: 3px;
+	color: #fff;
+}
+#turnProcedureContainer .substep
+{
+	margin-left: 6%;
+	font-size: 13px;
+}
+#turnProcedureContainer .highlighted
+{
+	color: #fff;
+}
+
+#quarantineArea
+{
+	background-image: url("images/quarantineArea.jpg");
+	z-index: 2;
+	opacity: 0;
+}
