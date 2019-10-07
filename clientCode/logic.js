@@ -911,10 +911,18 @@ function enableActionButton(buttonID)
 		});
 }
 
-$("#btnCancelAction").click(function()
+function enableBtnCancelAction()
 {
-	resetActionPrompt({ actionCancelled: true });
-});
+	$("#btnCancelAction").off("click").click(function()
+	{
+		resetActionPrompt({ actionCancelled: true });
+	}).css("display", "inline-block");
+}
+
+function disableBtnCancelAction()
+{
+	$("#btnCancelAction").off("click").css("display", "none");
+}
 
 function resetActionPrompt({ actionCancelled, doNotResumeStep } = {})
 {
@@ -975,6 +983,7 @@ function promptAction(actionProperties)
 		
 	if (interfaceIsRequired)
 	{
+		enableBtnCancelAction();
 		$actionCategories.addClass("hidden");
 		unhide($actionPrompt);
 
@@ -1628,7 +1637,9 @@ const actionInterfacePopulator = {
 
 async function forecastDraw()
 {
+	disableBtnCancelAction();
 	disableActions();
+	$(".discardSelections").remove();
 
 	const { forecast, forecastPlacement } = eventTypes,
 		events = await requestAction(forecast),
@@ -1646,22 +1657,22 @@ async function forecastDraw()
 
 	actionInterfacePopulator.$actionInterface.append($container);
 
-	let $card,
-		cards = [];
+	let cards = [];
 	for (let i = 0; i < cardKeys.length; i++)
 	{
-		$card = newInfectionCardTemplate();
-		$cardContainer.append($card);
-
-		cards.push({ cityKey: cardKeys[i], $card });
-
-		await dealFaceDownInfCard(i);
+		$cardContainer.append(newInfectionCardTemplate());
+		cards.push({ cityKey: cardKeys[i], index: i });
 	}
+	positionInfectionPanelComponents();
+	$cardContainer.find(".infectionCardContents").addClass("revealing");
+
+	await dealFaceDownInfGroup(cards);
 
 	for (let card of cards)
-		revealInfectionCard(card);
-
-	await sleep(getDuration("mediumInterval"));
+		revealInfectionCard(card, { omitPinpoint: true });
+	
+	await getDuration("mediumInterval");
+	$cardContainer.find(".infectionCardContents").removeClass("revealing");
 
 	$cardContainer.children(".infectionCard")
 		.draggable()
@@ -6286,8 +6297,6 @@ function getInfectionContainer()
 		|| currentStepIs("epInfect")
 		|| currentStepIs("epIntensify"))
 		containerID = "epidemicContainer";
-
-	log("infection containerID: ", containerID);
 	
 	return $("#" + containerID);
 }
@@ -6510,7 +6519,7 @@ function dealFaceDownInfCard(elementIndex)
 	});
 }
 
-async function revealInfectionCard({ cityKey, index, preventionCode = false })
+async function revealInfectionCard({ cityKey, index, preventionCode = false }, { omitPinpoint = false })
 {
 	await sleep(getDuration("mediumInterval"));
 
@@ -6521,7 +6530,7 @@ async function revealInfectionCard({ cityKey, index, preventionCode = false })
 			$veil = $card.find(".veil"),
 			duration = getDuration("revealInfCard");
 		
-		$(".drawnInfectionCard").first().fadeOut(duration,
+		$(".drawnInfectionCard").eq(index).fadeOut(duration,
 			function() { $(this).remove() });
 		
 		$card.attr("data-key", cityKey)
@@ -6537,11 +6546,8 @@ async function revealInfectionCard({ cityKey, index, preventionCode = false })
 			{
 				$veil.remove();
 
-				if (!data.fastForwarding)
-				{
-
+				if (!data.fastForwarding && !omitPinpoint)
 					pinpointCity(cityKey, getPinpointColor(preventionCode));
-				}
 				
 				resolve();
 			});
