@@ -819,8 +819,11 @@ span.r {color: #ef282a}
 }
 .hoverInfo
 {
+	font-family: sans-serif;
+	font-weight: 700;
 	border-bottom: 1px dashed #67acc8;
 }
+sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px }
 .contingencyPlanner .hoverInfo
 {
 	border-bottom: 1px dashed #054583;
@@ -885,3 +888,11 @@ span.r {color: #ef282a}
 	z-index: 2;
 	opacity: 0;
 }
+
+#forecastContainer { margin-bottom: 10px }
+#forecastContainer, #forecastContainer .veil { background-color: #252525 }
+#forecastContainer > p
+{
+	text-align: center;
+}
+#forecastContainer > p:first-of-type { margin-bottom: 5px }
