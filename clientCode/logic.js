@@ -1656,57 +1656,72 @@ async function forecastDraw()
 	disableActions();
 	$(".discardSelections").remove();
 
-	const { forecast, forecastPlacement } = eventTypes,
-		events = await requestAction(forecast),
-		forecastEvent = events.shift(),
-		{ cardKeys } = forecastEvent,
-		$container = $(`<div id='forecastContainer'>
-							<p>
-								Top<sup class='hoverInfo' title='The top card will be put back on the deck last.'>?</sup>
-							</p>
-							<div id='forecastCards'></div>
-							<p>
-								Bottom<sup class='hoverInfo' title='The bottom card will be put back on the deck first.'>?</sup>
-							</p>
-						</div>`),
-		$cardContainer = $container.children("#forecastCards"),
-		$btnConfirm = $("<div class='button'>DONE</div>");
-
+	const forecastEvent = (await requestAction(eventTypes.forecast)).shift();
+		
 	await discardEventCard(forecastEvent);
-
-	actionInterfacePopulator.replaceSubtitle("Click and drag to rearrange the cards. When done, the cards will be put back on top of the deck in order from bottom to top.")
-		.concealSubtitle()
-		.$actionInterface.append($container);
-
-	let cards = [];
-	for (let i = 0; i < cardKeys.length; i++)
-	{
-		$cardContainer.append(newInfectionCardTemplate());
-		cards.push({ cityKey: cardKeys[i], index: i });
-	}
-	positionInfectionPanelComponents();
-
-	await dealFaceDownInfGroup(cards);
-
-	for (let card of cards)
-		revealInfectionCard(card, { omitPinpoint: true });
+	await dealForecastedCards(forecastEvent.cardKeys);
 	
-	await sleep(getDuration("mediumInterval"));
+	const $btnDone = $("<div class='button'>DONE</div>");
 
-	$cardContainer.sortable(
-	{
-		containment: $container,
-		axis: "y",
-		sort: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "100%") },
-		stop: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "19.5%") },
-		revert: 200
-	});
-
+	// Subtitle remains hidden until the cards are revealed, then it's displayed along with $btnDone
 	actionInterfacePopulator
 		.showSubtitle()
-		.$actionInterface.append($btnConfirm);
+		.$actionInterface.append($btnDone);
 
-	await buttonClickPromise($btnConfirm, { afterClick: "hide" });
+	await buttonClickPromise($btnDone, { afterClick: "hide" });
+	forecastPlacement();
+}
+
+function dealForecastedCards(cardKeys)
+{
+	return new Promise(async resolve =>
+	{
+		const $container = $(`<div id='forecastContainer'>
+								<p>
+									Top<sup class='hoverInfo' title='The top card will be put back on the deck last.'>?</sup>
+								</p>
+								<div id='forecastCards'></div>
+								<p>
+									Bottom<sup class='hoverInfo' title='The bottom card will be put back on the deck first.'>?</sup>
+								</p>
+							</div>`),
+			$cardContainer = $container.children("#forecastCards"),
+			cards = [];
+		
+		actionInterfacePopulator.replaceSubtitle("Click and drag to rearrange the cards. When done, the cards will be put back on top of the deck in order from bottom to top.")
+			.concealSubtitle()
+			.$actionInterface.append($container);
+
+		for (let i = 0; i < cardKeys.length; i++)
+		{
+			$cardContainer.append(newInfectionCardTemplate());
+			cards.push({ cityKey: cardKeys[i], index: i });
+		}
+		positionInfectionPanelComponents();
+	
+		await dealFaceDownInfGroup(cards);
+	
+		for (let card of cards)
+			revealInfectionCard(card, { omitPinpoint: true });
+		
+		await sleep(getDuration("mediumInterval"));
+	
+		$cardContainer.sortable(
+		{
+			containment: $cardContainer.parent(),
+			axis: "y",
+			sort: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "100%") },
+			stop: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "19.5%") },
+			revert: 200
+		});
+
+		resolve();
+	});
+}
+
+function forecastPlacement()
+{
+	
 }
 
 async function oneQuietNight()
