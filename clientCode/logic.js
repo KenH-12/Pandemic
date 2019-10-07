@@ -1659,7 +1659,7 @@ async function forecastDraw()
 	const forecastEvent = (await requestAction(eventTypes.forecast)).shift();
 		
 	await discardEventCard(forecastEvent);
-	await dealForecastedCards(forecastEvent.cardKeys);
+	await animateForecastDraw(forecastEvent.cardKeys);
 	
 	const $btnDone = $("<div class='button'>DONE</div>");
 
@@ -1672,25 +1672,53 @@ async function forecastDraw()
 	forecastPlacement();
 }
 
-function dealForecastedCards(cardKeys)
+function animateForecastDraw(cardKeys)
 {
 	return new Promise(async resolve =>
 	{
-		const $container = $(`<div id='forecastContainer'>
-								<p>
-									Top<sup class='hoverInfo' title='The top card will be put back on the deck last.'>?</sup>
-								</p>
-								<div id='forecastCards'></div>
-								<p>
-									Bottom<sup class='hoverInfo' title='The bottom card will be put back on the deck first.'>?</sup>
-								</p>
-							</div>`),
-			$cardContainer = $container.children("#forecastCards"),
-			cards = [];
+		const { $container, $cardContainer } = newForecastContainer();
 		
-		actionInterfacePopulator.replaceSubtitle("Click and drag to rearrange the cards. When done, the cards will be put back on top of the deck in order from bottom to top.")
+		actionInterfacePopulator
+			.replaceSubtitle("Click and drag to rearrange the cards. When done, the cards will be put back on top of the deck in order from bottom to top.")
 			.concealSubtitle()
 			.$actionInterface.append($container);
+
+		// Cards are dealt one at a time...
+		const cards = await dealForecastedCards($cardContainer, cardKeys);
+		for (let card of cards)
+			revealInfectionCard(card, { omitPinpoint: true });
+		// ...but revealed simultaneously after the following duration:
+		await sleep(getDuration("mediumInterval"));
+	
+		enableForecastSorting($cardContainer);
+		$container.find(".concealed").removeClass("concealed");
+
+		resolve();
+	});
+}
+
+function newForecastContainer()
+{
+	const $container = $(`<div id='forecastContainer'>
+							<p class='concealed'>
+								Top<sup class='hoverInfo concealed' title='The top card will be put back on the deck last.'>?</sup>
+							</p>
+							<div id='forecastCards'></div>
+							<p class='concealed'>
+								Bottom<sup class='hoverInfo concealed' title='The bottom card will be put back on the deck first.'>?</sup>
+							</p>
+						</div>`),
+		$cardContainer = $container.children("#forecastCards");
+	
+	return { $container, $cardContainer };
+}
+
+function dealForecastedCards($cardContainer, cardKeys)
+{
+	return new Promise(async resolve =>
+	{
+		const $container = $cardContainer.parent(),
+			cards = [];
 
 		for (let i = 0; i < cardKeys.length; i++)
 		{
@@ -1698,30 +1726,117 @@ function dealForecastedCards(cardKeys)
 			cards.push({ cityKey: cardKeys[i], index: i });
 		}
 		positionInfectionPanelComponents();
-	
-		await dealFaceDownInfGroup(cards);
-	
-		for (let card of cards)
-			revealInfectionCard(card, { omitPinpoint: true });
-		
-		await sleep(getDuration("mediumInterval"));
-	
-		$cardContainer.sortable(
-		{
-			containment: $cardContainer.parent(),
-			axis: "y",
-			sort: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "100%") },
-			stop: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "19.5%") },
-			revert: 200
+
+		const containerInitialHeight = $container.height(),
+			$veils = $cardContainer.find(".veil").addClass("hidden");
+
+		await animatePromise({
+			$elements: $container,
+			initialProperties: { height: 0 },
+			desiredProperties: { height: containerInitialHeight },
+			duration: 400,
+			easing: "easeInQuad"
 		});
 
-		resolve();
+		$veils.removeClass("hidden");
+		$container.removeAttr("style");
+
+		await dealFaceDownInfGroup(cards);
+
+		resolve(cards);
 	});
 }
 
-function forecastPlacement()
+function enableForecastSorting($cardContainer)
 {
+	$cardContainer.sortable(
+	{
+		containment: $cardContainer.parent(),
+		axis: "y",
+		sort: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "100%") },
+		stop: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "19.5%") },
+		revert: 200
+	});
+}
+
+async function forecastPlacement()
+{
+	const $cardContainer = $("#forecastCards"),
+		cardKeys = [];
 	
+	$cardContainer.sortable("disable")
+		.children(".infectionCard").each(function()
+		{
+			cardKeys.push($(this).data("key"));
+		});
+	// Reversing achieves the order in which the cards will be placed back on the deck.
+	cardKeys.reverse();
+
+	await Promise.all(
+	[
+		//requestAction(eventTypes.forecastPlacement, { cardKeys }),
+		animateForecastPlacement($cardContainer)
+	]);
+
+	actionInterfacePopulator.$actionInterface.slideUp(function() { resetActionPrompt() });
+}
+
+async function animateForecastPlacement($cardContainer)
+{
+	const $cards = $cardContainer.children(".infectionCard");
+
+	$cards.prepend($(`<img	class='forecastCardback'
+							src='images/cards/infectionCardback.png'
+							alt='Infection Card' />`));
+	
+	const $cardbacks = $cardContainer.find(".forecastCardback").width(getDimension("diseaseIcon")),
+		$elementsToFadeOut = $(".actionPromptSubtitle")
+			.add($cardContainer.siblings("p")) // Top/Bottom labels
+			.add($cards.children(".infectionCardContents"));
+	
+	let duration = 500;
+	
+	await Promise.all(
+	[
+		animatePromise({
+			$elements: $elementsToFadeOut,
+			desiredProperties: { opacity: 0 },
+			duration
+		}),
+		animatePromise({
+			$elements: $cardbacks,
+			desiredProperties: { opacity: 1 },
+			duration
+		})
+	]);
+
+	await sleep(getDuration("shortInterval"));
+
+	const cardbackInitialWidth = $cardbacks.first().width(),
+		$deck = $("#imgInfectionDeck"),
+		deckWidth = $deck.width(),
+		deckOffset = $deck.offset(),
+		easing = "easeOutSine";
+	
+	duration = 300;
+
+	let $card, cardOffset;
+	for (let i = $cardbacks.length - 1; i >= 0 ; i--)
+	{
+		$card = $cardbacks.eq(i);
+		cardOffset = $card.offset();
+
+		await animatePromise(
+		{
+			$elements: $card.appendTo("body"),
+			initialProperties: { ...cardOffset, ...{ width: cardbackInitialWidth, zIndex: 10 } },
+			desiredProperties: { ...deckOffset, ...{ width: deckWidth } }, 
+			duration,
+			easing
+		});
+
+		$card.remove();
+	}
 }
 
 async function oneQuietNight()
@@ -5468,7 +5583,7 @@ async function epidemicIntensify()
 	await Promise.all(
 		[
 			requestAction(eventTypes.epidemicIntensify),
-			epidemicIntensifyAnimation()
+			animateEpidemicIntensify()
 		]);
 
 	// When 2 epidemics are drawn on the same turn,
@@ -5598,7 +5713,7 @@ function updateInfectionRate(epidemicCount)
 	data.steps["infect cities"].description = `Infection Rate: ${infRate}`;
 }
 
-async function epidemicIntensifyAnimation()
+async function animateEpidemicIntensify()
 {
 	const $container = $("#infectionDiscard"),
 		$title = $container.children(".title").first();

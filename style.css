@@ -256,7 +256,7 @@ span.r {color: #ef282a}
 }
 
 #infDiscardVeil { position: absolute; background-color: #252525; z-index: 10;}
-.infDiscardCardback
+.infDiscardCardback, .forecastCardback
 {
 	position: absolute;
 	width: 10.6%;
@@ -891,5 +891,6 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 
 #forecastContainer { padding: 5px 0; margin-bottom: 10px }
 #forecastContainer, #forecastContainer .veil { background-color: #252525 }
+#forecastContainer .concealed { color: #252525; border: none }
 #forecastContainer > p { text-align: center }
 #forecastContainer > p:first-of-type { margin-bottom: 5px }
