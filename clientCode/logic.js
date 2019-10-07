@@ -1674,9 +1674,13 @@ async function forecastDraw()
 	await getDuration("mediumInterval");
 	$cardContainer.find(".infectionCardContents").removeClass("revealing");
 
-	$cardContainer.children(".infectionCard")
-		.draggable()
-		.sortable();
+	$cardContainer.sortable({
+		containment: "parent",
+		axis: "y",
+		sort: function(event, ui) { ui.item.find(".infectionCardContents").css("width", "100%") },
+		stop: function(event, ui) { ui.item.find(".infectionCardContents").css("width", "19.5%") },
+		revert: 200
+	});
 }
 
 async function oneQuietNight()

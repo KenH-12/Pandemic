@@ -406,7 +406,6 @@ span.r {color: #ef282a}
 }
 #infectCitiesContainer > .infectionCard, #infectCitiesContainer > .btnContinue { margin-top: 20px }
 .infectionCardContents { position: relative }
-#forecastContainer .infectionCardContents:not(.revealing) { width: 100% }
 .infectionCard *
 {
 	position: absolute;
