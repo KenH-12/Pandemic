@@ -29,8 +29,6 @@ dispatcher played gg, medic's discard step came, and gg was in the discard promp
 
 TO DO
 -----
-what if there are no cards in the infection discard pile, and someone tries to play Resilient Population?
-
 for medic auto-treat animations triggered by movements, await the pawn movement then auto-treat
 
 perhaps resetActionPrompt should not resume the current step
@@ -42,8 +40,6 @@ when government grant is prompted, the research station supply should glow.
 compare client and server side hand sizes after drawing?
 
 in the php fn moveCardsToPile, $commaSeparatedCardKeys should be an array of card keys
-
-movementAction discard animation should assign a higher z-index to the card?
 
 show outbreak symbol on outbreaking city
 

@@ -1942,16 +1942,22 @@ async function animateOneQuietNight()
 
 function enableResilientPopulationSelection()
 {
-	$("#infectionDiscard").children(".infectionCard")
-		.off("click")
-		.click(function()
-		{
-			promptAction(
+	const $infectionDiscards = $("#infectionDiscard").children(".infectionCard");
+
+	if ($infectionDiscards.length)
+	{
+		$infectionDiscards.off("click")
+			.click(function()
 			{
-				eventType: eventTypes.resilientPopulation,
-				cardKeyToRemove: $(this).data("key")
+				promptAction(
+				{
+					eventType: eventTypes.resilientPopulation,
+					cardKeyToRemove: $(this).data("key")
+				});
 			});
-		});
+	}
+	else
+		actionInterfacePopulator.replaceSubtitle("<span class='r'>The Infection Discard Pile is empty!<br />To play Resilient Population, there must be at least 1 card in the Infection Discard Pile.</span>");
 }
 
 function disableResilientPopulationSelection()
