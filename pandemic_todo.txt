@@ -32,8 +32,7 @@ new game, forecast, finish actions, draw, infect city
 
 TO DO
 -----
-load forecast if it's in progress
-
+forecast during infection step makes the step indication undefined
 see what happens when forecast is played during the discard step
 	the two forecast steps could cause unpredictable behaviour
 
@@ -186,6 +185,8 @@ make animation effects juicier
 
 SMALL FIXES
 -----------
+infection cards should scroll with their container (forecast is an obvious example when there is overflow)
+
 reduce the number of arguments in php function definitions (pass objects instead?)
 
 there should be some message below the active role that says a request is being processed

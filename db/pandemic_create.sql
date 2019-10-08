@@ -218,7 +218,7 @@ CREATE TABLE EVENTHISTORY
 (
 	eventID			INT AUTO_INCREMENT,
     eventAbbrev		CHAR(2) NOT NULL,
-    eventDetails	VARCHAR(24) NOT NULL,
+    eventDetails	VARCHAR(29) NOT NULL,
     -- We will want to select/count events which occured on the same turn.
     -- The GAME table will store and update the running turnNumber, which will be looked up and inserted with events as they occur.
     turnNumber		TINYINT NOT NULL,

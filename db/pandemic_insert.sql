@@ -17,8 +17,6 @@ INSERT INTO STEP (description) VALUES ('infect cities');
 -- A special step is needed for the "hand limit reached" condition.
 -- This step occurs when a player receives an eighth card through the Share Knowledge action.
 INSERT INTO STEP (description) VALUES ('hand limit');
--- A special step is needed for when the "One Quiet Night" event card is played to skip the "infect cities" step for that turn.
-INSERT INTO STEP (description) VALUES ('oneQuietNight');
 
 INSERT INTO ROLE (roleName) VALUES ('Contingency Planner');
 INSERT INTO ROLE (roleName) VALUES ('Dispatcher');

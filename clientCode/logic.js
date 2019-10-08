@@ -484,30 +484,23 @@ class Step
 
 	indicate = function()
 	{
-		return new Promise(resolve =>
-			{
-				const $container = $("#indicatorContainer"),
-					activePlayer = getActivePlayer();
+		const $container = $("#indicatorContainer"),
+			activePlayer = getActivePlayer();
 
-				if (typeof this.setDescription === "function")
-					this.setDescription();
-		
-				$container.children("#turnIndicator")
-					.html(`----- ${activePlayer.name}'s Turn -----`)
-					.next() // role indicator
-					.html(activePlayer.role)
-					.attr("class", activePlayer.camelCaseRole)
-					.next() // step indicator
-					.html(this.description);
+		if (typeof this.setDescription === "function")
+			this.setDescription();
 
-				$container.slideDown(function()
-				{
-					unhide($container);
-					resolve();
-				});
+		$container.children("#turnIndicator")
+			.html(`----- ${activePlayer.name}'s Turn -----`)
+			.next() // role indicator
+			.html(activePlayer.role)
+			.attr("class", activePlayer.camelCaseRole)
+			.next() // step indicator
+			.html(this.description);
 
-				highlightTurnProcedureStep(this.name);
-			});
+		unhide($container);
+
+		highlightTurnProcedureStep(this.name);
 	}
 
 	resume = async function()
@@ -531,7 +524,7 @@ class Step
 		else
 		{
 			if (this.procedureIdx === 0)
-				await this.indicate();
+				this.indicate();
 			
 			this.procedure[this.procedureIdx]();
 		}
@@ -727,9 +720,26 @@ function enableEventCards({ resilientPopulationOnly } = {})
 		{
 			const eventType = getEventCardEventType($(this).data("key"));
 			
-			$("#stepIndicator").html("Play Event Card?");
+			indicatePromptingEventCard();
 			promptAction({ eventType });
 		});
+}
+
+function indicatePromptingEventCard()
+{
+	let description;
+	if (actionStepInProgress())
+	{
+		const numActionsRemaining = getNumActionsRemaining(),
+			pluralizer = numActionsRemaining === 1 ? "" : "s";
+		
+		description = `<span class='disabled'>[${numActionsRemaining} Action${pluralizer} Remaining]</span>`;
+	}
+
+	if (!eventTypeIsBeingPrompted(eventTypes.forecastPlacement))
+		description += "<br /><br />Play Event Card?";
+	
+	$("#stepIndicator").html(description);
 }
 
 function getEventCardEventType(cardKey)
@@ -913,6 +923,7 @@ function enableActionButton(buttonID)
 
 function enableBtnCancelAction()
 {
+	log("enableBtnCancelAction()");
 	$("#btnCancelAction").off("click").click(function()
 	{
 		resetActionPrompt({ actionCancelled: true });
@@ -921,6 +932,7 @@ function enableBtnCancelAction()
 
 function disableBtnCancelAction()
 {
+	log("disableBtnCancelAction()");
 	$("#btnCancelAction").off("click").css("display", "none");
 }
 
@@ -983,7 +995,9 @@ function promptAction(actionProperties)
 		
 	if (interfaceIsRequired)
 	{
-		enableBtnCancelAction();
+		if (!eventTypeIsBeingPrompted(eventTypes.forecastPlacement)) // Forecast can't be cancelled once the cards are drawn.
+			enableBtnCancelAction();
+		
 		$actionCategories.addClass("hidden");
 		unhide($actionPrompt);
 
@@ -1635,12 +1649,17 @@ const actionInterfacePopulator = {
 		
 		return true;
 	},
-	[eventTypes.forecast.name]()
+	[eventTypes.forecast.name]({ forecastEventToLoad })
 	{
+		if (forecastEventToLoad)
+		{
+			forecastDraw(forecastEventToLoad);
+			return true;
+		}
+		
 		const eventType = eventTypes.forecast;
 
 		data.promptingEventType = eventType;
-		
 		actionInterfacePopulator.appendDiscardPrompt(
 		{
 			cardKeys: eventType.cardKey,
@@ -1650,15 +1669,41 @@ const actionInterfacePopulator = {
 	}
 }
 
-async function forecastDraw()
+function checkForUnresolvedForecast()
 {
+	const { forecast, forecastPlacement } = eventTypes,
+		forecastEventsThisTurn = getEventsOfTurn([forecast, forecastPlacement]),
+		numEvents = forecastEventsThisTurn.length;
+	
+	if (numEvents > 0 && numEvents % 2 !== 0)
+	{
+		// A forecast must be resolved.
+		const forecastEventToLoad = forecastEventsThisTurn[numEvents - 1];
+		log("forecastEventToLoad: ", forecastEventToLoad);
+		promptAction({ eventType: forecast, forecastEventToLoad });
+
+		return true;
+	}
+
+	return false;
+}
+
+async function forecastDraw(forecastEventToLoad)
+{
+	data.promptingEventType = eventTypes.forecastPlacement;
+
 	disableBtnCancelAction();
 	disableActions();
 	$(".discardSelections").remove();
 
-	const forecastEvent = (await requestAction(eventTypes.forecast)).shift();
-		
-	await discardEventCard(forecastEvent);
+	indicatePromptingEventCard();
+
+	const forecastEvent = forecastEventToLoad || (await requestAction(eventTypes.forecast)).shift();
+	
+	// If loading an unresolved forecast, the event card will already be in the discard pile.
+	if (!forecastEventToLoad)
+		await discardEventCard(forecastEvent);
+	
 	await animateForecastDraw(forecastEvent.cardKeys);
 	
 	const $btnDone = $("<div class='button'>DONE</div>");
@@ -6448,7 +6493,7 @@ function getInfectionContainer()
 {
 	let containerID;
 
-	if (data.promptingEventType === eventTypes.forecast)
+	if (eventTypeIsBeingPrompted(eventTypes.forecastPlacement))
 		containerID = "forecastCards";
 	else if (currentStepIs("initial infections"))
 		containerID = "initialInfectionsContainer";
@@ -7235,6 +7280,7 @@ async function setup()
 	await removeCurtain();
 	
 	proceed();
+	checkForUnresolvedForecast();
 }
 
 function removeCurtain()
