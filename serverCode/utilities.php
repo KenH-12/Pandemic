@@ -399,29 +399,29 @@ function getPlayerCardType($mysqli, $cardKey)
     return "city";
 }
 
-function discardPlayerCards($mysqli, $game, $role, $commaSeparatedCardKeys)
+function discardPlayerCards($mysqli, $game, $role, $cardKeys)
 {
     $cardType = "player";
     $currentPile = $role;
     $newPile = "discard";
     
-    moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $commaSeparatedCardKeys);
+    moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKeys);
 }
 
-function discardInfectionCards($mysqli, $game, $commaSeparatedCardKeys)
+function discardInfectionCards($mysqli, $game, $cardKeys)
 {
     $cardType = "infection";
     // infection cards are drawn from the deck and immediately placed in the discard pile.
     $currentPile = "deck";
     $newPile = "discard";
 
-    moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $commaSeparatedCardKeys);
+    moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKeys);
 }
 
 // Moves the specified playerCard or infectionCard keys to the newPile,
 // given the cardType ("infection" or "player"), and the currentPile.
 // Accepts pile names or pile IDs for currentPile and newPile.
-function moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $commaSeparatedCardKeys)
+function moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKeys)
 {
     if ($cardType != "infection" && $cardType != "player")
         throw new Exception("Failed to move cards. Invalid card type: '$cardType'");
@@ -434,7 +434,8 @@ function moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $com
     if (!is_numeric($newPile))
         $newPile = "getPileID('$newPile')";
 
-    $cardKeys = explode(",", $commaSeparatedCardKeys);
+    if (!is_array($cardKeys))
+        $cardKeys = array($cardKeys);
 
     $cardIndex = $mysqli->query("SELECT MAX(cardIndex) AS 'maxIdx'
                                 FROM $cardView

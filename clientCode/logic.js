@@ -5976,7 +5976,7 @@ async function confirmDiscards(discardKeys)
 			requestAction(eventTypes.discard,
 				{
 					discardingRole: player.rID,
-					cardKeys: discardKeys.join(",")
+					cardKeys: discardKeys
 				}),
 			movePlayerCardsToDiscards({ player, cardKeys: discardKeys })
 		]);
@@ -6914,7 +6914,7 @@ async function discoverCure(cardKeys)
 			{
 				cityKey: player.cityKey,
 				diseaseColor: diseaseColor,
-				cardKeys: cardKeys.join(",")
+				cardKeys: cardKeys
 			}),
 			movePlayerCardsToDiscards({ player, cardKeys })
 		]),

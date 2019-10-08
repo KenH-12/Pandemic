@@ -37,13 +37,13 @@
         // Create an array of discarded infection card keys
         $infectionDiscardKeys = array();
         while ($row = mysqli_fetch_assoc($discardPile))
-            array_push($infectionDiscardKeys, $row["cardKey"]);
+            $infectionDiscardKeys[] = $row["cardKey"];
 
         // Move the infection cards from the discard pile to the top of the deck
         $cardType = "infection";
         $currentPile = "discard";
         $newPile = "deck";
-        moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, join(",", $infectionDiscardKeys));
+        moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $infectionDiscardKeys);
         
         // Get the epidemic cardKey and discard it
         $epidemicKey = $mysqli->query("SELECT cardKey
@@ -59,7 +59,7 @@
 
         $eventType = "et";
         $details = count($infectionDiscardKeys);
-        $response["events"] = recordEvent($mysqli, $game, $eventType, "$details", $role);
+        $response["events"] = recordEvent($mysqli, $game, $eventType, $details, $role);
         
         // Determine next step...
         $turnNum = getTurnNumber($mysqli, $game);

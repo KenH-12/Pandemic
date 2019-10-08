@@ -29,10 +29,6 @@ dispatcher played gg, medic's discard step came, and gg was in the discard promp
 
 TO DO
 -----
-post arrays to php instead of comma-separated strings
-
-the mexico city QS area shouldn't cover san francisco
-
 what if there are no cards in the infection discard pile, and someone tries to play Resilient Population?
 
 for medic auto-treat animations triggered by movements, await the pawn movement then auto-treat

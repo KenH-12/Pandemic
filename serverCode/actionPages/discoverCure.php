@@ -19,8 +19,6 @@
         $cityKey = $_POST["cityKey"];
         $diseaseColor = $_POST["diseaseColor"];
         $cardKeys = $_POST["cardKeys"];
-        
-        $cardKeyArray = explode(",", $cardKeys);
 
         require "../connect.php";
         include "../utilities.php";
@@ -43,14 +41,14 @@
         if (getRoleName($mysqli, $role) == "Scientist")
             $numCardsRequired = 4;
 
-        $numCards = count($cardKeyArray);
+        $numCards = count($cardKeys);
         if ($numCards != $numCardsRequired)
             throw new Exception("incorrect number of cards ($numCards)");
         
         // Check that all cards are the same color.
         for ($i = 0; $i < $numCards; $i++)
         {
-            if (getCityColor($mysqli, $cardKeyArray[$i]) != $diseaseColor)
+            if (getCityColor($mysqli, $cardKeys[$i]) != $diseaseColor)
                 throw new Exception("all cards must be the same color.");
         }
 
@@ -67,7 +65,7 @@
         
         // Record "discover cure" event
         $eventType = "dc";
-        $details = $cardKeys;
+        $details = implode(",", $cardKeys);
         $response["events"][] = recordEvent($mysqli, $game, $eventType, $details, $role);
 
         // The Medic automatically treats cured diseases in his location.

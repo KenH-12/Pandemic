@@ -12,7 +12,8 @@
 		$game = $_SESSION["game"];
 		$role = $_POST["role"];
 
-		$CURRENT_STEP = 'draw';
+		$CURRENT_STEP = "draw";
+		$EVENT_TYPE = "cd";
 		$HAND_LIMIT = 7;
 
 		require "../connect.php";
@@ -40,11 +41,6 @@
 		
 		$numEpidemics = count($epidemicKeys);
 		$numCards = count($cardKeys);
-
-		$actionDetails = join(",", array_merge($epidemicKeys, $cardKeys));
-
-		$epidemicKeys = join(",", $epidemicKeys);
-		$cardKeys = join(",", $cardKeys);
 		
 		$mysqli->autocommit(FALSE);
 
@@ -68,7 +64,8 @@
 		$response["nextStep"] = updateStep($mysqli, $game, $CURRENT_STEP, $nextStep, $role);
 		$response["numPlayerCardsRemaining"] = $cardsLeftInDeck;
 
-		$response["events"] = recordEvent($mysqli, $game, "cd", $actionDetails, $role);
+		$actionDetails = join(",", array_merge($epidemicKeys, $cardKeys));
+		$response["events"] = recordEvent($mysqli, $game, $EVENT_TYPE, $actionDetails, $role);
 	}
 	catch(Exception $e)
 	{

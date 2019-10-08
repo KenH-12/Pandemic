@@ -38,7 +38,8 @@
 
         $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $nextStep, $currentTurnRole);
         
-        $response["events"] = recordEvent($mysqli, $game, "ds", $cardKeys, $discardingRole);
+        $eventDetails = implode(",", $cardKeys);
+        $response["events"] = recordEvent($mysqli, $game, "ds", $eventDetails, $discardingRole);
     }
     catch(Exception $e)
     {
