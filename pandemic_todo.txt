@@ -25,7 +25,15 @@ ensure consistency of cube counts (cities have had outbreaks showing 2 cubes)
 
 clicking "DISCARD" on the df prompt cause movementAction to promptdf again with the destination, eventType, and waitingForConfirmation = true.
 
-dispatcher played gg, medic's discard step came, and gg was in the discard prompt
+Scenario:
+	active player has 7 cards
+	inactive player has 7 cards including government grant
+	active player gives a card to inactive player via share knowledge
+	inactive player plays government grant instead of discarding
+	active player draws 2 cards, then must discard
+	discard prompt contains government grant!
+
+discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----

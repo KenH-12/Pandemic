@@ -5974,11 +5974,13 @@ function discardStep()
 // because two players never receive cards simultaneously.
 function getPlayerWithTooManyCards()
 {
+	log("getPlayerWithTooManyCards()");
 	let player;
 	for (let rID in data.players)
 	{
 		player = data.players[rID];
-		
+		log(`checking ${player.role}...`);
+		log("cardKeys: ", player.cardKeys);
 		if (player.cardKeys.length > data.HAND_LIMIT)
 			return player;
 	}
