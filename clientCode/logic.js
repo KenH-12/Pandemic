@@ -957,9 +957,9 @@ function resetActionPrompt({ actionCancelled, doNotResumeStep } = {})
 		}
 		else if (eventTypeIsBeingPrompted(resilientPopulation))
 			disableResilientPopulationSelection();
-		
-		data.promptingEventType = false;
 	}
+
+	data.promptingEventType = false;
 
 	if (!actionStepInProgress())
 	{
@@ -1669,7 +1669,7 @@ async function forecastDraw()
 		.$actionInterface.append($btnDone);
 
 	await buttonClickPromise($btnDone, { afterClick: "hide" });
-	forecastPlacement();
+	forecastPlacement(forecastEvent);
 }
 
 function animateForecastDraw(cardKeys)
@@ -1686,7 +1686,7 @@ function animateForecastDraw(cardKeys)
 		// Cards are dealt one at a time...
 		const cards = await dealForecastedCards($cardContainer, cardKeys);
 		for (let card of cards)
-			revealInfectionCard(card, { omitPinpoint: true });
+			revealInfectionCard(card, { forecasting: true });
 		// ...but revealed simultaneously after the following duration:
 		await sleep(getDuration("mediumInterval"));
 	
@@ -1759,7 +1759,8 @@ function enableForecastSorting($cardContainer)
 	});
 }
 
-async function forecastPlacement()
+// 
+async function forecastPlacement(forecastEvent)
 {
 	const $cardContainer = $("#forecastCards"),
 		cardKeys = [];
@@ -1774,7 +1775,7 @@ async function forecastPlacement()
 
 	await Promise.all(
 	[
-		//requestAction(eventTypes.forecastPlacement, { cardKeys }),
+		requestAction(eventTypes.forecastPlacement, { cardKeys, forecastingRole: forecastEvent.role }),
 		animateForecastPlacement($cardContainer)
 	]);
 
@@ -6679,7 +6680,7 @@ function dealFaceDownInfCard(elementIndex)
 	});
 }
 
-async function revealInfectionCard({ cityKey, index, preventionCode = false }, { omitPinpoint = false })
+async function revealInfectionCard({ cityKey, index, preventionCode }, { forecasting } = {})
 {
 	await sleep(getDuration("mediumInterval"));
 
@@ -6688,10 +6689,11 @@ async function revealInfectionCard({ cityKey, index, preventionCode = false }, {
 		const $card = getInfectionContainer().find(".infectionCard").eq(index),
 			{name, color} = getCity(cityKey),
 			$veil = $card.find(".veil"),
-			duration = getDuration("revealInfCard");
+			duration = getDuration("revealInfCard"),
+			$cardback = forecasting ? $(".drawnInfectionCard").eq(index) : $(".drawnInfectionCard").first();
 		
-		$(".drawnInfectionCard").eq(index).fadeOut(duration,
-			function() { $(this).remove() });
+		// The first $cardback is removed if not forecasting because each one is removed after fading out.
+		$cardback.fadeOut(duration, function() { $(this).remove() });
 		
 		$card.attr("data-key", cityKey)
 			.find(".infectionCardImg")
@@ -6706,7 +6708,7 @@ async function revealInfectionCard({ cityKey, index, preventionCode = false }, {
 			{
 				$veil.remove();
 
-				if (!data.fastForwarding && !omitPinpoint)
+				if (!data.fastForwarding && !forecasting)
 					pinpointCity(cityKey, getPinpointColor(preventionCode));
 				
 				resolve();

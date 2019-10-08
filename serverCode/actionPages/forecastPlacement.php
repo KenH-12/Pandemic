@@ -14,11 +14,15 @@
 
         if (!isset($_POST["cardKeys"]))
             throw new Exception("Card order not set.");
+
+        if (!isset($_POST["forecastingRole"]))
+            throw new Exception("Forecasting role not set.");
         
         $game = $_SESSION["game"];
         $currentStep = $_POST["currentStep"];
         $activeRole = $_POST["role"];
-        $cardKeys = explode(",", $_POST["cardKeys"]);
+        $cardKeys = $_POST["cardKeys"];
+        $forecastingRole = $_POST["forecastingRole"];
         
         require "../connect.php";
         include "../utilities.php";
@@ -61,12 +65,14 @@
             
             if ($mysqli->error)
                 throw new Exception("Failed to update cardIndex ('$key', $cardIndex): " . $mysqli->error);
+            
+            $cardIndex++;
         }
         
         $eventDetails = implode(",", $cardKeys);
         $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails);
 
-        $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $discardingRole, $activeRole);
+        $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $forecastingRole, $activeRole);
 
         if ($proceedToNextStep)
             $response["proceedFromDiscardToStep"] = $proceedToNextStep;

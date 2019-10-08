@@ -27,12 +27,19 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 dispatcher played gg, medic's discard step came, and gg was in the discard prompt
 
+new game, forecast, finish actions, draw, infect city
+	the first infection card drawn during the infect cities step is not displayed properly
+
 TO DO
 -----
-finish coding forecastDraw()
+load forecast if it's in progress
 
 see what happens when forecast is played during the discard step
 	the two forecast steps could cause unpredictable behaviour
+
+the number of remaining actions should be displayed while an event card prompt is open
+
+post arrays to php instead of comma-separated strings
 
 make sure discover cure becomes available after gg if the player has the cards for it
 
