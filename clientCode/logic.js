@@ -503,9 +503,9 @@ class Step
 		highlightTurnProcedureStep(this.name);
 	}
 
-	resume = async function()
+	resume = function()
 	{
-		await this.indicate();
+		this.indicate();
 
 		if (this.procedureIdx === -1)
 			this.procedureIdx++;
@@ -513,7 +513,7 @@ class Step
 		this.procedure[this.procedureIdx]();
 	}
 	
-	proceed = async function()
+	proceed = function()
 	{
 		if (++this.procedureIdx === this.procedure.length)
 		{
@@ -604,7 +604,12 @@ function highlightTurnProcedureStep(stepName)
 			pluralizer = numActionsRemaining === 1 ? "" : "s";
 
 		if (!playerWithTooManyCards)
+		{
+			if (eventTypeIsBeingPrompted(eventTypes.forecastPlacement))
+				return false;
+			
 			return console.error("hand limit reached but card counts are inconsistent.");
+		}
 
 		this.description = `<span class='disabled'>[${numActionsRemaining} Action${pluralizer} Remaining]</span><br /><br />`;
 
@@ -727,17 +732,24 @@ function enableEventCards({ resilientPopulationOnly } = {})
 
 function indicatePromptingEventCard()
 {
-	let description;
-	if (actionStepInProgress())
+	const numActionsRemaining = getNumActionsRemaining();
+
+	let description = "";
+	if (actionStepInProgress() || currentStepIs("hand limit") && numActionsRemaining > 0)
 	{
 		const numActionsRemaining = getNumActionsRemaining(),
 			pluralizer = numActionsRemaining === 1 ? "" : "s";
 		
-		description = `<span class='disabled'>[${numActionsRemaining} Action${pluralizer} Remaining]</span>`;
+		description += `<span class='disabled'>[${numActionsRemaining} Action${pluralizer} Remaining]</span>`;
 	}
 
 	if (!eventTypeIsBeingPrompted(eventTypes.forecastPlacement))
-		description += "<br /><br />Play Event Card?";
+	{
+		if (description.length)
+			description += "<br /><br />";
+		
+		description += "Play Event Card?";
+	}
 	
 	$("#stepIndicator").html(description);
 }
@@ -1669,7 +1681,7 @@ const actionInterfacePopulator = {
 	}
 }
 
-function checkForUnresolvedForecast()
+function forecastInProgress()
 {
 	const { forecast, forecastPlacement } = eventTypes,
 		forecastEventsThisTurn = getEventsOfTurn([forecast, forecastPlacement]),
@@ -7279,8 +7291,13 @@ async function setup()
 
 	await removeCurtain();
 	
-	proceed();
-	checkForUnresolvedForecast();
+	if (forecastInProgress())
+	{
+		data.currentStep.indicate();
+		indicatePromptingEventCard();
+	}
+	else	
+		proceed();
 }
 
 function removeCurtain()
