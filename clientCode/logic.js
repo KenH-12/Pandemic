@@ -4505,8 +4505,7 @@ class City
 			percentFromLeft: 0.133,
 			connectedCityKeys: ["losa", "lima", "bogo", "miam", "chic"],
 			quarantineBoundaries: [
-				{ key: "sanf", points: ["tl"] },
-				{ key: "losa", points: ["bl"] },
+				{ key: "losa", points: ["tl", "bl"] },
 				{ key: "lima", points: ["bl", "br"] },
 				{ key: "bogo", points: ["r"] },
 				{ key: "miam", points: ["r", "tr", "tl"] },

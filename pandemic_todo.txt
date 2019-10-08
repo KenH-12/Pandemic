@@ -27,20 +27,9 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 dispatcher played gg, medic's discard step came, and gg was in the discard prompt
 
-new game, forecast, finish actions, draw, infect city
-	the first infection card drawn during the infect cities step is not displayed properly
-
 TO DO
 -----
-forecast during infection step makes the step indication undefined
-see what happens when forecast is played during the discard step
-	the two forecast steps could cause unpredictable behaviour
-
-the number of remaining actions should be displayed while an event card prompt is open
-
 post arrays to php instead of comma-separated strings
-
-make sure discover cure becomes available after gg if the player has the cards for it
 
 the mexico city QS area shouldn't cover san francisco
 
@@ -50,9 +39,6 @@ for medic auto-treat animations triggered by movements, await the pawn movement 
 
 perhaps resetActionPrompt should not resume the current step
 	check how many calls are using the doNotResume parameter
-
-event cards!
-	forecast
 
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated
