@@ -29,14 +29,10 @@ dispatcher played gg, medic's discard step came, and gg was in the discard promp
 
 TO DO
 -----
-for medic auto-treat animations triggered by movements, await the pawn movement then auto-treat
-
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated
 
 compare client and server side hand sizes after drawing?
-
-in the php fn moveCardsToPile, $commaSeparatedCardKeys should be an array of card keys
 
 show outbreak symbol on outbreaking city
 
@@ -71,9 +67,6 @@ for multiplayer games, require permission for certain actions
 	dispatch pawn
 	airlift
 
-event cards
-	if hand limit is reached, allow an event card to be played as an alternative to discarding
-
 instead of tooltips for special ability descriptions, display the role card
 
 make sure the medic's treat disease description specifies that all cubes are removed
@@ -89,10 +82,6 @@ make sure things look ok for different screen sizes
 highlight the active pawn in some way
 
 add tooltip for "eradicated" in discover cure and treat disease prompts
-
-disable pointer events for images and things that can't be clicked
-	auto-treat circle and cure marker
-	pinpointers
 
 TO TEST
 -------

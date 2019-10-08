@@ -2738,7 +2738,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			
 			await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
-			player.updateLocation(destination);
+			await player.updateLocation(destination);
 
 			if (events.length > 1)
 				await animateAutoTreatDiseaseEvents(events);
@@ -3468,8 +3468,11 @@ class Player
 		
 		this.cityKey = destination.key;
 
-		destination.cluster({ animatePawns: true });
-		origin.cluster({ animatePawns: true });
+		return Promise.all(
+		[
+			destination.cluster({ animatePawns: true }),
+			origin.cluster({ animatePawns: true })
+		]);
 	}
 	
 	getPanel()
@@ -4142,6 +4145,7 @@ class City
 	}
 
 	// Positions any pawns and disease cubes on this city into a cluster.
+	// Returns a Promise with after the most relevant animation duration.
 	cluster({ animatePawns, $pawnToExclude, animateResearchStation, stationInitialOffset, stationKeyToExclude } = {})
 	{
 		const pawns = $(".pawn." + this.key).not($pawnToExclude)
@@ -4149,7 +4153,9 @@ class City
 			pawnCount = pawns.length,
 			cityOffset = this.getOffset(),
 			coordsArray = [];
-		let pawnTop = cityOffset.top - data.pawnHeight,
+		
+		let stationPlacementDuration,
+			pawnTop = cityOffset.top - data.pawnHeight,
 			pawnLeft = cityOffset.left - data.pawnWidth,
 			i;
 		
@@ -4166,12 +4172,13 @@ class City
 				if (stationInitialOffset)
 					$researchStation.offset(stationInitialOffset);
 				
+				stationPlacementDuration = getDuration("stationPlacement");
 				$researchStation.animate(
 				{
 					top: desiredOffset.top,
 					left: desiredOffset.left,
 					width: data.stationWidth
-				}, getDuration("stationPlacement"), data.easings.stationPlacement);
+				}, stationPlacementDuration, data.easings.stationPlacement);
 			}
 			else
 				$researchStation.offset(desiredOffset);
@@ -4290,6 +4297,15 @@ class City
 			
 			i++;
 		});
+
+		// Return a Promise with the most relevant duration.
+		let ms = 0;
+		if (animateResearchStation) // Station animation takes longer than pawn animation.
+			ms = stationPlacementDuration;
+		else if (animatePawns)
+			ms = pawnAnimationDuration;
+
+		return sleep(ms)
 	}
 }
 
