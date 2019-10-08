@@ -948,7 +948,7 @@ function disableBtnCancelAction()
 	$("#btnCancelAction").off("click").css("display", "none");
 }
 
-function resetActionPrompt({ actionCancelled, doNotResumeStep } = {})
+function resetActionPrompt({ actionCancelled } = {})
 {
 	log("resetActionPrompt()");
 	const $actionInterface = $("#actionInterface"),
@@ -990,9 +990,6 @@ function resetActionPrompt({ actionCancelled, doNotResumeStep } = {})
 		$actionPrompt.parent().addClass("hidden");
 		enablePawnEvents();
 	}
-
-	if (!doNotResumeStep)
-		resumeCurrentStep();
 }
 
 function promptAction(actionProperties)
@@ -1464,7 +1461,7 @@ const actionInterfacePopulator = {
 
 		$btnConfirm.click(function()
 		{
-			resetActionPrompt({ doNotResumeStep: true });
+			resetActionPrompt();
 			passActions();
 		});
 
@@ -1572,7 +1569,7 @@ const actionInterfacePopulator = {
 				cardKeys: eventTypes.airlift.cardKey,
 				onConfirm: function()
 				{
-					resetActionPrompt({ doNotResumeStep: true });
+					resetActionPrompt();
 					data.promptingEventType = false;
 					airlift(playerToAirlift, destination);
 				}
@@ -1836,7 +1833,11 @@ async function forecastPlacement(forecastEvent)
 		animateForecastPlacement($cardContainer)
 	]);
 
-	actionInterfacePopulator.$actionInterface.slideUp(function() { resetActionPrompt() });
+	actionInterfacePopulator.$actionInterface.slideUp(function()
+	{
+		resetActionPrompt();
+		resumeCurrentStep();
+	});
 }
 
 async function animateForecastPlacement($cardContainer)
@@ -1899,7 +1900,7 @@ async function animateForecastPlacement($cardContainer)
 
 async function oneQuietNight()
 {
-	resetActionPrompt({ doNotResumeStep: true });
+	resetActionPrompt();
 	disableActions();
 
 	const events = await requestAction(eventTypes.oneQuietNight);
@@ -1967,7 +1968,7 @@ function disableResilientPopulationSelection()
 
 async function resilientPopulation(cardKeyToRemove)
 {
-	resetActionPrompt({ doNotResumeStep: true });
+	resetActionPrompt();
 	disableActions();
 
 	const eventType = eventTypes.resilientPopulation,
@@ -2154,7 +2155,7 @@ function getGovernmentGrantTargetCity($researchStation)
 async function governmentGrant(targetCity, relocationKey)
 {
 	data.promptingEventType = false;
-	resetActionPrompt({ doNotResumeStep: true });
+	resetActionPrompt();
 	disableActions();
 	
 	const eventType = eventTypes.governmentGrant,
@@ -2523,7 +2524,7 @@ function getValidShareKnowledgeParticipants(player)
 async function shareKnowledge(activePlayer, participant, cardKey)
 {
 	disableActions();
-	resetActionPrompt({ doNotResumeStep: true });
+	resetActionPrompt();
 	
 	let giver, receiver;
 	if (activePlayer.isHoldingCardKey(cardKey))
@@ -6909,7 +6910,7 @@ function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAut
 
 async function discoverCure(cardKeys)
 {
-	resetActionPrompt({ doNotResumeStep: true });
+	resetActionPrompt();
 	disableActions();
 	
 	const player = getActivePlayer(),

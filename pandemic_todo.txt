@@ -31,9 +31,6 @@ TO DO
 -----
 for medic auto-treat animations triggered by movements, await the pawn movement then auto-treat
 
-perhaps resetActionPrompt should not resume the current step
-	check how many calls are using the doNotResume parameter
-
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated
 
