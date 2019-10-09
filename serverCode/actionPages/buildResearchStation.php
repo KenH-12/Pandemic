@@ -45,6 +45,8 @@
                 checkEventCardLegality($mysqli, $game, $cardKey);
                 
                 $discardingRole = getEventCardHolder($mysqli, $game, $cardKey);
+                $eventRole = $discardingRole;
+
                 discardPlayerCards($mysqli, $game, $discardingRole, $cardKey);
 
                 $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $discardingRole, $role);
@@ -53,6 +55,7 @@
             }
             else // Build Research Station: "Discard the city card that matches the city you are in to place a research station there."
             {
+                $eventRole = $role;
                 // Operations Expert special ability:
 		        // "As an action, build a research station in his current city without discarding a city card."
                 if (getRoleName($mysqli, $role) !== "Operations Expert")
@@ -95,7 +98,7 @@
             if ($mysqli->affected_rows != 1)
                 throw new Exception("Failed to place research station on '$locationKey': " . $mysqli->error);
             
-            $response["events"] = recordEvent($mysqli, $game, $actionCode, $actionDetails, $role);
+            $response["events"] = recordEvent($mysqli, $game, $actionCode, $actionDetails, $eventRole);
         }
         catch(Exception $e)
         {

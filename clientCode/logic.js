@@ -939,6 +939,7 @@ function enableBtnCancelAction()
 	$("#btnCancelAction").off("click").click(function()
 	{
 		resetActionPrompt({ actionCancelled: true });
+		resumeCurrentStep();
 	}).css("display", "inline-block");
 }
 
@@ -2216,10 +2217,10 @@ function discardEventCard(event)
 			$card = $("#playerPanelContainer").find(`.playerCard[data-key='${cardKey}']`);
 		
 		$card.removeClass("unavailable");
-		log("event card: ", $card.attr("data-key"));
 	
 		await movePlayerCardsToDiscards({ $card });
 		player.removeCardsFromHand(cardKey);
+
 		resolve();
 	});
 }
@@ -2300,6 +2301,8 @@ class DiscardPrompt
 {
 	constructor({ eventTypeCode, buttonText, cardKeys, numDiscardsRequired, onConfirm })
 	{
+		log("new DiscardPrompt...");
+		log("cardKeys: ", cardKeys);
 		this.eventTypeCode = eventTypeCode;
 		this.cardKeys = cardKeys;
 		this.numDiscardsRequired = numDiscardsRequired;
@@ -3526,10 +3529,16 @@ class Player
 	// Excludes Epidemic cards because they go straight to the discard pile after being resolved.
 	addCardKeysToHand(cardKeys)
 	{
+		log("addCardKeysToHand()");
+		log("cardKeys: ", cardKeys);
+		this.logCardKeys();
+
 		this.cardKeys = [
 			...this.cardKeys,
 			...ensureIsArray(cardKeys).filter(key => !isEpidemicKey(key))
 		];
+
+		this.logCardKeys();
 	}
 
 	// Removes the card element from the player's panel,
@@ -3537,13 +3546,28 @@ class Player
 	// Accepts a single cardKey string, or an array of cardKey strings.
 	removeCardsFromHand(cardKeys)
 	{
+		log(`removeCardsFromHand()`);
+		this.logCardKeys();
+		
 		const panel = this.getPanel();
 		
 		for (let key of ensureIsArray(cardKeys))
 		{
+			log("removing card: ", key);
 			panel.find(`.playerCard[data-key='${key}']`).remove();
 			this.cardKeys.splice(this.cardKeys.indexOf(key), 1);
 		}
+
+		this.logCardKeys();
+	}
+
+	logCardKeys()
+	{
+		let keys = "";
+		for (let key of this.cardKeys)
+			keys += key + ",";
+
+		log(this.role + " cardKeys: " + keys);
 	}
 
 	canDirectFlight()
