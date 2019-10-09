@@ -742,6 +742,20 @@ function validateDispatcherRendezvous($mysqli, $game, $role, $destinationKey)
     return $destinationContainsPawn;
 }
 
+function getContingencyCardKey($mysqli, $game)
+{
+    $result = $mysqli->query("SELECT cardKey
+                            FROM vw_playerCard
+                            WHERE game = $game
+                            AND pile = 'contingency'
+                            LIMIT 1");
+    
+    if ($result->num_rows === 0)
+        return false;
+    
+    return $result->fetch_assoc()["cardKey"];
+}
+
 function countEpidemicsDrawnOnTurn($mysqli, $game, $turnNum)
 {
     $CARD_DRAW_EVENT_CODE = "cd";

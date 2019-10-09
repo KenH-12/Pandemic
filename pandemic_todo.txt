@@ -33,6 +33,26 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+Contingency Planner special ability
+	server-side
+		plan contingency
+			validation
+				role must be Contingency Planner
+				Player Discard Pile must contain at least 1 event card
+				there cannot already be a card "in contingency"
+			execution
+				update card from location "discard" to "contingency"
+				record Event
+		play contingency event card
+			validation
+			execution
+	client-side
+		action availability check
+		action button
+		action prompt interface
+		appearance of contingency event card
+		enable contingency event card to be played
+
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated
 
@@ -50,10 +70,6 @@ make sure that all cubes of a cured disease show the "X"
 fix the cube mouseover event while animating treatdisease
 
 standardize prompt appearance / button behaviour
-
-code action buttons
-	special actions
-		plan contingency
 
 show the process of deciding who goes first
 playerpanels should be arranged in turn order

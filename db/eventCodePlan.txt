@@ -24,6 +24,7 @@ Discover a Cure			key1,key2,key3,key4,key5						[24]		dc
 Eradication				diseaseColor									[1]			er
 
 Plan Contingency		cardKey											[4]			pc
+Play Contingency Card	cardKey											[4]			cc
 
 Dispatch Request	    rID,keyA,keyB,movementType						[14]		dp
 Dispatch Accept         y/n                         					[1]         da
