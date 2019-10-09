@@ -35,10 +35,6 @@ TO DO
 -----
 Contingency Planner special ability
 	server-side
-		plan contingency
-			execution
-				update card from location "discard" to "contingency"
-				record Event
 		play contingency event card
 			validation
 			execution

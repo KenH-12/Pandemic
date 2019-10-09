@@ -39,12 +39,14 @@
 
         $mysqli->autocommit(FALSE);
 
+        // moveCardsToPile will ensure that the specified event card is coming from the Player Discard Pile.
         $cardType = "player";
         $currentPile = "discard";
         $newPile = "contingency";
         moveCardToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKey);
         
-        //$response["events"][] = recordEvent($mysqli, $game, $eventType, $details, $role);
+        $eventDetails = $cardKey;
+        $response["events"][] = recordEvent($mysqli, $game, $eventType, $eventDetails, $role);
 
         $response["nextStep"] = nextStep($mysqli, $game, $currentStep, $role);
     }
