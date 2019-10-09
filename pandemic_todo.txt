@@ -36,10 +36,6 @@ TO DO
 Contingency Planner special ability
 	server-side
 		plan contingency
-			validation
-				role must be Contingency Planner
-				Player Discard Pile must contain at least 1 event card
-				there cannot already be a card "in contingency"
 			execution
 				update card from location "discard" to "contingency"
 				record Event

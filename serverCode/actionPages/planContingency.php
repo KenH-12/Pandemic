@@ -16,6 +16,9 @@
         $currentStep = $_POST["currentStep"];
         $cardKey = $_POST["cardKey"];
 
+        $EVENT_CARD_COLOR = "e";
+        $EVENT_CODE = "pc";
+
         require "../connect.php";
         include "../utilities.php";
 
@@ -25,11 +28,23 @@
         if (getContingencyCard($mysqli, $game))
             throw new Exception("There can be only 1 contingency card at a time.");
 
+        $isEventCardKey = $mysqli->query("SELECT color
+                                        FROM vw_playerCard
+                                        WHERE game = $game
+                                        AND cardKey = '$cardKey'")
+                                ->fetch_assoc()["color"] === $EVENT_CARD_COLOR;
+        
+        if (!$isEventCardKey)
+            throw new Exception("The specified card must be an Event card.");
+
         $mysqli->autocommit(FALSE);
+
+        $cardType = "player";
+        $currentPile = "discard";
+        $newPile = "contingency";
+        moveCardToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKey);
         
-        
-        
-        $response["events"][] = recordEvent($mysqli, $game, $eventType, $details, $role);
+        //$response["events"][] = recordEvent($mysqli, $game, $eventType, $details, $role);
 
         $response["nextStep"] = nextStep($mysqli, $game, $currentStep, $role);
     }
