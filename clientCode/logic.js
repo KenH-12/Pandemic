@@ -200,9 +200,16 @@ The card must come from the Dispatcher&#39;s hand.`,
 		propertyNames: ["diseaseColor"]
 	},
 	planContingency: {
-		name: "Discover Cure",
+		name: "Plan Contingency",
 		code: "pc",
-		propertyNames: ["cardKey"]
+		propertyNames: ["cardKey"],
+		rules: [
+			"The Contingency Plannermay, as an action, take <i>any</i> Event card from the Player Discard Pile and <i>store</i> it on his role card.",
+			"Only 1 Event card can be on his role card at a time. It does not could against his hand limit.",
+			"When the stored Event card is played, <i>remove it</i> from the game."
+		],
+		instructions: "Select a discarded Event card to store:",
+		pathName: "planContingency"
 	},
 	dispatchPawn: {
 		name: "Dispatch Pawn",
