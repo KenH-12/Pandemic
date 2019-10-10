@@ -39,10 +39,7 @@ Contingency Planner special ability
 			validation
 			execution
 	client-side
-		action availability check
-		action button
-		action prompt interface
-		appearance of contingency event card
+		request the action
 		enable contingency event card to be played
 
 when government grant is prompted, the research station supply should glow.

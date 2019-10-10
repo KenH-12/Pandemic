@@ -204,11 +204,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "pc",
 		propertyNames: ["cardKey"],
 		rules: [
-			"The Contingency Plannermay, as an action, take <i>any</i> Event card from the Player Discard Pile and <i>store</i> it on his role card.",
-			"Only 1 Event card can be on his role card at a time. It does not could against his hand limit.",
+			"The Contingency Planner may, as an action, take <i>any</i> Event card from the Player Discard Pile and <i>store</i> it on his role card.",
+			"Only 1 Event card can be stored at a time. It does not count against his hand limit.",
 			"When the stored Event card is played, <i>remove it</i> from the game."
 		],
-		instructions: "Select a discarded Event card to store:",
+		instructions: "Select an Event card to store:",
 		pathName: "planContingency"
 	},
 	dispatchPawn: {
@@ -1559,6 +1559,19 @@ const actionInterfacePopulator = {
 
 		return true;
 	},
+	[eventTypes.planContingency.name]()
+	{
+		const cardKeys = getContingencyOptionCardKeys();
+
+		data.promptingEventType = eventTypes.planContingency;
+
+		actionInterfacePopulator.appendOptionButtons("playerCard", cardKeys, function($clicked)
+		{
+			planContingency($clicked.data("key"));
+		});
+		
+		return true;
+	},
 	[eventTypes.airlift.name]({ playerToAirlift, destination })
 	{
 		if (!destination)
@@ -1684,6 +1697,31 @@ const actionInterfacePopulator = {
 		});
 		return true;
 	}
+}
+
+function getContingencyOptionCardKeys()
+{
+	const cardKeys = [];
+	$("#playerDiscard").find(".playerCard.event").each(function()
+	{
+		cardKeys.push($(this).data("key"));
+	});
+
+	return cardKeys;
+}
+
+async function planContingency(eventCardKey)
+{
+	disableActions();
+	resetActionPrompt();
+	
+	const $eventCard = $("#playerDiscard").find(`.playerCard[data-key='${eventCardKey}']`),
+		isContingencyCard = true,
+		targetProperties = getDrawnPlayerCardTargetProperties({ isContingencyCard });
+
+	await animateCardToHand($eventCard, targetProperties, { isContingencyCard });
+
+	getActivePlayer().contingencyKey = eventCardKey;
 }
 
 function forecastInProgress()
@@ -3147,10 +3185,7 @@ function revealPlayerCard(cardKey, cardHeight)
 
 async function animateCardsToHand($cards)
 {
-	const // The initial offsets need to be calculated before the Promise is made.
-		firstCardOffset = $cards.first().offset(),
-		lastCardOffset = $cards.last().offset(),
-		targetProperties = getDrawnPlayerCardTargetProperties();
+	const targetProperties = getDrawnPlayerCardTargetProperties();
 	
 	// If the second card is not an epidemic, both cards will be moved to the player's hand at once,
 	// and the first card should be offset from the second.
@@ -3158,63 +3193,73 @@ async function animateCardsToHand($cards)
 	if (!$cards.first().hasClass("epidemic"))
 		lastCardTop += targetProperties.height + 2; // + 2 for slight separation
     
-    // There will always be 2 cards to handle.
-	return Promise.all(
-		[
-			animateCardToHand($cards.first(), firstCardOffset, targetProperties),
-			animateCardToHand($cards.last(), lastCardOffset,
+	// There will always be 2 cards to handle.
+	animateCardToHand($cards.last(),
 				{
 					...targetProperties,
 					...{ top: lastCardTop }
-				})
-		]);
+				});
+	// returning the second Promise (instead of Promise.all) avoids an issue where the cards
+	// can swap positions after being inserted into the hand.
+	return animateCardToHand($cards.first(), targetProperties);
 }
 
-function getDrawnPlayerCardTargetProperties()
+function getDrawnPlayerCardTargetProperties({ isContingencyCard } = {})
 {
 	const $rolePanel = getActivePlayer().getPanel(),
 		$guide = $rolePanel.children().last(),
 		guideHeight = $guide.height(),
-		guideOffset = $guide.offset(),
+		guideOffset = isContingencyCard ? $rolePanel.children(".role").offset() : $guide.offset(),
 		$exampleCard = $("#playerPanelContainer").find(".playerCard").first(),
-		exampleCardHeight = $exampleCard ? $exampleCard.height() : false;
-
-	let top = guideOffset.top;
-	if (exampleCardHeight)
-		top += exampleCardHeight;
-	else
-		top += guideHeight;
+		exampleCardHeight = $exampleCard ? $exampleCard.height() : false,
+		top = exampleCardHeight ? guideOffset.top + exampleCardHeight : guideOffset.top + guideHeight;
 	
-	return {
+	const targetProperties = {
 		width: $guide.width(),
 		height: exampleCardHeight || guideHeight,
 		top: top,
 		left: guideOffset.left,
 		lineHeight: $guide.css("font-size")
 	};
+
+	log("targetProperties: ", targetProperties);
+	return targetProperties;
 }
 
-function animateCardToHand($card, initialOffset, targetProperties)
+function animateCardToHand($card, targetProperties, { isContingencyCard } = {})
 {
+	// Some initial values should be calculated before the Promise is made.
+	const initialOffset = $card.offset(),
+		initialWidth = $card.width();
+
 	return new Promise(resolve =>
 	{
 		if ($card.hasClass("epidemic"))
 			return resolve();
 
-		$card.appendTo("#rightPanel")
+		const $rolePanel = getActivePlayer().getPanel();
+		
+		let $insertAfterElement;
+		if (isContingencyCard) // Contingency cards are placed within the .role div
+			$insertAfterElement = $rolePanel.children(".role").children().first();
+		else
+			$insertAfterElement = $rolePanel.children().last();
+		
+		$card.appendTo("#rightPanel") // The animation is smoother if the $card is first appended to #rightPanel.
 			.css(
 			{
-				position: "absolute",
-				zIndex: "5",
-				top: initialOffset.top,
-				width: $card.width()
+				...{
+					position: "absolute",
+					zIndex: "5",
+					width: initialWidth
+				},
+				...initialOffset
 			})
 			.animate(targetProperties,
 			getDuration("dealCard"),
 			function()
 			{
-				const $rolePanel = getActivePlayer().getPanel();
-				$card.removeAttr("style").insertAfter($rolePanel.children().last());
+				$card.removeAttr("style").insertAfter($insertAfterElement);
 				resolve();
 			});
 	});
@@ -3719,7 +3764,9 @@ class Player
 
 	canPlanContingency()
 	{
-		return this.role == "Contingency Planner" && this.contingencyKey == "";
+		return this.role == "Contingency Planner"
+			&& !this.contingencyKey
+			&& getContingencyOptionCardKeys().length > 0;
 	}
 
 	canDispatchPawn()
@@ -3929,7 +3976,9 @@ function appendPlayerPanel(player)
 
 	$("#playerPanelContainer").append(`<div class='playerPanel' id='${camelCaseRole}'>
 								<div class='name'>${name}</div>
-								<div class='role ${camelCaseRole}'>${role}</div>
+								<div class='role ${camelCaseRole}'>
+									<p>${role}</p>
+								</div>
 							</div>`);
 }
 

@@ -626,7 +626,11 @@ span.r {color: #ef282a}
 {
 	background-color: #67c8c6;
 }
-
+.role.contingencyPlanner > .playerCard
+{
+	font-family: 'Electrolize', 'Oswald', sans-serif;
+	border: 1px solid #fff;
+}
 .button
 {
 	width: 75%;
