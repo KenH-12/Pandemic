@@ -8,7 +8,7 @@
 
         if (!isset($_POST["role"])
             || !isset($_POST["currentStep"])
-            || !isset($_POST["cardKey"])
+            || !isset($_POST["cardKey"]))
             throw new Exception("Required values not set.");
         
         $game = $_SESSION["game"];
@@ -25,7 +25,7 @@
         if (getRoleName($mysqli, $role) !== "Contingency Planner")
             throw new Exception("Only the Contingency Planner may perform this action.");
         
-        if (getContingencyCard($mysqli, $game))
+        if (getContingencyCardKey($mysqli, $game))
             throw new Exception("There can be only 1 contingency card at a time.");
 
         $isEventCardKey = $mysqli->query("SELECT color
@@ -43,10 +43,10 @@
         $cardType = "player";
         $currentPile = "discard";
         $newPile = "contingency";
-        moveCardToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKey);
+        moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKey);
         
         $eventDetails = $cardKey;
-        $response["events"][] = recordEvent($mysqli, $game, $eventType, $eventDetails, $role);
+        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails, $role);
 
         $response["nextStep"] = nextStep($mysqli, $game, $currentStep, $role);
     }

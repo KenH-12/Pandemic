@@ -39,7 +39,7 @@ Contingency Planner special ability
 			validation
 			execution
 	client-side
-		request the action
+		load contingency card on refresh
 		enable contingency event card to be played
 
 when government grant is prompted, the research station supply should glow.

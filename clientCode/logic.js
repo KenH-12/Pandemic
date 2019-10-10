@@ -1710,18 +1710,24 @@ function getContingencyOptionCardKeys()
 	return cardKeys;
 }
 
-async function planContingency(eventCardKey)
+async function planContingency(cardKey)
 {
 	disableActions();
 	resetActionPrompt();
 	
-	const $eventCard = $("#playerDiscard").find(`.playerCard[data-key='${eventCardKey}']`),
+	const $eventCard = $("#playerDiscard").find(`.playerCard[data-key='${cardKey}']`),
 		isContingencyCard = true,
 		targetProperties = getDrawnPlayerCardTargetProperties({ isContingencyCard });
 
-	await animateCardToHand($eventCard, targetProperties, { isContingencyCard });
+	await Promise.all([
+		requestAction(eventTypes.planContingency, { cardKey }),
+		animateCardToHand($eventCard, targetProperties, { isContingencyCard })
+	]);
 
-	getActivePlayer().contingencyKey = eventCardKey;
+	getActivePlayer().contingencyKey = cardKey;
+	$eventCard.addClass("contingency");
+
+	proceed();
 }
 
 function forecastInProgress()
