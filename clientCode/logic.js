@@ -7134,8 +7134,15 @@ function loadPlayerCards(playerCards)
 			player.cardKeys.push(card.key);
 			player.getPanel().append($card);
 		}
-		else
+		else if (card.pile === "discard")
 			$card.insertAfter($discardPileTitle);
+		else if (card.pile === "contingency")
+		{
+			$card.appendTo($("#contingencyPlanner").find(".role"))
+				.addClass("contingency");
+			
+			getPlayer("Contingency Planner").contingencyKey = card.key;
+		}
 	}
 	
 	bindPlayerCardEvents();

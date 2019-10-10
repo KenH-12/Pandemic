@@ -8,10 +8,10 @@
 		require "../connect.php";
 		
 		// get all player cards which are in a player's hand or the discard pile
-		$cards = $mysqli->query("SELECT pileID, cardKey as `key`
+		$cards = $mysqli->query("SELECT pileID, pile, cardKey as `key`
 								FROM vw_playerCard
 								WHERE game = $game
-								AND pile NOT IN ('deck', 'contingency', 'removed')
+								AND pile NOT IN ('deck', 'removed')
 								ORDER BY pileID, cardIndex");
 		
 		$response = array();
