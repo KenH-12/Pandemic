@@ -44,7 +44,7 @@
         
         $mysqli->autocommit(FALSE);
         
-        discardPlayerCards($mysqli, $game, $discardingRole, $CARD_KEY);
+        discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
         updateRoleLocation($mysqli, $game, $roleToAirlift, $originKey, $destinationKey);
 
         $details = "$roleToAirlift,$originKey,$destinationKey";

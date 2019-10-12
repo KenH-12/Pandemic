@@ -28,7 +28,7 @@
         
         $mysqli->autocommit(FALSE);
         
-        discardPlayerCards($mysqli, $game, $discardingRole, $CARD_KEY);
+        discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
         
         // No useful information to include here,
         // but eventDetails are usually critically important, so they are not nullable.

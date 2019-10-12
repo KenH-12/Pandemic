@@ -756,6 +756,19 @@ function getContingencyCardKey($mysqli, $game)
     return $result->fetch_assoc()["cardKey"];
 }
 
+function discardOrRemoveEventCard($mysqli, $game, $discardingRole, $cardKey)
+{
+    if ($cardKey && $cardKey === getContingencyCardKey($mysqli, $game))
+    {
+        $cardType = "player";
+        $currentPile = $discardingRole; // contingency
+        $newPile = "removed";
+        moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKey);
+    }
+    else
+        discardPlayerCards($mysqli, $game, $discardingRole, $cardKey);
+}
+
 function countEpidemicsDrawnOnTurn($mysqli, $game, $turnNum)
 {
     $CARD_DRAW_EVENT_CODE = "cd";

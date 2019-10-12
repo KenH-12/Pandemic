@@ -47,7 +47,7 @@
                 $discardingRole = getEventCardHolder($mysqli, $game, $cardKey);
                 $eventRole = $discardingRole;
 
-                discardPlayerCards($mysqli, $game, $discardingRole, $cardKey);
+                discardOrRemoveEventCard($mysqli, $game, $discardingRole, $cardKey);
 
                 $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $discardingRole, $role);
                 if ($proceedToNextStep)

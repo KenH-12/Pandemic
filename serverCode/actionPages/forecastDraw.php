@@ -29,7 +29,7 @@
         
         $mysqli->autocommit(FALSE);
         
-        discardPlayerCards($mysqli, $game, $discardingRole, $CARD_KEY);
+        discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
         
         $infectionCards = $mysqli->query("SELECT cardKey
                                         FROM vw_infectioncard
