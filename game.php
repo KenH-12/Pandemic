@@ -111,6 +111,9 @@
 						</div>
 						<div id='playerDiscard' class='bottomPanelDiv'>
 							<p class='title'>PLAYER DISCARDS</p>
+							<div id='removedPlayerCards' class='hidden'>
+								<p class='title'>REMOVED FROM GAME:</p>
+							</div>
 						</div>
 
 					</div>

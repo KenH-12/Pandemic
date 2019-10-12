@@ -7507,29 +7507,38 @@ function bindInfectionDiscardHover({ unbind } = {})
 }
 bindInfectionDiscardHover();
 
-$("#playerDiscard").hover(function()
+$("#playerDiscard").hover(
+	function() { expandPlayerDiscardPile($(this)) },
+	function() { collapsePlayerDiscardPile($(this)) }
+);
+
+function expandPlayerDiscardPile($discardPile)
 {
-	const $this = $(this),
+	const $removedCardsContainer = $discardPile.children("#removedPlayerCards"),
 		panelHeight = data.topPanelHeight,
 		maxHeight = data.boardHeight - panelHeight;
 	
-	$this.stop().css("height", "auto");
-	let expandedHeight = $this.height();
+	$discardPile.stop().css("height", "auto");
+
+	if ($removedCardsContainer.children(".playerCard").length)
+		$removedCardsContainer.removeClass("hidden");
+	
+	let expandedHeight = $discardPile.height();
 
 	if (expandedHeight < panelHeight)
 	{
-		$this.css("overflow-y", "hidden");
-		$this.css("height", panelHeight);
+		$discardPile.css("overflow-y", "hidden");
+		$discardPile.css("height", panelHeight);
 	}
 	else
 	{
 		if (expandedHeight > maxHeight)
 		{
-			$this.css("overflow-y", "scroll");
+			$discardPile.css("overflow-y", "scroll");
 			expandedHeight = maxHeight;
 		}
 		
-		$this.css(
+		$discardPile.css(
 			{
 				"height": panelHeight
 			})
@@ -7540,20 +7549,23 @@ $("#playerDiscard").hover(function()
 				},
 				getDuration("discardPileExpand"));
 	}
-		
-},
-function()
+}
+
+function collapsePlayerDiscardPile($discardPile)
 {
-	$(this).stop()
+	$discardPile.stop()
 		.css("overflow-y", "hidden")
 		.animate(
 		{
 			scrollTop: 0,
 			height: data.topPanelHeight,
 			top: data.boardHeight - data.topPanelHeight
-		},
-		getDuration("discardPileCollapse"));
-});
+		}, getDuration("discardPileCollapse"),
+		function()
+		{
+			$discardPile.children("#removedPlayerCards").addClass("hidden");
+		});
+}
 
 function bindDiseaseCubeEvents({ on } = { on: true })
 {

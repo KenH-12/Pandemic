@@ -179,16 +179,21 @@ span.r {color: #ef282a}
 	width: 14%;
 	left: 68%;
 }
+#playerDeck img
+{
+	width: 40%;
+	margin: 5px 30% 0 30%;
+}
 #playerDiscard
 {
 	width: 18%;
 	left: 82%;
 	z-index: 7;
 }
-#playerDeck img
+#removedPlayerCards
 {
-	width: 40%;
-	margin: 5px 30% 0 30%;
+	border-top: 1px solid #fff;
+	margin-top: 10px;
 }
 #topPanel
 {
