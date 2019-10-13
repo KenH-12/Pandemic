@@ -31,8 +31,6 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
-PLAN CONTINGENCY button sometimes not enabled after an event card is discarded
-
 TO DO
 -----
 when government grant is prompted, the research station supply should glow.

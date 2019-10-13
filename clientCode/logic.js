@@ -3811,6 +3811,11 @@ class Player
 
 	canPlanContingency()
 	{
+		log("canPlanContingency()");
+		log("role? ", this.role == "Contingency Planner");
+		log("contingency slot is open? ", !this.contingencyKey);
+		log("options available? ", getContingencyOptionCardKeys().length > 0);
+		
 		return this.role == "Contingency Planner"
 			&& !this.contingencyKey
 			&& getContingencyOptionCardKeys().length > 0;
@@ -6156,10 +6161,14 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 			completionInterval *= (1 - data.playerCardAnimationInterval);
 		}
 		else if ($card.length === 1)
+		{
 			animateDiscardPlayerCard($card);
 
+			// Increase completionInterval to ensure that the animation finishes completely before the Promise is resolved.
+			completionInterval += 50;
+		}
+
 		await sleep(completionInterval);
-		
 		resolve();
 	});
 }
