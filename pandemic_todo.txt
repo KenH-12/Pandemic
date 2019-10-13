@@ -31,15 +31,11 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
+PLAN CONTINGENCY button sometimes not enabled after an event card is discarded
+
 TO DO
 -----
-Contingency Planner special ability
-	server-side
-		play contingency event card
-			validation
-			execution
-	client-side
-		enable contingency event card to be played
+load removed playerCards
 
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated

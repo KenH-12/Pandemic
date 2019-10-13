@@ -1730,6 +1730,18 @@ async function planContingency(cardKey)
 	proceed();
 }
 
+function isContingencyCardKey(cardKey)
+{
+	const $contingencyCard = getContingencyCardElement();
+
+	return $contingencyCard.length && $contingencyCard.attr("data-key") === cardKey;
+}
+
+function getContingencyCardElement()
+{
+	return $("#contingencyPlanner").children(".role").children(`.playerCard.event.contingency`);
+}
+
 function forecastInProgress()
 {
 	const { forecast, forecastPlacement } = eventTypes,
@@ -1763,7 +1775,7 @@ async function forecastDraw(forecastEventToLoad)
 	
 	// If loading an unresolved forecast, the event card will already be in the discard pile.
 	if (!forecastEventToLoad)
-		await discardEventCard(forecastEvent);
+		await discardOrRemoveEventCard(forecastEvent);
 	
 	await animateForecastDraw(forecastEvent.cardKeys);
 	
@@ -1957,7 +1969,7 @@ async function oneQuietNight()
 
 	const events = await requestAction(eventTypes.oneQuietNight);
 	
-	await discardEventCard(events.shift());
+	await discardOrRemoveEventCard(events.shift());
 
 	if (isOneQuietNight())
 		indicateOneQuietNightStep();
@@ -2026,7 +2038,7 @@ async function resilientPopulation(cardKeyToRemove)
 	const eventType = eventTypes.resilientPopulation,
 		events = await requestAction(eventType, { cardKeyToRemove });
 
-	await discardEventCard(events.shift());
+	await discardOrRemoveEventCard(events.shift());
 	await resilientPopulationAnimation(cardKeyToRemove);
 
 	resizeInfectionDiscardElements();
@@ -2094,7 +2106,7 @@ async function airlift(playerToAirlift, destination)
 			destinationKey: destination.key
 		});
 	
-	await discardEventCard(events.shift());
+	await discardOrRemoveEventCard(events.shift());
 
 	playerToAirlift.updateLocation(destination);
 
@@ -2217,7 +2229,7 @@ async function governmentGrant(targetCity, relocationKey)
 			relocationKey: relocationKey || 0
 		});
 	
-	await discardEventCard(events.shift());
+	await discardOrRemoveEventCard(events.shift());
 
 	if (relocationKey)
 		getCity(relocationKey).relocateResearchStationTo(targetCity);
@@ -2259,18 +2271,39 @@ function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyTo
 	});
 }
 
-function discardEventCard(event)
+function discardOrRemoveEventCard(event)
 {
 	return new Promise(async resolve =>
 	{
 		const cardKey = getEventType(event.code).cardKey,
-			player = data.players[event.role],
 			$card = $("#playerPanelContainer").find(`.playerCard[data-key='${cardKey}']`);
 		
 		$card.removeClass("unavailable");
-	
-		await movePlayerCardsToDiscards({ $card });
-		player.removeCardsFromHand(cardKey);
+
+		if (isContingencyCardKey(cardKey))
+			await animateContingencyCardRemoval();
+		else
+		{
+			const player = data.players[event.role];
+			
+			await movePlayerCardsToDiscards({ $card });
+			player.removeCardsFromHand(cardKey);
+		}
+
+		resolve();
+	});
+}
+
+function animateContingencyCardRemoval()
+{
+	return new Promise(async resolve =>
+	{
+		const $card = getContingencyCardElement();
+
+		await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
+		await animateDiscardPlayerCard($card, { removingContingencyCard: true });
+		await sleep(getDuration("longInterval"));
+		await collapsePlayerDiscardPile();
 
 		resolve();
 	});
@@ -6118,20 +6151,22 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 	});
 }
 
-function animateDiscardPlayerCard($card)
+function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 {
-	const $container = $("#playerDiscard"),
-		initialOffset = $card.offset(),
-		initialWidth = $card.width(),
+	const $container = removingContingencyCard ? $("#removedPlayerCards") : $("#playerDiscard"),
 		$guide = $container.children(".title").first(),
-		guideOffset = $guide.offset();
-	
-	$card.css(
-		{
-			width: initialWidth,
+		guideOffset = $guide.offset(),
+		initialOffset = $card.offset(),
+		initialCardProperties = {
+			width: $card.width(),
 			position: "absolute",
 			zIndex: 10
-		})
+		};
+
+	if (removingContingencyCard)
+		initialCardProperties.border = "none";
+	
+	$card.css(initialCardProperties)
 		.offset(initialOffset)
 		.animate(
 			{
@@ -7508,63 +7543,98 @@ function bindInfectionDiscardHover({ unbind } = {})
 bindInfectionDiscardHover();
 
 $("#playerDiscard").hover(
-	function() { expandPlayerDiscardPile($(this)) },
-	function() { collapsePlayerDiscardPile($(this)) }
+	function() { expandPlayerDiscardPile() },
+	function() { collapsePlayerDiscardPile() }
 );
 
-function expandPlayerDiscardPile($discardPile)
+function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 {
-	const $removedCardsContainer = $discardPile.children("#removedPlayerCards"),
-		panelHeight = data.topPanelHeight,
-		maxHeight = data.boardHeight - panelHeight;
-	
-	$discardPile.stop().css("height", "auto");
-
-	if ($removedCardsContainer.children(".playerCard").length)
-		$removedCardsContainer.removeClass("hidden");
-	
-	let expandedHeight = $discardPile.height();
-
-	if (expandedHeight < panelHeight)
+	return new Promise(resolve =>
 	{
-		$discardPile.css("overflow-y", "hidden");
-		$discardPile.css("height", panelHeight);
-	}
-	else
-	{
-		if (expandedHeight > maxHeight)
-		{
-			$discardPile.css("overflow-y", "scroll");
-			expandedHeight = maxHeight;
-		}
+		const $discardPile = $("#playerDiscard"),
+			$removedCardsContainer = $discardPile.children("#removedPlayerCards"),
+			panelHeight = data.topPanelHeight,
+			maxHeight = data.boardHeight - panelHeight;
 		
-		$discardPile.css(
+		$discardPile.stop().css("height", "auto");
+
+		let expandedPileHeight = $discardPile.height();
+		
+		if (showRemovedCardsContainer || $removedCardsContainer.children(".playerCard").length)
+			resizeRemovedPlayerCardsContainer($removedCardsContainer, panelHeight, expandedPileHeight);
+		
+		expandedPileHeight = $discardPile.height();
+
+		if (expandedPileHeight < panelHeight)
+		{
+			if (!showRemovedCardsContainer)
 			{
-				"height": panelHeight
-			})
-			.animate(
+				$discardPile.css("overflow-y", "hidden");
+				$discardPile.css("height", panelHeight);
+			}
+			
+			resolve();
+		}
+		else
+		{
+			if (expandedPileHeight > maxHeight)
+			{
+				$discardPile.css("overflow-y", "scroll");
+				expandedPileHeight = maxHeight;
+			}
+			
+			$discardPile.css(
 				{
-					height: expandedHeight,
-					top: data.boardHeight - expandedHeight
+					"height": panelHeight
+				})
+				.animate(
+				{
+					height: expandedPileHeight,
+					top: data.boardHeight - expandedPileHeight
 				},
-				getDuration("discardPileExpand"));
-	}
+				getDuration("discardPileExpand"),
+				function() { resolve() });
+		}
+	});
 }
 
-function collapsePlayerDiscardPile($discardPile)
+function resizeRemovedPlayerCardsContainer($removedCardsContainer, panelHeight, expandedPileHeight)
 {
-	$discardPile.stop()
-		.css("overflow-y", "hidden")
-		.animate(
-		{
-			scrollTop: 0,
-			height: data.topPanelHeight,
-			top: data.boardHeight - data.topPanelHeight
-		}, getDuration("discardPileCollapse"),
-		function()
-		{
-			$discardPile.children("#removedPlayerCards").addClass("hidden");
-		});
+	const rccHeight = $removedCardsContainer.removeClass("hidden").height(),
+		rccExpandedProps = {};
+
+	if (expandedPileHeight < panelHeight)
+		rccExpandedProps.marginTop = panelHeight - expandedPileHeight;
+
+	if (rccHeight < panelHeight)
+		rccExpandedProps.height = panelHeight + 1;
+	
+	$removedCardsContainer.css(rccExpandedProps);
+}
+
+function collapsePlayerDiscardPile()
+{
+	return new Promise(resolve =>
+	{
+		const $discardPile = $("#playerDiscard");
+		
+		$discardPile.stop()
+			.css("overflow-y", "hidden")
+			.animate(
+			{
+				scrollTop: 0,
+				height: data.topPanelHeight,
+				top: data.boardHeight - data.topPanelHeight
+			}, getDuration("discardPileCollapse"),
+			function()
+			{
+				$discardPile.children("#removedPlayerCards")
+					.removeAttr("style")
+					.addClass("hidden");
+				
+				resolve();
+			});
+	});
 }
 
 function bindDiseaseCubeEvents({ on } = { on: true })
