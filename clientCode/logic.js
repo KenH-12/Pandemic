@@ -1132,18 +1132,25 @@ const actionInterfacePopulator = {
 	},
 	appendDiscardPrompt({ cardKeys, promptMsg, onConfirm })
 	{
-		log(`appendDiscardPrompt()`);
-		log("cardKeys: ", cardKeys);
 		const $discardPrompt = $(`<div class='discardSelections'></div>`),
-			buttonClass = "btnConfirmAction";
+			buttonClass = "btnConfirmAction",
+			isContingencyCard = typeof cardKeys === "string" && isContingencyCardKey(cardKeys);
+
+		let buttonText = false;
 		
+		if (isContingencyCard)
+		{
+			promptMsg = getPlayer("Contingency Planner").newSpecialAbilityTag();
+			buttonText = "PLAY AND REMOVE";
+		}
+
 		if (promptMsg)
 			$discardPrompt.append(`<p>${promptMsg}</p>`);
 
 		for (let key of ensureIsArray(cardKeys))
 			$discardPrompt.append(newPlayerCardElement(key));
 
-		$discardPrompt.append(`<div class='button ${buttonClass}'>DISCARD</div>`);
+		$discardPrompt.append(`<div class='button ${buttonClass}'>${buttonText || "DISCARD"}</div>`);
 
 		if (typeof onConfirm === "function")
 			$discardPrompt.children(`.${buttonClass}`).click(function()
@@ -1593,7 +1600,8 @@ const actionInterfacePopulator = {
 					resetActionPrompt();
 					data.promptingEventType = false;
 					airlift(playerToAirlift, destination);
-				}
+				},
+				
 			});
 		}
 
@@ -3950,6 +3958,11 @@ the same disease color to Discover a Cure for that disease.`;
 		description = `The Operations Expert may, as an action, either:
 - build a research station in his current city without discarding a city card, or
 - once per turn, move from a research station to any city by discarding a city card.`;
+	}
+	else if (role === "Contingency Planner")
+	{
+		description = `When the ${role} plays the Event card on his role card,
+remove this Event card from the game (instead of discarding it).`;
 	}
 
 	return description;
