@@ -1702,7 +1702,7 @@ const actionInterfacePopulator = {
 function getContingencyOptionCardKeys()
 {
 	const cardKeys = [];
-	$("#playerDiscard").find(".playerCard.event").each(function()
+	$("#playerDiscard").children(".playerCard.event").each(function()
 	{
 		cardKeys.push($(this).data("key"));
 	});
@@ -2298,7 +2298,7 @@ function animateContingencyCardRemoval()
 {
 	return new Promise(async resolve =>
 	{
-		const $card = getContingencyCardElement();
+		const $card = getContingencyCardElement().removeClass("contingency").addClass("removed");
 
 		await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
 		await animateDiscardPlayerCard($card, { removingContingencyCard: true });
