@@ -24,7 +24,8 @@ try
 
 	// One Quiet Night event card: "Skip the next Infect Cities step (do not flip over any Infection cards)."
 	// If the event card was played this turn and Infect Cities is attempted, something went wrong.
-	throwExceptionIfOneQuietNight($mysqli, $game, $turnNum);
+	if (oneQuietNightScheduledThisTurn($mysqli, $game))
+		throw new Exception("Infect Cities step not skipped for One Quiet Night.");
 
 	// Get the infection rate (the number of cities to infect),
 	// and confirm the current step.

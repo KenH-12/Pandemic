@@ -22,6 +22,9 @@
         $EVENT_CODE = "oq";
         $CARD_KEY = "oneq";
 
+        if (oneQuietNightScheduledThisTurn($mysqli, $game))
+            throw new Exception("One Quiet Night cannot be played more than once in a single turn.");
+        
         checkEventCardLegality($mysqli, $game, $CARD_KEY);
         
         $discardingRole = getEventCardHolder($mysqli, $game, $CARD_KEY);
@@ -33,7 +36,6 @@
         // No useful information to include here,
         // but eventDetails are usually critically important, so they are not nullable.
         $eventDetails = "";
-
         
         $turnNum = getTurnNumber($mysqli, $game);
         // If the "infect cities" step is already in progress,

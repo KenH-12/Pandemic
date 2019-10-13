@@ -1675,6 +1675,8 @@ const actionInterfacePopulator = {
 		// take effect until the next turn -- the player can simply wait until the "infect cities" step is over.
 		if (currentStepIs("infect cities") && getEventsOfTurn(eventTypes.infectCity).length)
 			actionInterfacePopulator.replaceSubtitle(`<span class='r'>This card skips the <i>next</i> Infect Cities step. Please wait until the the current Infect Cities step has completed.</span>`);
+		else if (isOneQuietNight())
+			actionInterfacePopulator.replaceSubtitle(`<span class='r'>One Quiet Night has already been played this turn! It cannot be played twice in the same turn.</span>`)
 		else
 		{
 			actionInterfacePopulator.appendDiscardPrompt(
@@ -3814,7 +3816,7 @@ class Player
 		log("canPlanContingency()");
 		log("role? ", this.role == "Contingency Planner");
 		log("contingency slot is open? ", !this.contingencyKey);
-		log("options available? ", getContingencyOptionCardKeys().length > 0);
+		log("options available? ", getContingencyOptionCardKeys());
 		
 		return this.role == "Contingency Planner"
 			&& !this.contingencyKey

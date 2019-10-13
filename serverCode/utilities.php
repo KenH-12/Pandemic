@@ -806,38 +806,42 @@ function countEpidemicsResolvedOnTurn($mysqli, $game, $turnNum)
 }
 
 // Throws an Exception if playing the specified $eventCardKey is illegal in the current game state.
+// "Event cards can be played at any time, except in between drawing and resolving a card."
+// Therefore, event cards cannot be played during the "draw" step or while resolving an epidemic.
+// EXCEPT:
+// 1. "When 2 Epidemic cards are drawn together, events can be played after resolving the first epidemic."
+// 2. From the Resilient Population event card text: "You may play this between the Infect and Intensify steps of an epidemic."
 function checkEventCardLegality($mysqli, $game, $eventCardKey)
 {   
     $currentStep = $mysqli->query("SELECT stepName
                                     FROM vw_gamestate
                                     WHERE game = $game")->fetch_assoc()["stepName"];
-    
-    // "Event cards can be played at any time, except in between drawing and resolving a card."
-    // Therefore, event cards cannot be played during the "draw" step or while resolving an epidemic.
-    // EXCEPTIONS:
-    // 1. "When 2 Epidemic cards are drawn together, events can be played after resolving the first epidemic."
-    // 2. From the Resilient Population event card text: "You may play this between the Infect and Intensify steps of an epidemic."
 
-    $cardsWereDrawn = false;
-    if ($currentStep === "draw")
-    {
-        $turnNum = getTurnNumber($mysqli, $game);
-        $cardsWereDrawn = $mysqli->query("SELECT COUNT(*) AS 'cardDrawEvent'
-                                        FROM vw_event
-                                        WHERE game = $game
-                                        AND turnNum = $turnNum
-                                        AND eventType = 'cd'")->fetch_assoc()["cardDrawEvent"] == 1;
-    }
+    $RESILIENT_POPULATION_KEY = "resi";
 
-    if ($cardsWereDrawn
+    if ($currentStep === "draw" && playerCardsWereDrawnThisTurn($mysqli, $game)
         || ($currentStep === "epIncrease" && countEpidemicsResolvedOnTurn($mysqli, $game, $turnNum) !== 1) // 1.
         || $currentStep === "epInfect"
-        || ($currentStep === "epIntensify" && $eventCardKey !== "resi")) // 2.
+        || ($currentStep === "epIntensify" && $eventCardKey !== $RESILIENT_POPULATION_KEY)) // 2.
         throw new Exception("Event cards cannot be played between drawing and resolving a card.");
-    
-    // Additionally, event cards cannot be played mid-forecast (the drawn infection cards are considered unresolved)..
+
+    // Additionally, event cards cannot be played mid-forecast (the drawn infection cards are considered unresolved).
     if (forecastIsInProgress($mysqli, $game))
         throw new Exception("The Forecast must be resolved before another action can be performed.");
+}
+
+function playerCardsWereDrawnThisTurn($mysqli, $game)
+{
+    $EVENT_CODE = "cd";
+    $turnNum = getTurnNumber($mysqli, $game);
+
+    $cardsWereDrawn = $mysqli->query("SELECT COUNT(*) AS 'cardDrawEvent'
+                                    FROM vw_event
+                                    WHERE game = $game
+                                    AND turnNum = $turnNum
+                                    AND eventType = '$EVENT_CODE")->fetch_assoc()["cardDrawEvent"] == 1;
+    
+    return $cardsWereDrawn;
 }
 
 // A Forecast event manifests in the db as a pair of events: the draw, and the placement.
@@ -856,9 +860,10 @@ function forecastIsInProgress($mysqli, $game)
     return $numForecastEvents > 0 && $numForecastEvents % 2 !== 0;
 }
 
-function throwExceptionIfOneQuietNight($mysqli, $game, $turnNum)
+function oneQuietNightScheduledThisTurn($mysqli, $game)
 {
     $EVENT_CODE = "oq";
+    $turnNum = getTurnNumber($mysqli, $game);
 
     $isOneQuietNight = $mysqli->query("SELECT COUNT(*) AS 'numEvents'
                                         FROM vw_event
@@ -866,7 +871,6 @@ function throwExceptionIfOneQuietNight($mysqli, $game, $turnNum)
                                         AND turnNum = $turnNum
                                         AND eventType = '$EVENT_CODE'")->fetch_assoc()["numEvents"];
     
-    if ($isOneQuietNight)
-        throw new Exception("Infect Cities step not skipped for One Quiet Night.");
+    return $isOneQuietNight;
 }
 ?>
