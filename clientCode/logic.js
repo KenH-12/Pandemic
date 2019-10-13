@@ -2286,16 +2286,18 @@ function discardOrRemoveEventCard(event)
 	return new Promise(async resolve =>
 	{
 		const cardKey = getEventType(event.code).cardKey,
-			$card = $("#playerPanelContainer").find(`.playerCard[data-key='${cardKey}']`);
+			$card = $("#playerPanelContainer").find(`.playerCard[data-key='${cardKey}']`),
+			player = data.players[event.role];
 		
 		$card.removeClass("unavailable");
 
 		if (isContingencyCardKey(cardKey))
+		{
 			await animateContingencyCardRemoval();
+			player.contingencyKey = false;
+		}
 		else
 		{
-			const player = data.players[event.role];
-			
 			await movePlayerCardsToDiscards({ $card });
 			player.removeCardsFromHand(cardKey);
 		}
@@ -3813,11 +3815,6 @@ class Player
 
 	canPlanContingency()
 	{
-		log("canPlanContingency()");
-		log("role? ", this.role == "Contingency Planner");
-		log("contingency slot is open? ", !this.contingencyKey);
-		log("options available? ", getContingencyOptionCardKeys());
-		
 		return this.role == "Contingency Planner"
 			&& !this.contingencyKey
 			&& getContingencyOptionCardKeys().length > 0;
