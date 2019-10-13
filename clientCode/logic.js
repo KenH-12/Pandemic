@@ -7155,7 +7155,10 @@ function getCureMarkerDesiredProperties(diseaseColor)
 function loadPlayerCards(playerCards)
 {
 	log("loadPlayerCards()");
-	const $discardPileTitle = $("#playerDiscard .title").first();
+	const $discardsContainer = $("#playerDiscard"),
+		$discardPileTitle =  $discardsContainer.children(".title").first(),
+		$removedCardsTitle = $discardsContainer.children("#removedPlayerCards").children(".title").first();
+	
 	let player,
 		$card;
 
@@ -7171,6 +7174,8 @@ function loadPlayerCards(playerCards)
 		}
 		else if (card.pile === "discard")
 			$card.insertAfter($discardPileTitle);
+		else if (card.pile === "removed")
+			$card.insertAfter($removedCardsTitle);
 		else if (card.pile === "contingency")
 		{
 			$card.appendTo($("#contingencyPlanner").find(".role"))

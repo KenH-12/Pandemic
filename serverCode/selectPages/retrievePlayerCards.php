@@ -11,7 +11,7 @@
 		$cards = $mysqli->query("SELECT pileID, pile, cardKey as `key`
 								FROM vw_playerCard
 								WHERE game = $game
-								AND pile NOT IN ('deck', 'removed')
+								AND pile NOT IN ('deck')
 								ORDER BY pileID, cardIndex");
 		
 		$response = array();

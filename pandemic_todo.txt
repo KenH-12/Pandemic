@@ -35,7 +35,7 @@ PLAN CONTINGENCY button sometimes not enabled after an event card is discarded
 
 TO DO
 -----
-load removed playerCards
+specify in the event card prompt that the contingency card will be removed from the game
 
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated
