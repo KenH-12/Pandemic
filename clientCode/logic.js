@@ -3927,13 +3927,15 @@ class Player
 	}
 }
 
-function getPlayer(role)
+// Given the name of a role, returns the corresponding Player object.
+// Also accepts the camelcase form of the role name.
+function getPlayer(roleName)
 {
 	let player;
 	for (let rID in data.players)
 	{
 		player = data.players[rID];
-		if (player.role === role)
+		if (player.role === roleName || player.camelCaseRole === roleName)
 			return player;
 	}
 

@@ -33,6 +33,14 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+style role cards
+	hovering over a .role div should display the role card
+
+put the role card image next to the player's name/role
+	in the player panel
+	in the step indicator or whatever that thing is called
+		rename the thing
+
 show the process of deciding who goes first
 playerpanels should be arranged in turn order
 the playerpanels should be collapsible (can't see chicago)
@@ -62,11 +70,6 @@ make sure that all cubes of a cured disease show the "X"
 fix the cube mouseover event while animating treatdisease
 
 instead of tooltips for special ability descriptions, display the role card
-
-put the role card image next to the player's name/role
-	in the player panel
-	in the step indicator or whatever that thing is called
-		rename the fucking thing
 
 handle errors
 	retrieveEventHistory
