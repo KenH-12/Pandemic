@@ -33,44 +33,40 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+show the process of deciding who goes first
+playerpanels should be arranged in turn order
+the playerpanels should be collapsible (can't see chicago)
+
+standardize prompt appearance / button behaviour
+
+highlight the active pawn in some way
+
+clicking on a player's role in the player panel should pinpoint their pawn's location
+clicking on an infection card in the discard pile should pinpoint the city
+
+add tooltip for "eradicated" in discover cure and treat disease prompts
+
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated
 
 compare client and server side hand sizes after drawing?
 
-show outbreak symbol on outbreaking city
+make sure the medic's treat disease description specifies that all cubes are removed
+make sure treat disease specified that all cubes of a cured disease will be removed
 
-put the role card image next to the player's name/role
-	in the player panel
-	in the step indicator or whatever the fuck that thing is called
-		rename the fucking thing
+rename the step indicator or whatever it's called
 
+use shapes for disease cubes
 fix the treat disease mouseover "X"
 make sure that all cubes of a cured disease show the "X"
 fix the cube mouseover event while animating treatdisease
 
-standardize prompt appearance / button behaviour
-
-show the process of deciding who goes first
-playerpanels should be arranged in turn order
-the playerpanels should be collapsible (can't see chicago)
-
-clicking on a player's role in the player panel should pinpoint their pawn's location
-clicking on an infection card in the discard pile should pinpoint the city
-
-other actions
-
-special abilities
-
-for multiplayer games, require permission for certain actions
-	share knowledge
-	dispatch pawn
-	airlift
-
 instead of tooltips for special ability descriptions, display the role card
 
-make sure the medic's treat disease description specifies that all cubes are removed
-make sure treat disease specified that all cubes of a cured disease will be removed
+put the role card image next to the player's name/role
+	in the player panel
+	in the step indicator or whatever that thing is called
+		rename the fucking thing
 
 handle errors
 	retrieveEventHistory
@@ -79,9 +75,10 @@ add tests
 
 make sure things look ok for different screen sizes
 
-highlight the active pawn in some way
-
-add tooltip for "eradicated" in discover cure and treat disease prompts
+for multiplayer games, require permission for certain actions
+	share knowledge
+	dispatch pawn
+	airlift
 
 TO TEST
 -------
@@ -149,6 +146,8 @@ make animation effects juicier
 
 SMALL FIXES
 -----------
+show outbreak symbol on outbreaking city
+
 One Quiet Night should notify success in a more visible way
 
 Resilient Population animation looks a little funny when very few cards (3ish or fewer) are in the discard pile
