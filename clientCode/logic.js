@@ -3526,9 +3526,25 @@ function getDimension(dimension,
 	return Math.round(base * factor);
 }
 
+function bindRoleCardHoverEvents()
+{
+	$(".playerPanel").children(".role").hover(function()
+	{
+		log("hovered");
+		const player = getPlayer($(this).parent().attr("id"));
+		
+		if (player)
+			player.showRoleCard();
+	},
+	function()
+	{
+		$(".roleCard").remove();
+	});
+}
+
 class Player
 {
-	constructor({ uID, pID, rID, nextTurnID, name, role, cityKey })
+	constructor({ uID, pID, rID, nextTurnID, name, role, roleCardText, cityKey })
 	{
 		this.uID = uID;
 		this.pID = pID;
@@ -3537,10 +3553,31 @@ class Player
 		this.name = name;
 		this.role = role;
 		this.camelCaseRole = toCamelCase(this.role);
+		this.roleCardBullets = roleCardText.split("&");
 
 		this.cityKey = cityKey;
 		
 		this.cardKeys = [];
+	}
+
+	showRoleCard()
+	{
+		log(this.roleCardText);
+		const $panel = this.getPanel(),
+			roleCardOffset = $panel.offset(),
+			CARD_MARGIN = 5,
+			$roleCard = $(`<div class='roleCard ${this.camelCaseRole}'>
+							<h3>${this.role}</h3>
+							<img src='images/cards/roles/${this.camelCaseRole}.jpg' alt='${this.role} Role Card' />
+						</div>`);
+		
+		for (let bullet of this.roleCardBullets)
+			$roleCard.append(`<li>${bullet}</li>`);
+
+		roleCardOffset.top += CARD_MARGIN;
+		roleCardOffset.left += $panel.width() + CARD_MARGIN;
+
+		$roleCard.appendTo("#boardContainer").offset(roleCardOffset);
 	}
 
 	newRoleTag()
@@ -4014,6 +4051,7 @@ function instantiatePlayers(playerInfoArray)
 	}
 	
 	setPlayerPanelWidth();
+	bindRoleCardHoverEvents();
 	bindPawnEvents();
 }
 

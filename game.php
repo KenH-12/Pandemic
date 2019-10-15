@@ -15,7 +15,7 @@
 				<!-- saved from url=(0014)about:internet -->
 				<title>Pandemic</title>
 				<meta name='viewport' content='width=device-width, initial-scale=1'>
-				<link href='https://fonts.googleapis.com/css?family=Electrolize|Oswald:400,700|B612+Mono' rel='stylesheet'>
+				<link href='https://fonts.googleapis.com/css?family=Electrolize|Oswald:400,700|B612+Mono|Ropa+Sans&display=swap' rel='stylesheet'>
 				<link rel='stylesheet' type='text/css' href='style.css'>
 				<script src='clientCode/jquery-1.11.2.min.js'></script>
 				<script src='clientCode/jquery-ui.min.js'></script>

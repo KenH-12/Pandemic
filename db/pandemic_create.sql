@@ -95,6 +95,7 @@ CREATE TABLE ROLE
 (
 	roleID		TINYINT AUTO_INCREMENT,
     roleName	VARCHAR(21) NOT NULL,
+    cardText	VARCHAR(300) NOT NULL,
 
     CONSTRAINT pk_role_roleID PRIMARY KEY(roleID)
 );
@@ -208,6 +209,7 @@ SELECT	gameID AS game,
         player.roleID AS rID,
 		username AS `name`,
 		roleName AS role,
+        cardText AS roleCardText,
         nextRoleID AS nextID,
         cityKey AS location
 FROM player
