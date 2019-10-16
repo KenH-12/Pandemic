@@ -1598,7 +1598,6 @@ const actionInterfacePopulator = {
 	{
 		if (!destination)
 		{
-			clusterAll({ pawns: true });
 			data.promptingEventType = eventTypes.airlift;
 			enablePawnEvents();
 		}
@@ -2115,8 +2114,6 @@ function tryAirlift(playerToAirlift)
 		getCity(playerToAirlift.cityKey).cluster({ animatePawns: true });
 		return false;
 	}
-
-	clusterAll({ pawns: true, playerToExcludePawn: playerToAirlift });
 
 	promptAction({ eventType: airlift, playerToAirlift, destination });
 }
@@ -4164,10 +4161,14 @@ function bindPawnEvents()
 				{
 					$(window).off("mouseup");
 					
+					const playerWhosePawnWasDropped = getPlayer(pawnRole);
+
+					clusterAll({ pawns: true, playerToExcludePawn: playerWhosePawnWasDropped });
+					
 					if (fn === movementAction)
 						fn();
 					else
-						fn(getPlayer(pawnRole));
+						fn(playerWhosePawnWasDropped);
 				});
 
 			// The dragged pawn appear in front of other pawns and disease cubes.

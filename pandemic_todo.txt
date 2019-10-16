@@ -33,9 +33,6 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-make sure all cities containing pawns are clustered when a dispatch event is prompted
-	exclude the pawnToDispatch
-
 show the process of deciding who goes first
 playerpanels should be arranged in turn order
 the playerpanels should be collapsible (can't see chicago)
