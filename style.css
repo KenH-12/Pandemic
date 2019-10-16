@@ -888,18 +888,6 @@ span.r {color: #ef282a}
 	padding: 1px 3px;
 	border-radius: 3px;
 }
-.hoverInfo
-{
-	font-family: sans-serif;
-	font-weight: 700;
-	border-bottom: 1px dashed #67acc8;
-}
-sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px }
-.contingencyPlanner .hoverInfo
-{
-	border-bottom: 1px dashed #054583;
-}
-
 #specialEventBanner
 {
 	position: absolute;
