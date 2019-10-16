@@ -597,29 +597,21 @@ span.r {color: #ef282a}
 }
 .scientist
 {
-	background-color: #f6f6f7;
+	background-image: linear-gradient(to bottom, #f6f6f7, #9ccdd1);
 	color: #000;
 }
 .roleCard.scientist { background-image: linear-gradient(to top, #f6f6f7, #9ccdd1) }
-.researcher
-{
-	background-color: #574319;
-}
+
+.researcher { background-image: linear-gradient(to bottom, #966c4b, #2a2017) }
 .roleCard.researcher { background-image: linear-gradient(to bottom, #966c4b, #2a2017) }
-.quarantineSpecialist
-{
-	background-color: #006951;
-}
+
+.quarantineSpecialist { background-image: linear-gradient(to bottom, #398044, #043d0a) }
 .roleCard.quarantineSpecialist { background-image: linear-gradient(to bottom, #398044, #043d0a) }
-.operationsExpert, #btnOperationsFlight
-{
-	background-color: #8dc73f;
-}
+
+.operationsExpert, #btnOperationsFlight { background-image: linear-gradient(to bottom, #aad37a, #407f48) }
 .roleCard.operationsExpert { background-image: linear-gradient(to bottom, #aad37a, #407f48) }
-.medic, .autoTreatCircle
-{
-	background-color: #f68426;
-}
+
+.medic, .autoTreatCircle { background-image: linear-gradient(to bottom, #ffb55c, #c56023) }
 .roleCard.medic { background-image: linear-gradient(to bottom, #ffb55c, #c56023) }
 .autoTreatCircle
 {
@@ -628,15 +620,11 @@ span.r {color: #ef282a}
 	opacity: 0;
 	z-index: 1;
 }
-.dispatcher, #btnDispatchPawn
-{
-	background-color: #ec84b5;
-}
+
+.dispatcher, #btnDispatchPawn { background-image: linear-gradient(to bottom, #ec84b5, #964967) }
 .roleCard.dispatcher { background-image: linear-gradient(to bottom, #ec84b5, #964967) }
-.contingencyPlanner, #btnPlanContingency
-{
-	background-color: #67c8c6;
-}
+
+.contingencyPlanner, #btnPlanContingency { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
 .roleCard.contingencyPlanner { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
 .role.contingencyPlanner > .playerCard
 {
@@ -662,25 +650,12 @@ span.r {color: #ef282a}
 	font-size: 18px;
 	text-align: center;
 }
-.rolePortrait/* , .pawnContainer */
+.rolePortrait
 {
 	display: block;
 	width: 100%;
 	border-bottom: 2px solid #fff;
 }
-/* .roleCard .rolePortrait
-{
-	margin-bottom: 0;
-}
-.roleCard .pawnContainer
-{
-	background-color: #000;
-}
-.roleCard .pawn
-{
-	width: 24%;
-	margin: 5px 38% 0 38%;
-} */
 .roleCard ul
 {
 	list-style: inside;
@@ -888,6 +863,7 @@ span.r {color: #ef282a}
 	padding: 1px 3px;
 	border-radius: 3px;
 }
+<<<<<<< HEAD
 .hoverInfo
 {
 	font-family: sans-serif;
@@ -895,6 +871,8 @@ span.r {color: #ef282a}
 	border-bottom: 1px dashed #67acc8;
 }
 sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px }
+=======
+>>>>>>> ad8cbdf584134fdf2c04cdac0dcf08a49b74c75c
 #specialEventBanner
 {
 	position: absolute;
