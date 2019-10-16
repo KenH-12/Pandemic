@@ -33,13 +33,8 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-style role cards
-	hovering over a .role div should display the role card
-
-put the role card image next to the player's name/role
-	in the player panel
-	in the step indicator or whatever that thing is called
-		rename the thing
+make sure all cities containing pawns are clustered when a dispatch event is prompted
+	exclude the pawnToDispatch
 
 show the process of deciding who goes first
 playerpanels should be arranged in turn order

@@ -895,11 +895,6 @@ span.r {color: #ef282a}
 	border-bottom: 1px dashed #67acc8;
 }
 sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px }
-.contingencyPlanner .hoverInfo
-{
-	border-bottom: 1px dashed #054583;
-}
-
 #specialEventBanner
 {
 	position: absolute;

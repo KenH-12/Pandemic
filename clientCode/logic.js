@@ -505,6 +505,7 @@ class Step
 			.next() // step indicator
 			.html(this.description);
 
+		bindRoleCardHoverEvents();
 		unhide($container);
 
 		highlightTurnProcedureStep(this.name);
@@ -1145,7 +1146,12 @@ const actionInterfacePopulator = {
 		}
 
 		if (promptMsg)
+		{
 			$discardPrompt.append(`<p>${promptMsg}</p>`);
+
+			if (isContingencyCard)
+				bindRoleCardHoverEvents();
+		}
 
 		for (let key of ensureIsArray(cardKeys))
 			$discardPrompt.append(newPlayerCardElement(key));
@@ -1305,6 +1311,7 @@ const actionInterfacePopulator = {
 					<br />(city card not required)`;
 			}
 			actionInterfacePopulator.replaceSubtitle(newSubtitle);
+			bindRoleCardHoverEvents();
 			
 			const $btnConfirm = $("<div class='button'>CONFIRM</div>");
 			$btnConfirm.click(function() { buildResearchStation(stationRelocationKey) });
@@ -1387,6 +1394,7 @@ const actionInterfacePopulator = {
 				});
 
 				$actionInterface.append($shareKnowledgePlayerOptions);
+				bindRoleCardHoverEvents();
 			}
 		}
 		
@@ -1446,6 +1454,8 @@ const actionInterfacePopulator = {
 				$cardOptions.off("click");
 				shareKnowledge(player, participant, $(this).data("key"));
 			});
+
+			bindRoleCardHoverEvents();
 		}
 		return true;
 	},
@@ -1465,8 +1475,12 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.$actionInterface.append($cardSelectionPrompt);
 
 		if (player.role === "Scientist")
+		{
 			actionInterfacePopulator.replaceSubtitle(`${player.newSpecialAbilityTag()}<br />
 				You need only 4 cards of the same color to do this action.`);
+
+			bindRoleCardHoverEvents();
+		}
 
 		return true;
 	},
@@ -1562,6 +1576,7 @@ const actionInterfacePopulator = {
 			}
 
 			actionInterfacePopulator.replaceSubtitle(newSubtitle);
+			bindRoleCardHoverEvents();
 		}
 
 		return true;
@@ -1603,6 +1618,8 @@ const actionInterfacePopulator = {
 				},
 				
 			});
+
+			bindRoleCardHoverEvents();
 		}
 
 		return true;
@@ -3528,18 +3545,37 @@ function getDimension(dimension,
 
 function bindRoleCardHoverEvents()
 {
-	$(".playerPanel").children(".role").hover(function()
-	{
-		log("hovered");
-		const player = getPlayer($(this).parent().attr("id"));
-		
-		if (player)
-			player.showRoleCard();
-	},
-	function()
-	{
-		$(".roleCard").remove();
-	});
+	$(".playerPanel").children(".role")
+		.add("#roleIndicator")
+		.add(".roleTag")
+		.add(".specialAbilityTag")
+		.off("mouseenter mouseleave")
+		.hover(function()
+		{
+			const $this = $(this);
+				
+			let player,
+				$hoveredElement = false;
+			
+			if ($this.hasClass("role"))
+				player = getPlayer($this.parent().attr("id"));
+			else 
+			{
+				$hoveredElement = $this;
+
+				if ($this.hasClass("roleTag") || $this.hasClass("specialAbilityTag"))
+					player = data.players[$this.attr("data-role")];
+				else
+					player = getActivePlayer();
+			}
+			
+			if (player)
+				player.showRoleCard($hoveredElement);
+		},
+		function()
+		{
+			$(".roleCard").remove();
+		});
 }
 
 class Player
@@ -3560,11 +3596,10 @@ class Player
 		this.cardKeys = [];
 	}
 
-	showRoleCard()
+	showRoleCard($hoveredElement)
 	{
-		log(this.roleCardText);
 		const $panel = this.getPanel(),
-			roleCardOffset = $panel.offset(),
+			roleCardOffset = $hoveredElement.length ? $hoveredElement.offset() : $panel.offset(),
 			CARD_MARGIN = 5,
 			$roleCard = $(`<div class='roleCard ${this.camelCaseRole}'>
 							<h3>${this.role}</h3>
@@ -3578,14 +3613,17 @@ class Player
 		for (let bullet of this.roleCardBullets)
 			$specialAbilities.append(`<li><span>${bullet}</span></li>`);
 
-		roleCardOffset.top += CARD_MARGIN;
-		roleCardOffset.left += $panel.width() + CARD_MARGIN;
-
-		$roleCard.appendTo("#boardContainer").offset(roleCardOffset);
-
-			/* <div class='pawnContainer'>
-			<img class='pawn' src='images/pieces/pawns/${this.camelCaseRole}.png' alt='${this.role} Pawn' />
-		</div> */
+		$roleCard.appendTo("#boardContainer");
+		
+		if ($hoveredElement.length)
+			roleCardOffset.left = data.boardWidth - ($roleCard.width() + CARD_MARGIN);
+		else
+		{
+			roleCardOffset.top += CARD_MARGIN;
+			roleCardOffset.left += $panel.width() + CARD_MARGIN;
+		}
+		
+		$roleCard.offset(roleCardOffset);
 	}
 
 	newRoleTag()
@@ -3600,7 +3638,8 @@ class Player
 
 	newSpecialAbilityTag()
 	{
-		return `<p class='${this.camelCaseRole} specialAbilityTag hoverInfo' title='${this.getSpecialAbilityDescription()}'>
+		return `<p	class='${this.camelCaseRole} specialAbilityTag hoverInfo'
+					data-role='${this.rID}'>
 					— Special Ability —
 				</p>`;
 	}
