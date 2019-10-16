@@ -888,6 +888,7 @@ span.r {color: #ef282a}
 	padding: 1px 3px;
 	border-radius: 3px;
 }
+<<<<<<< HEAD
 .hoverInfo
 {
 	font-family: sans-serif;
@@ -895,6 +896,8 @@ span.r {color: #ef282a}
 	border-bottom: 1px dashed #67acc8;
 }
 sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px }
+=======
+>>>>>>> ad8cbdf584134fdf2c04cdac0dcf08a49b74c75c
 #specialEventBanner
 {
 	position: absolute;
