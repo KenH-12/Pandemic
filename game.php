@@ -40,7 +40,7 @@
 						<div class='pinpointRect hidden'></div>
 						
 						<div id='demoCube' class='diseaseCube hidden'></div>
-						<img id='demoPawn' src='images/pieces/medic.png' class='pawn hidden'/>
+						<img id='demoPawn' src='images/pieces/pawns/medic.png' class='pawn hidden'/>
 						<img id='demoStation' src='images/pieces/researchStation.png' class='researchStation hidden'/>
 						
 						<div id='playerPanelContainer'></div>

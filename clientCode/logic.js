@@ -3568,16 +3568,24 @@ class Player
 			CARD_MARGIN = 5,
 			$roleCard = $(`<div class='roleCard ${this.camelCaseRole}'>
 							<h3>${this.role}</h3>
-							<img src='images/cards/roles/${this.camelCaseRole}.jpg' alt='${this.role} Role Card' />
-						</div>`);
+							<img	class='rolePortrait'
+									src='images/cards/roles/${this.camelCaseRole}.jpg'
+									alt='${this.role} Role Card' />
+							<ul></ul>
+						</div>`),
+			$specialAbilities = $roleCard.children("ul");
 		
 		for (let bullet of this.roleCardBullets)
-			$roleCard.append(`<li>${bullet}</li>`);
+			$specialAbilities.append(`<li><span>${bullet}</span></li>`);
 
 		roleCardOffset.top += CARD_MARGIN;
 		roleCardOffset.left += $panel.width() + CARD_MARGIN;
 
 		$roleCard.appendTo("#boardContainer").offset(roleCardOffset);
+
+			/* <div class='pawnContainer'>
+			<img class='pawn' src='images/pieces/pawns/${this.camelCaseRole}.png' alt='${this.role} Pawn' />
+		</div> */
 	}
 
 	newRoleTag()
@@ -4059,7 +4067,7 @@ function appendPawnToBoard(player)
 {
 	const { camelCaseRole, role, cityKey } = player;
 
-	$("#boardContainer").append(`<img	src='images/pieces/${camelCaseRole}.png'
+	$("#boardContainer").append(`<img	src='images/pieces/pawns/${camelCaseRole}.png'
 										alt='${role} pawn'
 										class='pawn ${cityKey}'
 										id='${camelCaseRole}Pawn'

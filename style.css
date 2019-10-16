@@ -78,7 +78,7 @@ body
 {
 	position: absolute;
 }
-.pawn
+#boardContainer > .pawn
 {
 	z-index: 4;
 	width: 1.6%;
@@ -600,22 +600,27 @@ span.r {color: #ef282a}
 	background-color: #f6f6f7;
 	color: #000;
 }
+.roleCard.scientist { background-image: linear-gradient(to top, #f6f6f7, #9ccdd1) }
 .researcher
 {
 	background-color: #574319;
 }
+.roleCard.researcher { background-image: linear-gradient(to bottom, #966c4b, #2a2017) }
 .quarantineSpecialist
 {
 	background-color: #006951;
 }
+.roleCard.quarantineSpecialist { background-image: linear-gradient(to bottom, #398044, #043d0a) }
 .operationsExpert, #btnOperationsFlight
 {
 	background-color: #8dc73f;
 }
+.roleCard.operationsExpert { background-image: linear-gradient(to bottom, #aad37a, #407f48) }
 .medic, .autoTreatCircle
 {
 	background-color: #f68426;
 }
+.roleCard.medic { background-image: linear-gradient(to bottom, #ffb55c, #c56023) }
 .autoTreatCircle
 {
 	position: absolute;
@@ -627,10 +632,12 @@ span.r {color: #ef282a}
 {
 	background-color: #ec84b5;
 }
+.roleCard.dispatcher { background-image: linear-gradient(to bottom, #ec84b5, #964967) }
 .contingencyPlanner, #btnPlanContingency
 {
 	background-color: #67c8c6;
 }
+.roleCard.contingencyPlanner { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
 .role.contingencyPlanner > .playerCard
 {
 	font-family: 'Electrolize', 'Oswald', sans-serif;
@@ -644,6 +651,7 @@ span.r {color: #ef282a}
 	border: 2px solid #fff;
 	width: 17%;
 	border-radius: 8px;
+	font-size: 14px;
 }
 .roleCard h3
 {
@@ -654,21 +662,42 @@ span.r {color: #ef282a}
 	font-size: 18px;
 	text-align: center;
 }
-.roleCard img
+.rolePortrait/* , .pawnContainer */
 {
 	display: block;
-	width: 50%;
-	margin: 3%;
+	width: 100%;
+	border-bottom: 2px solid #fff;
+}
+/* .roleCard .rolePortrait
+{
 	margin-bottom: 0;
-	border: 2px solid #fff;
+}
+.roleCard .pawnContainer
+{
+	background-color: #000;
+}
+.roleCard .pawn
+{
+	width: 24%;
+	margin: 5px 38% 0 38%;
+} */
+.roleCard ul
+{
+	list-style: inside;
+	padding: 4%;
+	padding-left: 14%;
+	font-family: 'Ropa Sans', sans-serif;
 }
 .roleCard li
 {
-	font-size: 14px;
-	padding: 3px 5px;
-	font-family: 'Ropa Sans', sans-serif;
+	text-indent: -12%;
+	padding-bottom: 5px;
 }
-
+.roleCard li span
+{
+	position: relative;
+	left: -5%;
+}
 .button
 {
 	width: 75%;
