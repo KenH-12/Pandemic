@@ -570,25 +570,6 @@ function highlightTurnProcedureStep(stepName)
 {
 	const steps = data.steps;
 
-	let stepName = "setup";
-	steps[stepName] = new Step(stepName, "Infect 9 Cities", [initialInfectionStep]);
-	steps[stepName].indicate = function()
-	{
-		return new Promise(resolve =>
-			{
-				const $indicatorContainer = $("#indicatorContainer");
-
-				$indicatorContainer
-					.children("#roleIndicator")
-					.html("INITIAL SETUP")
-					.next()
-					.html("--- Infect 9 Cities ---");
-
-				unhide($indicatorContainer);
-				resolve();
-			});
-	}
-	
 	// "action 1" through to "action 4"
 	let actionsRemaining = 4;
 	for (let i = 1; i <= 4; i++)
@@ -7485,8 +7466,6 @@ function loadGamestate(gamestate)
 	{
 		setCurrentStep("setup");
 		data.nextStep = "action 1";
-
-		$("#setupProcedureContainer").removeClass("hidden");
 	}
 
 	delete gamestate.gameIsResuming;
@@ -7560,8 +7539,40 @@ async function setup()
 		data.currentStep.indicate();
 		indicatePromptingEventCard();
 	}
-	else	
+	else if (currentStepIs("setup"))
+		animateNewGameSetup();
+	else
 		proceed();
+}
+
+async function animateNewGameSetup()
+{
+	const setupSteps = [animateRoleDetermination];
+	
+	for (let step of setupSteps)
+	{
+		highlightNextSetupStep();
+		await step();
+	}
+	
+	proceed();
+}
+
+function highlightNextSetupStep()
+{
+	const $procedureContainer = $("#setupProcedureContainer"),
+		highlighted = "highlighted";
+		$highlightedStep = $procedureContainer.children(`.${highlighted}`);
+
+	if ($highlightedStep.length)
+	{
+		$highlightedStep
+			.removeClass(highlighted)
+			.next()
+			.addClass(highlighted);
+	}
+	else
+		$procedureContainer.children(".step").first().addClass(highlighted);	
 }
 
 function removeCurtain()
