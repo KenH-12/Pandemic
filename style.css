@@ -892,7 +892,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	z-index: 10;
 }
 
-#turnProcedureContainer
+.procedureContainer
 {
 	padding: 5px 3%;
 	font-size: 14px;
@@ -901,24 +901,24 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	margin-top: 0;
 	background-color: #043d77;
 }
-#turnProcedureContainer > *
+.procedureContainer > *
 {
 	padding: 1px 3px;
 	color: #aaa;
 }
-#turnProcedureContainer .title
+.procedureContainer .title
 {
 	font-size: 15px;
 	border-bottom: 1px solid #fff;
 	margin-bottom: 3px;
 	color: #fff;
 }
-#turnProcedureContainer .substep
+.procedureContainer .substep
 {
 	margin-left: 6%;
 	font-size: 13px;
 }
-#turnProcedureContainer .highlighted
+.procedureContainer .highlighted
 {
 	color: #fff;
 }

@@ -121,7 +121,17 @@
 					<img id='boardImg' src='images/pandemic_board.png' alt='Game Board'>
 					
 					<div id='rightPanel'>
-						<div id='turnProcedureContainer'>
+						<div id='setupProcedureContainer' class='procedureContainer hidden'>
+							<p class='title'>SETUP</p>
+							<p class='step'>1. Determine roles</p>
+							<p class='step'>2. Give each player cards and a pawn</p>
+							<p class='step'>3. Place 1 research station in Atlanta</p>
+							<p class='step'>4. Prepare the player deck</p>
+							<p class='step'>5. Infect 9 cities</p>
+							<p class='step'>6. Determine turn order</p>
+						</div>
+
+						<div id='turnProcedureContainer' class='procedureContainer'>
 							<p class='title'>PLAY</p>
 							<p class='step action'>1. Do 4 actions</p>
 							<p class='step draw'>2. Draw 2 cards</p>

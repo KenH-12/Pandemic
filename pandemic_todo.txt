@@ -33,7 +33,14 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-show the process of deciding who goes first
+animate setup
+	determine roles
+	give each player cards and a pawn
+	place research station in Atlanta
+	prepare player deck
+	infect 9 cities
+	determine turn order
+
 playerpanels should be arranged in turn order
 the playerpanels should be collapsible (can't see chicago)
 
