@@ -559,7 +559,8 @@ function highlightTurnProcedureStep(stepName)
 	if (!releventStepNames.includes(stepName))
 		return;
 	
-	$("#turnProcedureContainer").children()
+	$("#turnProcedureContainer").removeClass("hidden")
+		.children()
 		.removeClass("highlighted")
 		.filter(`.${stepName}`).addClass("highlighted");
 }
@@ -569,7 +570,7 @@ function highlightTurnProcedureStep(stepName)
 {
 	const steps = data.steps;
 
-	let stepName = "initial infections";
+	let stepName = "setup";
 	steps[stepName] = new Step(stepName, "Infect 9 Cities", [initialInfectionStep]);
 	steps[stepName].indicate = function()
 	{
@@ -6745,7 +6746,7 @@ async function finishInfectionStep()
 	{
 		$("#indicatorContainer").removeAttr("style").addClass("hidden");
 		$container.removeAttr("style").addClass("hidden");
-		if (currentStepIs("initial infections"))
+		if (currentStepIs("setup"))
 		{
 			unhide($("#turnProcedureContainer"));
 			proceed();
@@ -6761,7 +6762,7 @@ function getInfectionContainer()
 
 	if (eventTypeIsBeingPrompted(eventTypes.forecastPlacement))
 		containerID = "forecastCards";
-	else if (currentStepIs("initial infections"))
+	else if (currentStepIs("setup"))
 		containerID = "initialInfectionsContainer";
 	else if (currentStepIs("infect cities"))
 		containerID = "infectCitiesContainer";
@@ -6828,7 +6829,7 @@ function positionInfectionPanelComponents()
 		cardNameTop = getDimension("infCardNameTop"),
 		cardFontSize = getDimension("infCardFont");
 	
-	if (currentStepIs("initial infections"))
+	if (currentStepIs("setup"))
 	{
 		$container.removeClass("hidden");
 		
@@ -7482,13 +7483,10 @@ function loadGamestate(gamestate)
 		setCurrentStep(gamestate.stepName);
 	else // beginning a new game
 	{
-		setCurrentStep("initial infections"); // TODO: change to "setup"?
+		setCurrentStep("setup");
 		data.nextStep = "action 1";
 
-		// TODO: show setup procedure instead
-		$("#turnProcedureContainer").addClass("hidden");
-
-		getCity("atla").buildResearchStation(); // TODO: make this an explicit setup step
+		$("#setupProcedureContainer").removeClass("hidden");
 	}
 
 	delete gamestate.gameIsResuming;

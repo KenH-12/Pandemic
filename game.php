@@ -131,7 +131,7 @@
 							<p class='step'>6. Determine turn order</p>
 						</div>
 
-						<div id='turnProcedureContainer' class='procedureContainer'>
+						<div id='turnProcedureContainer' class='procedureContainer hidden'>
 							<p class='title'>PLAY</p>
 							<p class='step action'>1. Do 4 actions</p>
 							<p class='step draw'>2. Draw 2 cards</p>
