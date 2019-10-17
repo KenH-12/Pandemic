@@ -131,6 +131,35 @@
 							<p class='step'>6. Determine turn order</p>
 						</div>
 
+						<div id='setupContainer'>
+							<div id='determineRolesContainer'>
+								
+							</div>
+
+							<div id='initialInfectionsContainer' class='hidden'>
+
+								<div class='infGroup'>
+									<div class='groupInfRate hidden'>
+										<div></div>
+										<div></div>
+										<div></div>
+									</div>
+								</div>
+								<div class='infGroup'>
+									<div class='groupInfRate hidden'>
+										<div></div>
+										<div></div>
+									</div>
+								</div>
+								<div class='infGroup'>
+									<div class='groupInfRate hidden'>
+										<div></div>
+									</div>
+								</div>
+								<div class='button btnContinue hidden'>SKIP</div>
+							</div>
+						</div>
+
 						<div id='turnProcedureContainer' class='procedureContainer hidden'>
 							<p class='title'>PLAY</p>
 							<p class='step action'>1. Do 4 actions</p>
@@ -223,33 +252,8 @@
 						<div id='infectCitiesContainer' class='interface hidden'>
 							<div class='button btnContinue hidden'>CONTINUE</div>
 						</div>
-
-						<div id='initialInfectionsContainer' class='hidden'>
-
-							<div class='infGroup'>
-								<div class='groupInfRate hidden'>
-									<div></div>
-									<div></div>
-									<div></div>
-								</div>
-							</div>
-							<div class='infGroup'>
-								<div class='groupInfRate hidden'>
-									<div></div>
-									<div></div>
-								</div>
-							</div>
-							<div class='infGroup'>
-								<div class='groupInfRate hidden'>
-									<div></div>
-								</div>
-							</div>
-							<div class='button btnContinue hidden'>SKIP</div>
-						</div>
-
 					</div>
 				</div>
-
 			</body>
 			</html>";
 

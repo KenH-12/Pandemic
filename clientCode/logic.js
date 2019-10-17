@@ -570,8 +570,12 @@ function highlightTurnProcedureStep(stepName)
 {
 	const steps = data.steps;
 
-	// "action 1" through to "action 4"
+	let stepName = "setup";
+	steps[stepName] = new Step(stepName, "Setup", [() => {}]);
+	steps[stepName].indicate = function() { $("#indicatorContainer").addClass("hidden") }
+
 	let actionsRemaining = 4;
+	// "action 1" through to "action 4"
 	for (let i = 1; i <= 4; i++)
 	{
 		stepName = `action ${i}`;
@@ -649,7 +653,7 @@ function setCurrentStep(stepName)
 
 function currentStepIs(stepName)
 {
-	return data.currentStep.name == stepName;
+	return data.currentStep.name === stepName;
 }
 
 function indicateActionsLeft({ addend, zeroRemaining } = {})
@@ -7500,6 +7504,7 @@ async function setup()
 	const {
 		0: {
 			gamestate,
+			allRoles,
 			cities,
 			players,
 			infectionDiscards,
@@ -7513,7 +7518,7 @@ async function setup()
 			console.error(err);
 			$("#curtain").children("p").first().html("An error occured: " + err);
 		});
-
+	
 	await parseEvents(eventHistory);
 	loadGamestate(gamestate);
 	loadCityStates(cities);
@@ -7540,9 +7545,41 @@ async function setup()
 		indicatePromptingEventCard();
 	}
 	else if (currentStepIs("setup"))
+	{
+		data.allRoles = allRoles;
 		animateNewGameSetup();
+	}
 	else
 		proceed();
+}
+
+function animateRoleDetermination()
+{
+	const $container = $("#determineRolesContainer");
+
+	let $slotMachine;
+	for (let rID in data.players)
+	{
+		player = data.players[rID];
+
+		$slotMachine = newRoleSlotMachine();
+		$container.append($slotMachine);
+	}
+	
+	// slot machines spin and then stop on the correct role after a random interval
+	// find a way to include the role cards, or indicate that hovering over the role will display the card
+}
+
+function newRoleSlotMachine()
+{
+	const $slotMachine = $(`<div class='slotMachine'>
+								<div class='slotMachineShadow'></div>
+							</div>`);
+
+	for (let role of data.allRoles)
+		$slotMachine.append(`<div class='${toCamelCase(role)}'>${role}</div>`);
+	
+	return $slotMachine;
 }
 
 async function animateNewGameSetup()
@@ -7560,8 +7597,8 @@ async function animateNewGameSetup()
 
 function highlightNextSetupStep()
 {
-	const $procedureContainer = $("#setupProcedureContainer"),
-		highlighted = "highlighted";
+	const $procedureContainer = $("#setupProcedureContainer").removeClass("hidden"),
+		highlighted = "highlighted",
 		$highlightedStep = $procedureContainer.children(`.${highlighted}`);
 
 	if ($highlightedStep.length)

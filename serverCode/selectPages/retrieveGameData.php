@@ -80,6 +80,14 @@
 									FROM vw_disease
 									WHERE game = $game")->fetch_assoc();
 		}
+		else // beginning new game -- get all roles for role determination slot machines.
+		{
+			$allRoles = $mysqli->query("SELECT roleName FROM role");
+			
+			$response["allRoles"] = array();
+			while ($row = mysqli_fetch_assoc($allRoles))
+				$response["allRoles"][] = $row["roleName"];
+		}
 		
 		$players = $mysqli->query("SELECT	uID,
 											pID,
