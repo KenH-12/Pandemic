@@ -946,6 +946,11 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 {
 	border-bottom: none;
 }
+#determineRolesContainer > .role
+{
+	text-align: center;
+	border: none;
+}
 .slotMachine
 {
 	overflow: hidden;

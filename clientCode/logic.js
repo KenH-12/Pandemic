@@ -7575,6 +7575,11 @@ async function animateRoleDetermination()
 	}
 
 	await sleep(slotMachine.duration * 2);
+
+	for (let slotMachine of slotMachines)
+	{
+		slotMachine.extractResult();
+	}
 	// find a way to include the role cards, or indicate that hovering over the role will display the card
 }
 
@@ -7583,6 +7588,7 @@ class RoleSlotMachine
 	constructor(player, $container)
 	{
 		this.player = player;
+		this.$container = $container;
 		
 		this.$slotMachine = $(`<div class='slotMachine'>
 								<div class='slotMachineShadow'></div>
@@ -7766,6 +7772,26 @@ class RoleSlotMachine
 					resolve());
 			
 		});
+	}
+
+	async extractResult()
+	{
+		const $role = this.$options.filter(`.${this.player.camelCaseRole}`).first(),
+			roleOffset = $role.offset();
+		
+		roleOffset.top += this.optionHeight * this.numOptions;
+		
+		$role.appendTo(this.$container)
+			.offset(roleOffset)
+			.addClass("role");
+
+		await animatePromise(
+		{
+			$elements: this.$slotMachine.children(),
+			desiredProperties: { opacity: 0 }
+		});
+
+		return $role;
 	}
 }
 
