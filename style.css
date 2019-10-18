@@ -516,6 +516,7 @@ span.r {color: #ef282a}
 }
 .name
 {
+	font-family: 'Ropa Sans', sans-serif;
 	line-height: 14px;
 }
 .role
@@ -936,17 +937,27 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 #forecastContainer > p { text-align: center }
 #forecastContainer > p:first-of-type { margin-bottom: 5px }
 
+
+#determineRolesContainer
+{
+	padding: 12%;
+}
+#determineRolesContainer .name
+{
+	border-bottom: none;
+}
 .slotMachine
 {
-	width: 76%;
 	overflow: hidden;
 	border-radius: 2px;
-	margin: 8px 12% 20px 12%;
+	margin-bottom: 20px;
 	text-align: center;
 }
 .slotMachineOption
 {
 	border-bottom: 1px solid #000;
+	border-left: 1px solid #fff;
+	border-right: 1px solid #fff;
 }
 .slotMachine .selectionWindow
 {

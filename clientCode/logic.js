@@ -7553,27 +7553,34 @@ async function setup()
 		proceed();
 }
 
-function animateRoleDetermination()
+async function animateRoleDetermination()
 {
-	const $container = $("#determineRolesContainer");
+	const $container = $("#determineRolesContainer"),
+		slotMachines = [];
 
 	let player, slotMachine;
 	for (let rID in data.players)
 	{
 		player = data.players[rID];
 
-		slotMachine = new RoleSlotMachine(player);
-		slotMachine.appendTo($container)
-			.pull();
+		slotMachine = new RoleSlotMachine(player, $container);
+
+		slotMachines.push(slotMachine);
 	}
 	
-	// slot machines spin and then stop on the correct role after a random interval
+	for (let slotMachine of slotMachines)
+	{
+		slotMachine.pull();
+		await sleep(400);
+	}
+
+	await sleep(slotMachine.duration * 2);
 	// find a way to include the role cards, or indicate that hovering over the role will display the card
 }
 
 class RoleSlotMachine
 {
-	constructor(player)
+	constructor(player, $container)
 	{
 		this.player = player;
 		
@@ -7589,7 +7596,7 @@ class RoleSlotMachine
 		this.numOptions = roleOptions.length;
 		
 		let $optionGroup;
-		for (let i = 0; i < 2; i++)
+		for (let i = 0; i < 3; i++)
 		{
 			$optionGroup = $(`<div class='optionGroup optionGroup${i}'></div>`);
 
@@ -7601,18 +7608,18 @@ class RoleSlotMachine
 		
 		this.$optionGroups = this.$slotMachine.children(".optionGroup");
 		this.$options = this.$slotMachine.find(".slotMachineOption");
-
-		this.$result = this.$options.filter(`.${this.player.camelCaseRole}`).first();
-
-		this.duration = 4000;
+		
+		this.duration = 3000;
 		this.elapsedMs = 0;
-		this.msPerRevolution = 50;
-		this.speedReductionRate = 1.05;
+		this.msPerRevolution = 250;
+		this.speedReductionRate = 1.02;
+		
+		this.appendTo($container);
 
 		return this;
 	}
 
-	// Randomized the order of all role options,
+	// Randomizes the order of all role options,
 	// EXCEPT the roleToLandOn which is placed at this.MIDDLE_OPTION_INDEX.
 	randomizeRoleOrder(roleOptions, roleToLandOn)
 	{
@@ -7648,9 +7655,12 @@ class RoleSlotMachine
 			SELECTION_WINDOW_BORDER_HEIGHT = 4,
 			self = this;
 
+		$container.append(`<p class='name'>${this.player.name}</div>`);
 		$container.append(this.$slotMachine);
 
 		this.optionHeight = this.$options.first().height() + OPTION_BORDER_HEIGHT;
+
+		this.startingIndex = this.randomizeStartingIndex();
 
 		this.$slotMachine.children(".selectionWindow")
 			.css(
@@ -7664,40 +7674,40 @@ class RoleSlotMachine
 
 	async pull()
 	{
-		const startingIndex = this.randomizeStartingIndex();
-		
-		await this.revolveOnce(startingIndex);
+		await this.revolveOnce({ firstRevolution: true });
 
 		while (this.elapsedMs < this.duration)
 			await this.revolveOnce();
+		
+		await this.finalRevolution();
 	}
 
 	randomizeStartingIndex()
 	{
 		const startingIndex = randomNumberBetween(0, this.numOptions);
 
-		this.setRevolutionPosition(startingIndex);
+		this.setIndex(startingIndex);
 
 		return startingIndex;
 	}
 
-	setRevolutionPosition(index)
+	setIndex(index)
 	{
-		const marginTop = -((this.numOptions - index) * this.optionHeight) + "px";
+		const marginTop = -((this.numOptions * 2 - index) * this.optionHeight) + "px";
 
 		this.$optionGroups.first().css({ marginTop });
 	}
 
-	revolveOnce(startingIndex)
+	revolveOnce({ firstRevolution } = {})
 	{
 		return new Promise(async resolve =>
 		{
 			let numOptionsThisRevolution = this.numOptions;
 			
-			if (startingIndex)
-				numOptionsThisRevolution -= startingIndex;
+			if (firstRevolution)
+				numOptionsThisRevolution -= this.startingIndex;
 			else
-				this.setRevolutionPosition(0);
+				this.setIndex(0);
 			
 			for (let i = 0; i < numOptionsThisRevolution; i++)
 				this.elapsedMs += await this.revolveToNextOption();
@@ -7706,19 +7716,22 @@ class RoleSlotMachine
 		});
 	}
 
-	revolveToNextOption()
+	revolveToNextOption({ maintainSpeed } = {})
 	{
 		return new Promise(resolve =>
 		{
 			const self = this,
-				duration = this.msPerRevolution / this.numOptions;
+				duration = this.msPerRevolution / this.numOptions,
+				easing = "linear";
 
 			this.$optionGroups.first()
 				.animate({ marginTop: "+=" + self.optionHeight + "px" },
-					duration, "linear",
+					duration, easing,
 					function()
 					{
-						self.reduceSpeed();
+						if (!maintainSpeed)
+							self.reduceSpeed();
+						
 						return resolve(duration);
 					});
 		});
@@ -7732,6 +7745,27 @@ class RoleSlotMachine
 			this.msPerRevolution *= this.speedReductionRate;
 		else
 			this.msPerRevolution = MIN_MS_PER_REVOLUTION;
+	}
+
+	finalRevolution()
+	{
+		return new Promise(async resolve =>
+		{
+			const self = this,
+				startingIndex = 5;
+			
+			this.setIndex(0);
+			
+			for (let i = 0; i < startingIndex; i++)
+				await self.revolveToNextOption({ maintainSpeed: true });
+		
+			this.$optionGroups.first()
+				.animate({ marginTop: "+=" + self.optionHeight * (self.numOptions - startingIndex) + "px" },
+					self.duration,
+					"easeOutElastic",
+					resolve());
+			
+		});
 	}
 }
 
