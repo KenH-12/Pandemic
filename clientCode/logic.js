@@ -7557,29 +7557,182 @@ function animateRoleDetermination()
 {
 	const $container = $("#determineRolesContainer");
 
-	let $slotMachine;
+	let player, slotMachine;
 	for (let rID in data.players)
 	{
 		player = data.players[rID];
 
-		$slotMachine = newRoleSlotMachine();
-		$container.append($slotMachine);
+		slotMachine = new RoleSlotMachine(player);
+		slotMachine.appendTo($container)
+			.pull();
 	}
 	
 	// slot machines spin and then stop on the correct role after a random interval
 	// find a way to include the role cards, or indicate that hovering over the role will display the card
 }
 
-function newRoleSlotMachine()
+class RoleSlotMachine
 {
-	const $slotMachine = $(`<div class='slotMachine'>
+	constructor(player)
+	{
+		this.player = player;
+		
+		this.$slotMachine = $(`<div class='slotMachine'>
 								<div class='slotMachineShadow'></div>
+								<div class='selectionWindow'></div>
 							</div>`);
+		
+		this.NUM_VISIBLE_OPTIONS = 5;
+		this.MIDDLE_OPTION_INDEX = (this.NUM_VISIBLE_OPTIONS - 1) / 2;
+		
+		const roleOptions = this.randomizeRoleOrder([...data.allRoles], player.role);
+		this.numOptions = roleOptions.length;
+		
+		let $optionGroup;
+		for (let i = 0; i < 2; i++)
+		{
+			$optionGroup = $(`<div class='optionGroup optionGroup${i}'></div>`);
 
-	for (let role of data.allRoles)
-		$slotMachine.append(`<div class='${toCamelCase(role)}'>${role}</div>`);
-	
-	return $slotMachine;
+			for (let role of roleOptions)
+				$optionGroup.append(`<div class='slotMachineOption ${toCamelCase(role)}'>${role}</div>`);
+
+			this.$slotMachine.append($optionGroup);
+		}
+		
+		this.$optionGroups = this.$slotMachine.children(".optionGroup");
+		this.$options = this.$slotMachine.find(".slotMachineOption");
+
+		this.$result = this.$options.filter(`.${this.player.camelCaseRole}`).first();
+
+		this.duration = 4000;
+		this.elapsedMs = 0;
+		this.msPerRevolution = 50;
+		this.speedReductionRate = 1.05;
+
+		return this;
+	}
+
+	// Randomized the order of all role options,
+	// EXCEPT the roleToLandOn which is placed at this.MIDDLE_OPTION_INDEX.
+	randomizeRoleOrder(roleOptions, roleToLandOn)
+	{
+		const randomizedRoles = [];
+
+		roleOptions.splice(roleOptions.indexOf(roleToLandOn), 1);
+
+		let i = 0,
+			roleIndex,	
+			role;
+		
+		while (roleOptions.length)
+		{
+			if (i === this.MIDDLE_OPTION_INDEX)
+				role = roleToLandOn;
+			else
+			{
+				roleIndex = randomNumberBetween(0, roleOptions.length - 1);
+				role = roleOptions[roleIndex];
+				roleOptions.splice(roleIndex, 1);
+			}
+			
+			randomizedRoles.push(role);
+			i++;
+		}
+
+		return randomizedRoles;
+	}
+
+	appendTo($container)
+	{
+		const OPTION_BORDER_HEIGHT = 1,
+			SELECTION_WINDOW_BORDER_HEIGHT = 4,
+			self = this;
+
+		$container.append(this.$slotMachine);
+
+		this.optionHeight = this.$options.first().height() + OPTION_BORDER_HEIGHT;
+
+		this.$slotMachine.children(".selectionWindow")
+			.css(
+			{
+				height: self.optionHeight + (SELECTION_WINDOW_BORDER_HEIGHT * 2) - OPTION_BORDER_HEIGHT + "px",
+				top: self.$slotMachine.offset().top + (self.optionHeight * self.MIDDLE_OPTION_INDEX) - SELECTION_WINDOW_BORDER_HEIGHT + "px"
+			});
+
+		return this;
+	}
+
+	async pull()
+	{
+		const startingIndex = this.randomizeStartingIndex();
+		
+		await this.revolveOnce(startingIndex);
+
+		while (this.elapsedMs < this.duration)
+			await this.revolveOnce();
+	}
+
+	randomizeStartingIndex()
+	{
+		const startingIndex = randomNumberBetween(0, this.numOptions);
+
+		this.setRevolutionPosition(startingIndex);
+
+		return startingIndex;
+	}
+
+	setRevolutionPosition(index)
+	{
+		const marginTop = -((this.numOptions - index) * this.optionHeight) + "px";
+
+		this.$optionGroups.first().css({ marginTop });
+	}
+
+	revolveOnce(startingIndex)
+	{
+		return new Promise(async resolve =>
+		{
+			let numOptionsThisRevolution = this.numOptions;
+			
+			if (startingIndex)
+				numOptionsThisRevolution -= startingIndex;
+			else
+				this.setRevolutionPosition(0);
+			
+			for (let i = 0; i < numOptionsThisRevolution; i++)
+				this.elapsedMs += await this.revolveToNextOption();
+			
+			resolve();
+		});
+	}
+
+	revolveToNextOption()
+	{
+		return new Promise(resolve =>
+		{
+			const self = this,
+				duration = this.msPerRevolution / this.numOptions;
+
+			this.$optionGroups.first()
+				.animate({ marginTop: "+=" + self.optionHeight + "px" },
+					duration, "linear",
+					function()
+					{
+						self.reduceSpeed();
+						return resolve(duration);
+					});
+		});
+	}
+
+	reduceSpeed()
+	{
+		const MIN_MS_PER_REVOLUTION = 1750;
+
+		if (this.speedReductionRate >= 1)
+			this.msPerRevolution *= this.speedReductionRate;
+		else
+			this.msPerRevolution = MIN_MS_PER_REVOLUTION;
+	}
 }
 
 async function animateNewGameSetup()
