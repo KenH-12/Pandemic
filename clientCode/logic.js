@@ -78,7 +78,7 @@ const data =
 	eventCards: {},
 	playerCardsRemaining: -1,
 	HAND_LIMIT: 7,
-	STARTING_HAND_CARD_HEIGHT: 32,
+	STARTING_HAND_CARD_HEIGHT: 24,
 	playerCardAnimationInterval: 0.4,
 	dragPieceZindex: 6,
 	stationZindex: 3,
@@ -3138,8 +3138,7 @@ async function drawStep()
 
 async function performDrawStep()
 {
-	const $container = $("#cardDrawContainer"), 
-		cardHeight = $("#cardDrawContainer .playerCard").css("height"),	
+	const $container = $("#cardDrawContainer"),
 		numCardsToDeal = 2,
 		{ 0: events } = await Promise.all(
 		[
@@ -3156,7 +3155,7 @@ async function performDrawStep()
 	// Without reversing the cardKeys array, the cards will be added to the player's hand in
 	// an order that does not match the cardIndices.
 	for (let key of cardDrawEvent.cardKeys.reverse())
-		revealPlayerCard(key, cardHeight);
+		revealPlayerCard(key, $container);
 
 	bindPlayerCardEvents();
 	return sleep(getDuration("mediumInterval"));
@@ -3212,27 +3211,28 @@ function dealFaceDownPlayerCard($container, { finalCardbackWidth } = {})
 	});
 }
 
-function revealPlayerCard(cardKey, cardHeight)
+async function revealPlayerCard(cardKey, $container)
 {
-	const duration = getDuration("revealPlayerCard"),
-		easing = data.easings.revealCard,
-		cardWidth = getDimension("playerCardWidth"),
-		widthPercentage = getDimension("playerCardWidth", { getFactor: true, format: "percent" });
-	
-    newPlayerCardElement(cardKey).prependTo($("#cardDrawContainer"))
-		.css(
-			{
-				"width": 0,
-				"line-height": (cardHeight * 3) + "px" // text will slide into view via line-height animation
-			})
-		.animate({ width: cardWidth + "px" },
-			duration, easing,
-			function()
-			{
-				$(this).animate({ "line-height": cardHeight + "px" },
-					duration, easing,
-					() => $(this).css("width", widthPercentage + "%"));
-			});
+	const $card = newPlayerCardElement(cardKey),
+		duration = getDuration("revealPlayerCard"),
+		easing = data.easings.revealCard;
+
+	if ($container.hasClass("roleContainer"))
+		$card.appendTo($container);
+	else
+		$card.prependTo($container);
+
+	const cardWidth = $card.width();
+
+	await animatePromise({
+		$elements: $card,
+		initialProperties: { width: 0 },
+		desiredProperties: { width: cardWidth },
+		duration,
+		easing
+	});
+
+	$card.removeAttr("style");
 }
 
 async function animateCardsToHand($cards)
@@ -7823,7 +7823,9 @@ class RoleSlotMachine
 			easing: "easeOutBounce"
 		});
 
-		this.$container.height(self.$container.height());
+		this.$container
+			.height(self.$container.height())
+			.attr("data-role", this.player.rID);
 		this.$slotMachine.remove();
 
 		$role.insertAfter(this.$playerName)
@@ -7860,15 +7862,17 @@ async function animateInitialDeal()
 	const startingHands = getEventsOfTurn(eventTypes.startingHand),
 		$roleContainers = $("#roleSetupContainer").find(".roleContainer");
 		
-	await dealInitialPlayerCardsFaceDown(startingHands, $roleContainers);
-	
+	await dealFaceDownStartingHands(startingHands, $roleContainers);
+	await sleep(getDuration("mediumInterval"));
+	await revealStartingHands(startingHands, $roleContainers);
 }
 
-async function dealInitialPlayerCardsFaceDown(startingHands, $roleContainers)
+async function dealFaceDownStartingHands(startingHands, $roleContainers)
 {
 	const startingHandSize = startingHands[0].cardKeys.length,
 		numCardsToDeal = startingHands.length * startingHandSize,
-		finalCardbackWidth = 32,
+		CARD_MARGIN_BOTTOM = 4,
+		finalCardbackWidth = data.STARTING_HAND_CARD_HEIGHT - CARD_MARGIN_BOTTOM,
 		interval = getDuration("dealCard") * 0.4;
 
 	await makeRoomForStartingHands(startingHandSize, $roleContainers);
@@ -7885,6 +7889,21 @@ async function dealInitialPlayerCardsFaceDown(startingHands, $roleContainers)
 			roleIndex = 0;
 		else
 			roleIndex++;
+	}
+}
+
+async function revealStartingHands(startingHands, $roleContainers)
+{
+	$roleContainers.children(".playerCard").remove();
+	$(".drawnPlayerCard").remove();
+	
+	let $container;
+	for (let hand of startingHands)
+	{
+		$container = $roleContainers.filter(`[data-role='${hand.role}']`);
+
+		for (let cardKey of hand.cardKeys)
+			revealPlayerCard(cardKey, $container);
 	}
 }
 

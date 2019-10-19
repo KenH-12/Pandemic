@@ -990,7 +990,9 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 
 .roleContainer .playerCard
 {
-	display: block;
-	height: 32px;
+	height: 20px;
+	line-height: 20px;
+	width: 92%;
+	margin-left: 4%;
 	margin-bottom: 4px;
 }
