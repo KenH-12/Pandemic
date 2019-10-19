@@ -533,7 +533,6 @@ span.r {color: #ef282a}
 	margin: 2px 1%;
 	border: none;
 	font-size: 14px;
-	white-space: nowrap;
 	overflow: hidden;
 }
 #playerCards .playerCard
@@ -938,22 +937,21 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 #forecastContainer > p:first-of-type { margin-bottom: 5px }
 
 
-#determineRolesContainer
+#roleSetupContainer
 {
 	padding: 8% 12%;
 }
-#determineRolesContainer .name
+#roleSetupContainer .name
 {
 	border-bottom: none;
 }
-#determineRolesContainer .role
+#roleSetupContainer .role
 {
 	text-align: center;
 	border: none;
 	font-size: 17px;
 }
-
-.slotMachineContainer { margin-bottom: 25px }
+.roleContainer { margin-bottom: 25px }
 .slotMachine
 {
 	overflow: hidden;
@@ -989,3 +987,10 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 		rgba(0, 0, 0, .9))
 }
 .slotMachine, .slotMachineShadow { height: 100px; }
+
+.roleContainer .playerCard
+{
+	display: block;
+	height: 32px;
+	margin-bottom: 4px;
+}

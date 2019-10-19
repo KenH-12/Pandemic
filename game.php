@@ -132,9 +132,7 @@
 						</div>
 
 						<div id='setupContainer'>
-							<div id='determineRolesContainer'>
-								
-							</div>
+							<div id='roleSetupContainer'></div>
 
 							<div id='initialInfectionsContainer' class='hidden'>
 

@@ -100,7 +100,7 @@ function animatePromise({ $elements, initialProperties, desiredProperties, durat
 }
 
 // Useful for extracting numbers from the beginning of css property values such as border or padding.
-function getNumberFromStartOfString(string)
+function getLeadingNumber(string)
 {
 	let numberString = "";
 	

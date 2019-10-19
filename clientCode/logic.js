@@ -78,6 +78,7 @@ const data =
 	eventCards: {},
 	playerCardsRemaining: -1,
 	HAND_LIMIT: 7,
+	STARTING_HAND_CARD_HEIGHT: 32,
 	playerCardAnimationInterval: 0.4,
 	dragPieceZindex: 6,
 	stationZindex: 3,
@@ -545,26 +546,6 @@ class Step
 	}
 }
 
-function highlightTurnProcedureStep(stepName)
-{
-	const releventStepNames = ["action", "draw", "epidemic", "discard", "infect"];
-	
-	// Only interested in the first word
-	stepName = stepName.split(" ")[0];
-
-	// There are 3 different epidemic steps, all of which start with "ep"
-	if (stepName.substring(0, 2) === "ep")
-		stepName = "epidemic";
-
-	if (!releventStepNames.includes(stepName))
-		return;
-	
-	$("#turnProcedureContainer").removeClass("hidden")
-		.children()
-		.removeClass("highlighted")
-		.filter(`.${stepName}`).addClass("highlighted");
-}
-
 // instantiate steps
 (function()
 {
@@ -633,6 +614,26 @@ function highlightTurnProcedureStep(stepName)
 	stepName = "infect cities";
 	steps[stepName] = new Step(stepName, "Infect 2 Cities", [infectionStep]);
 })();
+
+function highlightTurnProcedureStep(stepName)
+{
+	const releventStepNames = ["action", "draw", "epidemic", "discard", "infect"];
+	
+	// Only interested in the first word
+	stepName = stepName.split(" ")[0];
+
+	// There are 3 different epidemic steps, all of which start with "ep"
+	if (stepName.substring(0, 2) === "ep")
+		stepName = "epidemic";
+
+	if (!releventStepNames.includes(stepName))
+		return;
+	
+	$("#turnProcedureContainer").removeClass("hidden")
+		.children()
+		.removeClass("highlighted")
+		.filter(`.${stepName}`).addClass("highlighted");
+}
 
 function resumeCurrentStep()
 {
@@ -3138,11 +3139,12 @@ async function drawStep()
 async function performDrawStep()
 {
 	const $container = $("#cardDrawContainer"), 
-		cardHeight = $("#cardDrawContainer .playerCard").css("height"),
+		cardHeight = $("#cardDrawContainer .playerCard").css("height"),	
+		numCardsToDeal = 2,
 		{ 0: events } = await Promise.all(
 		[
 			requestAction(eventTypes.cardDraw),
-			dealFaceDownPlayerCards($container)
+			dealFaceDownPlayerCards($container, numCardsToDeal)
 		]),
 		cardDrawEvent = events[0];
 
@@ -3170,25 +3172,24 @@ async function finishDrawStep()
 	proceed();
 }
 
-async function dealFaceDownPlayerCards($container)
+async function dealFaceDownPlayerCards($container, numCards)
 {
-	const NUM_CARDS = 2;
-	for (let i = 0; i < NUM_CARDS; i++)
+	for (let i = 0; i < numCards; i++)
 	{
-		$container.prepend("<div class='playerCard'></div>");
-		await dealFaceDownPlayerCard();
-		await sleep(getDuration("dealCard") * 0.5)
+		await dealFaceDownPlayerCard($container);
+		await sleep(getDuration("dealCard") * 0.5);
 	}
 	return sleep(getDuration("longInterval"));
 }
 
-function dealFaceDownPlayerCard()
+function dealFaceDownPlayerCard($container, { finalCardbackWidth } = {})
 {
 	return new Promise(resolve =>
 	{
 		const $deck = $("#imgPlayerDeck"),
 			deckOffset = $deck.offset(),
-			containerOffset = $("#cardDrawContainer .playerCard").last().offset(),
+			$playerCard = $("<div class='playerCard'></div>").appendTo($container),
+			containerOffset = $playerCard.offset(),
 			$cardback = $("<img class='drawnPlayerCard' src='images/cards/playerCardback.png' alt='Player Card'/>");
 		
 		$cardback
@@ -3201,7 +3202,7 @@ function dealFaceDownPlayerCard()
 				})
 			.animate(
 				{
-					width: data.panelWidth * 0.152,
+					width: finalCardbackWidth || $container.width() * 0.152,
 					top: containerOffset.top,
 					left: containerOffset.left
 				},
@@ -4471,7 +4472,7 @@ class City
 			else
 				rowCount = 3;
 		
-		const cubeSpacing = data.cubeWidth + getNumberFromStartOfString($("#boardContainer .diseaseCube").css("border"));
+		const cubeSpacing = data.cubeWidth + getLeadingNumber($("#boardContainer .diseaseCube").css("border"));
 		let currentRow = 0,
 			cubesThisRow,
 			x, y = (cityOffset.top - (cubeSpacing / 2 * rowCount));
@@ -7059,7 +7060,7 @@ async function placeDiseaseCubes({cityKey, numCubes = 1}, { noPostDelay } = {})
 
 function getAnimatedCubeWidth()
 {
-	return getDimension("cubeWidth") + (getNumberFromStartOfString($("#boardContainer .diseaseCube").css("border")) * 2);
+	return getDimension("cubeWidth") + (getLeadingNumber($("#boardContainer .diseaseCube").css("border")) * 2);
 }
 function placeDiseaseCube(city, cubeSupplyOffset)
 {
@@ -7567,32 +7568,18 @@ async function setup()
 		proceed();
 }
 
-function resizeRoleDeterminationContainer($container)
-{
-	const paddingHeight = data.panelWidth * (getNumberFromStartOfString($container.css("padding-top")) / 100 / 2);
- 	// /100 because % and /2 because there is padding on the top and bottom.
-	
-	 $("#determineRolesContainer").css(
-	{
-		height: data.boardHeight - $("#setupProcedureContainer").height() - paddingHeight
-	});
-}
-
 async function animateRoleDetermination()
 {
-	const $container = $("#determineRolesContainer"),
+	const $container = $("#roleSetupContainer"),
 		slotMachines = [];
 
-	resizeRoleDeterminationContainer($container);
-
-	let player, slotMachine;
+	let player, $roleContainer;
 	for (let rID in data.players)
 	{
 		player = data.players[rID];
+		$roleContainer = $("<div class='roleContainer'></div>").appendTo($container);
 
-		slotMachine = new RoleSlotMachine(player, $container);
-
-		slotMachines.push(slotMachine);
+		slotMachines.push(new RoleSlotMachine(player, $roleContainer));
 	}
 	
 	for (let slotMachine of slotMachines)
@@ -7601,8 +7588,9 @@ async function animateRoleDetermination()
 		await sleep(400);
 	}
 
-	await sleep(slotMachine.duration * 2);
+	await sleep(6000);
 
+	let slotMachine;
 	for (let i = 0; i < slotMachines.length; i++)
 	{
 		slotMachine = slotMachines[i];
@@ -7616,13 +7604,11 @@ async function animateRoleDetermination()
 
 class RoleSlotMachine
 {
-	constructor(player, $parentContainer)
+	constructor(player, $container)
 	{
 		this.player = player;
-		this.$parentContainer = $parentContainer;
-		
-		this.$container = $("<div class='slotMachineContainer'></div>");
-		this.$container.appendTo(this.$parentContainer);
+
+		this.$container = $container;
 
 		this.$playerName = $(`<p class='name'>${this.player.name}</div>`);
 		this.$container.append(this.$playerName);
@@ -7653,7 +7639,6 @@ class RoleSlotMachine
 		this.$options = this.$slotMachine.find(".slotMachineOption");
 		
 		this.$slotMachine.appendTo(this.$container);
-		this.$container.appendTo($parentContainer);
 		this.resizeElements();
 
 		this.startingIndex = this.randomizeStartingIndex();
@@ -7699,12 +7684,10 @@ class RoleSlotMachine
 	resizeElements()
 	{
 		const $selectionWindow = this.$slotMachine.children(".selectionWindow"),
-			selectionWindowBorderHeight = getNumberFromStartOfString($selectionWindow.css("border-top")),
-			optionBorderHeight = getNumberFromStartOfString($(".slotMachineOption").css("border-bottom"));
+			selectionWindowBorderHeight = getLeadingNumber($selectionWindow.css("border-top")),
+			optionBorderHeight = getLeadingNumber($(".slotMachineOption").css("border-bottom"));
 
 		this.optionHeight = this.$options.first().height() + optionBorderHeight;
-
-		log("optionHeight: ", this.optionHeight);
 
 		const selectionWindowHeight = this.optionHeight + (selectionWindowBorderHeight * 2) - optionBorderHeight,
 			selectionWindowOffsetTop = this.$slotMachine.offset().top + (this.optionHeight * this.MIDDLE_OPTION_INDEX) - selectionWindowBorderHeight;
@@ -7714,8 +7697,6 @@ class RoleSlotMachine
 				height: selectionWindowHeight,
 				top: selectionWindowOffsetTop
 			});
-
-		log("selectionWindowOffsetTop: ", selectionWindowOffsetTop);
 
 		return this;
 	}
@@ -7824,7 +7805,7 @@ class RoleSlotMachine
 		
 		roleOffset.top += this.optionHeight * this.numOptions;
 		
-		$role.appendTo(this.$parentContainer)
+		$role.appendTo(this.$container.parent())
 			.offset(roleOffset)
 			.addClass("role");
 
@@ -7860,7 +7841,10 @@ class RoleSlotMachine
 
 async function animateNewGameSetup()
 {
-	const setupSteps = [animateRoleDetermination];
+	const setupSteps = [
+		animateRoleDetermination,
+		animateInitialDeal
+	];
 	
 	for (let step of setupSteps)
 	{
@@ -7869,6 +7853,62 @@ async function animateNewGameSetup()
 	}
 	
 	proceed();
+}
+
+async function animateInitialDeal()
+{
+	const startingHands = getEventsOfTurn(eventTypes.startingHand),
+		$roleContainers = $("#roleSetupContainer").find(".roleContainer");
+		
+	await dealInitialPlayerCardsFaceDown(startingHands, $roleContainers);
+	
+}
+
+async function dealInitialPlayerCardsFaceDown(startingHands, $roleContainers)
+{
+	const startingHandSize = startingHands[0].cardKeys.length,
+		numCardsToDeal = startingHands.length * startingHandSize,
+		finalCardbackWidth = 32,
+		interval = getDuration("dealCard") * 0.4;
+
+	await makeRoomForStartingHands(startingHandSize, $roleContainers);
+
+	let cardsDealt = 0,
+		roleIndex = 0;
+	while (cardsDealt < numCardsToDeal)
+	{
+		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), { finalCardbackWidth });
+		await sleep(interval);
+		
+		cardsDealt++;
+		if (roleIndex === $roleContainers.length - 1)
+			roleIndex = 0;
+		else
+			roleIndex++;
+	}
+}
+
+function makeRoomForStartingHands(startingHandSize, $roleContainers)
+{
+	const $aRoleContainer = $roleContainers.first(),
+		initialHeight = $aRoleContainer.height();
+
+	for (let i = 0; i < startingHandSize; i++)
+		$aRoleContainer.append("<div class='playerCard'></div>");
+
+	$aRoleContainer.css("height", "auto");
+	const requiredHeight = $aRoleContainer.height();
+
+	$aRoleContainer.children(".playerCard").remove();
+	
+	return animatePromise(
+	{
+		$elements: $roleContainers,
+		initialProperties: { height: initialHeight },
+		desiredProperties: { height: requiredHeight },
+		duration: 400,
+		easing: "easeOutQuad"
+	});
 }
 
 function highlightNextSetupStep()
