@@ -3579,10 +3579,11 @@ class Player
 		this.cardKeys = [];
 	}
 
-	showRoleCard($hoveredElement)
+	async showRoleCard($hoveredElement)
 	{
 		const $panel = this.getPanel(),
-			roleCardOffset = $hoveredElement.length ? $hoveredElement.offset() : $panel.offset(),
+			hoveredElementOffset = $hoveredElement.length ? $hoveredElement.offset() : false,
+			roleCardOffset = hoveredElementOffset || $panel.offset(),
 			CARD_MARGIN = 5,
 			$roleCard = $(`<div class='roleCard ${this.camelCaseRole}'>
 							<h3>${this.role}</h3>
@@ -3597,9 +3598,22 @@ class Player
 			$specialAbilities.append(`<li><span>${bullet}</span></li>`);
 
 		$roleCard.appendTo("#boardContainer");
-		
-		if ($hoveredElement.length)
+		log("hoveredElementOffset:", hoveredElementOffset);
+		if (hoveredElementOffset)
+		{
+			// Without a slight delay, the calculated $roleCard height is inaccurate.
+			// So we hide the card so that it doesn't appear in the wrong place for a split second,
+			// wait 10ms, show the card, then calculate the actual height.
+			$roleCard.addClass("hidden");
+			await sleep(10);
+			$roleCard.removeClass("hidden");
+			const roleCardHeight = $roleCard.height();
+			
+			if (hoveredElementOffset.top + roleCardHeight > data.boardHeight)
+				roleCardOffset.top = data.boardHeight - roleCardHeight - CARD_MARGIN;
+			
 			roleCardOffset.left = data.boardWidth - ($roleCard.width() + CARD_MARGIN);
+		}
 		else
 		{
 			roleCardOffset.top += CARD_MARGIN;
@@ -4457,7 +4471,7 @@ class City
 			else
 				rowCount = 3;
 		
-		const cubeSpacing = data.cubeWidth + getBorderWidth("#boardContainer .diseaseCube");
+		const cubeSpacing = data.cubeWidth + getNumberFromStartOfString($("#boardContainer .diseaseCube").css("border"));
 		let currentRow = 0,
 			cubesThisRow,
 			x, y = (cityOffset.top - (cubeSpacing / 2 * rowCount));
@@ -7045,7 +7059,7 @@ async function placeDiseaseCubes({cityKey, numCubes = 1}, { noPostDelay } = {})
 
 function getAnimatedCubeWidth()
 {
-	return getDimension("cubeWidth") + (getBorderWidth("#boardContainer .diseaseCube") * 2);
+	return getDimension("cubeWidth") + (getNumberFromStartOfString($("#boardContainer .diseaseCube").css("border")) * 2);
 }
 function placeDiseaseCube(city, cubeSupplyOffset)
 {
@@ -7553,10 +7567,23 @@ async function setup()
 		proceed();
 }
 
+function resizeRoleDeterminationContainer($container)
+{
+	const paddingHeight = data.panelWidth * (getNumberFromStartOfString($container.css("padding-top")) / 100 / 2);
+ 	// /100 because % and /2 because there is padding on the top and bottom.
+	
+	 $("#determineRolesContainer").css(
+	{
+		height: data.boardHeight - $("#setupProcedureContainer").height() - paddingHeight
+	});
+}
+
 async function animateRoleDetermination()
 {
 	const $container = $("#determineRolesContainer"),
 		slotMachines = [];
+
+	resizeRoleDeterminationContainer($container);
 
 	let player, slotMachine;
 	for (let rID in data.players)
@@ -7576,20 +7603,30 @@ async function animateRoleDetermination()
 
 	await sleep(slotMachine.duration * 2);
 
-	for (let slotMachine of slotMachines)
+	for (let i = 0; i < slotMachines.length; i++)
 	{
-		slotMachine.extractResult();
+		slotMachine = slotMachines[i];
+		
+		if (i < slotMachines.length - 1)
+			slotMachine.extractResult();
+		else
+			await slotMachine.extractResult();
 	}
-	// find a way to include the role cards, or indicate that hovering over the role will display the card
 }
 
 class RoleSlotMachine
 {
-	constructor(player, $container)
+	constructor(player, $parentContainer)
 	{
 		this.player = player;
-		this.$container = $container;
+		this.$parentContainer = $parentContainer;
 		
+		this.$container = $("<div class='slotMachineContainer'></div>");
+		this.$container.appendTo(this.$parentContainer);
+
+		this.$playerName = $(`<p class='name'>${this.player.name}</div>`);
+		this.$container.append(this.$playerName);
+
 		this.$slotMachine = $(`<div class='slotMachine'>
 								<div class='slotMachineShadow'></div>
 								<div class='selectionWindow'></div>
@@ -7615,12 +7652,16 @@ class RoleSlotMachine
 		this.$optionGroups = this.$slotMachine.children(".optionGroup");
 		this.$options = this.$slotMachine.find(".slotMachineOption");
 		
+		this.$slotMachine.appendTo(this.$container);
+		this.$container.appendTo($parentContainer);
+		this.resizeElements();
+
+		this.startingIndex = this.randomizeStartingIndex();
+		
 		this.duration = 3000;
 		this.elapsedMs = 0;
 		this.msPerRevolution = 250;
 		this.speedReductionRate = 1.02;
-		
-		this.appendTo($container);
 
 		return this;
 	}
@@ -7655,25 +7696,26 @@ class RoleSlotMachine
 		return randomizedRoles;
 	}
 
-	appendTo($container)
+	resizeElements()
 	{
-		const OPTION_BORDER_HEIGHT = 1,
-			SELECTION_WINDOW_BORDER_HEIGHT = 4,
-			self = this;
+		const $selectionWindow = this.$slotMachine.children(".selectionWindow"),
+			selectionWindowBorderHeight = getNumberFromStartOfString($selectionWindow.css("border-top")),
+			optionBorderHeight = getNumberFromStartOfString($(".slotMachineOption").css("border-bottom"));
 
-		$container.append(`<p class='name'>${this.player.name}</div>`);
-		$container.append(this.$slotMachine);
+		this.optionHeight = this.$options.first().height() + optionBorderHeight;
 
-		this.optionHeight = this.$options.first().height() + OPTION_BORDER_HEIGHT;
+		log("optionHeight: ", this.optionHeight);
 
-		this.startingIndex = this.randomizeStartingIndex();
-
-		this.$slotMachine.children(".selectionWindow")
-			.css(
+		const selectionWindowHeight = this.optionHeight + (selectionWindowBorderHeight * 2) - optionBorderHeight,
+			selectionWindowOffsetTop = this.$slotMachine.offset().top + (this.optionHeight * this.MIDDLE_OPTION_INDEX) - selectionWindowBorderHeight;
+		
+		$selectionWindow.css(
 			{
-				height: self.optionHeight + (SELECTION_WINDOW_BORDER_HEIGHT * 2) - OPTION_BORDER_HEIGHT + "px",
-				top: self.$slotMachine.offset().top + (self.optionHeight * self.MIDDLE_OPTION_INDEX) - SELECTION_WINDOW_BORDER_HEIGHT + "px"
+				height: selectionWindowHeight,
+				top: selectionWindowOffsetTop
 			});
+
+		log("selectionWindowOffsetTop: ", selectionWindowOffsetTop);
 
 		return this;
 	}
@@ -7777,21 +7819,42 @@ class RoleSlotMachine
 	async extractResult()
 	{
 		const $role = this.$options.filter(`.${this.player.camelCaseRole}`).first(),
-			roleOffset = $role.offset();
+			roleOffset = $role.offset(),
+			self = this;
 		
 		roleOffset.top += this.optionHeight * this.numOptions;
 		
-		$role.appendTo(this.$container)
+		$role.appendTo(this.$parentContainer)
 			.offset(roleOffset)
 			.addClass("role");
 
 		await animatePromise(
 		{
-			$elements: this.$slotMachine.children(),
+			$elements: this.$slotMachine,
 			desiredProperties: { opacity: 0 }
 		});
 
-		return $role;
+		await animatePromise(
+		{
+			$elements: $role,
+			desiredProperties: { top: "-=" + (this.optionHeight * this.MIDDLE_OPTION_INDEX) },
+			duration: 600,
+			easing: "easeOutBounce"
+		});
+
+		this.$container.height(self.$container.height());
+		this.$slotMachine.remove();
+
+		$role.insertAfter(this.$playerName)
+			.removeAttr("style")
+			.hover(function()
+			{
+				self.player.showRoleCard($role);
+			},
+			function()
+			{
+				$(".roleCard").remove();
+			});
 	}
 }
 

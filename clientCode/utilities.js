@@ -99,12 +99,20 @@ function animatePromise({ $elements, initialProperties, desiredProperties, durat
 		});
 }
 
-// Given a css selector, returns the border width of the first selected element as an integer.
-function getBorderWidth(cssSelector)
+// Useful for extracting numbers from the beginning of css property values such as border or padding.
+function getNumberFromStartOfString(string)
 {
-	const pxString = $(cssSelector).first().css("border").split(" ")[0];
-	// remove "px" from the value and return it as a number
-	return Number(pxString.substring(0, pxString.length - 2));
+	let numberString = "";
+	
+	for (let char of string)
+	{
+		if (isNaN(char))
+			break;
+		
+		numberString += char;
+	}
+	
+	return Number(numberString);
 }
 
 // Sets the height of all matched elements to the first matched element's width.

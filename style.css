@@ -940,22 +940,24 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 
 #determineRolesContainer
 {
-	padding: 12%;
+	padding: 8% 12%;
 }
 #determineRolesContainer .name
 {
 	border-bottom: none;
 }
-#determineRolesContainer > .role
+#determineRolesContainer .role
 {
 	text-align: center;
 	border: none;
+	font-size: 17px;
 }
+
+.slotMachineContainer { margin-bottom: 25px }
 .slotMachine
 {
 	overflow: hidden;
 	border-radius: 2px;
-	margin-bottom: 20px;
 	text-align: center;
 }
 .slotMachineOption
