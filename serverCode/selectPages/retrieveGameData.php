@@ -80,13 +80,24 @@
 									FROM vw_disease
 									WHERE game = $game")->fetch_assoc();
 		}
-		else // beginning new game -- get all roles for role determination slot machines.
+		else // beginning new game
 		{
+			// get all roles for role determination slot machines.
 			$allRoles = $mysqli->query("SELECT roleName FROM role");
 			
-			$response["allRoles"] = array();
 			while ($row = mysqli_fetch_assoc($allRoles))
 				$response["allRoles"][] = $row["roleName"];
+			
+			// Get populations of cities included in starting hands for determining turn order.
+			$populations = $mysqli->query("SELECT cityKey AS 'key', population
+											FROM city
+											WHERE cityKey IN (SELECT cardKey
+															FROM vw_playerCard
+															WHERE game = $game
+															AND pile != 'deck')");
+			
+			while ($row = mysqli_fetch_assoc($populations))
+				$response["startingHandPopulations"][] = $row;
 		}
 		
 		$players = $mysqli->query("SELECT	uID,

@@ -7520,6 +7520,7 @@ async function setup()
 		0: {
 			gamestate,
 			allRoles,
+			startingHandPopulations,
 			cities,
 			players,
 			infectionDiscards,
@@ -7561,7 +7562,7 @@ async function setup()
 	}
 	else if (currentStepIs("setup"))
 	{
-		data.allRoles = allRoles;
+		Object.assign(data, { allRoles, startingHandPopulations });
 		animateNewGameSetup();
 	}
 	else
@@ -7846,7 +7847,8 @@ async function animateNewGameSetup()
 	const $heading = $("#setupContainer").children("h4"),
 		setupSteps = [
 			animateRoleDetermination,
-			animateInitialDeal
+			animateInitialDeal,
+			determineTurnOrder
 		],
 		numPlayers = Object.keys(data.players).length,
 		headings = [
@@ -7865,6 +7867,31 @@ async function animateNewGameSetup()
 	}
 	
 	proceed();
+}
+
+async function determineTurnOrder()
+{
+	const $containers = $(".roleContainer"),
+		$cards = $containers.children(".playerCard"),
+		$aCard = $cards.first(),
+		initialCardHeight = $aCard.height();
+
+	let i = 0;
+	for (let city of data.startingHandPopulations)
+	{
+		$cards.filter(`[data-key='${city.key}']`)
+			.html(`${$cards.eq(i++).html()}<br />Population: ${numberWithCommas(city.population)}`);
+	}
+
+	$containers.add($aCard).css("height", "auto");
+	const expandedCardHeight = $aCard.height();
+	$aCard.height(initialCardHeight);
+
+	await animatePromise(
+	{
+		$elements: $cards,
+		desiredProperties: { height: expandedCardHeight }
+	});
 }
 
 async function animateInitialDeal()

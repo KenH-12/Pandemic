@@ -41,6 +41,8 @@ animate setup
 	infect 9 cities
 	determine turn order
 
+add checkmarks to completed setup steps?
+
 playerpanels should be arranged in turn order
 the playerpanels should be collapsible (can't see chicago)
 

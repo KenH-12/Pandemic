@@ -164,6 +164,11 @@ function typeOutString($element, string, { trailingEllipsis })
 	});
 }
 
+function numberWithCommas(x)
+{
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 // Returns a new object with name-value pairs derived from two parallel string arrays.
 function objectFromParallelArrays(names, values)
 {
