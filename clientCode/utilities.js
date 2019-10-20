@@ -146,6 +146,24 @@ function toCamelCase(string)
 	return s[0].toLowerCase() + s.substring(1).replace(/ /g,"");
 }
 
+function typeOutString($element, string, { trailingEllipsis })
+{
+	return new Promise(async resolve =>
+	{
+		if (trailingEllipsis)
+			string += "    .    .    .";
+		
+		$element.html("");
+		
+		for (let char of string)
+		{
+			$element.html($element.html() + char);
+			await sleep(25);
+		}
+		resolve();
+	});
+}
+
 // Returns a new object with name-value pairs derived from two parallel string arrays.
 function objectFromParallelArrays(names, values)
 {

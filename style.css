@@ -936,7 +936,12 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 #forecastContainer > p { text-align: center }
 #forecastContainer > p:first-of-type { margin-bottom: 5px }
 
-
+#setupContainer > h4
+{
+	font-weight: 400;
+	padding: 5px;
+	height: 32px;
+}
 #roleSetupContainer
 {
 	padding: 8% 12%;
@@ -951,7 +956,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	border: none;
 	font-size: 17px;
 }
-.roleContainer { margin-bottom: 25px }
+.roleContainer { margin-bottom: 20px }
 .slotMachine
 {
 	overflow: hidden;

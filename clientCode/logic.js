@@ -7843,14 +7843,24 @@ class RoleSlotMachine
 
 async function animateNewGameSetup()
 {
-	const setupSteps = [
-		animateRoleDetermination,
-		animateInitialDeal
-	];
+	const $heading = $("#setupContainer").children("h4"),
+		setupSteps = [
+			animateRoleDetermination,
+			animateInitialDeal
+		],
+		numPlayers = Object.keys(data.players).length,
+		headings = [
+			"Randomly assigning roles",
+			`${numPlayers} player game -> players start with ${6 - numPlayers} cards each`,
+			"The player with the highest city population goes first"
+		];
 	
+	let i = 0;
 	for (let step of setupSteps)
 	{
 		highlightNextSetupStep();
+		typeOutString($heading, headings[i++], { trailingEllipsis: true });
+		
 		await step();
 	}
 	
@@ -7865,6 +7875,8 @@ async function animateInitialDeal()
 	await dealFaceDownStartingHands(startingHands, $roleContainers);
 	await sleep(getDuration("mediumInterval"));
 	await revealStartingHands(startingHands, $roleContainers);
+
+	return sleep(getDuration("longInterval"));
 }
 
 async function dealFaceDownStartingHands(startingHands, $roleContainers)
