@@ -133,8 +133,6 @@
 						</div>
 
 						<div id='setupContainer'>
-							<h4></h4>
-
 							<div id='roleSetupContainer'></div>
 
 							<div id='initialInfectionsContainer' class='hidden'>

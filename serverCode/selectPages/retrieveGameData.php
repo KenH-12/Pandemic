@@ -89,9 +89,12 @@
 				$response["allRoles"][] = $row["roleName"];
 			
 			// Get populations of cities included in starting hands for determining turn order.
-			$populations = $mysqli->query("SELECT cityKey AS 'key', population
-											FROM city
-											WHERE cityKey IN (SELECT cardKey
+			$populations = $mysqli->query("SELECT	cardKey AS 'key',
+													pop AS 'population',
+													pileID AS 'role'
+											FROM vw_playerCard
+											WHERE game = $game
+											AND cardKey IN (SELECT cardKey
 															FROM vw_playerCard
 															WHERE game = $game
 															AND pile != 'deck')");

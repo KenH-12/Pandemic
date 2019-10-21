@@ -7844,55 +7844,132 @@ class RoleSlotMachine
 
 async function animateNewGameSetup()
 {
-	const $heading = $("#setupContainer").children("h4"),
-		setupSteps = [
+	const setupSteps = [
 			animateRoleDetermination,
 			animateInitialDeal,
-			determineTurnOrder
+			animateDetermineTurnOrder
 		],
-		numPlayers = Object.keys(data.players).length,
-		headings = [
-			"Randomly assigning roles",
-			`${numPlayers} player game -> players start with ${6 - numPlayers} cards each`,
-			"The player with the highest city population goes first"
-		];
+		interval = getDuration("shortInterval");
 	
 	let i = 0;
 	for (let step of setupSteps)
 	{
 		highlightNextSetupStep();
-		typeOutString($heading, headings[i++], { trailingEllipsis: true });
-		
 		await step();
+		await sleep(interval)
 	}
 	
 	proceed();
 }
 
-async function determineTurnOrder()
+async function animateDetermineTurnOrder()
 {
-	const $containers = $(".roleContainer"),
-		$cards = $containers.children(".playerCard"),
-		$aCard = $cards.first(),
+	const $roleContainers = $(".roleContainer");
+
+	await showStartingHandPopulations();
+
+	const rankAdjustments = getPopulationRankOffsetAdjustments($roleContainers.find(".playerCard").first());
+
+	let $card,
+		$rank,
+		popRank = 1,
+		rankOffset;
+	for (let card of getTurnOrderCardArray())
+	{
+		$card = $roleContainers.find(`.playerCard[data-key='${card.key}']`);
+		
+		$card.css("border-left", `3px solid #fff`);
+		
+		$rank = $(`<h5 class='popRank'>#${popRank++}</h5>`);
+
+		rankOffset = $card.offset();
+		rankOffset.top += rankAdjustments.top;
+		rankOffset.left += rankAdjustments.left;
+		
+		$rank.appendTo($card.parent())
+			.offset(rankOffset);
+		
+		await animatePromise(
+		{
+			$elements: $rank,
+			initialProperties: { opacity: 0.1 },
+			desiredProperties: { opacity: 1 },
+			duration: 500
+		});
+		await sleep(500);
+	}
+
+	return sleep(500);
+}
+
+function getPopulationRankOffsetAdjustments($exampleCard)
+{
+	const $exampleRank = $("<h5 class='popRank'>#1</h5>").appendTo($exampleCard.parent()),
+		adjustments = {
+			top: ($exampleCard.height() / 2) - ($exampleRank.height() / 2),
+			left: -($exampleRank.width() + 5)
+		};
+	
+	$exampleRank.remove();
+
+	return adjustments;
+}
+
+function showStartingHandPopulations()
+{
+	const $containers = $(".roleContainer");
+	let $cards = $containers.children(".playerCard");
+	const $aCard = $cards.first(),
 		initialCardHeight = $aCard.height();
 
-	let i = 0;
-	for (let city of data.startingHandPopulations)
+	let $card;
+	for (let { key, population } of data.startingHandPopulations)
 	{
-		$cards.filter(`[data-key='${city.key}']`)
-			.html(`${$cards.eq(i++).html()}<br />Population: ${numberWithCommas(city.population)}`);
+		$card = $cards.filter(`[data-key='${key}']`);
+
+		if (isEventCardKey(key))
+			$cards = $cards.not($card);
+		else
+			$card.html(`${$card.html()}<br />Population: ${numberWithCommas(population)}`);
 	}
 
 	$containers.add($aCard).css("height", "auto");
 	const expandedCardHeight = $aCard.height();
 	$aCard.height(initialCardHeight);
 
-	await animatePromise(
+	return animatePromise(
 	{
 		$elements: $cards,
 		desiredProperties: { height: expandedCardHeight }
 	});
 }
+
+function getTurnOrderCardArray()
+{
+	const turnOrderCards = [];
+
+	let highestPop,
+		cardWithHighestPop;
+	while (data.startingHandPopulations.length)
+	{
+		highestPop = 0;
+		for (let card of data.startingHandPopulations)
+		{
+			if (Number(card.population) > highestPop)
+			{
+				highestPop = Number(card.population);
+				cardWithHighestPop = card;
+			}
+		}
+		
+		turnOrderCards.push(cardWithHighestPop);
+		data.startingHandPopulations = data.startingHandPopulations.filter(c => c.role != cardWithHighestPop.role);
+	}
+
+	log(turnOrderCards);
+	return turnOrderCards;
+}
+
 
 async function animateInitialDeal()
 {

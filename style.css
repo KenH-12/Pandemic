@@ -936,15 +936,9 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 #forecastContainer > p { text-align: center }
 #forecastContainer > p:first-of-type { margin-bottom: 5px }
 
-#setupContainer > h4
-{
-	font-weight: 400;
-	padding: 5px;
-	height: 32px;
-}
 #roleSetupContainer
 {
-	padding: 8% 12%;
+	padding: 2% 12%;
 }
 #roleSetupContainer .name
 {
@@ -954,7 +948,6 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 {
 	text-align: center;
 	border: none;
-	font-size: 17px;
 }
 .roleContainer { margin-bottom: 20px }
 .slotMachine
@@ -1000,4 +993,11 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	width: 92%;
 	margin-left: 4%;
 	margin-bottom: 4px;
+}
+.popRank
+{
+	position: absolute;
+	font-size: 20px;
+	font-family: 'B612 Mono', monospace;
+	font-weight: 400;
 }
