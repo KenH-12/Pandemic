@@ -4115,7 +4115,7 @@ function appendPawnToBoard(player)
 
 	$("#boardContainer").append(`<img	src='images/pieces/pawns/${camelCaseRole}.png'
 										alt='${role} pawn'
-										class='pawn ${cityKey}'
+										class='pawn ${cityKey}${currentStepIs("setup") ? " hidden" : ""}'
 										id='${camelCaseRole}Pawn'
 										data-role='${role}' />`);
 }
@@ -4315,7 +4315,7 @@ class City
 		if (animate)
 		{
 			stationInitialOffset = stationInitialOffset || $("#researchStationSupply img").offset();
-			this.cluster({ animateResearchStation: true, stationInitialOffset, animatePawns: true });
+			return this.cluster({ animateResearchStation: true, stationInitialOffset, animatePawns: true });
 		}
 	}
 
@@ -7845,7 +7845,9 @@ async function animateNewGameSetup()
 	const setupSteps = [
 			animateRoleDetermination,
 			animateInitialDeal,
-			animateDetermineTurnOrder
+			animateDetermineTurnOrder,
+			placePawnsInAtlanta,
+			placeResearchStationInAtlanta
 		],
 		interval = getDuration("shortInterval");
 	
@@ -7860,27 +7862,93 @@ async function animateNewGameSetup()
 	proceed();
 }
 
+async function placeResearchStationInAtlanta()
+{
+	return new Promise(async resolve =>
+	{
+		const $cdcBlurb = $("#setupContainer").children("h4");
+
+		await data.cities["atla"].buildResearchStation({ animate: true });
+		await sleep(getDuration("longInterval"));
+		
+		await animatePromise(
+		{
+			$elements: $cdcBlurb,
+			desiredProperties: { opacity: 0 }
+		});
+		$cdcBlurb.remove();
+
+		resolve();
+	});
+}
+
+async function placePawnsInAtlanta()
+{
+	const duration = 400,
+		easing = "easeInQuad",
+		panelWidth = $(".playerPanel").first().width(),
+		$cdcBlurb = $(`<h4>Atlanta is home to the CDC, the Center for Disease Control and Prevention</h4>`);
+	
+	let player,
+		$pawn,
+		$panel,
+		pawnOffsetInAtlanta,
+		initialOffset;
+	
+	await animatePromise(
+	{
+		$elements: $cdcBlurb.prependTo("#setupContainer"),
+		initialProperties: { opacity: 0 },
+		desiredProperties: { opacity: 1 }
+	});
+	
+	for (let rID of data.turnOrder)
+	{
+		player = data.players[rID];
+		$pawn = player.getPawn();
+		$panel = player.getPanel();
+		
+		pawnOffsetInAtlanta = $pawn.removeClass("hidden").offset();
+
+		initialOffset = $panel.offset();
+		initialOffset.top -= data.pawnHeight;
+		initialOffset.left += panelWidth / 2;
+		initialOffset.left -= data.pawnWidth / 2;
+
+		await animatePromise(
+		{
+			$elements: $pawn,
+			initialProperties: initialOffset,
+			desiredProperties: pawnOffsetInAtlanta,
+			duration,
+			easing
+		});
+	}
+
+	return sleep(duration);
+}
+
 async function animateDetermineTurnOrder()
 {
 	const interval = getDuration("shortInterval");
 
 	await showStartingHandPopulations();
 	await sleep(interval);
-	const turnOrder = await showTurnOrder();
+	data.turnOrder = await showTurnOrder();
 	await sleep(interval);
-	await arrangePlayerPanels(turnOrder);
+	await arrangePlayerPanels();
 }
 
-async function arrangePlayerPanels(turnOrder)
+async function arrangePlayerPanels()
 {
 	const $roleContainers = $(".roleContainer");
 
 	lockElements($roleContainers);
 
-	for (let rID of turnOrder)
-	{
-		await transformIntoPlayerPanel($roleContainers.filter(`[data-role='${rID}']`));	
-	}
+	for (let rID of data.turnOrder)
+		await transformIntoPlayerPanel($roleContainers.filter(`[data-role='${rID}']`));
+	
+	return sleep(500);
 }
 
 async function transformIntoPlayerPanel($roleContainer)

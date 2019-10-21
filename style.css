@@ -934,6 +934,11 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 #forecastContainer > p { text-align: center }
 #forecastContainer > p:first-of-type { margin-bottom: 5px }
 
+#setupContainer > h4
+{
+	padding: 5px;
+	font-weight: 400;
+}
 #roleSetupContainer
 {
 	padding: 2% 12%;
