@@ -31,6 +31,9 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
+It's possible for order of cards in the starting hands to not match the actual cardIndex order
+	the issue might lie in the way the starting hand event cardKeys are inserted
+
 TO DO
 -----
 animate setup
@@ -150,6 +153,10 @@ make animation effects juicier
 
 SMALL FIXES
 -----------
+use a more straightforward way of retrieving the turn order in retrieveGameData.php
+
+use flexbox for #playerPanelContainer
+
 show outbreak symbol on outbreaking city
 
 One Quiet Night should notify success in a more visible way

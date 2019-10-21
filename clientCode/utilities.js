@@ -197,3 +197,19 @@ function ensureIsArray(obj)
 
 	return [obj];
 }
+
+function lockElements($elements)
+{
+	let $e, initialOffset, initialWidth;
+	
+	for (let i = $elements.length - 1; i >= 0; i--)
+	{
+		$e = $elements.eq(i);
+		initialOffset = $e.offset();
+		initialWidth = $e.width();
+
+		$e.css("position", "absolute")
+			.offset(initialOffset)
+			.width(initialWidth);
+	}
+}

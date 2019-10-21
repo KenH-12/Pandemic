@@ -4090,14 +4090,23 @@ function instantiatePlayers(playerInfoArray)
 		player = new Player(pInfo);
 		data.players[player.rID] = player;
 		
-		appendPlayerPanel(player);
 		appendPawnToBoard(player);
 		queueCluster(player.cityKey);
 	}
+
+	for (let rID of getTurnOrder())
+	{
+		player = data.players[rID];
+		appendPlayerPanel(player);
+	}
 	
-	setPlayerPanelWidth();
 	bindRoleCardHoverEvents();
 	bindPawnEvents();
+}
+
+function getTurnOrder()
+{
+	return getTurnOrderCardArray().map(card => card.role);
 }
 
 function appendPawnToBoard(player)
@@ -4115,25 +4124,12 @@ function appendPlayerPanel(player)
 {
 	const { camelCaseRole, name, role } = player;
 
-	$("#playerPanelContainer").append(`<div class='playerPanel' id='${camelCaseRole}'>
+	$("#playerPanelContainer").append(`<div class='playerPanel hidden' id='${camelCaseRole}'>
 								<div class='name'>${name}</div>
 								<div class='role ${camelCaseRole}'>
 									<p>${role}</p>
 								</div>
 							</div>`);
-}
-
-function setPlayerPanelWidth()
-{
-	const $playerPanelContainer = $("#playerPanelContainer"),
-		$panels = $playerPanelContainer.children(".playerPanel"),
-		numPanels = $panels.length;
-		
-	$panels.css(
-		{
-			width: Math.round(90 / numPanels) + "%",
-			marginRight: Math.round(9 / numPanels) + "%"
-		});
 }
 
 function bindPawnEvents()
@@ -7538,6 +7534,8 @@ async function setup()
 	await parseEvents(eventHistory);
 	loadGamestate(gamestate);
 	loadCityStates(cities);
+
+	data.startingHandPopulations = startingHandPopulations;
 	instantiatePlayers(players);
 	loadDiseaseStatuses(diseaseStatuses);
 	loadInfectionDiscards(infectionDiscards);
@@ -7562,7 +7560,7 @@ async function setup()
 	}
 	else if (currentStepIs("setup"))
 	{
-		Object.assign(data, { allRoles, startingHandPopulations });
+		data.allRoles = allRoles;
 		animateNewGameSetup();
 	}
 	else
@@ -7851,10 +7849,10 @@ async function animateNewGameSetup()
 		],
 		interval = getDuration("shortInterval");
 	
-	let i = 0;
 	for (let step of setupSteps)
 	{
 		highlightNextSetupStep();
+		await sleep(interval);
 		await step();
 		await sleep(interval)
 	}
@@ -7864,42 +7862,118 @@ async function animateNewGameSetup()
 
 async function animateDetermineTurnOrder()
 {
-	const $roleContainers = $(".roleContainer");
+	const interval = getDuration("shortInterval");
 
 	await showStartingHandPopulations();
+	await sleep(interval);
+	const turnOrder = await showTurnOrder();
+	await sleep(interval);
+	await arrangePlayerPanels(turnOrder);
+}
 
-	const rankAdjustments = getPopulationRankOffsetAdjustments($roleContainers.find(".playerCard").first());
+async function arrangePlayerPanels(turnOrder)
+{
+	const $roleContainers = $(".roleContainer");
 
-	let $card,
-		$rank,
-		popRank = 1,
-		rankOffset;
-	for (let card of getTurnOrderCardArray())
+	lockElements($roleContainers);
+
+	for (let rID of turnOrder)
 	{
-		$card = $roleContainers.find(`.playerCard[data-key='${card.key}']`);
-		
-		$card.css("border-left", `3px solid #fff`);
-		
-		$rank = $(`<h5 class='popRank'>#${popRank++}</h5>`);
-
-		rankOffset = $card.offset();
-		rankOffset.top += rankAdjustments.top;
-		rankOffset.left += rankAdjustments.left;
-		
-		$rank.appendTo($card.parent())
-			.offset(rankOffset);
-		
-		await animatePromise(
-		{
-			$elements: $rank,
-			initialProperties: { opacity: 0.1 },
-			desiredProperties: { opacity: 1 },
-			duration: 500
-		});
-		await sleep(500);
+		await transformIntoPlayerPanel($roleContainers.filter(`[data-role='${rID}']`));	
 	}
+}
 
-	return sleep(500);
+async function transformIntoPlayerPanel($roleContainer)
+{
+	const $cards = $roleContainer.find(".playerCard"),
+		$popRank = $roleContainer.parent().find(`.popRank[data-role='${$roleContainer.attr("data-role")}']`);
+	
+	$cards.removeAttr("style")
+		.children("span.population").remove();
+	
+	$popRank.remove();
+	$roleContainer.removeClass("roleContainer")
+		.addClass("playerPanel");
+	
+	const initialProperties = $roleContainer.offset(),
+		$playerPanel = $(".playerPanel.hidden").first().removeClass("hidden"),
+		desiredProperties = $playerPanel.offset();
+
+	initialProperties.position = "absolute";
+	initialProperties.width = $roleContainer.width();
+	desiredProperties.width = $playerPanel.width() + 2;
+	desiredProperties.left += 1;
+	desiredProperties.top -= 1; // 1px border-top will be removed
+
+	$playerPanel.addClass("hidden");
+
+	const borderString = "1px solid #fff";
+	$roleContainer.find(".role")
+		.css(
+		{
+			borderTop: borderString,
+			borderBottom: borderString,
+			borderLeft: "none",
+			borderRight: "none"
+		})
+		.siblings(".name")
+		.css("border-top", borderString);
+	
+	await animatePromise(
+	{
+		$elements: $roleContainer.appendTo($("#rightPanel")),
+		initialProperties,
+		desiredProperties,
+		duration: 600,
+		easing: "easeInQuad"
+	});
+
+	$roleContainer.remove();
+	$playerPanel.removeClass("hidden");
+}
+
+function showTurnOrder()
+{
+	return new Promise(async resolve =>
+	{
+		const $roleSetupContainer = $("#roleSetupContainer"),
+			$roleContainers = $roleSetupContainer.children(".roleContainer"),
+			rankAdjustments = getPopulationRankOffsetAdjustments($roleContainers.find(".playerCard").first()),
+			turnOrder = [];
+
+		let $card,
+			$rank,
+			popRank = 1,
+			rankOffset;
+		
+		for (let card of getTurnOrderCardArray())
+		{
+			turnOrder.push(card.role);
+			
+			$card = $roleContainers.find(`.playerCard[data-key='${card.key}']`);
+			
+			$card.css("border-left", `3px solid #fff`);
+			
+			$rank = $(`<h5 class='popRank' data-role='${card.role}'>#${popRank++}</h5>`);
+
+			rankOffset = $card.offset();
+			rankOffset.top += rankAdjustments.top;
+			rankOffset.left += rankAdjustments.left;
+			
+			$rank.appendTo($roleSetupContainer)
+				.offset(rankOffset);
+			
+			await animatePromise(
+			{
+				$elements: $rank,
+				initialProperties: { opacity: 0.1 },
+				desiredProperties: { opacity: 1 },
+				duration: 500
+			});
+			await sleep(500);
+		}
+		resolve(turnOrder);
+	});
 }
 
 function getPopulationRankOffsetAdjustments($exampleCard)
@@ -7917,6 +7991,7 @@ function getPopulationRankOffsetAdjustments($exampleCard)
 
 function showStartingHandPopulations()
 {
+	log("showStartingHandPopulations");
 	const $containers = $(".roleContainer");
 	let $cards = $containers.children(".playerCard");
 	const $aCard = $cards.first(),
@@ -7930,7 +8005,7 @@ function showStartingHandPopulations()
 		if (isEventCardKey(key))
 			$cards = $cards.not($card);
 		else
-			$card.html(`${$card.html()}<br />Population: ${numberWithCommas(population)}`);
+			$card.append(`<span class='population'>Population: ${numberWithCommas(population)}</span>`);
 	}
 
 	$containers.add($aCard).css("height", "auto");
@@ -7948,12 +8023,14 @@ function getTurnOrderCardArray()
 {
 	const turnOrderCards = [];
 
-	let highestPop,
+	let startingHandPopulations = [...data.startingHandPopulations],
+		highestPop,
 		cardWithHighestPop;
-	while (data.startingHandPopulations.length)
+	
+	while (startingHandPopulations.length)
 	{
 		highestPop = 0;
-		for (let card of data.startingHandPopulations)
+		for (let card of startingHandPopulations)
 		{
 			if (Number(card.population) > highestPop)
 			{
@@ -7963,13 +8040,12 @@ function getTurnOrderCardArray()
 		}
 		
 		turnOrderCards.push(cardWithHighestPop);
-		data.startingHandPopulations = data.startingHandPopulations.filter(c => c.role != cardWithHighestPop.role);
+		startingHandPopulations = startingHandPopulations.filter(c => c.role != cardWithHighestPop.role);
 	}
 
-	log(turnOrderCards);
+	log("turnOrderCards: ", turnOrderCards);
 	return turnOrderCards;
 }
-
 
 async function animateInitialDeal()
 {
