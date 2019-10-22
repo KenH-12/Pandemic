@@ -935,12 +935,13 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 #forecastContainer > p:first-of-type { margin-bottom: 5px }
 
 #setupProcedureContainer .highlighted { font-size: 16px }
-#setupContainer > h4
+#setupContainer h4
 {
 	padding: 5px;
+	margin-bottom: 10px;
 	font-weight: 400;
 }
-#roleSetupContainer
+#roleSetupContainer, #preparePlayerDeckContainer
 {
 	padding: 2% 12%;
 }
@@ -1013,9 +1014,23 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	font-weight: 400;
 	z-index: 8;
 }
-
 #roleSetupContainer .playerPanel
 {
 	width: 100%;
 	border: 1px solid #fff;
+}
+
+#preparePlayerDeckContainer > div
+{
+	margin-bottom: 60px;
+}
+#preparePlayerDeckContainer .playerCard
+{
+	height: 24px;
+	line-height: 24px;
+	font-size: 16px;
+}
+#preparePlayerDeckContainer img
+{
+	width: 24px;
 }

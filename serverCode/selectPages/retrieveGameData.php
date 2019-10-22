@@ -15,6 +15,7 @@
 											turnNum,
 											stepName,
 											infRate AS 'infectionRate',
+											numEpidemics,
 											epidemicCount,
 											outbreakCount
 									FROM vw_gameState

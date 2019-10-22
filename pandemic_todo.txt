@@ -37,16 +37,15 @@ It's possible for order of cards in the starting hands to not match the actual c
 TO DO
 -----
 animate setup
-	determine roles
-	give each player cards and a pawn
-	place research station in Atlanta
 	prepare player deck
 	infect 9 cities
-	determine turn order
+
+pawns should not be appended to the board until they are about to be placed in Atlanta
 
 add checkmarks to completed setup steps?
 
-playerpanels should be arranged in turn order
+the player deck should appear smaller when it contains fewer cards
+
 the playerpanels should be collapsible (can't see chicago)
 
 standardize prompt appearance / button behaviour

@@ -107,7 +107,7 @@
 						</div>
 						<div id='playerDeck' class='bottomPanelDiv'>
 							<p class='title'>PLAYER DECK</p>
-							<img id='imgPlayerDeck' src='images/cards/playerCardback.png' alt='Player Deck'/>
+							<img id='imgPlayerDeck' src='images/cards/playerDeck_6.png' alt='Player Deck'/>
 						</div>
 						<div id='playerDiscard' class='bottomPanelDiv'>
 							<p class='title'>PLAYER DISCARDS</p>
@@ -134,6 +134,10 @@
 
 						<div id='setupContainer'>
 							<div id='roleSetupContainer'></div>
+
+							<div id='preparePlayerDeckContainer' class='hidden'>
+								<h4>Difficulty: <span class='difficulty'></span><br />-&gt; <span class='numEpidemics'></span> Epidemics</h4>
+							</div>
 
 							<div id='initialInfectionsContainer' class='hidden'>
 

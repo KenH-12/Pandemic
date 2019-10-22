@@ -490,7 +490,7 @@ class Step
 		this.procedureIdx = -1;
 	}
 
-	indicate = function()
+	indicate()
 	{
 		const $container = $("#indicatorContainer"),
 			activePlayer = getActivePlayer();
@@ -512,7 +512,7 @@ class Step
 		highlightTurnProcedureStep(this.name);
 	}
 
-	resume = function()
+	resume()
 	{
 		this.indicate();
 
@@ -522,7 +522,7 @@ class Step
 		this.procedure[this.procedureIdx]();
 	}
 	
-	proceed = function()
+	proceed()
 	{
 		if (++this.procedureIdx === this.procedure.length)
 		{
@@ -539,7 +539,7 @@ class Step
 		}
 	}
 
-	next = function()
+	next()
 	{
 		log("nextStep: ", data.nextStep);
 		setCurrentStep(data.nextStep).proceed();
@@ -3189,7 +3189,7 @@ function dealFaceDownPlayerCard($container, { finalCardbackWidth } = {})
 			deckOffset = $deck.offset(),
 			$playerCard = $("<div class='playerCard'></div>").appendTo($container),
 			containerOffset = $playerCard.offset(),
-			$cardback = $("<img class='drawnPlayerCard' src='images/cards/playerCardback.png' alt='Player Card'/>");
+			$cardback = newFacedownPlayerCard().addClass("drawnPlayerCard");
 		
 		$cardback
 			.appendTo("body")
@@ -3209,6 +3209,11 @@ function dealFaceDownPlayerCard($container, { finalCardbackWidth } = {})
 				data.easings.dealCard,
 				resolve());
 	});
+}
+
+function newFacedownPlayerCard()
+{
+	return $("<img src='images/cards/playerCardback.png' alt='Player Card'/>");
 }
 
 async function revealPlayerCard(cardKey, $container)
@@ -4089,9 +4094,6 @@ function instantiatePlayers(playerInfoArray)
 	{
 		player = new Player(pInfo);
 		data.players[player.rID] = player;
-		
-		appendPawnToBoard(player);
-		queueCluster(player.cityKey);
 	}
 
 	for (let rID of getTurnOrder())
@@ -7847,7 +7849,8 @@ async function animateNewGameSetup()
 			animateInitialDeal,
 			animateDetermineTurnOrder,
 			placePawnsInAtlanta,
-			placeResearchStationInAtlanta
+			placeResearchStationInAtlanta,
+			animatePreparePlayerDeck
 		],
 		interval = getDuration("shortInterval");
 	
@@ -7860,6 +7863,125 @@ async function animateNewGameSetup()
 	}
 	
 	proceed();
+}
+
+async function animatePreparePlayerDeck()
+{
+	const $container = $("#preparePlayerDeckContainer").removeClass("hidden"),
+		$heading = $container.children("h4").first();
+	
+	let $div;
+	
+	$heading.children(".difficulty").html(getDifficultyName())
+		.siblings(".numEpidemics").html(data.numEpidemics);
+	
+	for (let i = 0; i < data.numEpidemics; i++)
+	{
+		$div = $("<div></div>").appendTo($container);
+		newFacedownPlayerCard().appendTo($div);
+		newPlayerCardElement("epi").appendTo($div);
+	}
+
+	await showEpidemicsToShuffle($container);
+	await dividePlayerDeckIntoEqualPiles();
+}
+
+async function showEpidemicsToShuffle($container)
+{
+	const $cardbacks = $container.find("img"),
+		$epidemics = $container.find(".epidemic"),
+		epidemicWidth = $epidemics.first().width(),
+		duration = getDuration("revealCard"),
+		easing = data.easings.revealCard;
+	
+	$epidemics.addClass("hidden");
+
+	await animatePromise(
+	{
+		$elements: $cardbacks,
+		initialProperties: { opacity: 0 },
+		desiredProperties: { opacity: 1 },
+		duration
+	});
+	await sleep(getDuration("mediumInterval"));
+	$cardbacks.remove();
+	
+	return animatePromise(
+	{
+		$elements: $epidemics.removeClass("hidden"),
+		initialProperties: { width: 0 },
+		desiredProperties: { width: epidemicWidth },
+		duration,
+		easing
+	});
+}
+
+async function dividePlayerDeckIntoEqualPiles()
+{
+	const numCardsToDeal = Object.keys(data.cities).length + Object.keys(data.eventCards).length,
+		$divs = $("#preparePlayerDeckContainer").children("div"),
+		$deck = $("#imgPlayerDeck"),
+		initialProperties = $deck.offset(),
+		duration = getDuration("dealCard"),
+		easing = data.easings.dealCard,
+		desiredProps = [];
+
+	Object.assign(initialProperties,
+	{
+		position: "absolute",
+		zIndex: "6",
+		width: $deck.width()
+	});
+	
+	let $exampleCardback, cardbackWidth;
+	for (let i = 0; i < $divs.length; i++)
+	{
+		$exampleCardback = newFacedownPlayerCard().appendTo($divs.eq(i));
+		
+		desiredProps[i] = $exampleCardback.offset();
+		desiredProps[i].width = cardbackWidth || (cardbackWidth = $exampleCardback.width());
+
+		$exampleCardback.remove();
+	}
+
+	const cardsPerPile = Math.ceil(numCardsToDeal / $divs.length),
+		leftOffsetIncrement = ($divs.find(".epidemic").first().width() - cardbackWidth) / cardsPerPile;
+	log("leftOffsetIncrement ", leftOffsetIncrement);
+	let $cardback, divIdx = 0;
+	for (let i = 0; i < numCardsToDeal; i++)
+	{	
+		desiredProps[divIdx].left += leftOffsetIncrement; // offset the next card 1px to the right
+		$cardback = newFacedownPlayerCard();
+		
+		animatePromise(
+		{
+			$elements: $cardback.appendTo("body"),
+			initialProperties,
+			desiredProperties: desiredProps[divIdx],
+			duration,
+			easing
+		});
+
+		if (i === numCardsToDeal - 1) // deck is empty
+			$("#imgPlayerDeck").addClass("hidden");
+
+		await sleep(duration / 4);
+
+		if (++divIdx === $divs.length)
+			divIdx = 0;
+	}
+}
+
+function getDifficultyName()
+{
+	if (data.numEpidemics == 4)
+		return "Introductory";
+	
+	if (data.numEpidemics == 5)
+		return "Standard";
+	
+	if (data.numEpidemics == 6)
+		return "Heroic";
 }
 
 async function placeResearchStationInAtlanta()
@@ -7901,6 +8023,14 @@ async function placePawnsInAtlanta()
 		initialProperties: { opacity: 0 },
 		desiredProperties: { opacity: 1 }
 	});
+
+	for (let rID in data.players)
+	{
+		player = data.players[rID];
+		appendPawnToBoard(player);
+		queueCluster(player.cityKey);
+	}
+	executePendingClusters();
 	
 	for (let rID of data.turnOrder)
 	{
@@ -7937,6 +8067,8 @@ async function animateDetermineTurnOrder()
 	data.turnOrder = await showTurnOrder();
 	await sleep(interval);
 	await arrangePlayerPanels();
+
+	$("#roleSetupContainer").addClass("hidden");
 }
 
 async function arrangePlayerPanels()
