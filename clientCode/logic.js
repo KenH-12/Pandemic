@@ -7885,9 +7885,9 @@ async function placeResearchStationInAtlanta()
 async function placePawnsInAtlanta()
 {
 	const duration = 400,
-		easing = "easeInQuad",
+		easing = "easeInQuart",
 		panelWidth = $(".playerPanel").first().width(),
-		$cdcBlurb = $(`<h4>Atlanta is home to the CDC, the Center for Disease Control and Prevention</h4>`);
+		$cdcBlurb = $(`<h4>Atlanta is home to the CDC, the Center for Disease Control and Prevention.</h4>`);
 	
 	let player,
 		$pawn,
@@ -7992,8 +7992,8 @@ async function transformIntoPlayerPanel($roleContainer)
 		$elements: $roleContainer.appendTo($("#rightPanel")),
 		initialProperties,
 		desiredProperties,
-		duration: 600,
-		easing: "easeInQuad"
+		duration: 500,
+		easing: "easeInOutQuint"
 	});
 
 	$roleContainer.remove();
