@@ -7929,7 +7929,6 @@ async function dividePlayerDeckIntoEqualPiles()
 	Object.assign(initialProperties,
 	{
 		position: "absolute",
-		zIndex: "6",
 		width: $deck.width()
 	});
 	
@@ -7940,17 +7939,19 @@ async function dividePlayerDeckIntoEqualPiles()
 		
 		desiredProps[i] = $exampleCardback.offset();
 		desiredProps[i].width = cardbackWidth || (cardbackWidth = $exampleCardback.width());
+		desiredProps[i].zIndex = 1;
 
 		$exampleCardback.remove();
 	}
 
 	const cardsPerPile = Math.ceil(numCardsToDeal / $divs.length),
 		leftOffsetIncrement = ($divs.find(".epidemic").first().width() - cardbackWidth) / cardsPerPile;
-	log("leftOffsetIncrement ", leftOffsetIncrement);
+	
 	let $cardback, divIdx = 0;
-	for (let i = 0; i < numCardsToDeal; i++)
+	for (let i = numCardsToDeal; i > 0; i--)
 	{	
-		desiredProps[divIdx].left += leftOffsetIncrement; // offset the next card 1px to the right
+		initialProperties.zIndex = i;
+		desiredProps[divIdx].left += leftOffsetIncrement; // offset the next card to the right
 		$cardback = newFacedownPlayerCard();
 		
 		animatePromise(

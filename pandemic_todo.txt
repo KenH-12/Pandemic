@@ -40,8 +40,6 @@ animate setup
 	prepare player deck
 	infect 9 cities
 
-pawns should not be appended to the board until they are about to be placed in Atlanta
-
 add checkmarks to completed setup steps?
 
 the player deck should appear smaller when it contains fewer cards
