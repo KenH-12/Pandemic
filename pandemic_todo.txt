@@ -37,8 +37,9 @@ It's possible for order of cards in the starting hands to not match the actual c
 TO DO
 -----
 animate setup
-	prepare player deck
 	infect 9 cities
+
+starting hand deal should set the zIndex of each card as it comes off the deck
 
 add checkmarks to completed setup steps?
 

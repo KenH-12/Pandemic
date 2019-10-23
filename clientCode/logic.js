@@ -6030,18 +6030,13 @@ async function animateEpidemicIntensify()
 	const $cards = $container.children(".infectionCard"),
 		$veil = $container.children("#infDiscardVeil"),
 		$deck = $("#imgInfectionDeck"),
-		deckWidth = $deck.width(),
-		centerOfContainer = {
-			top: ($container.height() - $title.outerHeight()) / 2 - (deckWidth / 2),
-			left: $container.width() / 2 - (deckWidth / 2)
-		}
+		deckWidth = $deck.width();
 	
 	$cards.prepend($(`<img	class='infDiscardCardback'
 							src='images/cards/infectionCardback.png'
 							alt='Infection Card' />`));
 	
-	const $cardbacks = $(".infDiscardCardback"),
-		easing = "easeInOutQuad";
+	const $cardbacks = $(".infDiscardCardback");
 	let duration = 500;
 
 	if ($cardbacks.length > 1)
@@ -6078,36 +6073,7 @@ async function animateEpidemicIntensify()
 	);
 	
 	$veil.addClass("hidden");
-	await animatePromise(
-		{
-			$elements: $cardbacks,
-			desiredProperties: { ...centerOfContainer, ...{ width: deckWidth } },
-			duration: duration,
-			easing: easing
-		});
-
-	if ($cardbacks.length > 1)
-	{
-		duration = 100;
-		for (let i = 0; i < 5; i++)
-		{
-			await randomizeOffsets($cardbacks,
-				{
-					minDistance: 10,
-					maxDistance: Math.floor(deckWidth * 0.75),
-					duration: duration,
-					easing: easing
-				});
-			
-			await animatePromise(
-				{
-					$elements: $cardbacks,
-					desiredProperties: centerOfContainer,
-					duration: duration,
-					easing: easing
-				});
-		}
-	}
+	await shuffleAnimation($container, $cardbacks, 5);
 
 	const initialCardPosition = $cardbacks.first().offset(),
 		deckPosition = $deck.offset();
@@ -6122,7 +6088,7 @@ async function animateEpidemicIntensify()
 			{
 				$elements: $card,
 				initialProperties: { ...initialCardPosition, ...{ zIndex: 10 } },
-				desiredProperties: deckPosition,
+				desiredProperties: { ...deckPosition, ...{ width: deckWidth } },
 				duration: duration,
 				easing: "easeOutQuad"
 			});
@@ -6136,6 +6102,56 @@ async function animateEpidemicIntensify()
 	bindInfectionDiscardHover();
 
 	return sleep(getDuration("longInterval"));
+}
+
+function shuffleAnimation($container, $elements, numShuffles)
+{
+	return new Promise(async resolve =>
+	{
+		const containerWidth = $container.width(),
+			containerHeight = $container.height(),
+			containerOffset = $container.offset(),
+			elementWidth = $elements.first().width(),
+			centerOfContainer = {
+				top: containerOffset.top + containerHeight / 2 - elementWidth / 2,
+				left: containerOffset.left + containerWidth / 2 - elementWidth / 2
+			},
+			maxDistanceFromCenter = containerHeight < containerWidth ? containerHeight / 2 : containerWidth / 2,
+			easing = "easeInOutQuad";
+		
+		let duration = 500;
+		await animatePromise(
+			{
+				$elements,
+				desiredProperties: centerOfContainer,
+				duration: duration,
+				easing: easing
+			});
+
+		if ($elements.length === 1)
+			return resolve();
+		
+		duration = 100;
+		for (let i = 0; i < numShuffles; i++)
+		{
+			await randomizeOffsets($elements,
+				{
+					minDistance: 5,
+					maxDistance: maxDistanceFromCenter,
+					duration: duration,
+					easing: easing
+				});
+			
+			await animatePromise(
+				{
+					$elements,
+					desiredProperties: centerOfContainer,
+					duration: duration,
+					easing: easing
+				});
+		}
+		resolve();
+	});
 }
 
 function randomizeOffsets($elements, { minDistance, maxDistance, duration, easing })
@@ -7867,27 +7883,40 @@ async function animateNewGameSetup()
 
 async function animatePreparePlayerDeck()
 {
-	const $container = $("#preparePlayerDeckContainer").removeClass("hidden"),
-		$heading = $container.children("h4").first();
-	
-	let $div;
-	
-	$heading.children(".difficulty").html(getDifficultyName())
+	const $container = $("#preparePlayerDeckContainer").removeClass("hidden");
+
+	await showEpidemicsToShuffle($container);
+	await dividePlayerDeckIntoEqualPiles($container);
+
+	await animatePromise(
+	{
+		$elements: $container.children("h4"),
+		desiredProperties: { opacity: 0 },
+		duration: getDuration("longInterval")
+	});
+
+	const $divs = $container.children("div");
+	for (let i = $divs.length - 1; i >= 0; i--)
+	{
+		await shuffleEpidemicIntoPile($divs.eq(i));
+		await placePileOnPlayerDeck($divs.eq(i));
+	}
+}
+
+async function showEpidemicsToShuffle($container)
+{
+	$container.children("h4").first()
+		.children(".difficulty").html(getDifficultyName())
 		.siblings(".numEpidemics").html(data.numEpidemics);
 	
+	let $div;
 	for (let i = 0; i < data.numEpidemics; i++)
 	{
 		$div = $("<div></div>").appendTo($container);
 		newFacedownPlayerCard().appendTo($div);
 		newPlayerCardElement("epi").appendTo($div);
 	}
-
-	await showEpidemicsToShuffle($container);
-	await dividePlayerDeckIntoEqualPiles();
-}
-
-async function showEpidemicsToShuffle($container)
-{
+	
 	const $cardbacks = $container.find("img"),
 		$epidemics = $container.find(".epidemic"),
 		epidemicWidth = $epidemics.first().width(),
@@ -7916,13 +7945,14 @@ async function showEpidemicsToShuffle($container)
 	});
 }
 
-async function dividePlayerDeckIntoEqualPiles()
+async function dividePlayerDeckIntoEqualPiles($container)
 {
-	const numCardsToDeal = Object.keys(data.cities).length + Object.keys(data.eventCards).length,
-		$divs = $("#preparePlayerDeckContainer").children("div"),
+	const numCardsToDeal = getInitialPlayerDeckSize(),
+		$divs = $container.children("div"),
 		$deck = $("#imgPlayerDeck"),
 		initialProperties = $deck.offset(),
 		duration = getDuration("dealCard"),
+		interval = duration / 6,
 		easing = data.easings.dealCard,
 		desiredProps = [];
 
@@ -7956,7 +7986,7 @@ async function dividePlayerDeckIntoEqualPiles()
 		
 		animatePromise(
 		{
-			$elements: $cardback.appendTo("body"),
+			$elements: $cardback.appendTo($divs.eq(divIdx)),
 			initialProperties,
 			desiredProperties: desiredProps[divIdx],
 			duration,
@@ -7964,13 +7994,144 @@ async function dividePlayerDeckIntoEqualPiles()
 		});
 
 		if (i === numCardsToDeal - 1) // deck is empty
+		{
 			$("#imgPlayerDeck").addClass("hidden");
+			setPlayerDeckImgSize(getMaxPlayerDeckImgSize() - data.numEpidemics);
+		}
 
-		await sleep(duration / 4);
+		await sleep(interval);
 
 		if (++divIdx === $divs.length)
 			divIdx = 0;
 	}
+}
+
+function getInitialPlayerDeckSize({ includeEpidemics } = {})
+{
+	let deckSize = Object.keys(data.cities).length + Object.keys(data.eventCards).length;
+
+	if (includeEpidemics)
+		deckSize += data.numEpidemics;
+	
+	return deckSize;
+}
+
+async function shuffleEpidemicIntoPile($div)
+{
+	const $epidemic = $div.children(".epidemic"),
+		initialEpidemicOffset = $epidemic.offset(),
+		duration = getDuration("dealCard"),
+		easing = data.easings.dealCard;
+	
+	let $cardbacks = $div.children("img");
+
+	$div.height($div.height());
+
+	await animatePromise(
+	{
+		$elements: $epidemic,
+		desiredProperties: { width: 0 },
+		duration,
+		easing
+	});
+
+	const $epidemicCardback = newFacedownPlayerCard();
+	$epidemic.replaceWith($epidemicCardback);
+
+	await animatePromise(
+	{
+		$elements: $epidemicCardback,
+		initialProperties: { ...{ position: "absolute"}, ...{ initialEpidemicOffset } },
+		desiredProperties: { top: $cardbacks.last().offset().top },
+		duration: duration / 2,
+		easing
+	});
+
+	await shuffleAnimation($div, $cardbacks.add($epidemicCardback), 3);
+}
+
+function placePileOnPlayerDeck($div)
+{
+	return new Promise(async resolve =>
+	{
+		const $cardbacks = $div.children("img"),
+			$deck = $("#imgPlayerDeck"),
+			deckIsHidden = $deck.hasClass("hidden"),
+			duration = getDuration("dealCard"),
+			easing = data.easings.dealCard,
+			interval = duration / 8;
+		
+		if (deckIsHidden) unhide($deck);
+		const desiredProperties = $deck.offset();
+		desiredProperties.width = $deck.width() * 0.94;
+		if (deckIsHidden) $deck.addClass("hidden");
+
+		let $cardback, zIndex = 10;
+		for (let i = $cardbacks.length - 1; i >= 0; i--)
+		{
+			$cardback = $cardbacks.eq(i);
+			animatePromise(
+			{
+				$elements: $cardback,
+				initialProperties: { zIndex },
+				desiredProperties,
+				duration, 
+				easing
+			});
+
+			await sleep(interval);
+			zIndex++;
+		}
+
+		await sleep(duration);
+		if (deckIsHidden) unhide($deck);
+		increasePlayerDeckImgSize();
+		$cardbacks.remove();
+
+		resolve();
+	});
+}
+
+function increasePlayerDeckImgSize()
+{
+	const $deck = $("#imgPlayerDeck");
+	
+	const deckSrc = $deck.attr("src"),
+		dotIdx = deckSrc.indexOf("."),
+		currentSize = deckSrc.substring(dotIdx - 1, dotIdx),
+		MAX_SIZE = getMaxPlayerDeckImgSize();
+
+	if (currentSize == MAX_SIZE)
+		return;
+		
+	let newSize;
+	if (isNaN(currentSize))
+		newSize = 1;
+	else
+		newSize = Number(currentSize) + 1;
+	
+	$deck.attr("src", `images/cards/playerDeck_${newSize}.png`);
+}
+
+function getMaxPlayerDeckImgSize() { return 6; }
+
+function setPlayerDeckImgSize(size)
+{
+	const $deck = $("#imgPlayerDeck"),
+		MAX_SIZE = getMaxPlayerDeckImgSize();
+
+	if (size === 0)
+	{
+		$deck.attr("src", `images/cards/playerCardback.png`);
+		return;
+	}
+	else if (size < 0)
+		return;
+	
+	if (size > MAX_SIZE)
+		size = MAX_SIZE;
+	
+	$deck.attr("src", `images/cards/playerDeck_${size}.png`);
 }
 
 function getDifficultyName()
