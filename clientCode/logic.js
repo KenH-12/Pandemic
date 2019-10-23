@@ -6886,7 +6886,7 @@ async function initialInfectionStep()
 {
 	prepareInitialInfections();
 	await dealInitialInfectionCards();
-	finishInfectionStep();
+	return finishInfectionStep();
 }
 
 function prepareInitialInfections()
@@ -7874,10 +7874,10 @@ async function animateNewGameSetup()
 			animateRoleDetermination,
 			animateInitialDeal,
 			animateDetermineTurnOrder,
-			placePawnsInAtlanta,
-			placeResearchStationInAtlanta,
 			animatePreparePlayerDeck,
-			initialInfectionStep
+			initialInfectionStep,
+			placePawnsInAtlanta,
+			placeResearchStationInAtlanta
 		],
 		interval = getDuration("shortInterval");
 	
