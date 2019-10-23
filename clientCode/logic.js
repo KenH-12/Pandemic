@@ -3181,7 +3181,7 @@ async function dealFaceDownPlayerCards($container, numCards)
 	return sleep(getDuration("longInterval"));
 }
 
-function dealFaceDownPlayerCard($container, { finalCardbackWidth } = {})
+function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex } = {})
 {
 	return new Promise(resolve =>
 	{
@@ -3191,6 +3191,9 @@ function dealFaceDownPlayerCard($container, { finalCardbackWidth } = {})
 			containerOffset = $playerCard.offset(),
 			$cardback = newFacedownPlayerCard().addClass("drawnPlayerCard");
 		
+		if (zIndex)
+			$cardback.css({ zIndex });
+
 		$cardback
 			.appendTo("body")
 			.width($deck.width())
@@ -7906,11 +7909,12 @@ async function animatePreparePlayerDeck()
 		duration: getDuration("longInterval")
 	});
 
-	const $divs = $container.children("div");
+	const $divs = $container.children("div"),
+		deckProperties = getPlayerDeckProperties();
 	for (let i = $divs.length - 1; i >= 0; i--)
 	{
 		await shuffleEpidemicIntoPile($divs.eq(i));
-		await placePileOnPlayerDeck($divs.eq(i));
+		await placePileOnPlayerDeck($divs.eq(i), deckProperties);
 	}
 
 	$container.addClass("hidden");
@@ -8063,46 +8067,45 @@ async function shuffleEpidemicIntoPile($div)
 	await shuffleAnimation($div, $cardbacks.add($epidemicCardback), 3);
 }
 
-function placePileOnPlayerDeck($div)
+function placePileOnPlayerDeck($div, deckPropertes)
 {
 	return new Promise(async resolve =>
 	{
 		const $cardbacks = $div.children("img"),
+			$cardback = $cardbacks.first(),
 			$deck = $("#imgPlayerDeck"),
-			deckIsHidden = $deck.hasClass("hidden"),
 			duration = getDuration("dealCard"),
-			easing = data.easings.dealCard,
-			interval = duration / 8;
+			easing = data.easings.dealCard;
 		
-		if (deckIsHidden) unhide($deck);
-		const desiredProperties = $deck.offset();
-		desiredProperties.width = $deck.width() * 0.94;
-		if (deckIsHidden) $deck.addClass("hidden");
+		$cardbacks.not($cardback).remove();
 
-		let $cardback, zIndex = 10;
-		for (let i = $cardbacks.length - 1; i >= 0; i--)
+		await animatePromise(
 		{
-			$cardback = $cardbacks.eq(i);
-			animatePromise(
-			{
-				$elements: $cardback,
-				initialProperties: { zIndex },
-				desiredProperties,
-				duration, 
-				easing
-			});
+			$elements: $cardback,
+			desiredProperties: deckPropertes,
+			duration, 
+			easing
+		});
 
-			await sleep(interval);
-			zIndex++;
-		}
-
-		await sleep(duration);
-		if (deckIsHidden) unhide($deck);
+		if ($deck.hasClass("hidden")) unhide($deck);
 		increasePlayerDeckImgSize();
-		$cardbacks.remove();
+		$cardback.remove();
 
 		resolve();
 	});
+}
+
+function getPlayerDeckProperties()
+{
+	const $deck = $("#imgPlayerDeck"),
+		deckIsHidden = $deck.hasClass("hidden");
+	
+	if (deckIsHidden) unhide($deck);
+	const deckProperties = $deck.offset();
+	deckProperties.width = $deck.width() * 0.94;
+	if (deckIsHidden) $deck.addClass("hidden");
+
+	return deckProperties;
 }
 
 function increasePlayerDeckImgSize()
@@ -8445,10 +8448,11 @@ async function dealFaceDownStartingHands(startingHands, $roleContainers)
 	await makeRoomForStartingHands(startingHandSize, $roleContainers);
 
 	let cardsDealt = 0,
-		roleIndex = 0;
+		roleIndex = 0,
+		zIndex = 10 + numCardsToDeal;
 	while (cardsDealt < numCardsToDeal)
 	{
-		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), { finalCardbackWidth });
+		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), { finalCardbackWidth, zIndex });
 		await sleep(interval);
 		
 		cardsDealt++;
@@ -8456,6 +8460,8 @@ async function dealFaceDownStartingHands(startingHands, $roleContainers)
 			roleIndex = 0;
 		else
 			roleIndex++;
+		
+		zIndex--;
 	}
 }
 

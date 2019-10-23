@@ -39,8 +39,6 @@ TO DO
 animate setup
 	infect 9 cities
 
-starting hand deal should set the zIndex of each card as it comes off the deck
-
 add checkmarks to completed setup steps?
 
 the player deck should appear smaller when it contains fewer cards
