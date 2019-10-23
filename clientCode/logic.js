@@ -6736,17 +6736,25 @@ async function finishInfectionStep()
 {
 	log("finishInfectionStep()");
 	log("nextStep: ", data.nextStep);
-	const $container = getInfectionContainer();
+	const $container = getInfectionContainer(),
+		$btn = $container.find(".btnContinue");
 	
 	if (currentStepIs("infect cities"))
+	{
 		enableEventCards();
 	
-	await buttonClickPromise($container.find(".btnContinue").html("CONTINUE"),
+		await buttonClickPromise($btn.html("CONTINUE"),
+		{
+			beforeClick: "show",
+			afterClick: "hide"
+		});
+		disableEventCards();
+	}
+	else
 	{
-		beforeClick: "show",
-		afterClick: "hide"
-	});
-	disableEventCards();
+		$btn.removeAttr("style").addClass("hidden");
+		await sleep(getDuration("longInterval"));
+	}
 
 	let $cards = $container.find(".infectionCard");
 	while ($cards.length)
@@ -6755,18 +6763,17 @@ async function finishInfectionStep()
 		$cards = $container.find(".infectionCard");
 	}
 	
+	if (currentStepIs("setup"))
+	{
+		$container.removeAttr("style").addClass("hidden");
+		return sleep(500);
+	}
+
 	$container.fadeOut(450);
 	$("#indicatorContainer").fadeOut(500, function()
 	{
 		$("#indicatorContainer").removeAttr("style").addClass("hidden");
-		$container.removeAttr("style").addClass("hidden");
-		if (currentStepIs("setup"))
-		{
-			unhide($("#turnProcedureContainer"));
-			proceed();
-		}
-		else
-			nextTurn();
+		nextTurn();
 	});
 }
 
@@ -6857,7 +6864,7 @@ function positionInfectionPanelComponents()
 		
 		// determine and evenly distribute the available height for .infGroup elements
 		const $infGroups = $(".infGroup"),
-			availableHeight = data.boardHeight - $("#indicatorContainer").height() - $("#btnContinue").height();
+			availableHeight = data.boardHeight - $("#setupProcedureContainer").height() - $("#btnContinue").height();
 			
 		$infGroups.height(availableHeight / $infGroups.length - getDimension("infGroupAdj"));
 	}
@@ -6901,7 +6908,7 @@ function prepareInitialInfections()
 	$btn.html("SKIP").off("click").click(function()
 	{
 		data.fastForwarding = true;
-		$btn.off("click").html("...");
+		$btn.off("click").removeAttr("style").addClass("hidden");
 	}).fadeIn(function() { $btn.removeClass("hidden") });
 	
 	positionInfectionPanelComponents();
@@ -6927,8 +6934,9 @@ function dealInitialInfectionCards()
 			
 			for (let card of group)
 			{
+				await sleep(getDuration("shortInterval"));
 				await revealInfectionCard(card);
-				await placeDiseaseCubes(card);
+				await placeDiseaseCubes(card, { noPostDelay: true });
 			}
 		}
 	
@@ -6955,7 +6963,7 @@ function showNextGroupInfRate()
 		{
 			marginLeft: computeGroupInfRateMargin($groupInfRate)
 		},
-		getDuration("longInterval"),
+		getDuration("shortInterval"),
 		data.easings.revealCard,
 		() => resolve());
 	});
@@ -7008,7 +7016,8 @@ function dealFaceDownInfCard(elementIndex)
 
 async function revealInfectionCard({ cityKey, index, preventionCode }, { forecasting } = {})
 {
-	await sleep(getDuration("mediumInterval"));
+	if (currentStepIs("infect cities"))
+		await sleep(getDuration("mediumInterval"));
 
 	return new Promise(resolve =>
 	{
@@ -7048,7 +7057,8 @@ async function placeDiseaseCubes({cityKey, numCubes = 1}, { noPostDelay } = {})
 		cubeSupplyOffset = $(`.cubeSupply .diseaseCube.${city.color}`).offset(),
 		shortInterval = getDuration("shortInterval");
 	
-	await sleep(shortInterval);
+	if (currentStepIs("infect cities"))
+		await sleep(shortInterval);
 	
 	for (let i = numCubes; i > 0; i--)
 	{
@@ -7866,7 +7876,8 @@ async function animateNewGameSetup()
 			animateDetermineTurnOrder,
 			placePawnsInAtlanta,
 			placeResearchStationInAtlanta,
-			animatePreparePlayerDeck
+			animatePreparePlayerDeck,
+			initialInfectionStep
 		],
 		interval = getDuration("shortInterval");
 	
@@ -7901,6 +7912,8 @@ async function animatePreparePlayerDeck()
 		await shuffleEpidemicIntoPile($divs.eq(i));
 		await placePileOnPlayerDeck($divs.eq(i));
 	}
+
+	$container.addClass("hidden");
 }
 
 async function showEpidemicsToShuffle($container)
