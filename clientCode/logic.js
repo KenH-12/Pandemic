@@ -6857,7 +6857,7 @@ function discardInfectionCard($card, duration)
 
 function positionInfectionPanelComponents()
 {
-	const $container = getInfectionContainer(),
+	const $container = getInfectionContainer().removeAttr("style"),
 		$cards = $container.find(".infectionCard"),
 		$veils = $container.find(".veil"),
 		cardHeight = getDimension("infCardHeight"),

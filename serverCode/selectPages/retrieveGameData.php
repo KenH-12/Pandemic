@@ -106,21 +106,27 @@
 		{
 			$response["players"][] = $row;
 		}
-
-		// Get populations of cities included in starting hands for determining turn order.
-		$populations = $mysqli->query("SELECT	cardKey AS 'key',
-												pop AS 'population',
-												pileID AS 'role'
-										FROM vw_playerCard
+		
+		$startingHands = $mysqli->query("SELECT role, details AS 'cardKeys'
+										FROM vw_event
 										WHERE game = $game
-										AND cardKey IN (SELECT cardKey
-														FROM vw_playerCard
-														WHERE game = $game
-														AND pile != 'deck')
-										ORDER BY pileID, cardIndex");
+										AND eventType = 'sh'");
 
-		while ($row = mysqli_fetch_assoc($populations))
-			$response["startingHandPopulations"][] = $row;
+		while ($row = mysqli_fetch_assoc($startingHands))
+		{
+			$role = $row["role"];
+			$cardKeys = explode(",", $row["cardKeys"]);
+
+			for ($i = 0; $i < count($cardKeys); $i++)
+			{
+				$cityKey = $cardKeys[$i];
+				$population = $mysqli->query("SELECT population FROM city WHERE cityKey = '$cityKey'")->fetch_assoc()["population"];
+				
+				$response["startingHandPopulations"][] = array("role" => $role,
+																"cardKey" => $cityKey,
+																"population" => $population);
+			}
+		}
 	}
 	catch(Exception $e)
 	{
