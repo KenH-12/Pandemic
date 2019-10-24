@@ -132,7 +132,7 @@
 							<p class='step'>7. Place 1 research station in Atlanta</p>
 						</div>
 
-						<div id='setupContainer'>
+						<div id='setupContainer' class='hidden'>
 							<div id='roleSetupContainer'></div>
 
 							<div id='preparePlayerDeckContainer' class='hidden'>

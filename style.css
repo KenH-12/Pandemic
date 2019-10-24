@@ -32,8 +32,7 @@ body
 }
 body,
 #curtain,
-.veil,
-#actionInterface > h2
+.veil
 {
 	background-color: #09154f;
 }
@@ -709,6 +708,7 @@ span.r {color: #ef282a}
 	font-size: 20px;
 	margin: 10px 0 5px 0;
 	background-color: #fff;
+	color: #09154f;
 	text-align: center;
 }
 #actionInterface > .instructions { margin-bottom: 25px; }

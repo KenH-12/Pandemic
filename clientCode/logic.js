@@ -4092,6 +4092,8 @@ function instantiatePlayers(playerInfoArray)
 		return;
 	}
 
+	const gameIsResuming = data.currentStep !== "setup";
+
 	let player;
 	for (let pInfo of playerInfoArray)
 	{
@@ -4103,10 +4105,19 @@ function instantiatePlayers(playerInfoArray)
 	{
 		player = data.players[rID];
 		appendPlayerPanel(player);
+
+		if (gameIsResuming)
+		{
+			appendPawnToBoard(player);
+			queueCluster(player.cityKey);
+		}
 	}
-	
-	bindRoleCardHoverEvents();
-	bindPawnEvents();
+
+	if (gameIsResuming)
+	{
+		bindPawnEvents();
+		unhide($(".playerPanel"));
+	}
 }
 
 function getTurnOrder()
@@ -7892,7 +7903,30 @@ async function animateNewGameSetup()
 		await sleep(interval)
 	}
 	
-	proceed();
+	beginGame();
+}
+
+async function beginGame()
+{
+	const $setupProcedureContainer = $("#setupProcedureContainer");
+
+	$setupProcedureContainer.children(".title")
+		.html("SETUP COMPLETE").addClass("highlighted")
+		.siblings().removeClass("highlighted");
+
+	await sleep(getDuration("longInterval"));
+	await animatePromise(
+	{
+		$elements: $setupProcedureContainer,
+		desiredProperties: { height: 0 }
+	});
+
+	$setupProcedureContainer.add("#setupContainer").remove();
+	unhide($("#turnProcedureContainer, #indicatorContainer, #actionsContainer"));
+
+	bindRoleCardHoverEvents();
+	bindPawnEvents();
+	data.currentStep.next();
 }
 
 async function animatePreparePlayerDeck()

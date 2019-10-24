@@ -36,8 +36,9 @@ It's possible for order of cards in the starting hands to not match the actual c
 
 TO DO
 -----
-animate setup
-	infect 9 cities
+fix epidemicInfect card draw animation
+fix epidemicIntensify shuffle animation
+infectCitiesContainer has display: "none" at start of infect cities step
 
 add checkmarks to completed setup steps?
 
