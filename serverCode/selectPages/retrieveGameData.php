@@ -123,7 +123,7 @@
 				$population = $mysqli->query("SELECT population FROM city WHERE cityKey = '$cityKey'")->fetch_assoc()["population"];
 				
 				$response["startingHandPopulations"][] = array("role" => $role,
-																"cardKey" => $cityKey,
+																"key" => $cityKey,
 																"population" => $population);
 			}
 		}

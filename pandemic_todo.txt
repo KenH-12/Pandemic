@@ -34,13 +34,10 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 It's possible for order of cards in the starting hands to not match the actual cardIndex order
 	the issue might lie in the way the starting hand event cardKeys are inserted
 
-something is wrong with the pawn clustering algorithm
-
 TO DO
 -----
 fix epidemicInfect card draw animation
 fix epidemicIntensify shuffle animation
-
 
 add checkmarks to completed setup steps?
 

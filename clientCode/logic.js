@@ -1582,9 +1582,10 @@ const actionInterfacePopulator = {
 		return true;
 	},
 	[eventTypes.airlift.name]({ playerToAirlift, destination })
-	{
+	{	
 		if (!destination)
 		{
+			clusterAll({ pawns: true });
 			data.promptingEventType = eventTypes.airlift;
 			enablePawnEvents();
 		}
@@ -2102,6 +2103,7 @@ function tryAirlift(playerToAirlift)
 		return false;
 	}
 
+	clusterAll({ pawns: true, playerToExcludePawn: playerToAirlift });
 	promptAction({ eventType: airlift, playerToAirlift, destination });
 }
 
@@ -2336,6 +2338,8 @@ function tryDispatchPawn(playerToDispatch)
 	
 	if (movementTypeRequiresDiscard(method))
 	{
+		clusterAll({ pawns: true, playerToExcludePawn: playerToDispatch });
+		
 		// If both Direct Flight and Charter Flight are valid ways to reach the destination, the Dispatcher must choose between them.
 		const dispatcherMustChooseMethod = method.code === eventTypes.directFlight.code
 											&& getPlayer("Dispatcher").isHoldingCardKey(playerToDispatch.cityKey),
@@ -2800,7 +2804,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		{
 			if (movementDetails.waitingForConfirmation)
 			{
-				log("prompting action with movement details: ", movementDetails);
+				clusterAll({ pawns: true, playerToExcludePawn: player });
 				promptAction(movementDetails);
 				return false;
 			}
@@ -3607,7 +3611,7 @@ class Player
 			$specialAbilities.append(`<li><span>${bullet}</span></li>`);
 
 		$roleCard.appendTo("#boardContainer");
-		log("hoveredElementOffset:", hoveredElementOffset);
+		
 		if (hoveredElementOffset)
 		{
 			// Without a slight delay, the calculated $roleCard height is inaccurate.
@@ -4092,8 +4096,6 @@ function instantiatePlayers(playerInfoArray)
 		return;
 	}
 
-	const gameIsResuming = data.currentStep !== "setup";
-
 	let player;
 	for (let pInfo of playerInfoArray)
 	{
@@ -4106,14 +4108,14 @@ function instantiatePlayers(playerInfoArray)
 		player = data.players[rID];
 		appendPlayerPanel(player);
 
-		if (gameIsResuming)
+		if (data.gameIsResuming)
 		{
 			appendPawnToBoard(player);
 			queueCluster(player.cityKey);
 		}
 	}
 
-	if (gameIsResuming)
+	if (data.gameIsResuming)
 	{
 		bindPawnEvents();
 		unhide($(".playerPanel"));
@@ -4122,7 +4124,7 @@ function instantiatePlayers(playerInfoArray)
 
 function getTurnOrder()
 {
-	return getTurnOrderCardArray().map(card => card.role);
+	return getDecidingTurnOrderCardPopulations().map(card => card.role);
 }
 
 function appendPawnToBoard(player)
@@ -4176,8 +4178,6 @@ function bindPawnEvents()
 					
 					const playerWhosePawnWasDropped = getPlayer(pawnRole);
 
-					clusterAll({ pawns: true, playerToExcludePawn: playerWhosePawnWasDropped });
-					
 					if (fn === movementAction)
 						fn();
 					else
@@ -7525,7 +7525,6 @@ function loadGamestate(gamestate)
 		data.nextStep = "action 1";
 	}
 
-	delete gamestate.gameIsResuming;
 	delete gamestate.stepName;
 	Object.assign(data, gamestate);
 }
@@ -7613,6 +7612,8 @@ async function animateRoleDetermination()
 {
 	const $container = $("#roleSetupContainer"),
 		slotMachines = [];
+
+	$container.parent().removeClass("hidden");
 
 	let player, $roleContainer;
 	for (let rID in data.players)
@@ -8358,7 +8359,7 @@ function showTurnOrder()
 			popRank = 1,
 			rankOffset;
 		
-		for (let card of getTurnOrderCardArray())
+		for (let card of getDecidingTurnOrderCardPopulations())
 		{
 			turnOrder.push(card.role);
 			
@@ -8397,7 +8398,7 @@ function getPopulationRankOffsetAdjustments($exampleCard)
 		};
 	
 	$exampleRank.remove();
-
+	
 	return adjustments;
 }
 
@@ -8431,7 +8432,7 @@ function showStartingHandPopulations()
 	});
 }
 
-function getTurnOrderCardArray()
+function getDecidingTurnOrderCardPopulations()
 {
 	const turnOrderCards = [];
 
