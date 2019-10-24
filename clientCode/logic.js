@@ -7914,7 +7914,7 @@ async function animatePreparePlayerDeck()
 	for (let i = $divs.length - 1; i >= 0; i--)
 	{
 		await shuffleEpidemicIntoPile($divs.eq(i));
-		await placePileOnPlayerDeck($divs.eq(i), deckProperties);
+		await placePileOntoPlayerDeck($divs.eq(i), deckProperties);
 	}
 
 	$container.addClass("hidden");
@@ -8067,21 +8067,21 @@ async function shuffleEpidemicIntoPile($div)
 	await shuffleAnimation($div, $cardbacks.add($epidemicCardback), 3);
 }
 
-function placePileOnPlayerDeck($div, deckPropertes)
+function placePileOntoPlayerDeck($div, deckPropertes)
 {
 	return new Promise(async resolve =>
 	{
 		const $cardbacks = $div.children("img"),
-			$cardback = $cardbacks.first(),
+			$pile = $cardbacks.first().attr("src", "images/cards/playerDeck_3.png"),
 			$deck = $("#imgPlayerDeck"),
 			duration = getDuration("dealCard"),
 			easing = data.easings.dealCard;
-		
-		$cardbacks.not($cardback).remove();
+
+		$cardbacks.not($pile).remove();
 
 		await animatePromise(
 		{
-			$elements: $cardback,
+			$elements: $pile,
 			desiredProperties: deckPropertes,
 			duration, 
 			easing
@@ -8089,7 +8089,7 @@ function placePileOnPlayerDeck($div, deckPropertes)
 
 		if ($deck.hasClass("hidden")) unhide($deck);
 		increasePlayerDeckImgSize();
-		$cardback.remove();
+		$pile.remove();
 
 		resolve();
 	});
