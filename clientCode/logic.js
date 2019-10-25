@@ -5865,6 +5865,7 @@ async function epidemicInfect()
 	getInfectionContainer().append(newInfectionCardTemplate());
 	positionInfectionPanelComponents();
 	await dealFaceDownInfCard(card.index);
+	await sleep(getDuration("mediumInterval")); // for suspense
 	await revealInfectionCard(card);
 
 	if (preventionCode == 0)
@@ -6045,13 +6046,18 @@ async function animateEpidemicIntensify()
 	const $cards = $container.children(".infectionCard"),
 		$veil = $container.children("#infDiscardVeil"),
 		$deck = $("#imgInfectionDeck"),
-		deckWidth = $deck.width();
+		deckWidth = $deck.width(),
+		centerOfContainer = {
+			top: ($container.height() - $title.outerHeight()) / 2 - (deckWidth / 2),
+			left: $container.width() / 2 - (deckWidth / 2)
+		}
 	
 	$cards.prepend($(`<img	class='infDiscardCardback'
 							src='images/cards/infectionCardback.png'
 							alt='Infection Card' />`));
 	
-	const $cardbacks = $(".infDiscardCardback");
+	const $cardbacks = $(".infDiscardCardback"),
+		easing = "easeInOutQuad";
 	let duration = 500;
 
 	if ($cardbacks.length > 1)
@@ -6088,7 +6094,36 @@ async function animateEpidemicIntensify()
 	);
 	
 	$veil.addClass("hidden");
-	await shuffleAnimation($container, $cardbacks, 5);
+	await animatePromise(
+		{
+			$elements: $cardbacks,
+			desiredProperties: { ...centerOfContainer, ...{ width: deckWidth } },
+			duration: duration,
+			easing: easing
+		});
+
+	if ($cardbacks.length > 1)
+	{
+		duration = 100;
+		for (let i = 0; i < 5; i++)
+		{
+			await randomizeOffsets($cardbacks,
+				{
+					minDistance: 10,
+					maxDistance: Math.floor(deckWidth * 0.5),
+					duration: duration,
+					easing: easing
+				});
+			
+			await animatePromise(
+				{
+					$elements: $cardbacks,
+					desiredProperties: centerOfContainer,
+					duration: duration,
+					easing: easing
+				});
+		}
+	}
 
 	const initialCardPosition = $cardbacks.first().offset(),
 		deckPosition = $deck.offset();
@@ -6103,7 +6138,7 @@ async function animateEpidemicIntensify()
 			{
 				$elements: $card,
 				initialProperties: { ...initialCardPosition, ...{ zIndex: 10 } },
-				desiredProperties: { ...deckPosition, ...{ width: deckWidth } },
+				desiredProperties: deckPosition,
 				duration: duration,
 				easing: "easeOutQuad"
 			});
@@ -6119,7 +6154,7 @@ async function animateEpidemicIntensify()
 	return sleep(getDuration("longInterval"));
 }
 
-function shuffleAnimation($container, $elements, numShuffles)
+function shuffleAnimation($container, $elements, { numShuffles } = {})
 {
 	return new Promise(async resolve =>
 	{
@@ -6131,7 +6166,8 @@ function shuffleAnimation($container, $elements, numShuffles)
 				top: containerOffset.top + containerHeight / 2 - elementWidth / 2,
 				left: containerOffset.left + containerWidth / 2 - elementWidth / 2
 			},
-			maxDistanceFromCenter = containerHeight < containerWidth ? containerHeight / 2 : containerWidth / 2,
+			minDistance = Math.ceil(elementWidth / 4),
+			maxDistance = containerHeight < containerWidth ? containerHeight / 2 : containerWidth / 2,
 			easing = "easeInOutQuad";
 		
 		let duration = 500;
@@ -6147,22 +6183,22 @@ function shuffleAnimation($container, $elements, numShuffles)
 			return resolve();
 		
 		duration = 100;
-		for (let i = 0; i < numShuffles; i++)
+		for (let i = 0; i < (numShuffles || 3); i++)
 		{
 			await randomizeOffsets($elements,
 				{
-					minDistance: 5,
-					maxDistance: maxDistanceFromCenter,
-					duration: duration,
-					easing: easing
+					minDistance,
+					maxDistance,
+					duration,
+					easing
 				});
 			
 			await animatePromise(
 				{
 					$elements,
 					desiredProperties: centerOfContainer,
-					duration: duration,
-					easing: easing
+					duration,
+					easing
 				});
 		}
 		resolve();
@@ -7031,9 +7067,6 @@ function dealFaceDownInfCard(elementIndex)
 
 async function revealInfectionCard({ cityKey, index, preventionCode }, { forecasting } = {})
 {
-	if (data.currentStep !== "setup")
-		await sleep(getDuration("mediumInterval"));
-
 	return new Promise(resolve =>
 	{
 		const $card = getInfectionContainer().find(".infectionCard").eq(index),
@@ -8100,7 +8133,7 @@ async function shuffleEpidemicIntoPile($div)
 		easing
 	});
 
-	await shuffleAnimation($div, $cardbacks.add($epidemicCardback), 3);
+	await shuffleAnimation($div, $cardbacks.add($epidemicCardback));
 }
 
 function placePileOntoPlayerDeck($div, deckPropertes)

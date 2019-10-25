@@ -36,9 +36,6 @@ It's possible for order of cards in the starting hands to not match the actual c
 
 TO DO
 -----
-fix epidemicIntensify shuffle animation
-double epidemic draw causes an infinite loop of epidemic draws
-
 add checkmarks to completed setup steps?
 
 the player deck should appear smaller when it contains fewer cards
