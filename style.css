@@ -492,7 +492,6 @@ span.r {color: #ef282a}
 .playerPanel
 {
 	vertical-align: top;
-	width: 24.1%;
 	margin-right: 1%;
 	color: #fff;
 	text-align: center;
@@ -501,6 +500,9 @@ span.r {color: #ef282a}
 	background-color: #353535;
 	margin-left: -1px;
 }
+.playerPanel2 { width: 49.1% }
+.playerPanel3 { width: 32.4% }
+.playerPanel4 { width: 24.1% }
 #playerPanelContainer .playerPanel:not(.hidden) { display: inline-block }
 
 .name, .role

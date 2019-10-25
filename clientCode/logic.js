@@ -4140,9 +4140,10 @@ function appendPawnToBoard(player)
 
 function appendPlayerPanel(player)
 {
-	const { camelCaseRole, name, role } = player;
+	const { camelCaseRole, name, role } = player,
+		numPlayers = Object.keys(data.players).length;
 
-	$("#playerPanelContainer").append(`<div class='playerPanel hidden' id='${camelCaseRole}'>
+	$("#playerPanelContainer").append(`<div class='playerPanel playerPanel${numPlayers} hidden' id='${camelCaseRole}'>
 								<div class='name'>${name}</div>
 								<div class='role ${camelCaseRole}'>
 									<p>${role}</p>

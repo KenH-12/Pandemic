@@ -36,6 +36,9 @@ It's possible for order of cards in the starting hands to not match the actual c
 
 TO DO
 -----
+do all player pile shuffle animations at once, then move the piles onto the deck one at a time.
+when an epidemic is drawn, movePlayerCardsToHand should be awaited, then the epidemic can expand.
+
 add checkmarks to completed setup steps?
 
 the player deck should appear smaller when it contains fewer cards
