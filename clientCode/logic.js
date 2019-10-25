@@ -7957,11 +7957,16 @@ async function beginGame()
 	});
 
 	$setupProcedureContainer.add("#setupContainer").remove();
-	unhide($("#turnProcedureContainer, #indicatorContainer, #actionsContainer"));
 
-	bindRoleCardHoverEvents();
-	bindPawnEvents();
-	data.currentStep.next();
+	const $containersToShow = $("#turnProcedureContainer, #indicatorContainer");
+	$containersToShow.slideDown(function()
+	{
+		unhide($containersToShow);
+		bindRoleCardHoverEvents();
+		bindPawnEvents();
+		data.currentStep.next();
+		$("#actionsContainer").slideDown(function() { unhide($(this)) });
+	});
 }
 
 async function animatePreparePlayerDeck()
