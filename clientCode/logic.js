@@ -7986,11 +7986,11 @@ async function animatePreparePlayerDeck()
 
 	const $divs = $container.children("div"),
 		deckProperties = getPlayerDeckProperties();
+
+	await shuffleEpidemicsIntoPiles($divs);
+
 	for (let i = $divs.length - 1; i >= 0; i--)
-	{
-		await shuffleEpidemicIntoPile($divs.eq(i));
 		await placePileOntoPlayerDeck($divs.eq(i), deckProperties);
-	}
 
 	$container.addClass("hidden");
 }
@@ -8108,51 +8108,64 @@ function getInitialPlayerDeckSize({ includeEpidemics } = {})
 	return deckSize;
 }
 
-async function shuffleEpidemicIntoPile($div)
+function shuffleEpidemicsIntoPiles($divs)
 {
-	const $epidemic = $div.children(".epidemic"),
-		initialEpidemicOffset = $epidemic.offset(),
-		duration = getDuration("dealCard"),
-		easing = data.easings.dealCard;
+	for (let i = $divs.length - 1; i > 0; i--)
+		shuffleEpidemicIntoPile($divs.eq(i));
 	
-	let $cardbacks = $div.children("img");
+	return shuffleEpidemicIntoPile($divs.first());
+}
 
-	$div.height($div.height());
-
-	await animatePromise(
+function shuffleEpidemicIntoPile($div)
+{
+	return new Promise(async resolve =>
 	{
-		$elements: $epidemic,
-		desiredProperties: { width: 0 },
-		duration,
-		easing
+		const $epidemic = $div.children(".epidemic"),
+			initialEpidemicOffset = $epidemic.offset(),
+			duration = getDuration("dealCard"),
+			easing = data.easings.dealCard;
+		
+		let $cardbacks = $div.children("img");
+
+		$div.height($div.height());
+
+		await animatePromise(
+		{
+			$elements: $epidemic,
+			desiredProperties: { width: 0 },
+			duration,
+			easing
+		});
+
+		const $epidemicCardback = newFacedownPlayerCard();
+		$epidemic.replaceWith($epidemicCardback);
+
+		await animatePromise(
+		{
+			$elements: $epidemicCardback,
+			initialProperties: { ...{ position: "absolute"}, ...{ initialEpidemicOffset } },
+			desiredProperties: { top: $cardbacks.last().offset().top },
+			duration: duration / 2,
+			easing
+		});
+
+		$cardbacks = $cardbacks.add($epidemicCardback);
+		await shuffleAnimation($div, $cardbacks);
+
+		const $pile = $cardbacks.first().attr("src", "images/cards/playerDeck_3.png");
+		$cardbacks.not($pile).remove();
+		resolve();
 	});
-
-	const $epidemicCardback = newFacedownPlayerCard();
-	$epidemic.replaceWith($epidemicCardback);
-
-	await animatePromise(
-	{
-		$elements: $epidemicCardback,
-		initialProperties: { ...{ position: "absolute"}, ...{ initialEpidemicOffset } },
-		desiredProperties: { top: $cardbacks.last().offset().top },
-		duration: duration / 2,
-		easing
-	});
-
-	await shuffleAnimation($div, $cardbacks.add($epidemicCardback));
 }
 
 function placePileOntoPlayerDeck($div, deckPropertes)
 {
 	return new Promise(async resolve =>
 	{
-		const $cardbacks = $div.children("img"),
-			$pile = $cardbacks.first().attr("src", "images/cards/playerDeck_3.png"),
+		const $pile = $div.children("img"),
 			$deck = $("#imgPlayerDeck"),
 			duration = getDuration("dealCard"),
 			easing = data.easings.dealCard;
-
-		$cardbacks.not($pile).remove();
 
 		await animatePromise(
 		{
