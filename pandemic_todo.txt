@@ -36,8 +36,8 @@ It's possible for order of cards in the starting hands to not match the actual c
 
 TO DO
 -----
-fix epidemicInfect card draw animation
 fix epidemicIntensify shuffle animation
+double epidemic draw causes an infinite loop of epidemic draws
 
 add checkmarks to completed setup steps?
 

@@ -5863,6 +5863,7 @@ async function epidemicInfect()
 		};
 
 	getInfectionContainer().append(newInfectionCardTemplate());
+	positionInfectionPanelComponents();
 	await dealFaceDownInfCard(card.index);
 	await revealInfectionCard(card);
 
@@ -7024,13 +7025,13 @@ function dealFaceDownInfCard(elementIndex)
 			},
 			getDuration("dealCard"),
 			data.easings.dealCard,
-			resolve());
+			function() { resolve() });
 	});
 }
 
 async function revealInfectionCard({ cityKey, index, preventionCode }, { forecasting } = {})
 {
-	if (currentStepIs("infect cities"))
+	if (data.currentStep !== "setup")
 		await sleep(getDuration("mediumInterval"));
 
 	return new Promise(resolve =>
