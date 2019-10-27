@@ -497,8 +497,11 @@ span.r {color: #ef282a}
 	text-align: center;
 	border: 1px solid #fff;
 	border-top: none;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
 	background-color: #353535;
 	margin-left: -1px;
+	overflow: hidden;
 }
 .playerPanel2 { width: 49.1% }
 .playerPanel3 { width: 32.4% }
@@ -525,6 +528,30 @@ span.r {color: #ef282a}
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #fff;
 }
+.btnCollapseExpandPanel
+{
+	background-color: #353535;
+	font-family: 'Times New Roman', Times, serif;
+	font-size: 20px;
+	height: 14px;
+	line-height: 12px;
+}
+.btnCollapseExpandPanel > div
+{
+	transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg); /* Safari */
+	-moz-transform: rotate(-90deg); /* Firefox */
+	-ms-transform: rotate(-90deg); /* IE */
+	-o-transform: rotate(-90deg); /* Opera */
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3); /* Internet Explorer */
+
+	pointer-events: none;
+}
+.btnCollapseExpandPanel:hover
+{
+	background-color: #444;
+	cursor: pointer;
+}
 .playerCard
 {
 	width: 98%;
@@ -534,13 +561,6 @@ span.r {color: #ef282a}
 	border: none;
 	font-size: 14px;
 	overflow: hidden;
-}
-#playerCards .playerCard
-{
-	width: 80%;
-	margin: 2% 10%;
-	font-size: 18px;
-	border-radius: 2px;
 }
 #cardDrawContainer .playerCard
 {

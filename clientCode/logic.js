@@ -3731,6 +3731,11 @@ class Player
 		return (this.cardKeys.filter( cardKey => isCityKey(cardKey) ).length > 0);
 	}
 
+	appendCardToHand($card)
+	{
+		$card.insertBefore(this.getPanel().children(".btnCollapseExpandPanel"));
+	}
+
 	// Given a cardKey from the player's hand,
 	// returns a jQuery object containing the corresponding .playerCard element
 	getCardElementFromHand(cardKey)
@@ -4163,6 +4168,9 @@ function appendPlayerPanel(player)
 								<div class='name'>${name}</div>
 								<div class='role ${camelCaseRole}'>
 									<p>${role}</p>
+								</div>
+								<div class='btnCollapseExpandPanel collapse' title='collapse'>
+									<div>&#187;</div>
 								</div>
 							</div>`);
 }
@@ -7369,7 +7377,7 @@ function loadPlayerCards(playerCards)
 		{
 			player = data.players[card.pileID];
 			player.cardKeys.push(card.key);
-			player.getPanel().append($card);
+			player.appendCardToHand($card);
 		}
 		else if (card.pile === "discard")
 			$card.insertAfter($discardPileTitle);
