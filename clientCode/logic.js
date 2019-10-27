@@ -8810,14 +8810,19 @@ function bindDiseaseCubeEvents({ on } = { on: true })
 
 		$cubes = $cubes.filter(`.${player.cityKey}`);
 
+		let $this,
+			diseaseColor,
+			$cubesToMark;
+		
 		$cubes.hover(function()
 			{
-				let $cubesToMark;
+				$this = $(this);
+				diseaseColor = getCubeColor($this);
 
-				if (player.role === "Medic")
-					$cubesToMark = $cubes;
+				if (player.role === "Medic" || data.cures[diseaseColor] === "cured")
+					$cubesToMark = $cubes.filter(`.${diseaseColor}`);
 				else
-					$cubesToMark = $(this);
+					$cubesToMark = $this;
 				
 				$cubesToMark.html("<p>X</p>")
 					.children("p").css(
@@ -8833,10 +8838,14 @@ function bindDiseaseCubeEvents({ on } = { on: true })
 			.click(function()
 			{
 				bindDiseaseCubeEvents({ on: false });
-				if (player.role === "Medic")
-					treatDisease($cubes);
+
+				$this = $(this);
+				diseaseColor = getCubeColor($this);
+
+				if (player.role === "Medic" || data.cures[diseaseColor] === "cured")
+					treatDisease($cubes.filter(`.${diseaseColor}`));
 				else
-					treatDisease($(this));
+					treatDisease($this);
 			});
 	}
 }
