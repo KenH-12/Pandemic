@@ -52,14 +52,10 @@ when government grant is prompted, the research station supply should glow.
 
 compare client and server side hand sizes after drawing?
 
-make sure the medic's treat disease description specifies that all cubes are removed
-make sure treat disease specified that all cubes of a cured disease will be removed
-
 rename the step indicator or whatever it's called
 
 use shapes for disease cubes
 fix the treat disease mouseover "X"
-make sure that all cubes of a cured disease show the "X"
 fix the cube mouseover event while animating treatdisease
 
 handle errors
