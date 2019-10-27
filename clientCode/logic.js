@@ -1331,6 +1331,17 @@ const actionInterfacePopulator = {
 		
 		if (diseaseColorOptions.length > 1)
 		{
+			const player = getActivePlayer();
+
+			if (player.role === "Medic")
+			{
+				actionInterfacePopulator.replaceSubtitle(`${player.newSpecialAbilityTag()}
+					The Medic removes <i>all</i> cubes of one color from his location when doing Treat Disease.
+					<br /><br />Select a Disease Color:`);
+				
+				bindRoleCardHoverEvents();
+			}
+			
 			for (let color of diseaseColorOptions)
 				$actionInterface.append(`<div class='diseaseColorOption ${color}' data-color='${color}'></div>`);
 
@@ -3653,7 +3664,7 @@ class Player
 
 	newSpecialAbilityTag()
 	{
-		return `<p	class='${this.camelCaseRole} specialAbilityTag hoverInfo'
+		return `<p	class='${this.camelCaseRole} specialAbilityTag'
 					data-role='${this.rID}'>
 					— Special Ability —
 				</p>`;

@@ -59,7 +59,6 @@ rename the step indicator or whatever it's called
 
 use shapes for disease cubes
 fix the treat disease mouseover "X"
-make sure that all cubes of a cured disease show the "X"
 fix the cube mouseover event while animating treatdisease
 
 handle errors
