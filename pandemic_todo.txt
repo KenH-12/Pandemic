@@ -31,12 +31,16 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
+the stepProcedureContainer remained hidden after reloading during the "hand limit" step
+
 TO DO
 -----
+the playerpanels should be collapsible (can't see chicago)
+	the numCardsInHand displayed on a collapsed playerPanel should update any time a player receives or uses a card
+	a collapsed playerPanel should expand when it is about to receive or use a card
+
 the player deck should appear smaller when it contains fewer cards
 as should the infection deck
-
-the playerpanels should be collapsible (can't see chicago)
 
 standardize prompt appearance / button behaviour
 

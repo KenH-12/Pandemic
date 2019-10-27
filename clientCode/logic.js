@@ -2676,7 +2676,7 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 	await animateShareKnowledge(giver, receiver, cardKey);
 
 	giver.removeCardsFromHand(cardKey);
-	receiver.cardKeys.push(cardKey);
+	receiver.addCardKeysToHand(cardKey);
 
 	for (let p of players)
 	{
@@ -2696,7 +2696,7 @@ function animateShareKnowledge(giver, receiver, cardKey)
 	return new Promise(resolve =>
 	{
 		const $card = giver.getPanel().find(`.playerCard[data-key='${cardKey}']`),
-			$insertAfterMe = receiver.getPanel().children().last(),
+			$insertAfterMe = receiver.getPanel().children(".role, .playerCard").last(),
 			desiredOffset = $insertAfterMe.offset();
 	
 		desiredOffset.top += $insertAfterMe.height();
@@ -3323,7 +3323,7 @@ function animateCardToHand($card, targetProperties, { isContingencyCard } = {})
 		if (isContingencyCard) // Contingency cards are placed within the .role div
 			$insertAfterElement = $rolePanel.children(".role").children().first();
 		else
-			$insertAfterElement = $rolePanel.children().last();
+			$insertAfterElement = $rolePanel.children(".role, .playerCard").last();
 		
 		$card.appendTo("#rightPanel") // The animation is smoother if the $card is first appended to #rightPanel.
 			.css(
@@ -3733,7 +3733,7 @@ class Player
 
 	appendCardToHand($card)
 	{
-		$card.insertBefore(this.getPanel().children(".btnCollapseExpandPanel"));
+		$card.insertBefore(this.getPanel().children(".btnCollapseExpand"));
 	}
 
 	// Given a cardKey from the player's hand,
@@ -3756,6 +3756,8 @@ class Player
 			...ensureIsArray(cardKeys).filter(key => !isEpidemicKey(key))
 		];
 
+		this.updateCollapsedPanelCardCount();
+
 		this.logCardKeys();
 	}
 
@@ -3776,7 +3778,15 @@ class Player
 			this.cardKeys.splice(this.cardKeys.indexOf(key), 1);
 		}
 
+		this.updateCollapsedPanelCardCount();
+
 		this.logCardKeys();
+	}
+
+	updateCollapsedPanelCardCount()
+	{
+		this.getPanel().find(".numCardsInHand")
+			.children("span").html(this.cardKeys.length);
 	}
 
 	logCardKeys()
@@ -4162,17 +4172,51 @@ function appendPawnToBoard(player)
 function appendPlayerPanel(player)
 {
 	const { camelCaseRole, name, role } = player,
-		numPlayers = Object.keys(data.players).length;
+		numPlayers = Object.keys(data.players).length,
+		$panel = $(`<div class='playerPanel playerPanel${numPlayers} hidden' id='${camelCaseRole}'>
+						<div class='name'>${name}</div>
+						<div class='role ${camelCaseRole}'>
+							<p>${role}</p>
+						</div>
+						<div class='btnCollapseExpand collapse' title='collapse'>
+							<p class='numCardsInHand hidden'>— <span>0</span> cards in hand —</p>
+							<div>&#187;</div>
+						</div>
+					</div>`);
+	
+	$panel.appendTo("#playerPanelContainer")
+		.children(".btnCollapseExpand").click(function() { togglePlayerPanel($(this)) });
+}
 
-	$("#playerPanelContainer").append(`<div class='playerPanel playerPanel${numPlayers} hidden' id='${camelCaseRole}'>
-								<div class='name'>${name}</div>
-								<div class='role ${camelCaseRole}'>
-									<p>${role}</p>
-								</div>
-								<div class='btnCollapseExpandPanel collapse' title='collapse'>
-									<div>&#187;</div>
-								</div>
-							</div>`);
+function togglePlayerPanel($btnCollapseExpand)
+{
+	const collapse = "collapse",
+		expand = "expand",
+		upChevron = "&#187;",
+		downChevron = "&#171;",
+		$cards = $btnCollapseExpand.siblings(".playerCard"),
+		duration = 200;
+
+	if ($btnCollapseExpand.hasClass(collapse))
+	{
+		$btnCollapseExpand.removeClass(collapse)
+			.addClass(expand)
+			.attr("title", expand)
+			.children().first().removeClass("hidden")
+			.next().html(downChevron);
+
+		$cards.slideUp(duration);
+	}
+	else
+	{
+		$btnCollapseExpand.removeClass(expand)
+			.addClass(collapse)
+			.attr("title", collapse)
+			.children().first().addClass("hidden")
+			.next().html(upChevron);
+		
+		$cards.slideDown(duration, function() { $(this).removeAttr("style") });
+	}
 }
 
 function bindPawnEvents()
@@ -7376,7 +7420,7 @@ function loadPlayerCards(playerCards)
 		if (card.pileID in data.players)
 		{
 			player = data.players[card.pileID];
-			player.cardKeys.push(card.key);
+			player.addCardKeysToHand(card.key);
 			player.appendCardToHand($card);
 		}
 		else if (card.pile === "discard")

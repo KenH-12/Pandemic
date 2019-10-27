@@ -524,30 +524,37 @@ span.r {color: #ef282a}
 {
 	font-family: 'Oswald', sans-serif;
 	font-size: 14px;
-	margin-bottom: 4px;
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #fff;
 }
-.btnCollapseExpandPanel
+.btnCollapseExpand
 {
 	background-color: #353535;
+}
+.btnCollapseExpand > .numCardsInHand
+{
+	font-size: 14px;
+	font-family: 'Ropa Sans', sans-serif;
+	padding: 3px 0;
+}
+.btnCollapseExpand > div
+{
 	font-family: 'Times New Roman', Times, serif;
 	font-size: 20px;
-	height: 14px;
 	line-height: 12px;
-}
-.btnCollapseExpandPanel > div
-{
+	
 	transform: rotate(-90deg);
 	-webkit-transform: rotate(-90deg); /* Safari */
 	-moz-transform: rotate(-90deg); /* Firefox */
 	-ms-transform: rotate(-90deg); /* IE */
 	-o-transform: rotate(-90deg); /* Opera */
 	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3); /* Internet Explorer */
-
+}
+.btnCollapseExpand > *
+{
 	pointer-events: none;
 }
-.btnCollapseExpandPanel:hover
+.btnCollapseExpand:hover
 {
 	background-color: #444;
 	cursor: pointer;
@@ -562,6 +569,7 @@ span.r {color: #ef282a}
 	font-size: 14px;
 	overflow: hidden;
 }
+.playerPanel > .playerCard:first-of-type { margin-top: 4px }
 #cardDrawContainer .playerCard
 {
 	width: 98%;
