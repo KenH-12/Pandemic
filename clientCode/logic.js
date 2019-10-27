@@ -3259,11 +3259,16 @@ async function animateCardsToHand($cards)
     
 	// There will always be 2 cards to handle.
 	animateCardToHand($cards.last(),
-				{
-					...targetProperties,
-					...{ top: lastCardTop }
-				});
-	// returning the second Promise (instead of Promise.all) avoids an issue where the cards
+	{
+		...targetProperties,
+		...{ top: lastCardTop }
+	});
+	
+	// If there are 0 epidemics, the cards are animated to the hand simultaneously.
+	// If $cards.first() is an epidemic, await the same duration to finish the draw animation before expanding the epidemic.
+	if ($cards.first().hasClass("epidemic"))
+		await sleep(getDuration("dealCard"));
+	// Returning the second Promise (instead of Promise.all) avoids an issue where the cards
 	// can swap positions after being inserted into the hand.
 	return animateCardToHand($cards.first(), targetProperties);
 }

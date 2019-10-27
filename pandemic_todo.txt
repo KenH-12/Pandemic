@@ -33,8 +33,6 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-when an epidemic is drawn, movePlayerCardsToHand should be awaited, then the epidemic can expand.
-
 the player deck should appear smaller when it contains fewer cards
 as should the infection deck
 
