@@ -502,6 +502,8 @@ span.r {color: #ef282a}
 	background-color: #353535;
 	margin-left: -1px;
 	overflow: hidden;
+	position: relative;
+	z-index: 6;
 }
 .playerPanel2 { width: 49.1% }
 .playerPanel3 { width: 32.4% }

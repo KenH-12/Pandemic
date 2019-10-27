@@ -2312,7 +2312,7 @@ function discardOrRemoveEventCard(event)
 		}
 		else
 		{
-			await movePlayerCardsToDiscards({ $card });
+			await movePlayerCardsToDiscards({ player, $card });
 			player.removeCardsFromHand(cardKey);
 		}
 
@@ -2672,7 +2672,10 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 			cardKey: cardKey
 		});
 
-	
+	await Promise.all([
+		giver.expandPanelIfCollapsed(),
+		receiver.expandPanelIfCollapsed()
+	]);
 	await animateShareKnowledge(giver, receiver, cardKey);
 
 	giver.removeCardsFromHand(cardKey);
@@ -2767,7 +2770,7 @@ async function buildResearchStation(relocationKey)
 	// "As an action, build a research station in his current city without discarding a city card"
 	if (!playerIsOperationsExpert)
 	{
-		await movePlayerCardsToDiscards({ $card: player.getCardElementFromHand(city.key) });
+		await movePlayerCardsToDiscards({ player, $card: player.getCardElementFromHand(city.key) });
 		player.removeCardsFromHand(city.key);
 	}
 
@@ -2921,7 +2924,7 @@ function movementActionDiscard(eventType, destination, { playerToDispatch, opera
 		else if (eventCode === charterFlight.code)
 			discardKey = playerToDispatch ? playerToDispatch.cityKey : player.cityKey;
 
-		await movePlayerCardsToDiscards({ $card: player.getCardElementFromHand(discardKey) });
+		await movePlayerCardsToDiscards({ player, $card: player.getCardElementFromHand(discardKey) });
 		player.removeCardsFromHand(discardKey);
 
 		resolve();
@@ -3130,7 +3133,7 @@ async function drawStep()
 		});
 	disableEventCards();
 
-	await performDrawStep();
+	const cardKeys = await performDrawStep();
 
 	if (data.nextStep === "epIncrease")
 	{
@@ -3148,40 +3151,45 @@ async function drawStep()
 		});
 	$btn.stop();
 
-	finishDrawStep();
+	finishDrawStep(cardKeys);
 }
 
 async function performDrawStep()
 {
-	const $container = $("#cardDrawContainer"),
-		numCardsToDeal = 2,
-		{ 0: events } = await Promise.all(
-		[
-			requestAction(eventTypes.cardDraw),
-			dealFaceDownPlayerCards($container, numCardsToDeal)
-		]),
-		cardDrawEvent = events[0];
+	return new Promise(async resolve =>
+	{
+		const $container = $("#cardDrawContainer"),
+			numCardsToDeal = 2,
+			{ 0: events } = await Promise.all(
+			[
+				requestAction(eventTypes.cardDraw),
+				dealFaceDownPlayerCards($container, numCardsToDeal)
+			]),
+			cardDrawEvent = events[0];
 
-	getActivePlayer().addCardKeysToHand(cardDrawEvent.cardKeys);
+		$("img.drawnPlayerCard").remove();
+		$container.children().not(".button").remove();
+		
+		// Without reversing the cardKeys array, the cards will be added to the player's hand in
+		// an order that does not match the cardIndex order.
+		for (let key of cardDrawEvent.cardKeys.reverse())
+			revealPlayerCard(key, $container);
 
-	$("img.drawnPlayerCard").remove();
-	$container.children().not(".button").remove();
-	
-	// Without reversing the cardKeys array, the cards will be added to the player's hand in
-	// an order that does not match the cardIndices.
-	for (let key of cardDrawEvent.cardKeys.reverse())
-		revealPlayerCard(key, $container);
-
-	bindPlayerCardEvents();
-	return sleep(getDuration("mediumInterval"));
+		bindPlayerCardEvents();
+		
+		await sleep(getDuration("mediumInterval"));
+		resolve(cardDrawEvent.cardKeys);
+	});
 }
 
-async function finishDrawStep()
+async function finishDrawStep(cardKeys)
 {
 	const $container = $("#cardDrawContainer");
 	
 	await animateCardsToHand($container.find(".playerCard"));
 	$container.addClass("hidden");
+
+	getActivePlayer().addCardKeysToHand(cardKeys);
 	
 	proceed();
 }
@@ -3260,6 +3268,8 @@ async function revealPlayerCard(cardKey, $container)
 
 async function animateCardsToHand($cards)
 {
+	await getActivePlayer().expandPanelIfCollapsed();
+
 	const targetProperties = getDrawnPlayerCardTargetProperties();
 	
 	// If the second card is not an epidemic, both cards will be moved to the player's hand at once,
@@ -3267,7 +3277,7 @@ async function animateCardsToHand($cards)
 	let lastCardTop = targetProperties.top;
 	if (!$cards.first().hasClass("epidemic"))
 		lastCardTop += targetProperties.height + 2; // + 2 for slight separation
-    
+	
 	// There will always be 2 cards to handle.
 	animateCardToHand($cards.last(),
 	{
@@ -3694,6 +3704,19 @@ class Player
 	getPanel()
 	{
 		return $(`#${this.camelCaseRole}`);
+	}
+
+	expandPanelIfCollapsed()
+	{
+		return new Promise(async resolve =>
+		{
+			const panel = this.getPanel();
+
+			if (panel.hasClass("collapsed"))
+				await togglePlayerPanel(panel.find(".btnCollapseExpand"));
+		
+			resolve();
+		});
 	}
 
 	getPawn()
@@ -4190,33 +4213,43 @@ function appendPlayerPanel(player)
 
 function togglePlayerPanel($btnCollapseExpand)
 {
-	const collapse = "collapse",
-		expand = "expand",
-		upChevron = "&#187;",
-		downChevron = "&#171;",
-		$cards = $btnCollapseExpand.siblings(".playerCard"),
-		duration = 200;
-
-	if ($btnCollapseExpand.hasClass(collapse))
+	return new Promise(async resolve =>
 	{
-		$btnCollapseExpand.removeClass(collapse)
-			.addClass(expand)
-			.attr("title", expand)
-			.children().first().removeClass("hidden")
-			.next().html(downChevron);
+		const collapse = "collapse",
+			expand = "expand",
+			upChevron = "&#187;",
+			downChevron = "&#171;",
+			$cards = $btnCollapseExpand.siblings(".playerCard"),
+			duration = 200;
 
-		$cards.slideUp(duration);
-	}
-	else
-	{
-		$btnCollapseExpand.removeClass(expand)
-			.addClass(collapse)
-			.attr("title", collapse)
-			.children().first().addClass("hidden")
-			.next().html(upChevron);
-		
-		$cards.slideDown(duration, function() { $(this).removeAttr("style") });
-	}
+		if ($btnCollapseExpand.hasClass(collapse))
+		{
+			$btnCollapseExpand.removeClass(collapse)
+				.addClass(expand)
+				.attr("title", expand)
+				.children().first().removeClass("hidden")
+				.next().html(downChevron)
+				.closest(".playerPanel").addClass("collapsed");
+
+			$cards.slideUp(duration, function() { resolve() });
+		}
+		else
+		{
+			$btnCollapseExpand.removeClass(expand)
+				.addClass(collapse)
+				.attr("title", collapse)
+				.children().first().addClass("hidden")
+				.next().html(upChevron)
+				.closest(".playerPanel").removeClass("collapsed");
+			
+			$cards.slideDown(duration,
+				function()
+				{
+					$(this).removeAttr("style");
+					resolve();
+				});
+		}
+	});
 }
 
 function bindPawnEvents()
@@ -6374,6 +6407,12 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 {
 	return new Promise(async (resolve) =>
 	{
+		if (player)
+		{
+			await player.expandPanelIfCollapsed();
+			await sleep(getDuration("shortInterval"));
+		}
+		
 		let completionInterval = getDuration("discardPlayerCard");
 		if (player && Array.isArray(cardKeys))
 		{
@@ -7303,8 +7342,10 @@ async function discoverCure(cardKeys)
 	resetActionPrompt();
 	disableActions();
 	
-	const player = getActivePlayer(),
-		diseaseColor = getDiseaseColor(cardKeys[0]),
+	const player = getActivePlayer();
+	await player.expandPanelIfCollapsed();
+	
+	const diseaseColor = getDiseaseColor(cardKeys[0]),
 		{ discoverCure, eradication, autoTreatDisease } = eventTypes,
 		{ 0: events } = await Promise.all([
 			requestAction(discoverCure,
