@@ -33,6 +33,14 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+game end conditions
+	players lose
+		not enough player cards are left when needed (out of time)
+		8 outbreaks occured (worldwide panic)
+		not enough disease cubes are left when needed (a disease spreads out of control)
+	players win
+		all 4 cures discovered
+
 the player deck should appear smaller when it contains fewer cards
 as should the infection deck
 
