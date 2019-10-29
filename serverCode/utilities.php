@@ -873,4 +873,35 @@ function oneQuietNightScheduledThisTurn($mysqli, $game)
     
     return $isOneQuietNight;
 }
+
+function checkVictory($mysqli, $game)
+{
+    $diseaseStatuses = $mysqli->query("SELECT   yStatus,
+                                                rStatus,
+                                                uStatus,
+                                                bStatus
+                                        FROM vw_disease
+                                        WHERE game = $game")->fetch_assoc();
+
+    foreach ($diseaseStatuses as $key => $value)
+    {
+        if ($value === "rampant")
+            return false;
+    }
+
+    // All diseases are cured or eradicated and the players are victorious.
+    recordGameEndCause($mysqli, $game, "victory");
+
+    return true;
+}
+
+function recordGameEndCause($mysqli, $game, $endCauseName)
+{
+    $mysqli->query("UPDATE vw_gamestate
+                    SET endCause = getEndCauseID('$endCauseName')
+                    WHERE game = $game");
+    
+    if ($mysqli->affected_rows != 1)
+        throw new Exception("Failed to record game end cause: $mysqli->error");
+}
 ?>

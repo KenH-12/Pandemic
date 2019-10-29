@@ -1,3 +1,8 @@
+INSERT INTO GAMEENDCAUSE (description) VALUES ('victory');
+INSERT INTO GAMEENDCAUSE (description) VALUES ('outbreak');
+INSERT INTO GAMEENDCAUSE (description) VALUES ('cubes');
+INSERT INTO GAMEENDCAUSE (description) VALUES ('cards');
+
 -- For each turn, a player does 4 actions...
 INSERT INTO STEP (description) VALUES ('action 1');
 INSERT INTO STEP (description) VALUES ('action 2');

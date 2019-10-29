@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS pandemic;
 DROP TABLE IF EXISTS diseaseStatus;
 DROP TABLE IF EXISTS game;
 DROP TABLE IF EXISTS step;
+DROP TABLE IF EXISTS gameEndCause;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS role;
 DROP TABLE IF EXISTS cardpile;
@@ -24,6 +25,14 @@ CREATE TABLE STEP
     description VARCHAR(13) NOT NULL,
     
     CONSTRAINT pk_step_stepID PRIMARY KEY(stepID)
+);
+
+CREATE TABLE gameEndCause
+(
+	endCauseID TINYINT AUTO_INCREMENT,
+    description	VARCHAR(8) NOT NULL, -- 'victory','outbreak', 'cubes', or 'cards'
+    
+    CONSTRAINT pk_gameEndCause_endCauseID PRIMARY KEY(endCauseID)
 );
 
 CREATE TABLE GAME
@@ -39,13 +48,13 @@ CREATE TABLE GAME
 		-- divided by 2 draws per turn = 25.5.
 		-- Therefore the maximum turnNumber is 26 based on the following "GAME END" condition:
 		-- "[The players lose] if a player cannot draw 2 Player cards after doing his actions."
-	result				CHAR(1), -- 'w' or 'l'
-    gameEndCause		VARCHAR(8), -- why did the game end? 'victory','outbreak', 'cubes', or 'cards'
     turnRoleID			TINYINT, -- which role's turn is it?
     stepID				TINYINT DEFAULT 1, -- default 'action 1'
+    endCauseID			TINYINT,
     
     CONSTRAINT pk_game_gameID PRIMARY KEY(gameID),
-    CONSTRAINT fk_step_game FOREIGN KEY(stepID) REFERENCES step(stepID)
+    CONSTRAINT fk_step_game FOREIGN KEY(stepID) REFERENCES step(stepID),
+    CONSTRAINT fk_gameEndCause_game FOREIGN KEY(endCauseID) REFERENCES gameEndCause(endCauseID)
 );
 
 CREATE TABLE diseaseStatus
@@ -252,10 +261,11 @@ SELECT	game.gameID AS game,
         infectionRate AS infRate,
         epidemicsDrawn AS epidemicCount,
         numOutbreaks AS outbreakCount,
-        result AS endResult,
-        gameEndCause AS endCause
+        game.endCauseID AS endCause,
+        gameEndCause.description AS endCauseName
 FROM game
 INNER JOIN step ON game.stepID = step.stepID
+LEFT OUTER JOIN gameEndCause ON game.endCauseID = gameEndCause.endCauseID
 INNER JOIN player ON game.gameID = player.gameID
 WHERE turnRoleID = roleID;
 

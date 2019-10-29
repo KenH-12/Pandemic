@@ -68,17 +68,24 @@
         $details = implode(",", $cardKeys);
         $response["events"][] = recordEvent($mysqli, $game, $eventType, $details, $role);
 
-        // The Medic automatically treats cured diseases in his location.
-        $medicLocationKey = getLocationKey($mysqli, $game, "Medic");
-        if ($medicLocationKey)
+        $playersAreVictorious = checkVictory($mysqli, $game);
+
+        if ($playersAreVictorious) // Medic auto-treat events are irrelevant
+            $response["gameEndCause"] = "victory";
+        else
         {
-            $autoTreatEvents = getAutoTreatDiseaseEvents($mysqli, $game, $medicLocationKey, $diseaseColor);
-
-            if ($autoTreatEvents)
-                $response["events"] = array_merge($response["events"], $autoTreatEvents);
+            // The Medic automatically treats cured diseases in his location.
+            $medicLocationKey = getLocationKey($mysqli, $game, "Medic");
+            if ($medicLocationKey)
+            {
+                $autoTreatEvents = getAutoTreatDiseaseEvents($mysqli, $game, $medicLocationKey, $diseaseColor);
+    
+                if ($autoTreatEvents)
+                    $response["events"] = array_merge($response["events"], $autoTreatEvents);
+            }
+    
+            $response["nextStep"] = nextStep($mysqli, $game, $currentStep, $role);
         }
-
-        $response["nextStep"] = nextStep($mysqli, $game, $currentStep, $role);
     }
     catch(Exception $e)
     {
