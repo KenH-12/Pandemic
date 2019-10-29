@@ -7408,59 +7408,63 @@ function endGame()
 	$curtain.find(selectorToShow).removeClass(hidden)
 		.first().css("margin-top", data.boardHeight / 3);
 		
-	$curtain.fadeIn(1000, "easeInQuint", function() { $(this).removeClass(hidden) });
+	$curtain.fadeIn(1000, "easeInOutQuint", function() { $(this).removeClass(hidden) });
 }
 
-async function animateDiscoverCure(diseaseColor, diseaseStatus)
+function animateDiscoverCure(diseaseColor, diseaseStatus)
 {
-	const $cureMarker = newCureMarker(diseaseColor, diseaseStatus, { isForReveal: true });
-
-	$cureMarker.css("opacity", 0.1)
-		.animate({ opacity: 1 }, getDuration("specialEventBannerReveal") * 8, "easeOutQuad");
-
-	let description = "", postDelayMs = 1500;
-	if (data.cures.remaining > 0)
-		description = `Discover ${data.cures.remaining} more to win the game`;
-	else
-		postDelayMs = 500;
-
-	await specialEventAlert(
+	return new Promise(async resolve =>
 	{
-		title: "DISCOVERED CURE!",
-		description,
-		eventClass: diseaseColor
-	});
+		const $cureMarker = newCureMarker(diseaseColor, diseaseStatus, { isForReveal: true });
 
-	if (diseaseStatus === "eradicated")
-	{
-		description = `No new disease cubes of this color will be placed on the board`;
+		$cureMarker.css("opacity", 0.1)
+			.animate({ opacity: 1 }, getDuration("specialEventBannerReveal") * 8, "easeOutQuad");
+
+		let description = "";
+		if (data.cures.remaining > 0)
+			description = `Discover ${data.cures.remaining} more to win the game`;
+
 		await specialEventAlert(
-			{
-				title: "DISEASE ERADICATED!",
-				description,
-				eventClass: diseaseColor
-			});
-	}
+		{
+			title: "DISCOVERED CURE!",
+			description,
+			eventClass: diseaseColor
+		});
 
-	await animatePromise(
-	{
-		$elements: $cureMarker,
-		initialProperties: {
-			...$cureMarker.offset(),
-			...{ width: $cureMarker.width() }
-		},
-		desiredProperties: getCureMarkerDesiredProperties(diseaseColor),
-		duration: getDuration("cureMarkerAnimation"),
-		easing: data.easings.cureMarkerAnimation
+		if (diseaseStatus === "eradicated")
+		{
+			description = `No new disease cubes of this color will be placed on the board`;
+			await specialEventAlert(
+				{
+					title: "DISEASE ERADICATED!",
+					description,
+					eventClass: diseaseColor
+				});
+		}
+
+		await animatePromise(
+		{
+			$elements: $cureMarker,
+			initialProperties: {
+				...$cureMarker.offset(),
+				...{ width: $cureMarker.width() }
+			},
+			desiredProperties: getCureMarkerDesiredProperties(diseaseColor),
+			duration: getDuration("cureMarkerAnimation"),
+			easing: data.easings.cureMarkerAnimation
+		});
+
+		$cureMarker.removeClass("specialEventImg").removeAttr("style")
+			.addClass("cureMarker")
+			.attr("id", `cureMarker${diseaseColor.toUpperCase()}`);
+		
+		positionCureMarkers();
+		
+		if (data.cures.remaining > 0)
+			await sleep(1500);
+		
+		resolve();
 	});
-
-	$cureMarker.removeClass("specialEventImg").removeAttr("style")
-		.addClass("cureMarker")
-		.attr("id", `cureMarker${diseaseColor.toUpperCase()}`);
-	
-	positionCureMarkers();
-	
-	return sleep(postDelayMs);
 }
 
 function getCureMarkerDesiredProperties(diseaseColor)
