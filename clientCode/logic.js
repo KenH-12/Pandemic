@@ -76,7 +76,6 @@ const data =
 	},
 	researchStationKeys: new Set(),
 	eventCards: {},
-	playerCardsRemaining: -1,
 	HAND_LIMIT: 7,
 	STARTING_HAND_CARD_HEIGHT: 24,
 	playerCardAnimationInterval: 0.4,
@@ -3126,6 +3125,13 @@ async function drawStep()
 	
 	getActivePlayer().disablePawn();
 	$container.find(".playerCard").remove();
+
+	if (data.numPlayerCardsRemaining == 0) // the players lose.
+	{
+		data.gameEndCause = "cards";
+		return outOfPlayerCards($container);
+	}
+
 	unhide($container, $btn);
 
 	// Event cards can be played before drawing.
@@ -3137,7 +3143,9 @@ async function drawStep()
 		});
 	disableEventCards();
 
-	const cardKeys = await performDrawStep();
+	const cardKeys = await performDrawStep()
+		.catch((reason) => log(reason));
+	if (!cardKeys) return false;
 
 	if (data.nextStep === "epIncrease")
 	{
@@ -3160,10 +3168,10 @@ async function drawStep()
 
 async function performDrawStep()
 {
-	return new Promise(async resolve =>
+	return new Promise(async (resolve, reject) =>
 	{
 		const $container = $("#cardDrawContainer"),
-			numCardsToDeal = 2,
+			numCardsToDeal = data.numPlayerCardsRemaining >= 2 ? 2 : data.numPlayerCardsRemaining,
 			{ 0: events } = await Promise.all(
 			[
 				requestAction(eventTypes.cardDraw),
@@ -3174,16 +3182,37 @@ async function performDrawStep()
 		$("img.drawnPlayerCard").remove();
 		$container.children().not(".button").remove();
 		
-		// Without reversing the cardKeys array, the cards will be added to the player's hand in
-		// an order that does not match the cardIndex order.
-		for (let key of cardDrawEvent.cardKeys.reverse())
-			revealPlayerCard(key, $container);
+		// It's possible that 0 cards are left in the deck.
+		if (cardDrawEvent.cardKeys)
+		{
+			// Without reversing the cardKeys array, the cards will be added to the player's hand in
+			// an order that does not match the cardIndex order.
+			for (let key of ensureIsArray(cardDrawEvent.cardKeys).reverse())
+				revealPlayerCard(key, $container);
+		}
+		
+		if (data.gameEndCause) // not enough player cards remain in the deck -- the players lose.
+		{
+			await sleep(getDuration("longInterval"));
+			reject("Out of player cards -- the players lose.");
+			return outOfPlayerCards($container);
+		}
 
 		bindPlayerCardEvents();
 		
 		await sleep(getDuration("mediumInterval"));
 		resolve(cardDrawEvent.cardKeys);
 	});
+}
+
+// To be called when there are too few cards left in the player deck to complete the 'Draw 2 Cards' step.
+async function outOfPlayerCards($cardDrawContainer)
+{
+	$cardDrawContainer.append("<h2>Out of cards!</h2>");
+	unhide($cardDrawContainer);
+
+	await sleep(getDuration("longInterval"));
+	endGame();
 }
 
 async function finishDrawStep(cardKeys)
@@ -3198,9 +3227,10 @@ async function finishDrawStep(cardKeys)
 	proceed();
 }
 
-async function dealFaceDownPlayerCards($container, numCards)
+async function dealFaceDownPlayerCards($container, numCardsToDeal)
 {
-	for (let i = 0; i < numCards; i++)
+	log("numCards: ", numCardsToDeal)
+	for (let i = 0; i < numCardsToDeal; i++)
 	{
 		await dealFaceDownPlayerCard($container);
 		await sleep(getDuration("dealCard") * 0.5);
@@ -7719,6 +7749,7 @@ function loadGamestate(gamestate)
 
 	delete gamestate.stepName;
 	Object.assign(data, gamestate);
+	log("gamestate pcr: ", gamestate.numPlayerCardsRemaining);
 }
 
 function loadDiseaseStatuses(diseaseStatuses)
@@ -7785,6 +7816,8 @@ async function setup()
 		indicateOneQuietNightStep();
 
 	await removeCurtain();
+
+	bindPlayerDeckHover();
 	
 	if (forecastInProgress())
 	{
@@ -7798,6 +7831,16 @@ async function setup()
 	}
 	else
 		proceed();
+}
+
+function bindPlayerDeckHover()
+{
+	$("#playerDeck").off("mouseenter")
+		.hover(function()
+		{
+			if (!currentStepIs("setup"))
+				$(this).attr("title", `${data.numPlayerCardsRemaining} cards`);
+		});
 }
 
 async function animateRoleDetermination()

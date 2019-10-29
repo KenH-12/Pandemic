@@ -57,7 +57,7 @@ body,
 }
 #curtain h1 { font-size: 60px }
 #curtain h2 { font-size: 26px }
-#curtain h3 { font-size: 16px }
+#curtain h3 { font-size: 16px; font-weight: 400; }
 .pinpointRect,
 .infectionRateHighlight,
 .outbreaksHighlight,
@@ -595,6 +595,12 @@ span.r {color: #ef282a}
 	font-size: 20px;
 	font-weight: 700;
 	overflow: hidden;
+}
+#cardDrawContainer h2
+{
+	text-align: center;
+	font-size: 24px;
+	font-family: 'Oswald', sans-serif;
 }
 .discardPrompt { border-top: 1px solid #fff; }
 .discardPrompt > div:not(.button)

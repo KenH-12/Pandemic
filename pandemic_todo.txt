@@ -35,11 +35,8 @@ TO DO
 -----
 game end conditions
 	players lose
-		not enough player cards are left when needed (out of time)
 		8 outbreaks occured (worldwide panic)
 		not enough disease cubes are left when needed (a disease spreads out of control)
-	players win
-		all 4 cures discovered
 
 the player deck should appear smaller when it contains fewer cards
 as should the infection deck
@@ -82,6 +79,9 @@ make sure the height limit on the expanded infection discards functions properly
 
 IDEAS
 -----
+hovering over the player deck causes the cursor to become a "?".
+	clicking shows the explaination of what happens when the cards run out.
+
 add checkmarks to completed setup steps?
 
 pinpointing should happen on mousover of playercards/infection cards?

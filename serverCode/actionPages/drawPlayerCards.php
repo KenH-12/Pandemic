@@ -14,6 +14,7 @@
 
 		$CURRENT_STEP = "draw";
 		$EVENT_TYPE = "cd";
+		$NUM_CARDS_TO_DRAW = 2;
 		$HAND_LIMIT = 7;
 
 		require "../connect.php";
@@ -24,7 +25,16 @@
 								WHERE game = $game
 								AND pile = 'deck'
 								ORDER BY cardIndex DESC
-								LIMIT 2");
+								LIMIT $NUM_CARDS_TO_DRAW");
+		
+		$mysqli->autocommit(FALSE);
+		
+		if ($cards->num_rows < $NUM_CARDS_TO_DRAW)
+		{
+			$gameEndCause = "cards";
+			recordGameEndCause($mysqli, $game, $gameEndCause);
+			$response["gameEndCause"] = $gameEndCause;
+		}
 		
 		$cardKeys = array();
 		$epidemicKeys = array();
@@ -38,34 +48,35 @@
 			else
 				array_unshift($cardKeys, $key);
 		}
-		
-		$numEpidemics = count($epidemicKeys);
-		$numCards = count($cardKeys);
-		
-		$mysqli->autocommit(FALSE);
-
-		if ($numCards > 0)
-		{
-			$cardType = "player";
-			$currentPile = "deck";
-			$newPile = $role;
-			
-			moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKeys);
-		}
-		
-		if ($numEpidemics > 0)
-			$nextStep = "epIncrease";
-		else if (getHandSize($mysqli, $game, $role) > $HAND_LIMIT)
-			$nextStep = "discard";
-		else
-			$nextStep = "infect cities";
-		
-		$response["turnNum"] = getTurnNumber($mysqli, $game);
-		$response["nextStep"] = updateStep($mysqli, $game, $CURRENT_STEP, $nextStep, $role);
-		$response["numPlayerCardsRemaining"] = $cardsLeftInDeck;
 
 		$actionDetails = join(",", array_merge($epidemicKeys, $cardKeys));
 		$response["events"] = recordEvent($mysqli, $game, $EVENT_TYPE, $actionDetails, $role);
+
+		if (!isset($response["gameEndCause"]))
+		{
+			$numEpidemics = count($epidemicKeys);
+			$numCards = count($cardKeys);
+	
+			if ($numCards > 0)
+			{
+				$cardType = "player";
+				$currentPile = "deck";
+				$newPile = $role;
+				
+				moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKeys);
+			}
+			
+			if ($numEpidemics > 0)
+				$nextStep = "epIncrease";
+			else if (getHandSize($mysqli, $game, $role) > $HAND_LIMIT)
+				$nextStep = "discard";
+			else
+				$nextStep = "infect cities";
+			
+			$response["turnNum"] = getTurnNumber($mysqli, $game);
+			$response["nextStep"] = updateStep($mysqli, $game, $CURRENT_STEP, $nextStep, $role);
+			$response["numPlayerCardsRemaining"] = $cardsLeftInDeck;
+		}
 	}
 	catch(Exception $e)
 	{

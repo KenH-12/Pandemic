@@ -344,7 +344,21 @@ function nextStep($mysqli, $game, $currentStep, $currentTurnRoleID)
     if ($mysqli->affected_rows != 1)
         throw new Exception("Failed to update step ($currentStep -> $nextStep): " . $mysqli->error);
     
+    if ($nextStep === "draw" && countCardsInPlayerDeck($mysqli, $game) == 0)
+        recordGameEndCause($mysqli, $game, "cards");
+    
     return $nextStep;
+}
+
+function countCardsInPlayerDeck($mysqli, $game)
+{
+    $numCards = $mysqli->query("SELECT COUNT(*) AS 'numCards'
+								FROM vw_playerCard
+								WHERE game = $game
+								AND pile = 'deck'")
+                        ->fetch_assoc()["numCards"];
+    
+    return $numCards;
 }
 
 // Updates the step to the specified nextStep,

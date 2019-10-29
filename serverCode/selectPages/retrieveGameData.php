@@ -127,6 +127,8 @@
 																"population" => $population);
 			}
 		}
+
+		$response["gamestate"]["numPlayerCardsRemaining"] = countCardsInPlayerDeck($mysqli, $game);
 	}
 	catch(Exception $e)
 	{
