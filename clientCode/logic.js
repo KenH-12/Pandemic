@@ -2585,6 +2585,7 @@ function requestAction(eventType, dataToPost)
 				proceedFromDiscardToStep, // in case playing an event card satisfied the discard requirement.
 				turnNum,
 				numPlayerCardsRemaining,
+				gameEndCause,
 				failure
 			} = JSON.parse(response);
 			
@@ -2606,6 +2607,9 @@ function requestAction(eventType, dataToPost)
 
 				if (numPlayerCardsRemaining)
 					data.numPlayerCardsRemaining = numPlayerCardsRemaining;
+
+				if (gameEndCause)
+					data.gameEndCause = gameEndCause;
 				
 				if (events)
 					resolve(parseEvents(events));
@@ -7376,12 +7380,35 @@ async function discoverCure(cardKeys)
 	
 	await animateDiscoverCure(diseaseColor, newDiseaseStatus);
 
+	if (data.gameEndCause)
+		return endGame();
+
 	// The auto-treat event (if there is one) would have been the cause of eradication (if eradication occured),
 	// so we pass both here.
 	if (autoTreatEvents.length)
 		await animateAutoTreatDiseaseEvents([ ...autoTreatEvents, ...eradicationEvents ]);
 
 	proceed();
+}
+
+function endGame()
+{
+	log(`endGame(${data.gameEndCause})`);
+	const $curtain = $("#curtain"),
+		hidden = "hidden";
+
+	$curtain.children("p").addClass(hidden);
+
+	let selectorToShow;
+	if (data.gameEndCause === "victory")
+		selectorToShow = "#victory";
+	else
+		selectorToShow = `#defeat, .${data.gameEndCause}Defeat`;
+
+	$curtain.find(selectorToShow).removeClass(hidden)
+		.first().css("margin-top", data.boardHeight / 3);
+		
+	$curtain.fadeIn(1000, "easeInQuint", function() { $(this).removeClass(hidden) });
 }
 
 async function animateDiscoverCure(diseaseColor, diseaseStatus)
@@ -7391,19 +7418,26 @@ async function animateDiscoverCure(diseaseColor, diseaseStatus)
 	$cureMarker.css("opacity", 0.1)
 		.animate({ opacity: 1 }, getDuration("specialEventBannerReveal") * 8, "easeOutQuad");
 
+	let description = "", postDelayMs = 1500;
+	if (data.cures.remaining > 0)
+		description = `Discover ${data.cures.remaining} more to win the game`;
+	else
+		postDelayMs = 500;
+
 	await specialEventAlert(
 	{
 		title: "DISCOVERED CURE!",
-		description: `Discover ${data.cures.remaining} more to win the game`,
+		description,
 		eventClass: diseaseColor
 	});
 
 	if (diseaseStatus === "eradicated")
 	{
+		description = `No new disease cubes of this color will be placed on the board`;
 		await specialEventAlert(
 			{
 				title: "DISEASE ERADICATED!",
-				description: `No new disease cubes of this color will be placed on the board`,
+				description,
 				eventClass: diseaseColor
 			});
 	}
@@ -7426,7 +7460,7 @@ async function animateDiscoverCure(diseaseColor, diseaseStatus)
 	
 	positionCureMarkers();
 	
-	return sleep(1500);
+	return sleep(postDelayMs);
 }
 
 function getCureMarkerDesiredProperties(diseaseColor)
@@ -8723,11 +8757,7 @@ function removeCurtain()
 		sleep(75)
 		.then(() => {
 			const curtain = $("#curtain");
-			curtain.fadeOut(function()
-			{
-				curtain.remove();
-				resolve();
-			});
+			curtain.fadeOut(function() { resolve() });
 		});
 	});
 }

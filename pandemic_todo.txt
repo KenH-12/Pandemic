@@ -144,6 +144,8 @@ make animation effects juicier
 
 SMALL FIXES
 -----------
+center gameEnd text vertically
+
 use a more straightforward way of retrieving the turn order in retrieveGameData.php
 
 use flexbox for #playerPanelContainer
