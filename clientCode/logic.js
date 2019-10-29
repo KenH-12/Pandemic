@@ -6453,7 +6453,8 @@ function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 	if (removingContingencyCard)
 		initialCardProperties.border = "none";
 	
-	$card.css(initialCardProperties)
+	$card.appendTo("#boardContainer")
+		.css(initialCardProperties)
 		.offset(initialOffset)
 		.animate(
 			{
@@ -7391,7 +7392,7 @@ async function discoverCure(cardKeys)
 	proceed();
 }
 
-function endGame()
+async function endGame()
 {
 	log(`endGame(${data.gameEndCause})`);
 	const $curtain = $("#curtain"),
@@ -7407,8 +7408,17 @@ function endGame()
 
 	$curtain.find(selectorToShow).removeClass(hidden)
 		.first().css("margin-top", data.boardHeight / 3);
-		
-	$curtain.fadeIn(1000, "easeInOutQuint", function() { $(this).removeClass(hidden) });
+	
+	await animatePromise(
+	{
+		$elements: $curtain.removeAttr("style"),
+		initialProperties: { opacity: 0 },
+		desiredProperties: { opacity: 0.9 },
+		duration: 1000,
+		easing: "easeInOutQuint"
+	});
+
+	// TODO: show options for what to do after the game ends
 }
 
 function animateDiscoverCure(diseaseColor, diseaseStatus)
