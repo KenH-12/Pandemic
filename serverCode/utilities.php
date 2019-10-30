@@ -186,14 +186,14 @@ function outbreak($mysqli, $game, $originCityKey, $cubeColor)
         $outbreakCount++;
         $events[] = recordEvent($mysqli, $game, "ob", "$outbreakCount,$outbreakKey,$cubeColor");
 
-        $updateGamestateQuery = "UPDATE vw_gamestate SET outbreakCount = $outbreakCount";
-        // If the outbreak limit was reached, the game is over and the players lose.
+        // If the outbreak limit is reached, the game is over and the players lose.
         if ($outbreakCount == $OUTBREAK_LIMIT)
-            $updateGamestateQuery .= ", endResult = 'l', endCause = 'outbreak'";
+        {
+            recordGameEndCause($mysqli, $game, "outbreak");
+            return $events;
+        }
 
-        $updateGamestateQuery .= " WHERE game = $game";
-
-        $mysqli->query($updateGamestateQuery);
+        $mysqli->query("UPDATE vw_gamestate SET outbreakCount = $outbreakCount WHERE game = $game");
         
         if ($mysqli->affected_rows != 1)
             throw new Exception("Failed to update gamestate after outbreak.");

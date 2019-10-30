@@ -33,7 +33,7 @@
 					</div>
 					<div id='defeat' class='hidden'>
 						<h1>D E F E A T</h1>
-						<h2 class='outbreakDefeat hidden'>A worldwide panic has occured!</h2>
+						<h2 class='outbreakDefeat hidden'>A worldwide panic happened!</h2>
 						<h3 class='outbreakDefeat hidden'>(too many outbreaks)</h3>
 
 						<h2 class='cubesDefeat hidden'>The <span>red</span> disease has spread out of control!</h2>

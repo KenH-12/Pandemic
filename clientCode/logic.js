@@ -5642,6 +5642,8 @@ async function resolveOutbreaks(events)
 
 		await moveOutbreaksMarker(outbreakEvent.outbreakCount, { animate: true });
 
+		if (tooManyOutbreaksOccured()) return false;
+
 		initialCubeOffset = $triggerCube.offset();
 		$triggerCube.remove();
 
@@ -5714,6 +5716,16 @@ async function resolveOutbreaks(events)
 	return sleep(getDuration("shortInterval"));
 }
 
+function tooManyOutbreaksOccured()
+{
+	const OUTBREAK_LIMIT = 8;
+
+	if (data.outbreakCount == OUTBREAK_LIMIT)
+		return true;
+	
+	return false;
+}
+
 function moveOutbreaksMarker(outbreakCount, { animate } = {})
 {
 	return new Promise(async resolve =>
@@ -5740,6 +5752,13 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 			if (animate)
 			{
 				await sleep(getDuration("longInterval"));
+
+				if (tooManyOutbreaksOccured())
+				{
+					data.gameEndCause = "outbreak";
+					return endGame();
+				}
+
 				await highlightMarkerTrack("outbreaks", { off: true });
 			}
 
@@ -6001,7 +6020,6 @@ async function epidemicInfect()
 	getInfectionContainer().append(newInfectionCardTemplate());
 	positionInfectionPanelComponents();
 	await dealFaceDownInfCard(card.index);
-	await sleep(getDuration("mediumInterval")); // for suspense
 	await revealInfectionCard(card);
 
 	if (preventionCode == 0)
@@ -6010,7 +6028,10 @@ async function epidemicInfect()
 		await infectionPreventionAnimation(card);
 
 	if (triggeredOutbreakEvents.length)
+	{
 		await resolveOutbreaks(triggeredOutbreakEvents);
+		if (tooManyOutbreaksOccured()) return false;
+	}
 		
 	await sleep(interval);
 	await discardInfectionCard($("#epidemicContainer").find(".infectionCard"), 400);
@@ -6613,7 +6634,10 @@ async function infectionStep()
 		
 		// if any events are left after shifting the first, an outbreak occured.
 		if (events.length)
+		{
 			await resolveOutbreaks(events);
+			if (tooManyOutbreaksOccured()) return false;
+		}
 		else
 		{
 			if (card.preventionCode === data.infectionPreventionCodes.notPrevented)
