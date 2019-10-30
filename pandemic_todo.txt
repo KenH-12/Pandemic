@@ -37,6 +37,9 @@ game end conditions
 	players lose
 		not enough disease cubes are left when needed (a disease spreads out of control)
 
+		add flashing red background to outbreaks track when too many outbreaks occurs
+		add flashing red background to player deck when there aren't enough cards to draw
+
 the player deck should appear smaller when it contains fewer cards
 as should the infection deck
 

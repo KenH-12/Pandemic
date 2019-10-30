@@ -6641,7 +6641,12 @@ async function infectionStep()
 		else
 		{
 			if (card.preventionCode === data.infectionPreventionCodes.notPrevented)
+			{
+				if (data.gameEndCause)
+					return outOfDiseaseCubes(getCity(card.cityKey).color);
+				
 				await placeDiseaseCubes(card);
+			}
 			else
 				await infectionPreventionAnimation(card);
 		}
@@ -7258,7 +7263,7 @@ async function revealInfectionCard({ cityKey, index, preventionCode }, { forecas
 			{
 				$veil.remove();
 
-				if (!data.fastForwarding && !forecasting)
+				if (!data.fastForwarding && !forecasting && !data.gameEndCause)
 					pinpointCity(cityKey, getPinpointColor(preventionCode));
 				
 				resolve();
@@ -7444,6 +7449,29 @@ async function discoverCure(cardKeys)
 		await animateAutoTreatDiseaseEvents([ ...autoTreatEvents, ...eradicationEvents ]);
 
 	proceed();
+}
+
+async function outOfDiseaseCubes(diseaseColor)
+{
+	const $cubeSupply = $("#cubeSupplies"),
+		originalBackgroundColor = $cubeSupply.css("background-color"),
+		interval = 125;
+
+	let backgroundColor;
+	for (let i = 0; i < 11; i++)
+	{
+		if (i % 2 === 0)
+			backgroundColor = "#8a181a";
+		else
+			backgroundColor = originalBackgroundColor;
+		
+		$cubeSupply.css({ backgroundColor });
+
+		await sleep(interval);
+	}
+
+	$("#curtain").find(".cubesDefeat > span").html(getColorWord(diseaseColor));
+	endGame();
 }
 
 async function endGame()

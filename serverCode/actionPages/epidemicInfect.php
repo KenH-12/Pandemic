@@ -53,11 +53,19 @@
         $details = "$cardKey," . $infectionResult["prevCubeCount"] . ",$infectionPrevention";
         $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $details, $role);
         
-        // Include any triggered outbreak events in the response.
-        if (isset($infectionResult["outbreakEvents"]))
-            $response["events"] = array_merge($response["events"], $infectionResult["outbreakEvents"]);
+        if ($cubesToAdd > 0)
+        {
+            // Include any triggered outbreak events in the response.
+            if (isset($infectionResult["outbreakEvents"]))
+                $response["events"] = array_merge($response["events"], $infectionResult["outbreakEvents"]);
 
-        $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $NEXT_STEP, $role);
+            // Adding disease cubes to the board can cause the game to end in defeat.
+            if (getGameEndCause($mysqli, $game) === "cubes")
+                $response["gameEndCause"] = "cubes";
+        }
+
+        if (!isset($response["gameEndCause"]))
+            $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $NEXT_STEP, $role);
     }
     catch(Exception $e)
     {

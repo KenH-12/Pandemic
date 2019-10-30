@@ -84,21 +84,19 @@ function getCubeCount($mysqli, $game, $cityKey, $diseaseColorOrCubeColumn)
     return $cubeCount;
 }
 
-function addCubesToCity($mysqli, $game, $cityKey, $cubeColor, $cubesToAdd)
+function addCubesToCity($mysqli, $game, $cityKey, $diseaseColor, $cubesToAdd)
 {
     $MAX_CUBE_COUNT = 3;
-    $cubeColumn = getCubeColumnName($cubeColor);
+    $cubeColumn = getCubeColumnName($diseaseColor);
     $cubeCount = getCubeCount($mysqli, $game, $cityKey, $cubeColumn);
     $result["prevCubeCount"] = $cubeCount;
     
     if ($cubeCount + $cubesToAdd <= $MAX_CUBE_COUNT)
-    {
         $newCubeCount = $cubeCount + $cubesToAdd;
-    }
     else
     {
         $newCubeCount = $MAX_CUBE_COUNT;
-        $result["outbreakEvents"] = outbreak($mysqli, $game, $cityKey, $cubeColor);
+        $result["outbreakEvents"] = outbreak($mysqli, $game, $cityKey, $diseaseColor);
     }
 
     if ($newCubeCount != $cubeCount)
@@ -109,7 +107,9 @@ function addCubesToCity($mysqli, $game, $cityKey, $cubeColor, $cubesToAdd)
                         AND locationKey = '$cityKey'");
         
         if ($mysqli->affected_rows != 1)
-            throw new Exception("Failed to add $cubesToAdd cubes ($cubeColor) to $cityKey: $mysqli->error");
+            throw new Exception("Failed to add $cubesToAdd cubes ($diseaseColor) to $cityKey: $mysqli->error");
+        
+        checkAndRecordDiseaseCubeDefeat($mysqli, $game, $diseaseColor);
     }
 
     return $result;
@@ -163,7 +163,7 @@ function recordEvent($mysqli, $game, $type, $details, $role = "NULL")
                 "role" => $role);
 }
 
-function outbreak($mysqli, $game, $originCityKey, $cubeColor)
+function outbreak($mysqli, $game, $originCityKey, $diseaseColor)
 {
     $events = array();
 
@@ -173,7 +173,7 @@ function outbreak($mysqli, $game, $originCityKey, $cubeColor)
                                     FROM vw_gamestate
                                     WHERE game = $game")->fetch_assoc()["outbreakCount"];
     
-    $cubeColumn = getCubeColumnName($cubeColor);
+    $cubeColumn = getCubeColumnName($diseaseColor);
     $pendingOutbreakKeys = array($originCityKey);
     // A city cannot outbreak more than once
     // as a result of resolving the current infection card.
@@ -184,7 +184,7 @@ function outbreak($mysqli, $game, $originCityKey, $cubeColor)
         $outbreakKey = array_shift($pendingOutbreakKeys);
         
         $outbreakCount++;
-        $events[] = recordEvent($mysqli, $game, "ob", "$outbreakCount,$outbreakKey,$cubeColor");
+        $events[] = recordEvent($mysqli, $game, "ob", "$outbreakCount,$outbreakKey,$diseaseColor");
 
         // If the outbreak limit is reached, the game is over and the players lose.
         if ($outbreakCount == $OUTBREAK_LIMIT)
@@ -213,11 +213,11 @@ function outbreak($mysqli, $game, $originCityKey, $cubeColor)
             if (in_array($affectedKey, $currentOutbreakKeys))
                 continue;
         
-            $infectionPrevention = checkInfectionPrevention($mysqli, $game, $affectedKey, $cubeColor);
+            $infectionPrevention = checkInfectionPrevention($mysqli, $game, $affectedKey, $diseaseColor);
             if ($infectionPrevention != "0")
             {
                 // Infection prevented -- the city will not be affected.
-                $events[] = recordEvent($mysqli, $game, "oi", "$outbreakKey,$affectedKey,$cubeColor,$infectionPrevention");
+                $events[] = recordEvent($mysqli, $game, "oi", "$outbreakKey,$affectedKey,$diseaseColor,$infectionPrevention");
                 continue;
             }
 
@@ -233,7 +233,7 @@ function outbreak($mysqli, $game, $originCityKey, $cubeColor)
                 if ($mysqli->affected_rows != 1)
                     throw new Exception("Failed to add $cubeColumn to $affectedKey (outbreak infection triggered by $outbreakKey): " . $mysqli->error);
                 
-                $events[] = recordEvent($mysqli, $game, "oi", "$outbreakKey,$affectedKey,$cubeColor,$infectionPrevention");
+                $events[] = recordEvent($mysqli, $game, "oi", "$outbreakKey,$affectedKey,$diseaseColor,$infectionPrevention");
             }
             else // the affected city will have an outbreak
             {
@@ -241,64 +241,15 @@ function outbreak($mysqli, $game, $originCityKey, $cubeColor)
                 array_push($currentOutbreakKeys, $affectedKey);
             }
         }
+
+        // Let each individual outbreak resolve fully before checking this,
+        // and return early if the players lose.
+        if (checkAndRecordDiseaseCubeDefeat($mysqli, $game, $diseaseColor))
+            return $events;
     }
 
     return $events;
 }
-
-
-// Performs Epidemic steps 1 and 2, which happen immediately when an epidemic card is drawn.
-// Step 3 (INTENSIFY) is handled separately because the "RESILIENT POPULATION"
-// event card can be played between steps 2 and 3.
-// NOTE:    When two epidemic cards are drawn on the same turn,
-//          the second is not triggered until after the first has been resolved.
-// Epidemic Step 1: INCREASE
-// "MOVE THE INFECTION RATE MARKER FORWARD 1 SPACE."
-// Epidemic Step 2: INFECT
-// "DRAW THE BOTTOM CARD FROM THE INFECTION DECK AND PUT 3 CUBES ON THAT CITY. DISCARD THAT CARD."
-// Returns the epidemic event created by recordEvent.
-function triggerEpidemic($mysqli, $game, $role)
-{
-    $EVENT_CODE = "ep";
-    
-    // Update epidemicCount and infectionRate
-    $newEpidemicCount = $mysqli->query("SELECT epidemicCount
-                                        FROM vw_gamestate
-                                        WHERE game = $game")->fetch_assoc()["epidemicCount"] + 1;
-    
-    $mysqli->query("UPDATE vw_gamestate
-                    SET epidemicCount = $newEpidemicCount,
-                        infRate = getInfectionRate($newEpidemicCount)
-                    WHERE game = $game");
-    
-    if ($mysqli->affected_rows != 1)
-        throw new Exception("Failed to update epidemic count / infection rate: " . $mysqli->error);
-    
-    // Get the bottom card from the infection deck.
-    $bottomCard = $mysqli->query("SELECT cardKey, color
-                                FROM vw_infectionCard
-                                WHERE game = $game
-                                AND pile = 'deck'
-                                AND cardIndex = (SELECT MIN(cardIndex)
-                                                FROM vw_infectionCard
-                                                WHERE game = $game
-                                                AND pile = 'deck')")->fetch_assoc();
-    
-    $cardKey = $bottomCard["cardKey"];
-    $color = $bottomCard["color"];
-
-    discardInfectionCards($mysqli, $game, $cardKey);
-
-    // Add 3 cubes to the corresponding city, unless the infection will be prevented somehow.
-    $cubesToAdd = 3;
-    $infectionPrevention = checkInfectionPrevention($mysqli, $game, $cardKey, $color);
-    if ($infectionPrevention != "0")
-        $cubesToAdd = 0;
-    
-    $prevCubeCount = addCubesToCity($mysqli, $game, $cardKey, $color, $cubesToAdd)["prevCubeCount"];
-    
-    return recordEvent($mysqli, $game, $EVENT_CODE, "$newEpidemicCount,$cardKey,$prevCubeCount,$infectionPrevention", $role);
-}    
 
 function nextTurn($mysqli, $game, $currentTurnRoleID)
 {
@@ -592,17 +543,6 @@ function setDiseaseStatus($mysqli, $game, $diseaseColor, $newStatus)
         return recordEvent($mysqli, $game, "er", $diseaseColor);
 }
 
-function numDiseaseCubesOnBoard($mysqli, $game, $diseaseColor)
-{
-    $cubeColumn = $diseaseColor . "Cubes";
-
-    $numCubesOnBoard = $mysqli->query("SELECT SUM($cubeColumn) AS 'numCubes'
-                                        FROM vw_location
-                                        WHERE game = $game")->fetch_assoc()["numCubes"];
-
-    return $numCubesOnBoard;
-}
-
 function checkInfectionPrevention($mysqli, $game, $cityKey, $diseaseColor)
 {
     // Possible return values
@@ -888,6 +828,35 @@ function oneQuietNightScheduledThisTurn($mysqli, $game)
     return $isOneQuietNight;
 }
 
+// The players lose if not enough disease cubes are left when needed.
+// Therefore, the $MAX_CUBES_ON_BOARD of a given $diseaseColor is equal to the cube supply of said $diseaseColor.
+// Meaning a cube supply can be 0, but the players lose if it ever becomes negative).
+// To make the cause of defeat more obvious for the user, the cube supply will become negative,
+// after which the user will immediately be notified of defeat.
+function checkAndRecordDiseaseCubeDefeat($mysqli, $game, $diseaseColor)
+{
+    $MAX_CUBES_ON_BOARD = 24;
+
+    if (numDiseaseCubesOnBoard($mysqli, $game, $diseaseColor) > $MAX_CUBES_ON_BOARD)
+    {
+        recordGameEndCause($mysqli, $game, "cubes");
+        return true;
+    }
+
+    return false;
+}
+
+function numDiseaseCubesOnBoard($mysqli, $game, $diseaseColor)
+{
+    $cubeColumn = $diseaseColor . "Cubes";
+
+    $numCubesOnBoard = $mysqli->query("SELECT SUM($cubeColumn) AS 'numCubes'
+                                        FROM vw_location
+                                        WHERE game = $game")->fetch_assoc()["numCubes"];
+
+    return $numCubesOnBoard;
+}
+
 function checkVictory($mysqli, $game)
 {
     $diseaseStatuses = $mysqli->query("SELECT   yStatus,
@@ -917,5 +886,14 @@ function recordGameEndCause($mysqli, $game, $endCauseName)
     
     if ($mysqli->affected_rows != 1)
         throw new Exception("Failed to record game end cause: $mysqli->error");
+}
+
+function getGameEndCause($mysqli, $game)
+{
+    $endCauseName = $mysqli->query("SELECT endCauseName
+                                FROM vw_gamestate
+                                WHERE game = $game")->fetch_assoc()["endCauseName"];
+    
+    return $endCauseName;
 }
 ?>

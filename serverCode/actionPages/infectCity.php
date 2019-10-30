@@ -77,9 +77,13 @@ try
 
 		if (isset($infectionResult["outbreakEvents"]))
 			$response["events"] = array_merge($response["events"], $infectionResult["outbreakEvents"]);
+		
+		// Adding disease cubes to the board can cause the game to end in defeat.
+		if (getGameEndCause($mysqli, $game) === "cubes")
+			$response["gameEndCause"] = "cubes";
 	}
 	
-	if (++$numInfected == $infRate)
+	if (!isset($response["gameEndCause"]) && ++$numInfected == $infRate)
 		$response["nextStep"] = updateStep($mysqli, $game, $CURRENT_STEP, $NEXT_STEP, $role);
 }
 catch(Exception $e)
