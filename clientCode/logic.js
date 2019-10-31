@@ -3135,7 +3135,7 @@ async function drawStep()
 	if (data.numPlayerCardsRemaining == 0) // the players lose.
 	{
 		data.gameEndCause = "cards";
-		return outOfPlayerCards($container);
+		return outOfPlayerCardsDefeatAnimation($container);
 	}
 
 	unhide($container, $btn);
@@ -3201,7 +3201,7 @@ async function performDrawStep()
 		{
 			await sleep(getDuration("longInterval"));
 			reject("Out of player cards -- the players lose.");
-			return outOfPlayerCards($container);
+			return outOfPlayerCardsDefeatAnimation($container);
 		}
 
 		bindPlayerCardEvents();
@@ -3209,16 +3209,6 @@ async function performDrawStep()
 		await sleep(getDuration("mediumInterval"));
 		resolve(cardDrawEvent.cardKeys);
 	});
-}
-
-// To be called when there are too few cards left in the player deck to complete the 'Draw 2 Cards' step.
-async function outOfPlayerCards($cardDrawContainer)
-{
-	$cardDrawContainer.append("<h2>Out of cards!</h2>");
-	unhide($cardDrawContainer);
-
-	await sleep(getDuration("longInterval"));
-	endGame();
 }
 
 async function finishDrawStep(cardKeys)
@@ -7490,6 +7480,25 @@ async function discoverCure(cardKeys)
 	proceed();
 }
 
+async function outOfPlayerCardsDefeatAnimation($cardDrawContainer)
+{
+	const $playerDeckContainer = $("#playerDeck");
+	
+	$cardDrawContainer.append("<h2>Out of cards!</h2>");
+	unhide($cardDrawContainer);
+
+	await propertyStrobe($playerDeckContainer,
+	{
+		initialState: { backgroundColor: $playerDeckContainer.css("background-color") },
+		strobeState: { backgroundColor: "#8a181a" },
+		numFlashes: 10,
+		flashIntervalMs: 125,
+		endOnStrobeState: true
+	});
+
+	endGame();
+}
+
 function diseaseCubeLimitExceeded(color)
 {
 	return data.gameEndCause === "cubes" && data.diseaseCubeSupplies[color] < 0;
@@ -7522,7 +7531,7 @@ async function outbreakDefeatAnimation()
 		initialState: { opacity: 0 },
 		strobeState: { opacity: 0.5 },
 		numFlashes: 5,
-		flashIntervalMs: 200,
+		flashIntervalMs: 125,
 		endOnStrobeState: true
 	});
 
