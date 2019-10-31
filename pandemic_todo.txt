@@ -33,10 +33,11 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+fix the epidemic discard animation
+
 animate cubes directly to their eventual position in the cluster
 
-the player deck should appear smaller when it contains fewer cards
-as should the infection deck
+the infection deck should appear smaller when it contains fewer cards
 
 fix wording of contingency planner's special ability ("on this card")
 

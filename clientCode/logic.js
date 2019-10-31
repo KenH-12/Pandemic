@@ -3225,7 +3225,6 @@ async function finishDrawStep(cardKeys)
 
 async function dealFaceDownPlayerCards($container, numCardsToDeal)
 {
-	log("numCards: ", numCardsToDeal)
 	for (let i = 0; i < numCardsToDeal; i++)
 	{
 		await dealFaceDownPlayerCard($container);
@@ -3246,6 +3245,13 @@ function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex } = {})
 		
 		if (zIndex)
 			$cardback.css({ zIndex });
+
+		// Although data.numPlayerCardsRemaining is explicitly set after a card draw request,
+		// said request happens asynchronously with this function, therefore manually decrementing here ensures
+		// that setPlayerDeckImgSize chooses the correct img.
+		// This is especially important when 1 or 0 player cards remain in the deck.
+		data.numPlayerCardsRemaining--;
+		setPlayerDeckImgSize();
 
 		$cardback
 			.appendTo("body")
@@ -7672,6 +7678,7 @@ function loadPlayerCards(playerCards)
 	}
 	
 	bindPlayerCardEvents();
+	setPlayerDeckImgSize();
 }
 
 function getEradicationBlockedDiscardKeys()
@@ -7955,7 +7962,7 @@ function bindPlayerDeckHover()
 		.hover(function()
 		{
 			if (!currentStepIs("setup"))
-				$(this).attr("title", `${data.numPlayerCardsRemaining} cards`);
+				$(this).attr("title", `${data.numPlayerCardsRemaining} card${data.numPlayerCardsRemaining != 1 ? "" : ""}`);
 		});
 }
 
@@ -8514,45 +8521,67 @@ function getPlayerDeckProperties()
 
 function increasePlayerDeckImgSize()
 {
-	const $deck = $("#imgPlayerDeck");
-	
-	const deckSrc = $deck.attr("src"),
-		dotIdx = deckSrc.indexOf("."),
-		currentSize = deckSrc.substring(dotIdx - 1, dotIdx),
+	const $deck = $("#imgPlayerDeck"),
+		currentSize = $deck.hasClass("hidden") ? -1 : getPlayerDeckImgSize($deck),
 		MAX_SIZE = getMaxPlayerDeckImgSize();
 
 	if (currentSize == MAX_SIZE)
 		return;
-		
-	let newSize;
-	if (isNaN(currentSize))
-		newSize = 1;
-	else
-		newSize = Number(currentSize) + 1;
 	
-	$deck.attr("src", `images/cards/playerDeck_${newSize}.png`);
+	$deck.attr("src", `images/cards/playerDeck_${Number(currentSize) + 1}.png`)
+		.removeClass("hidden");
 }
-
-function getMaxPlayerDeckImgSize() { return 6; }
 
 function setPlayerDeckImgSize(size)
 {
-	const $deck = $("#imgPlayerDeck"),
-		MAX_SIZE = getMaxPlayerDeckImgSize();
+	const $deck = $("#imgPlayerDeck");
+	
+	if (!size && $deck.hasClass("hidden"))
+		return;
 
-	if (size === 0)
-	{
-		$deck.attr("src", `images/cards/playerCardback.png`);
-		return;
-	}
-	else if (size < 0)
-		return;
-	
-	if (size > MAX_SIZE)
-		size = MAX_SIZE;
-	
-	$deck.attr("src", `images/cards/playerDeck_${size}.png`);
+	size = size || calculatePlayerDeckImgSize();
+	log("newSize: ", size);
+	if (size >= 0)
+		$deck.attr("src", `images/cards/playerDeck_${size}.png`);
+	else
+		$deck.addClass("hidden");
 }
+
+function calculatePlayerDeckImgSize()
+{
+	log("data.numPlayerCardsRemaining", data.numPlayerCardsRemaining);
+	const numCardsLeft = data.numPlayerCardsRemaining,
+		ranges = [
+			{ maxCards: 0, deckSize: -1 },
+			{ maxCards: 1, deckSize: 0 },
+			{ maxCards: 9, deckSize: 1 },
+			{ maxCards: 17, deckSize: 2 },
+			{ maxCards: 25, deckSize: 3 },
+			{ maxCards: 33, deckSize: 4 },
+			{ maxCards: 41, deckSize: 5 },
+			{ maxCards: 51, deckSize: 6 }
+		];
+	
+	for (let range of ranges)
+	{
+		if (numCardsLeft <= range.maxCards)
+			return range.deckSize;
+	}
+}
+
+function getPlayerDeckImgSize($imgDeck)
+{
+	const deckSrc = $imgDeck.attr("src"),
+		dotIdx = deckSrc.indexOf("."),
+		currentSize = deckSrc.substring(dotIdx - 1, dotIdx);
+	
+	if (isNaN(currentSize))
+		return 0;
+	
+	return currentSize;
+}
+
+function getMaxPlayerDeckImgSize() { return 6; }
 
 function getDifficultyName()
 {
