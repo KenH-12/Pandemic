@@ -358,6 +358,15 @@ span.r {color: #ef282a}
 	height: 5%;
 	width: 10.3%;
 }
+#outbreaksTrackHighlight
+{
+	position: absolute;
+	z-index: 10;
+	background-color: #8a181a;
+	top: 50.4%;
+	width: 10.3%;
+	height: 44.6%;
+}
 
 #rightPanel, .infectionCardContents {width: 19.5%;}
 #rightPanel

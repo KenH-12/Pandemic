@@ -5740,9 +5740,10 @@ async function resolveOutbreaks(events)
 
 function tooManyOutbreaksOccured()
 {
+	log("tooManyOutbreaksOccured()");
 	const OUTBREAK_LIMIT = 8;
 
-	if (data.outbreakCount == OUTBREAK_LIMIT)
+	if (data.outbreakCount >= OUTBREAK_LIMIT)
 		return true;
 	
 	return false;
@@ -5778,7 +5779,7 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 				if (tooManyOutbreaksOccured()) // defeat -- return early
 				{
 					data.gameEndCause = "outbreak";
-					return false;
+					return resolve();
 				}
 
 				await highlightMarkerTrack("outbreaks", { off: true });
@@ -6060,7 +6061,7 @@ async function epidemicInfect()
 	{
 		await resolveOutbreaks(triggeredOutbreakEvents);
 		if (tooManyOutbreaksOccured())
-			return endGame();
+			return outbreakDefeatAnimation();
 		
 		if (diseaseCubeLimitExceeded(color))
 			return diseaseCubeDefeatAnimation(color);
@@ -6671,7 +6672,7 @@ async function infectionStep()
 		{
 			await resolveOutbreaks(events);
 			if (tooManyOutbreaksOccured())
-				return endGame();
+				return outbreakDefeatAnimation();
 			
 			if (diseaseCubeLimitExceeded(color))
 				return diseaseCubeDefeatAnimation(color);
@@ -7498,24 +7499,33 @@ async function diseaseCubeDefeatAnimation(diseaseColor)
 {
 	executePendingClusters();
 	
-	const $cubeSupply = $("#cubeSupplies"),
-		originalBackgroundColor = $cubeSupply.css("background-color"),
-		interval = 125;
+	const $cubeSupply = $("#cubeSupplies");
 
-	let backgroundColor;
-	for (let i = 0; i < 11; i++)
+	await propertyStrobe($cubeSupply,
 	{
-		if (i % 2 === 0)
-			backgroundColor = "#8a181a";
-		else
-			backgroundColor = originalBackgroundColor;
-		
-		$cubeSupply.css({ backgroundColor });
-
-		await sleep(interval);
-	}
+		initialState: { backgroundColor: $cubeSupply.css("background-color") },
+		strobeState: { backgroundColor: "#8a181a" },
+		numFlashes: 10,
+		flashIntervalMs: 125,
+		endOnStrobeState: true
+	});
 
 	$("#curtain").find(".cubesDefeat > span").html(getColorWord(diseaseColor));
+	endGame();
+}
+
+async function outbreakDefeatAnimation()
+{
+	log("outbreakDefeatAnimation()");
+	await propertyStrobe($("#outbreaksTrackHighlight").removeClass("hidden"),
+	{
+		initialState: { opacity: 0 },
+		strobeState: { opacity: 0.5 },
+		numFlashes: 5,
+		flashIntervalMs: 200,
+		endOnStrobeState: true
+	});
+
 	endGame();
 }
 

@@ -104,6 +104,7 @@
 						<div class='infectionRateHighlight left hidden'></div>
 						<img id='infectionRateMarker' src='images/pieces/infectionRateMarker.png' alt='Infection Rate Marker'/>
 						
+						<div id='outbreaksTrackHighlight' class='hidden'></div>
 						<div class='outbreaksHighlight top hidden'></div>
 						<div class='outbreaksHighlight right hidden'></div>
 						<div class='outbreaksHighlight bottom hidden'></div>

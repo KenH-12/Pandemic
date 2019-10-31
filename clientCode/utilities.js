@@ -99,6 +99,37 @@ function animatePromise({ $elements, initialProperties, desiredProperties, durat
 		});
 }
 
+function propertyStrobe($elements,
+	{
+		initialState,
+		strobeState,
+		numFlashes = 3,
+		flashIntervalMs = 200,
+		endOnStrobeState = false
+	})
+{
+	return new Promise(async (resolve, reject) =>
+	{
+		if (numFlashes < 0)
+			return reject("Parameter 'numFlashes' of function 'propertyStobe' cannot be negative.");
+		
+		// Ensure the correct number of flashes occur.
+		let iMax = 2 * numFlashes - 1;
+		if (endOnStrobeState) iMax--;
+		
+		for (let i = 0; i <= iMax; i++)
+		{
+			if (i % 2 === 0)
+				$elements.css(strobeState);
+			else
+				$elements.css(initialState);
+
+			await sleep(flashIntervalMs);
+		}
+		resolve();
+	});
+}
+
 // Useful for extracting numbers from the beginning of css property values such as border or padding.
 function getLeadingNumber(string)
 {
