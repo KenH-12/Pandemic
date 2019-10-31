@@ -880,6 +880,11 @@ function checkVictory($mysqli, $game)
 
 function recordGameEndCause($mysqli, $game, $endCauseName)
 {
+    // If there is already a gameEndCause, don't overwrite it.
+    // The first one triggered is the one that counts.
+    if (getGameEndCause($mysqli, $game))
+        return;
+    
     $mysqli->query("UPDATE vw_gamestate
                     SET endCause = getEndCauseID('$endCauseName')
                     WHERE game = $game");

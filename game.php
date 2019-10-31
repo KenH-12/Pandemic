@@ -36,8 +36,8 @@
 						<h2 class='outbreakDefeat hidden'>A worldwide panic happened!</h2>
 						<h3 class='outbreakDefeat hidden'>(too many outbreaks)</h3>
 
-						<h2 class='cubesDefeat hidden'>The <span>red</span> disease has spread out of control!</h2>
-						<h3 class='cubesDefeat hidden'>(insufficient disease cubes to place on the board)</h3>
+						<h2 class='cubesDefeat hidden'>The <span></span> disease has spread out of control!</h2>
+						<h3 class='cubesDefeat hidden'>(too many <span></span> disease cubes on the board)</h3>
 						
 						<h2 class='cardsDefeat hidden'>Your team ran out of time!</h2>
 						<h3 class='cardsDefeat hidden'>(a player was unable to draw 2 cards)</h3>

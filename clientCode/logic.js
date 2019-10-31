@@ -90,6 +90,12 @@ const data =
 	},
 	epidemicCount: 0,
 	outbreakCount: 0,
+	diseaseCubeSupplies: {
+		y: 24,
+		r: 24,
+		u: 24,
+		b: 24
+	},
 	pendingClusters: new Set(),
 	infectionPreventionCodes: {
 		notPrevented: "0",
@@ -4395,6 +4401,18 @@ class City
 			r: 0 // red
 		};
 	}
+
+	addCubes(color, numCubes)
+	{
+		this.cubes[color] += numCubes;
+		data.diseaseCubeSupplies[color] -= numCubes;
+	}
+
+	removeCubes(color, numCubes)
+	{
+		this.cubes[color] -= numCubes;
+		data.diseaseCubeSupplies[color] += numCubes;
+	}
 	
 	isConnectedTo(cityKey)
 	{
@@ -5642,7 +5660,8 @@ async function resolveOutbreaks(events)
 
 		await moveOutbreaksMarker(outbreakEvent.outbreakCount, { animate: true });
 
-		if (tooManyOutbreaksOccured()) return false;
+		if (tooManyOutbreaksOccured()) // defeat -- return early
+			return false;
 
 		initialCubeOffset = $triggerCube.offset();
 		$triggerCube.remove();
@@ -5672,11 +5691,11 @@ async function resolveOutbreaks(events)
 				}
 				else
 				{
-					queueCluster(affectedCity.key);
+					queueCluster(affectedCity.key);			
 					numInfected++;
 				}
 			}
-			
+
 			addCube(color, affectedCity.key)
 				.offset(initialCubeOffset)
 				.animate(affectedCity.getOffset("cube"), duration, easing);
@@ -5691,7 +5710,7 @@ async function resolveOutbreaks(events)
 				showMedicAutoTreatCircle({ fadeInMs: preventionVisualFadeInMs });
 		}
 		
-		updateCubeSupplyCount(color, -numInfected);
+		updateCubeSupplyCount(color, { addend: -numInfected });
 		
 		// remove the handled events
 		events = events.filter(e => !(infections.includes(e) || Object.is(outbreakEvent, e)));
@@ -5711,6 +5730,9 @@ async function resolveOutbreaks(events)
 
 			await sleep(500); // instead of awaiting both of the above
 		}
+
+		if (diseaseCubeLimitExceeded(color)) // defeat -- return early
+			return sleep(getDuration("shortInterval"));
 	}
 
 	return sleep(getDuration("shortInterval"));
@@ -5753,10 +5775,10 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 			{
 				await sleep(getDuration("longInterval"));
 
-				if (tooManyOutbreaksOccured())
+				if (tooManyOutbreaksOccured()) // defeat -- return early
 				{
 					data.gameEndCause = "outbreak";
-					return endGame();
+					return false;
 				}
 
 				await highlightMarkerTrack("outbreaks", { off: true });
@@ -5773,7 +5795,7 @@ function addCube(color, cityKey, {prepareAnimation} = {})
 	
 	// max 3 cubes per color per city
 	if (city.cubes[color] < 3)
-		city.cubes[color]++;
+		city.addCubes(color, 1);
 
 	$("#boardContainer").append("<div class='diseaseCube " + color + " " + cityKey + "'></div>");
 	const newCube = $(".diseaseCube").last();
@@ -5835,7 +5857,7 @@ async function removeCubes(city, { $clickedCube, color, numToRemove, animate } =
 			});
 
 			$cube.remove();
-			updateCubeSupplyCount(color, 1);
+			updateCubeSupplyCount(color, { addend: 1 });
 
 			$cubesToRemove = $(`.diseaseCube.removing`);
 		}
@@ -5843,11 +5865,11 @@ async function removeCubes(city, { $clickedCube, color, numToRemove, animate } =
 	else
 	{
 		$(`.diseaseCube.removing`).remove();
-		updateCubeSupplyCount(color, numToRemove);
+		updateCubeSupplyCount(color, { addend : numToRemove });
 	}
 
 	city.cluster();
-	city.cubes[color] -= numToRemove;
+	city.removeCubes(color, numToRemove);
 	
 
 	return(sleep(getDuration("shortInterval")));
@@ -5871,17 +5893,17 @@ function enforceCubeCount(cityKey, expectedCubeCount, cubeColor)
 				addCube(cubeColor, cityKey);
 				numAdded++;
 			}
-			updateCubeSupplyCount(cubeColor, -numAdded);
+			updateCubeSupplyCount(cubeColor, { addend: -numAdded });
 		}
 
 		city.cluster();
 	}
 }
 
-function updateCubeSupplyCount(cubeColor, addend)
+function updateCubeSupplyCount(cubeColor, { addend, newCount } = {})
 {
 	const $supplyCount = $(`#${cubeColor}Supply`),
-		updatedCount = parseInt($supplyCount.html()) + addend;
+		updatedCount = !isNaN(newCount) ? newCount : parseInt($supplyCount.html()) + addend;
 	
 	$supplyCount.html(updatedCount);
 }
@@ -6022,15 +6044,26 @@ async function epidemicInfect()
 	await dealFaceDownInfCard(card.index);
 	await revealInfectionCard(card);
 
+	const color = getCity(card.cityKey).color;
+
 	if (preventionCode == 0)
-		await placeDiseaseCubes(card, { noPostDelay: true });
+	{
+		await placeDiseaseCubes(card);
+
+		if (diseaseCubeLimitExceeded(color))
+			return diseaseCubeDefeatAnimation(color);
+	}
 	else
 		await infectionPreventionAnimation(card);
 
 	if (triggeredOutbreakEvents.length)
 	{
 		await resolveOutbreaks(triggeredOutbreakEvents);
-		if (tooManyOutbreaksOccured()) return false;
+		if (tooManyOutbreaksOccured())
+			return endGame();
+		
+		if (diseaseCubeLimitExceeded(color))
+			return diseaseCubeDefeatAnimation(color);
 	}
 		
 	await sleep(interval);
@@ -6632,20 +6665,29 @@ async function infectionStep()
 		await dealFaceDownInfCard(card.index);
 		await revealInfectionCard(card);
 		
+		const color = getCity(card.cityKey).color;
 		// if any events are left after shifting the first, an outbreak occured.
 		if (events.length)
 		{
 			await resolveOutbreaks(events);
-			if (tooManyOutbreaksOccured()) return false;
+			if (tooManyOutbreaksOccured())
+				return endGame();
+			
+			if (diseaseCubeLimitExceeded(color))
+				return diseaseCubeDefeatAnimation(color);
 		}
 		else
 		{
 			if (card.preventionCode === data.infectionPreventionCodes.notPrevented)
 			{
-				if (data.gameEndCause)
-					return outOfDiseaseCubes(getCity(card.cityKey).color);
-				
+				const interval = getDuration("shortInterval");
+
+				await sleep(interval);
 				await placeDiseaseCubes(card);
+				await sleep(interval);
+
+				if (diseaseCubeLimitExceeded(color))
+					return diseaseCubeDefeatAnimation(color);
 			}
 			else
 				await infectionPreventionAnimation(card);
@@ -7159,7 +7201,7 @@ function dealInitialInfectionCards()
 			{
 				await sleep(getDuration("shortInterval"));
 				await revealInfectionCard(card);
-				await placeDiseaseCubes(card, { noPostDelay: true });
+				await placeDiseaseCubes(card);
 			}
 		}
 	
@@ -7263,7 +7305,7 @@ async function revealInfectionCard({ cityKey, index, preventionCode }, { forecas
 			{
 				$veil.remove();
 
-				if (!data.fastForwarding && !forecasting && !data.gameEndCause)
+				if (!data.fastForwarding && !forecasting)
 					pinpointCity(cityKey, getPinpointColor(preventionCode));
 				
 				resolve();
@@ -7271,35 +7313,31 @@ async function revealInfectionCard({ cityKey, index, preventionCode }, { forecas
 	});
 }
 
-async function placeDiseaseCubes({cityKey, numCubes = 1}, { noPostDelay } = {})
+function placeDiseaseCubes({ cityKey, numCubes = 1 })
 {
-	const city = getCity(cityKey),
-		cubeSupplyOffset = $(`.cubeSupply .diseaseCube.${city.color}`).offset(),
-		shortInterval = getDuration("shortInterval");
-	
-	if (currentStepIs("infect cities"))
-		await sleep(shortInterval);
-	
-	for (let i = numCubes; i > 0; i--)
+	return new Promise(async resolve =>
 	{
-		updateCubeSupplyCount(city.color, -1);
+		const city = getCity(cityKey),
+			cubeSupplyOffset = $(`.cubeSupply .diseaseCube.${city.color}`).offset();
 		
-		placeDiseaseCube(city, cubeSupplyOffset);
-		await sleep(getDuration("cubeAnimation") * 0.45);
-	}
-	
-	// let the last cube animation finish completely before clustering the city
-	await sleep(getDuration("cubeAnimation") * 0.6);
-	
-	if (data.fastForwarding)
-		queueCluster(cityKey);
-	else
-		city.cluster();
-
-	if (noPostDelay)
-		return sleep(0);
-	
-	return sleep(shortInterval);
+		for (let i = numCubes; i > 0; i--)
+		{
+			updateCubeSupplyCount(city.color, { addend: -1 });
+			
+			placeDiseaseCube(city, cubeSupplyOffset);
+			await sleep(getDuration("cubeAnimation") * 0.45);
+		}
+		
+		// let the last cube animation finish completely before clustering the city
+		await sleep(getDuration("cubeAnimation") * 0.6);
+		
+		if (data.fastForwarding)
+			queueCluster(cityKey);
+		else
+			city.cluster();
+		
+		resolve(false);
+	});
 }
 
 function getAnimatedCubeWidth()
@@ -7451,8 +7489,15 @@ async function discoverCure(cardKeys)
 	proceed();
 }
 
-async function outOfDiseaseCubes(diseaseColor)
+function diseaseCubeLimitExceeded(color)
 {
+	return data.gameEndCause === "cubes" && data.diseaseCubeSupplies[color] < 0;
+}
+
+async function diseaseCubeDefeatAnimation(diseaseColor)
+{
+	executePendingClusters();
+	
 	const $cubeSupply = $("#cubeSupplies"),
 		originalBackgroundColor = $cubeSupply.css("background-color"),
 		interval = 125;

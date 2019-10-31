@@ -40,8 +40,12 @@ game end conditions
 		add flashing red background to outbreaks track when too many outbreaks occurs
 		add flashing red background to player deck when there aren't enough cards to draw
 
+animate cubes directly to their eventual position in the cluster
+
 the player deck should appear smaller when it contains fewer cards
 as should the infection deck
+
+fix wording of contingency planner's special ability ("on this card")
 
 standardize prompt appearance / button behaviour
 
@@ -245,8 +249,6 @@ fix z-index of pinpointers as it relates to pawns, cubes, and stations
 create trigger that updates a card's index after updating its location
 in movementAction.php and drawPlayerCards.php, set the cardIndex of discarded cards
 also allow players to rearrange their hands. update cardIndex to reflect the hand order.
-
-animate cubes directly to their eventual position in the cluster
 
 check rows returned or whatever in php files
 
