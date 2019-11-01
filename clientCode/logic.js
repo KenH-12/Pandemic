@@ -6539,7 +6539,7 @@ function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 	if (removingContingencyCard)
 		initialCardProperties.border = "none";
 	
-	$card.appendTo("#boardContainer")
+	$card.appendTo("body")
 		.css(initialCardProperties)
 		.offset(initialOffset)
 		.animate(

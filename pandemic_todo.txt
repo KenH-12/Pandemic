@@ -33,8 +33,6 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-fix the epidemic discard animation
-
 animate cubes directly to their eventual position in the cluster
 
 fix wording of contingency planner's special ability ("on this card")
