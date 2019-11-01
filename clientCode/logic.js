@@ -7941,6 +7941,7 @@ async function setup()
 	await removeCurtain();
 
 	bindPlayerDeckHover();
+	bindInfectionDeckHover();
 	
 	if (forecastInProgress())
 	{
@@ -7961,8 +7962,10 @@ function bindPlayerDeckHover()
 	$("#playerDeck").off("mouseenter")
 		.hover(function()
 		{
-			if (!currentStepIs("setup"))
-				$(this).attr("title", `${data.numPlayerCardsRemaining} card${data.numPlayerCardsRemaining != 1 ? "" : ""}`);
+			if (currentStepIs("setup"))
+				return;
+
+			$(this).attr("title", `${data.numPlayerCardsRemaining} card${data.numPlayerCardsRemaining != 1 ? "s" : ""}`);
 		});
 }
 
@@ -9017,6 +9020,26 @@ function collapsenfectionDiscardPile()
 				getDuration("discardPileCollapse"),
 				function() { resolve(); });
 		});
+}
+
+function bindInfectionDeckHover()
+{
+	$("#infectionDeck").hover(function()
+	{
+		if (currentStepIs("setup"))
+			return;
+		
+		const MAX_CARDS_IN_DECK = 48;
+		let numCardsInDeck = MAX_CARDS_IN_DECK - $("#infectionDiscard").find(".infectionCard").length;
+		
+		if (currentStepIs("infect cities"))
+			numCardsInDeck -= $("#infectCitiesContainer").find(".playerCard").length;
+		
+		if (currentStepIs("epInfect"))
+			numCardsInDeck -= $("#epidemicContainer").find(".playerCard").length;
+		
+		$(this).attr("title", `${numCardsInDeck} cards`);
+	});
 }
 
 function bindInfectionDiscardHover({ unbind } = {})
