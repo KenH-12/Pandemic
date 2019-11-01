@@ -37,9 +37,9 @@ fix the epidemic discard animation
 
 animate cubes directly to their eventual position in the cluster
 
-the infection deck should appear smaller when it contains fewer cards
-
 fix wording of contingency planner's special ability ("on this card")
+
+allow the setup animations to be skipped
 
 standardize prompt appearance / button behaviour
 

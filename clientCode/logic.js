@@ -2708,16 +2708,21 @@ function animateShareKnowledge(giver, receiver, cardKey)
 	return new Promise(resolve =>
 	{
 		const $card = giver.getPanel().find(`.playerCard[data-key='${cardKey}']`),
+			initialProperties = $card.offset(),
 			$insertAfterMe = receiver.getPanel().children(".role, .playerCard").last(),
 			desiredOffset = $insertAfterMe.offset();
-	
+
+		initialProperties.width = $card.width();
 		desiredOffset.top += $insertAfterMe.height();
 		
-		$card.css(
+		$card.appendTo("body")
+			.css(
 			{
-				"position": "absolute",
-				"z-index": "5",
-				"width": $card.width()
+				...initialProperties,
+				...{
+					"position": "absolute",
+					"z-index": "5"
+				}
 			})
 			.animate(desiredOffset,
 			getDuration("dealCard"),
