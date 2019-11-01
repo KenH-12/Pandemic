@@ -3850,7 +3850,7 @@ class Player
 	updateCollapsedPanelCardCount()
 	{
 		this.getPanel().find(".numCardsInHand")
-			.children("span").html(this.cardKeys.length);
+			.html(`— ${this.cardKeys.length} card${this.cardKeys.length === 1 ? "" : "s"} in hand —`);
 	}
 
 	logCardKeys()
@@ -4243,7 +4243,7 @@ function appendPlayerPanel(player)
 							<p>${role}</p>
 						</div>
 						<div class='btnCollapseExpand collapse' title='collapse'>
-							<p class='numCardsInHand hidden'>— <span>0</span> cards in hand —</p>
+							<p class='numCardsInHand hidden'>— 0 cards in hand —</p>
 							<div>&#187;</div>
 						</div>
 					</div>`);
@@ -4256,13 +4256,15 @@ function togglePlayerPanel($btnCollapseExpand)
 {
 	return new Promise(async resolve =>
 	{
-		const collapse = "collapse",
+		const initialButtonHeight = $btnCollapseExpand.stop().height(),
+			collapse = "collapse",
 			expand = "expand",
 			upChevron = "&#187;",
 			downChevron = "&#171;",
-			$cards = $btnCollapseExpand.siblings(".playerCard"),
+			$cards = $btnCollapseExpand.siblings(".playerCard").stop(),
 			duration = 200;
 
+		let resultingButtonHeight;
 		if ($btnCollapseExpand.hasClass(collapse))
 		{
 			$btnCollapseExpand.removeClass(collapse)
@@ -4271,8 +4273,21 @@ function togglePlayerPanel($btnCollapseExpand)
 				.children().first().removeClass("hidden")
 				.next().html(downChevron)
 				.closest(".playerPanel").addClass("collapsed");
+			
+			resultingButtonHeight = $btnCollapseExpand.height();
 
-			$cards.slideUp(duration, function() { resolve() });
+			$cards.slideUp(duration);
+			
+			await animatePromise(
+			{
+				$elements: $btnCollapseExpand,
+				initialProperties: { height: initialButtonHeight },
+				desiredProperties: { height: resultingButtonHeight },
+				duration
+			});
+
+			$btnCollapseExpand.removeAttr("style");
+			resolve();
 		}
 		else
 		{
@@ -4283,12 +4298,21 @@ function togglePlayerPanel($btnCollapseExpand)
 				.next().html(upChevron)
 				.closest(".playerPanel").removeClass("collapsed");
 			
-			$cards.slideDown(duration,
-				function()
-				{
-					$(this).removeAttr("style");
-					resolve();
-				});
+			
+			resultingButtonHeight = $btnCollapseExpand.height();
+
+			$cards.slideDown(duration, function() { $(this).removeAttr("style") });
+			
+			await animatePromise(
+			{
+				$elements: $btnCollapseExpand,
+				initialProperties: { height: initialButtonHeight },
+				desiredProperties: { height: resultingButtonHeight },
+				duration
+			});
+
+			$btnCollapseExpand.removeAttr("style");
+			resolve();
 		}
 	});
 }
