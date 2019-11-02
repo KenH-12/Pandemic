@@ -66,19 +66,39 @@
 								<p class='title'>DISEASE CUBE SUPPLY</p>
 								<div class='cubeSupply'>
 									<p id='ySupply'>$MAX_CUBE_SUPPLY_COUNT</p>
-									<div class='diseaseCube y'></div>
+									<div class='diseaseCube y'>
+										<div class='cubeBackground'></div>
+										<div class='cubeTop'></div>
+										<div class='cubeLeft'></div>
+										<div class='cubeRight'></div>
+									</div>
 								</div>
 								<div class='cubeSupply'>
 									<p id='rSupply'>$MAX_CUBE_SUPPLY_COUNT</p>
-									<div class='diseaseCube r'></div>
+									<div class='diseaseCube r'>
+										<div class='cubeBackground'></div>
+										<div class='cubeTop'></div>
+										<div class='cubeLeft'></div>
+										<div class='cubeRight'></div>
+									</div>
 								</div>
 								<div class='cubeSupply'>
 									<p id='uSupply'>$MAX_CUBE_SUPPLY_COUNT</p>
-									<div class='diseaseCube u'></div>
+									<div class='diseaseCube u'>
+										<div class='cubeBackground'></div>
+										<div class='cubeTop'></div>
+										<div class='cubeLeft'></div>
+										<div class='cubeRight'></div>
+									</div>
 								</div>
 								<div class='cubeSupply'>
 									<p id='bSupply'>$MAX_CUBE_SUPPLY_COUNT</p>
-									<div class='diseaseCube b'></div>
+									<div class='diseaseCube b'>
+										<div class='cubeBackground'></div>
+										<div class='cubeTop'></div>
+										<div class='cubeLeft'></div>
+										<div class='cubeRight'></div>
+									</div>
 								</div>
 							</div>
 							

@@ -35,6 +35,8 @@ TO DO
 -----
 animate cubes directly to their eventual position in the cluster
 
+pinpoint atlanta during setup procedure pawn placement step
+
 fix wording of contingency planner's special ability ("on this card")
 
 allow the setup animations to be skipped
@@ -54,10 +56,6 @@ when government grant is prompted, the research station supply should glow.
 compare client and server side hand sizes after drawing?
 
 rename the step indicator or whatever it's called
-
-use shapes for disease cubes
-fix the treat disease mouseover "X"
-fix the cube mouseover event while animating treatdisease
 
 handle errors
 	retrieveEventHistory

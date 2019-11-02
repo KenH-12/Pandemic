@@ -4,14 +4,14 @@ const data =
 {
 	sizeRatios:
 	{
-		piecePlacementThreshold:	["boardWidth", 0.023],
+		piecePlacementThreshold:["boardWidth", 0.023],
 		playerCardWidth:		["panelWidth", 0.98],
 		cubeSupplyMarginTop:	["topPanelHeight", 0.087],
 		bottomPanelDivs:		["boardHeight",	0.222],
 		cureMarkerMarginTop:	["boardHeight",	0.931],
 		cityWidth:				["boardWidth",	0.012],
 		autoTreatCircleWidth:	["boardWidth", 0.036],
-		cubeWidth:				["boardWidth", 0.0082],
+		cubeWidth:				["boardWidth", 0.016],
 		infGroupAdj:			["boardHeight", 0.025],
 		groupInfRateCubeWidth:	["panelWidth", 0.1],
 		infCardDiv:				["boardHeight",	0.047],
@@ -685,7 +685,7 @@ function disableActions()
 
 	disableEventCards();
 	disablePawnEvents();
-	bindDiseaseCubeEvents({ on: false });
+	// bindDiseaseCubeEvents({ on: false });
 	disableResearchStationDragging();
 }
 
@@ -703,7 +703,7 @@ function enableAvailableActions()
 	unhide($actionsContainer);
 	
 	enablePawnEvents();
-	bindDiseaseCubeEvents();
+	// bindDiseaseCubeEvents();
 
 	enableEventCards();
 }
@@ -1630,7 +1630,7 @@ const actionInterfacePopulator = {
 	[eventTypes.governmentGrant.name]({ targetCity, relocationKey })
 	{
 		disablePawnEvents();
-		bindDiseaseCubeEvents({ on: false });
+		// bindDiseaseCubeEvents({ on: false });
 		clusterAll(
 		{
 			pawns: true,
@@ -3018,7 +3018,7 @@ function finishActionStep()
 {
 	if (currentStepIs("action 4"))
 	{
-		bindDiseaseCubeEvents({ on: false });
+		// bindDiseaseCubeEvents({ on: false });
 		$("#actionsContainer").slideUp();
 	}
 	
@@ -3533,7 +3533,7 @@ function resizeAndRepositionPieces()
 	
 	data.cubeWidth = getDimension("cubeWidth");
 	$("#boardContainer > .diseaseCube").width(data.cubeWidth).height(data.cubeWidth);
-	bindDiseaseCubeEvents({ on: actionStepInProgress() });
+	// bindDiseaseCubeEvents({ on: actionStepInProgress() });
 
 	positionAutoTreatCircleComponents();
 	
@@ -4562,7 +4562,15 @@ class City
 
 	// Positions any pawns and disease cubes on this city into a cluster.
 	// Returns a Promise with after the most relevant animation duration.
-	cluster({ animatePawns, $pawnToExclude, animateResearchStation, stationInitialOffset, stationKeyToExclude } = {})
+	cluster(
+		{
+			animatePawns,
+			$pawnToExclude,
+			animateCubes,
+			animateResearchStation,
+			stationInitialOffset,
+			stationKeyToExclude
+		} = {})
 	{
 		const pawns = $(".pawn." + this.key).not($pawnToExclude)
 				.sort(function (a, b) { return $(a).data("pawnIndex") - $(b).data("pawnIndex") }),
@@ -4651,77 +4659,92 @@ class City
 
 		// reset to default
 		setDuration("pawnAnimation", 250);
-		
-		const cubes = $(".diseaseCube." + this.key),
-			cubeCount = cubes.length;
-		
-		let rowCount;	
-			if (cubeCount < 3)
-				rowCount = 1;
-			else if (cubeCount < 9)
-				rowCount = 2;
-			else
-				rowCount = 3;
-		
-		const cubeSpacing = data.cubeWidth + getLeadingNumber($("#boardContainer .diseaseCube").css("border"));
-		let currentRow = 0,
-			cubesThisRow,
-			x, y = (cityOffset.top - (cubeSpacing / 2 * rowCount));
-		
-		if (pawnCount > 2) // move down to make room for 2 rows of pawns
-			y += data.pawnHeight * 0.2;
-		else if (this.hasResearchStation) // must move down slighly with 1 row of pawns and a research station
-			y += cubeSpacing / 2;
-		
-		coordsArray.length = 0;
-		// for each row...
-		for (let r = rowCount; r > 0; r--)
-		{				
-			// determine the y coordinate (moving down a cube's height for each consecutive row).
-			// y coordinate doesn't change on the first iteration.
-			if (coordsArray.length)
-				y += cubeSpacing;
-			
-			// determine the number of cubes for this row
-			cubesThisRow = Math.floor((cubeCount - coordsArray.length) / (rowCount - currentRow));
-			
-			// determine the x coordinate of the first cube in this row
-			x = cityOffset.left - ((cubeSpacing / 2) * cubesThisRow);
-			// for each cube in this row...
-			for (let c = cubesThisRow; c > 0; c--)
-			{
-				// determine the x (moving a cube's width to the right for each consecutive cube).
-				// x coordinate doesn't change for the first iteration.
-				if (c < cubesThisRow)
-					x += cubeSpacing;
-				// record the point
-				coordsArray.push([x, y]);
-			}
-			
-			currentRow++;
-		}
-		
-		// place the cubes
-		i = 0;
-		cubes.each(function()
-		{
-			$(this).offset(
-			{
-				left: coordsArray[i][0],
-				top: coordsArray[i][1]
-			});
-			
-			i++;
-		});
+
+		this.clusterDiseaseCubes({ animate: (animateCubes || animatePawns) });
 
 		// Return a Promise with the most relevant duration.
 		let ms = 0;
-		if (animateResearchStation) // Station animation takes longer than pawn animation.
+		if (animateResearchStation) // Station animation takes the longest.
 			ms = stationPlacementDuration;
+		else if (cubeAnimation) // Cube animation takes longer than pawn animation.
+			ms = getDuration("cubeAnimation");
 		else if (animatePawns)
 			ms = pawnAnimationDuration;
 
 		return sleep(ms)
+	}
+
+	clusterDiseaseCubes({ animate } = {})
+	{
+		const $cubes = $(`.diseaseCube.${this.key}`),
+			colors = new Set(),
+			coordinates = {},
+			cityOffset = this.getOffset("cube"),
+			cubeWidth = getDimension("cubeWidth"),
+			numPawnsInCity = this.getOccupants().length;
+		
+		if (!$cubes.length)
+			return;
+		
+		$cubes.each(function(){ colors.add(getCubeColor($(this))) });
+
+		let topAdjustment;
+		if (numPawnsInCity > 2
+			|| (this.hasResearchStation && ($cubes.length > 1 || numPawnsInCity > 0)))
+			topAdjustment = cubeWidth * 1.25;
+		else
+			topAdjustment = cubeWidth / 2;
+
+		// Get y values to create a column for each color.
+		let top;
+		for (let color of [...colors])
+		{
+			top = cityOffset.top + topAdjustment;
+			coordinates[color] = [];
+			
+			for (let i = 0; i < $cubes.filter(`.${color}`).length; i++)
+			{
+				top -= cubeWidth * 0.5
+				coordinates[color].push({ top });
+			}
+		}
+
+		// Sort colors by column size ascending.
+		const colorOrder = [],
+			MIN_COL_HEIGHT = 1,
+			MAX_COL_HEIGHT = 3;
+
+		for (let i = MIN_COL_HEIGHT; i <= MAX_COL_HEIGHT; i++)
+			for (let color in coordinates)
+				if (coordinates[color].length === i)
+					colorOrder.push(color);
+
+		// Get x values to separate each column.
+		let left = cityOffset.left;
+		if (colors.size > 1)
+			left -= (colors.size - 1) * (cubeWidth / 2);
+		
+		for (let color of colorOrder)
+		{
+			for (let coord of coordinates[color])
+				coord.left = left;
+			
+			left += cubeWidth;
+		}
+
+		let $cubesOfColor;
+		for (let color in coordinates)
+		{
+			$cubesOfColor = $cubes.filter(`.${color}`);
+
+			for (let i = 0; i < $cubesOfColor.length; i++)
+			{
+				if (animate)
+					$cubesOfColor.eq(i).animate(coordinates[color][i]);
+				else
+					$cubesOfColor.eq(i).offset(coordinates[color][i]);
+			}
+		}
 	}
 }
 
@@ -5657,7 +5680,7 @@ async function resolveOutbreaks(events)
 		{
 			resolvingInitalOutbreak = false;
 			
-			const cubeWidth = getAnimatedCubeWidth();
+			const cubeWidth = getDimension("cubeWidth");
 			$triggerCube = $triggerCube || addCube(color, originCity.key, { prepareAnimation: true });
 			
 			await animatePromise(
@@ -5741,7 +5764,7 @@ async function resolveOutbreaks(events)
 		events = events.filter(e => !(infections.includes(e) || Object.is(outbreakEvent, e)));
 		
 		await sleep(getDuration("cubeAnimation"));
-		executePendingClusters();
+		executePendingClusters({ animateCubes: true });
 
 		if (preventionOccured)
 		{
@@ -5823,8 +5846,13 @@ function addCube(color, cityKey, {prepareAnimation} = {})
 	if (city.cubes[color] < 3)
 		city.addCubes(color, 1);
 
-	$("#boardContainer").append("<div class='diseaseCube " + color + " " + cityKey + "'></div>");
-	const newCube = $(".diseaseCube").last();
+	const newCube = $(`<div class='diseaseCube ${color} ${cityKey}'>
+						<div class='cubeBackground'></div>
+						<div class='cubeTop'></div>
+						<div class='cubeLeft'></div>
+						<div class='cubeRight'></div>
+					</div>`)
+		.appendTo("#boardContainer");
 	
 	let startingWidth = prepareAnimation ? $(".cubeSupply .diseaseCube").first().width() : getDimension("cubeWidth");
 
@@ -5832,8 +5860,6 @@ function addCube(color, cityKey, {prepareAnimation} = {})
 	
 	if (city.color == "y" && color == "y")
 		newCube.css("border-color", "#000");
-	
-	city.hasOccupants = true;
 	
 	return newCube;
 }
@@ -5850,13 +5876,10 @@ async function removeCubes(city, { $clickedCube, color, numToRemove, animate } =
 	else if (numToRemove === "all")
 		numToRemove = city.cubes[color];
 
-	if (numToRemove == 1 && $clickedCube)
-		$cubesToRemove = $clickedCube;
+	if (numToRemove == 1)
+		$cubesToRemove = $clickedCube || $(`.diseaseCube.${city.key}.${color}`).last();
 	else
-	{
 		$cubesToRemove = $(`.diseaseCube.${city.key}.${color}`);
-		$cubesToRemove.length = numToRemove;
-	}
 	
 	$cubesToRemove.addClass("removing");
 
@@ -5873,7 +5896,7 @@ async function removeCubes(city, { $clickedCube, color, numToRemove, animate } =
 		let $cube;
 		while ($cubesToRemove.length)
 		{
-			$cube = $cubesToRemove.first();
+			$cube = $cubesToRemove.last();
 
 			await animatePromise({
 				$elements: $cube,
@@ -5894,7 +5917,7 @@ async function removeCubes(city, { $clickedCube, color, numToRemove, animate } =
 		updateCubeSupplyCount(color, { addend : numToRemove });
 	}
 
-	city.cluster();
+	city.clusterDiseaseCubes({ animate: true });
 	city.removeCubes(color, numToRemove);
 	
 
@@ -5922,7 +5945,7 @@ function enforceCubeCount(cityKey, expectedCubeCount, cubeColor)
 			updateCubeSupplyCount(cubeColor, { addend: -numAdded });
 		}
 
-		city.cluster();
+		city.clusterDiseaseCubes();
 	}
 }
 
@@ -7360,16 +7383,12 @@ function placeDiseaseCubes({ cityKey, numCubes = 1 })
 		if (data.fastForwarding)
 			queueCluster(cityKey);
 		else
-			city.cluster();
+			city.clusterDiseaseCubes({ animate: true });
 		
 		resolve(false);
 	});
 }
 
-function getAnimatedCubeWidth()
-{
-	return getDimension("cubeWidth") + (getLeadingNumber($("#boardContainer .diseaseCube").css("border")) * 2);
-}
 function placeDiseaseCube(city, cubeSupplyOffset)
 {
 	return new Promise((resolve) =>
@@ -7377,10 +7396,7 @@ function placeDiseaseCube(city, cubeSupplyOffset)
 		// add a disease cube to the board, and determine the eventual cube width
 		const $newCube = addCube(city.color, city.key, {prepareAnimation: true}),
 			cityOffset = city.getOffset("cube"),
-			resultingWidth = getAnimatedCubeWidth();
-		// For some reason the amimated width subtracts the border widths (despite the elements using box-sizing: border-box).
-		// We cannot simply use getDimension as we do in any other case without issue.
-		// Adding the border widths fixes this issue, which exists only here.
+			resultingWidth = getDimension("cubeWidth");
 		
 		// animate the cube from the cube supply to the city
 		$newCube.offset(cubeSupplyOffset)
@@ -9186,7 +9202,7 @@ function collapsePlayerDiscardPile()
 	});
 }
 
-function bindDiseaseCubeEvents({ on } = { on: true })
+/* function bindDiseaseCubeEvents({ on } = { on: true })
 {
 	let $cubes = $("#boardContainer > .diseaseCube");
 
@@ -9236,7 +9252,7 @@ function bindDiseaseCubeEvents({ on } = { on: true })
 					treatDisease($this);
 			});
 	}
-}
+} */
 
 setup();
 });
