@@ -4510,7 +4510,13 @@ class City
 		if (animate)
 		{
 			stationInitialOffset = stationInitialOffset || $("#researchStationSupply img").offset();
-			return this.cluster({ animateResearchStation: true, stationInitialOffset, animatePawns: true });
+			return this.cluster(
+				{
+					stationInitialOffset,
+					animateResearchStation: true,
+					animatePawns: true,
+					animateCubes: true
+				});
 		}
 	}
 
@@ -4666,7 +4672,7 @@ class City
 		let ms = 0;
 		if (animateResearchStation) // Station animation takes the longest.
 			ms = stationPlacementDuration;
-		else if (cubeAnimation) // Cube animation takes longer than pawn animation.
+		else if (animateCubes) // Cube animation takes longer than pawn animation.
 			ms = getDuration("cubeAnimation");
 		else if (animatePawns)
 			ms = pawnAnimationDuration;
@@ -4712,7 +4718,9 @@ class City
 		// Sort colors by column size ascending.
 		const colorOrder = [],
 			MIN_COL_HEIGHT = 1,
-			MAX_COL_HEIGHT = 3;
+			MAX_CUBES_OF_COLOR_ON_CITY = 3, // 4th cube causes an outbreak.
+			MAX_INFECTIONS_PER_OUTBREAK = 6, // Hong Kong / Istanbul both have 6 neighbouring cities.
+			MAX_COL_HEIGHT = MAX_CUBES_OF_COLOR_ON_CITY + MAX_INFECTIONS_PER_OUTBREAK;
 
 		for (let i = MIN_COL_HEIGHT; i <= MAX_COL_HEIGHT; i++)
 			for (let color in coordinates)
@@ -4727,7 +4735,11 @@ class City
 		for (let color of colorOrder)
 		{
 			for (let coord of coordinates[color])
+			{
 				coord.left = left;
+				coord.width = cubeWidth;
+				coord.height = cubeWidth;
+			}
 			
 			left += cubeWidth;
 		}
@@ -7382,8 +7394,6 @@ function placeDiseaseCubes({ cityKey, numCubes = 1 })
 		
 		if (data.fastForwarding)
 			queueCluster(cityKey);
-		else
-			city.clusterDiseaseCubes({ animate: true });
 		
 		resolve(false);
 	});
@@ -7391,24 +7401,15 @@ function placeDiseaseCubes({ cityKey, numCubes = 1 })
 
 function placeDiseaseCube(city, cubeSupplyOffset)
 {
-	return new Promise((resolve) =>
+	return new Promise(async resolve =>
 	{
-		// add a disease cube to the board, and determine the eventual cube width
-		const $newCube = addCube(city.color, city.key, {prepareAnimation: true}),
-			cityOffset = city.getOffset("cube"),
-			resultingWidth = getDimension("cubeWidth");
+		addCube(city.color, city.key, { prepareAnimation: true })
+			.offset(cubeSupplyOffset);
+
+		if (!data.fastForwarding)
+			await city.clusterDiseaseCubes({ animate: true });
 		
-		// animate the cube from the cube supply to the city
-		$newCube.offset(cubeSupplyOffset)
-			.animate(
-			{
-				top: cityOffset.top,
-				left: cityOffset.left,
-				width: resultingWidth,
-				height: resultingWidth
-			},
-			getDuration("cubeAnimation"),
-			resolve());
+		resolve();
 	});
 }
 

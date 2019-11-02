@@ -34,6 +34,8 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 TO DO
 -----
 animate cubes directly to their eventual position in the cluster
+	make outbreak trigger cubes land on top of the 3 existing cubes
+	try rotating new cubes / outbreaking cubes 360deg
 
 pinpoint atlanta during setup procedure pawn placement step
 
