@@ -33,13 +33,6 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-account for the possibility that an outbreak places no disease cubes (all connected cities have already outbroken while resolving the current card)
-	animate disease cube back to its supply and increment the supply count
-
-test the 'not enough cubes' defeat scenario
-
-try rotating new cubes / outbreaking cubes 360deg
-
 infection prevention animations are too long, especially when they occur frequently like quarantine
 
 pinpoint atlanta during setup procedure pawn placement step
