@@ -32,7 +32,8 @@
         $mysqli->autocommit(FALSE);
         
         discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
-        
+        $discardingRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
+
         // No useful information to include here,
         // but eventDetails are usually critically important, so they are not nullable.
         $eventDetails = "";

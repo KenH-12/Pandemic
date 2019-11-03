@@ -45,9 +45,9 @@
                 checkEventCardLegality($mysqli, $game, $cardKey);
                 
                 $discardingRole = getEventCardHolder($mysqli, $game, $cardKey);
-                $eventRole = $discardingRole;
 
                 discardOrRemoveEventCard($mysqli, $game, $discardingRole, $cardKey);
+                $eventRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
 
                 $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $discardingRole, $role);
                 if ($proceedToNextStep)

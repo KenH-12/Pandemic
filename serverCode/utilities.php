@@ -485,6 +485,24 @@ function getRoleName($mysqli, $roleID)
     return $roleName;
 }
 
+function convertRoleFromPossibleContingency($mysqli, $possiblyContingency)
+{
+    $contingency = $mysqli->query("SELECT ID AS 'contingencyPileID'
+                                    FROM cardPile
+                                    WHERE pileName = 'contingency'")
+                        ->fetch_assoc()["contingencyPileID"];
+    
+    if ($possiblyContingency != $contingency)
+        return $possiblyContingency;
+    
+    $contingencyPlanner = $mysqli->query("SELECT roleID
+                                            FROM role
+                                            WHERE roleName = 'Contingency Planner'")
+                                ->fetch_assoc()["roleID"];
+    
+    return $contingencyPlanner;
+}
+
 function getLocationKey($mysqli, $game, $role)
 {
     if (!is_numeric($role))

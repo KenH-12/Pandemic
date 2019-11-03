@@ -45,6 +45,8 @@
         $mysqli->autocommit(FALSE);
         
         discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
+        $discardingRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
+        
         updateRoleLocation($mysqli, $game, $roleToAirlift, $originKey, $destinationKey);
 
         $details = "$roleToAirlift,$originKey,$destinationKey";

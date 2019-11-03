@@ -33,13 +33,32 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+when stacking outbreak infection cubes on the origin city, use placeDiseaseCubes to animate them one at a time
+	use the destinationKeys as a param to give them that data attribute
+	OR...
+	allow the existing cubes to be passed to placeDiseaseCubes as an argument
+
+click on cube to treat disease
+cube animation time/easing feels a little weirdly
+
+cure special event timing between the banner and the cure vial seems weird
+
 infection prevention animations are too long, especially when they occur frequently like quarantine
+
+in action prompts that show the special ability tag, make below text look more closely related to the tag
 
 pinpoint atlanta during setup procedure pawn placement step
 
+immediately reveal forecasted cards after the facedown animation finishes
+
+resilient population prompt should indicate contingency
+government grant contingency planner special event tag is not hoverable
 fix wording of contingency planner's special ability ("on this card")
 
 allow the setup animations to be skipped
+
+add a glowing arrow over the active player's pawn
+	when the dispatcher is active, add smaller glowing arrows over all other pawns
 
 standardize prompt appearance / button behaviour
 

@@ -5702,8 +5702,7 @@ async function resolveOutbreaks(events)
 			$triggerCube = $triggerCube || appendNewCubeToBoard(color, originCity.key, { prepareAnimation: true });
 			
 			updateCubeSupplyCount(color, { addend: -1 });
-			originCity.clusterDiseaseCubes({ animate: true });
-			await sleep(duration);
+			await originCity.clusterDiseaseCubes({ animate: true });
 		}
 		else
 			$triggerCube = $(`.diseaseCube.${color}.${originCity.key}`).last();

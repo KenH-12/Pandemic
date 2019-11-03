@@ -32,6 +32,7 @@
         $mysqli->autocommit(FALSE);
         
         discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
+        $discardingRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
 
         $cardType = "infection";
         $currentPile = "discard";

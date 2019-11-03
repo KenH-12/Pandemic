@@ -30,7 +30,8 @@
         $mysqli->autocommit(FALSE);
         
         discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
-        
+        $discardingRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
+
         $infectionCards = $mysqli->query("SELECT cardKey
                                         FROM vw_infectioncard
                                         WHERE game = $game
