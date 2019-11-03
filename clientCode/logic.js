@@ -4427,10 +4427,15 @@ class City
 		};
 	}
 
-	addCubes(color, numCubes)
+	addCube(color)
 	{
-		this.cubes[color] += numCubes;
-		data.diseaseCubeSupplies[color] -= numCubes;
+		const MAX_CUBES_OF_COLOR_PER_CITY = 3;
+
+		if (this.cubes[color] < MAX_CUBES_OF_COLOR_PER_CITY)
+		{
+			this.cubes[color]++;
+			data.diseaseCubeSupplies[color]--;
+		}
 	}
 
 	removeCubes(color, numCubes)
@@ -4752,7 +4757,11 @@ class City
 			for (let i = 0; i < $cubesOfColor.length; i++)
 			{
 				if (animate)
-					$cubesOfColor.eq(i).animate(coordinates[color][i]);
+				{
+					$cubesOfColor.eq(i).animate(coordinates[color][i],
+						getDuration("cubePlacement"),
+						data.easings.cubePlacement);
+				}
 				else
 					$cubesOfColor.eq(i).offset(coordinates[color][i]);
 			}
@@ -5663,13 +5672,10 @@ async function resolveOutbreaks(events)
 	const { outbreak, outbreakInfection } = eventTypes,
 		pendingOutbreaks = events.filter(e => e.code === outbreak.code),
 		color = pendingOutbreaks[0].diseaseColor,
-		cubeSupplyOffset = $(".cubeSupply .diseaseCube." + color).offset(),
-		duration = getDuration("cubePlacement"),
-		easing = data.easings.cubePlacement;
+		duration = getDuration("cubePlacement");
 	
 	let outbreakEvent,
 		originCity,
-		initialCubeOffset,
 		infections,
 		$triggerCube,
 		resolvingInitalOutbreak = true;
@@ -5683,8 +5689,8 @@ async function resolveOutbreaks(events)
 		// and outbreak events whose origin is connected to the currently outbreaking city.
 		// However, if a city has been triggered to outbreak but there are pending outbreakInfection events
 		// where the infectedKey is the outbreak originKey, don't include that outbreak event.
-		infections = events.filter(e => (e.code == outbreakInfection.code && e.originKey == outbreakEvent.originKey)
-										|| (e.code == outbreak.code
+		infections = events.filter(e => (e.code === outbreakInfection.code && e.originKey === outbreakEvent.originKey)
+										|| (e.code === outbreak.code
 											&& originCity.isConnectedTo(e.originKey)
 											&& !events.some(f => f.infectedKey == e.originKey)));
 		
@@ -5692,20 +5698,11 @@ async function resolveOutbreaks(events)
 		{
 			resolvingInitalOutbreak = false;
 			
-			const cubeWidth = getDimension("cubeWidth");
 			$triggerCube = $triggerCube || addCube(color, originCity.key, { prepareAnimation: true });
 			
-			await animatePromise(
-				{
-					$elements: $triggerCube,
-					initialProperties: cubeSupplyOffset,
-					desiredProperties: {
-						...originCity.getOffset("cube"),
-						...{ width: cubeWidth, height: cubeWidth }
-					},
-					duration: duration,
-					easing: easing
-				});
+			updateCubeSupplyCount(color, { addend: -1 });
+			originCity.clusterDiseaseCubes({ animate: true });
+			await sleep(duration);
 		}
 		else
 			$triggerCube = $(`.diseaseCube.${color}.${originCity.key}`).last();
@@ -5723,43 +5720,56 @@ async function resolveOutbreaks(events)
 		if (tooManyOutbreaksOccured()) // defeat -- return early
 			return false;
 
-		initialCubeOffset = $triggerCube.offset();
-		$triggerCube.remove();
-
-		let affectedCity, numInfected = 0,
+		let affectedCity,
+			cubesToDisperse = [],
+			triggerCubeNeedsDestination = true,
 			preventionOccured = false,
 			quarantinePrevention = false,
 			medicAutoTreatPrevention = false,
-			preventionVisualFadeInMs = 250;
+			preventionVisualFadeInMs = 250,
+			numInfected = 0;
 		
 		for (let inf of infections)
 		{			
 			affectedCity = getCity(inf.infectedKey || inf.originKey);
 			
-			if (inf.code == outbreakInfection.code)
+			if (inf.code === outbreakInfection.code
+				&& inf.preventionCode !== data.infectionPreventionCodes.notPrevented)
 			{
-				if (inf.preventionCode !== data.infectionPreventionCodes.notPrevented)
-				{
-					if (inf.preventionCode === data.infectionPreventionCodes.quarantine)
-						quarantinePrevention = true;
-					
-					if (inf.preventionCode === data.infectionPreventionCodes.medicAutoTreat)
-						medicAutoTreatPrevention = true;
-					
-					preventionOccured = true;
-					continue;
-				}
-				else
-				{
-					queueCluster(affectedCity.key);			
-					numInfected++;
-				}
+				if (inf.preventionCode === data.infectionPreventionCodes.quarantine)
+					quarantinePrevention = true;
+				
+				if (inf.preventionCode === data.infectionPreventionCodes.medicAutoTreat)
+					medicAutoTreatPrevention = true;
+				
+				preventionOccured = true;
+				continue;
 			}
+			else
+				numInfected++;
 
-			addCube(color, affectedCity.key)
-				.offset(initialCubeOffset)
-				.animate(affectedCity.getOffset("cube"), duration, easing);
+			if (triggerCubeNeedsDestination) // The trigger cube has already been placed on the column, and something needs to be done with it.
+			{
+				cubesToDisperse.push($triggerCube);
+
+				// The cube supply was already decremented when the trigger cube was placed.
+				numInfected--;
+
+				triggerCubeNeedsDestination = false;
+			}
+			else
+				cubesToDisperse.push(addCube(color, originCity.key, { outbreakDestinationKey: affectedCity.key, prepareAnimation: true }));
 		}
+		
+		updateCubeSupplyCount(color, { addend: -numInfected });
+		
+		// remove the handled events
+		events = events.filter(e => !(infections.includes(e) || Object.is(outbreakEvent, e)));
+		
+		originCity.cluster({ animateCubes: true });
+		await sleep(duration);
+
+		await sleep(getDuration("longInterval"));
 
 		if (preventionOccured)
 		{
@@ -5769,14 +5779,19 @@ async function resolveOutbreaks(events)
 			if (medicAutoTreatPrevention)
 				showMedicAutoTreatCircle({ fadeInMs: preventionVisualFadeInMs });
 		}
-		
-		updateCubeSupplyCount(color, { addend: -numInfected });
-		
-		// remove the handled events
-		events = events.filter(e => !(infections.includes(e) || Object.is(outbreakEvent, e)));
-		
-		await sleep(getDuration("cubeAnimation"));
-		executePendingClusters({ animateCubes: true });
+
+		let destinationKey;
+		for (let $cube of cubesToDisperse)
+		{
+			destinationKey = $cube.data("destinationKey");
+
+			$cube.removeClass(originCity.key)
+				.addClass(destinationKey)
+				.removeAttr("data-destinationKey");
+			
+			getCity(destinationKey).clusterDiseaseCubes({ animate: true });
+		}
+		await sleep(duration);
 
 		if (preventionOccured)
 		{
@@ -5849,16 +5864,11 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 		});
 }
 
-// Adds a disease cube to a city, and potentially triggers outbreaks.
-function addCube(color, cityKey, {prepareAnimation} = {})
+function addCube(color, cityKey, { prepareAnimation, outbreakDestinationKey } = {})
 {
-	const city = getCity(cityKey);
-	
-	// max 3 cubes per color per city
-	if (city.cubes[color] < 3)
-		city.addCubes(color, 1);
+	getCity(outbreakDestinationKey ? outbreakDestinationKey : cityKey).addCube(color);
 
-	const newCube = $(`<div class='diseaseCube ${color} ${cityKey}'>
+	const $newCube = $(`<div class='diseaseCube ${color} ${cityKey}'>
 						<div class='cubeBackground'></div>
 						<div class='cubeTop'></div>
 						<div class='cubeLeft'></div>
@@ -5866,14 +5876,22 @@ function addCube(color, cityKey, {prepareAnimation} = {})
 					</div>`)
 		.appendTo("#boardContainer");
 	
-	let startingWidth = prepareAnimation ? $(".cubeSupply .diseaseCube").first().width() : getDimension("cubeWidth");
+	if (outbreakDestinationKey)
+		$newCube.data("destinationKey", outbreakDestinationKey);
 
-	newCube.width(startingWidth).height(startingWidth);
+	if (prepareAnimation)
+	{
+		const $cubeSupply = $(`.cubeSupply .diseaseCube.${color}`),
+			startingWidth = $cubeSupply.width(),
+			startingProperties = $cubeSupply.offset();
+		
+		startingProperties.width = startingWidth;
+		startingProperties.height = startingWidth;
+		
+		$newCube.css(startingProperties);
+	}
 	
-	if (city.color == "y" && color == "y")
-		newCube.css("border-color", "#000");
-	
-	return newCube;
+	return $newCube;
 }
 
 async function removeCubes(city, { $clickedCube, color, numToRemove, animate } = {})
@@ -7553,6 +7571,7 @@ async function outOfPlayerCardsDefeatAnimation($cardDrawContainer)
 
 function diseaseCubeLimitExceeded(color)
 {
+	log(color, "cubes left: ", data.diseaseCubeSupplies[color]);
 	return data.gameEndCause === "cubes" && data.diseaseCubeSupplies[color] < 0;
 }
 
