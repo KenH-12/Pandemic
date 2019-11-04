@@ -3451,11 +3451,16 @@ function resizeTopPanelElements()
 	$("#topPanel > div").css("height", "auto");
 	data.topPanelHeight = $("#topPanel").height();
 	$("#topPanel > div").height(data.topPanelHeight);
-	$(".cubeSupply").css("margin-top", getDimension("cubeSupplyMarginTop") + "px");
-	makeElementsSquare(".cubeSupply .diseaseCube");
+	resizeCubeSupplies();
 	data.infectionDeckOffset = $("#imgInfectionDeck").offset();
 
 	resizeInfectionDiscardElements();
+}
+
+function resizeCubeSupplies()
+{
+	$(".cubeSupply").css("margin-top", getDimension("cubeSupplyMarginTop") + "px");
+	makeElementsSquare(".cubeSupply .diseaseCube");
 }
 
 function resizeInfectionDiscardElements()
@@ -5938,12 +5943,12 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } =
 	$cubesToRemove.addClass("removing");
 
 	const $supplyCube = $(".cubeSupply .diseaseCube." + color),
-		desiredProps = $supplyCube.offset(),
+		desiredProperties = $supplyCube.offset(),
 		supplyCubeWidth = $supplyCube.width(),
 		duration = getDuration("cubePlacement") * 0.5;
-	
-	desiredProps.width = supplyCubeWidth;
-	desiredProps.height = supplyCubeWidth;
+
+	desiredProperties.width = supplyCubeWidth;
+	desiredProperties.height = supplyCubeWidth;
 
 	let $cube;
 	while ($cubesToRemove.length)
@@ -5952,7 +5957,7 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } =
 
 		await animatePromise({
 			$elements: $cube,
-			desiredProperties: desiredProps,
+			desiredProperties,
 			duration,
 			easing: data.easings.cubePlacement
 		});
@@ -5961,9 +5966,48 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } =
 		updateCubeSupplyCount(color, { addend: 1 });
 
 		$cubesToRemove = $(`.diseaseCube.removing`);
+
+		await supplyCubeBounceEffect($supplyCube);
 	}
 
 	return city.clusterDiseaseCubes({ animate: true });
+}
+
+function supplyCubeBounceEffect($supplyCube)
+{
+	return new Promise(async resolve =>
+	{
+		const $supplyContainer = $supplyCube.parent(),
+			supplyCubeOffset = $supplyCube.offset(),
+			supplyCubeWidth = $supplyCube.width(),
+			SIZE_INCREASE_FACTOR = 1.24,
+			OFFSET_ADJUSTMENT = supplyCubeWidth * ((SIZE_INCREASE_FACTOR - 1) / 2),
+			expandedWidth = supplyCubeWidth * SIZE_INCREASE_FACTOR;
+
+		// Make the cube slightly bigger, then animate it back to its normal size with a bounce effect.
+		await animatePromise(
+		{
+			$elements: $supplyCube.appendTo("body"),
+			initialProperties: { 
+				position: "absolute",
+				top: supplyCubeOffset.top - OFFSET_ADJUSTMENT,
+				left: supplyCubeOffset.left - OFFSET_ADJUSTMENT,
+				width: expandedWidth,
+				height: expandedWidth
+			},
+			desiredProperties: {
+				...supplyCubeOffset,
+				...{ width: supplyCubeWidth, height: supplyCubeWidth }
+			},
+			duration: getDuration(400),
+			easing: "easeOutBounce"
+		});
+
+		$supplyCube.removeAttr("style").appendTo($supplyContainer);
+		resizeCubeSupplies();
+		
+		resolve();
+	});
 }
 
 function updateCubeSupplyCount(cubeColor, { addend, newCount } = {})

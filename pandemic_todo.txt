@@ -31,6 +31,8 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
+dragging a disabled pawn should not change its z-index
+
 TO DO
 -----
 when a cube is removed, bounce the width/height of the cube supply after the cube reaches it
