@@ -3398,12 +3398,15 @@ function animateCardToHand($card, targetProperties, { isContingencyCard } = {})
 	});
 }
 
-function getDuration(durationName)
+function getDuration(durationNameOrMs)
 {
-	if (data.fastForwarding)
-		return 25;
-	else
-		return data.durations[durationName];
+	if (data.skippingSetup)
+		return 0;
+	
+	if (isNaN(durationNameOrMs))
+		return data.durations[durationNameOrMs];
+	
+	return durationNameOrMs;
 }
 
 function setDuration(durationName, ms)
@@ -4760,12 +4763,12 @@ class City
 			for (let i = 0; i < $cubesOfColor.length; i++)
 			{
 				if (animate)
-					$cubesOfColor.eq(i).animate(coordinates[color][i], duration, data.easings.cubePlacement);
+					$cubesOfColor.eq(i).animate(coordinates[color][i], getDuration(duration), data.easings.cubePlacement);
 				else
 					$cubesOfColor.eq(i).offset(coordinates[color][i]);
 			}
 		}
-		return sleep(duration);
+		return sleep(getDuration(duration));
 	}
 }
 
@@ -5587,6 +5590,9 @@ function executePendingClusters(details)
 // shows a city's location by animating 2 rectangles such that their points overlap on the specified city's position
 function pinpointCity(cityKey, pinpointColor)
 {
+	if (data.skippingSetup)
+		return;
+	
 	const city = getCity(cityKey),
 		cityOffset = city.getOffset(),
 		cWidth = data.cityWidth,
@@ -6417,26 +6423,24 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 			maxDistance = containerHeight < containerWidth ? containerHeight / 2 : containerWidth / 2,
 			easing = "easeInOutQuad";
 		
-		let duration = 500;
 		await animatePromise(
 			{
 				$elements,
 				desiredProperties: centerOfContainer,
-				duration: duration,
+				duration: getDuration(500),
 				easing: easing
 			});
 
 		if ($elements.length === 1)
 			return resolve();
 		
-		duration = 100;
 		for (let i = 0; i < (numShuffles || 3); i++)
 		{
 			await randomizeOffsets($elements,
 				{
 					minDistance,
 					maxDistance,
-					duration,
+					duration: getDuration(100),
 					easing
 				});
 			
@@ -6444,7 +6448,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 				{
 					$elements,
 					desiredProperties: centerOfContainer,
-					duration,
+					duration: getDuration(100),
 					easing
 				});
 		}
@@ -7073,10 +7077,7 @@ async function finishInfectionStep()
 		disableEventCards();
 	}
 	else
-	{
-		$btn.removeAttr("style").addClass("hidden");
 		await sleep(getDuration("longInterval"));
-	}
 
 	let $cards = $container.find(".infectionCard");
 	while ($cards.length)
@@ -7088,7 +7089,7 @@ async function finishInfectionStep()
 	if (currentStepIs("setup"))
 	{
 		$container.removeAttr("style").addClass("hidden");
-		return sleep(500);
+		return sleep(getDuration(500));
 	}
 
 	$container.fadeOut(450);
@@ -7146,7 +7147,7 @@ function discardInfectionCard($card, duration)
 					left: $discardPile.offset().left,
 					top: $discardTitle.offset().top + $discardTitle.height()
 				},
-				duration || 125,
+				getDuration(duration || 125),
 				function()
 				{
 					$card.insertAfter($discardTitle)
@@ -7186,7 +7187,7 @@ function positionInfectionPanelComponents()
 		
 		// determine and evenly distribute the available height for .infGroup elements
 		const $infGroups = $(".infGroup"),
-			availableHeight = data.boardHeight - $("#setupProcedureContainer").height() - $("#btnContinue").height();
+			availableHeight = data.boardHeight - $("#setupProcedureContainer").height();
 			
 		$infGroups.height(availableHeight / $infGroups.length - getDimension("infGroupAdj"));
 	}
@@ -7214,7 +7215,6 @@ async function initialInfectionStep()
 function prepareInitialInfections()
 {
 	const $initialInfContainer = $("#initialInfectionsContainer"),
-		$btn = $initialInfContainer.find(".btnContinue"),
 		NUM_GROUPS = 3,
 		GROUP_SIZE = 3;
 	
@@ -7226,12 +7226,6 @@ function prepareInitialInfections()
 		
 		$infGroup = $infGroup.next(".infGroup");
 	}
-	
-	$btn.html("SKIP").off("click").click(function()
-	{
-		data.fastForwarding = true;
-		$btn.off("click").removeAttr("style").addClass("hidden");
-	}).fadeIn(function() { $btn.removeClass("hidden") });
 	
 	positionInfectionPanelComponents();
 }
@@ -7343,11 +7337,10 @@ async function revealInfectionCard({ cityKey, index, preventionCode }, { forecas
 		const $card = getInfectionContainer().find(".infectionCard").eq(index),
 			{name, color} = getCity(cityKey),
 			$veil = $card.find(".veil"),
-			duration = getDuration("revealInfCard"),
 			$cardback = forecasting ? $(".drawnInfectionCard").eq(index) : $(".drawnInfectionCard").first();
 		
 		// The first $cardback is removed if not forecasting because each one is removed after fading out.
-		$cardback.fadeOut(duration, function() { $(this).remove() });
+		$cardback.fadeOut(getDuration("revealInfCard"), function() { $(this).remove() });
 		
 		$card.attr("data-key", cityKey)
 			.find(".infectionCardImg")
@@ -7356,7 +7349,7 @@ async function revealInfectionCard({ cityKey, index, preventionCode }, { forecas
 			.html(name.toUpperCase());
 		
 		$veil.animate({ left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
-			duration,
+			getDuration("revealInfCard"),
 			data.easings.revealCard,
 			() =>
 			{
@@ -7608,7 +7601,7 @@ async function endGame()
 	
 	await animatePromise(
 	{
-		$elements: $curtain.removeAttr("style"),
+		$elements: $curtain.removeAttr("style").removeClass("hidden"),
 		initialProperties: { opacity: 0 },
 		desiredProperties: { opacity: 0.9 },
 		duration: 1000,
@@ -8033,10 +8026,10 @@ async function animateRoleDetermination()
 	for (let slotMachine of slotMachines)
 	{
 		slotMachine.pull();
-		await sleep(400);
+		await sleep(getDuration(400));
 	}
 
-	await sleep(6000);
+	await sleep(getDuration(6000));
 
 	let slotMachine;
 	for (let i = 0; i < slotMachines.length; i++)
@@ -8153,7 +8146,7 @@ class RoleSlotMachine
 	{
 		await this.revolveOnce({ firstRevolution: true });
 
-		while (this.elapsedMs < this.duration)
+		while (!data.skippingSetup && this.elapsedMs < this.duration)
 			await this.revolveOnce();
 		
 		await this.finalRevolution();
@@ -8198,7 +8191,7 @@ class RoleSlotMachine
 		return new Promise(resolve =>
 		{
 			const self = this,
-				duration = this.msPerRevolution / this.numOptions,
+				duration = getDuration(this.msPerRevolution / this.numOptions),
 				easing = "linear";
 
 			this.$optionGroups.first()
@@ -8238,10 +8231,9 @@ class RoleSlotMachine
 		
 			this.$optionGroups.first()
 				.animate({ marginTop: "+=" + self.optionHeight * (self.numOptions - startingIndex) + "px" },
-					self.duration,
+					getDuration(self.duration),
 					"easeOutElastic",
 					resolve());
-			
 		});
 	}
 
@@ -8267,7 +8259,7 @@ class RoleSlotMachine
 		{
 			$elements: $role,
 			desiredProperties: { top: "-=" + (this.optionHeight * this.MIDDLE_OPTION_INDEX) },
-			duration: 600,
+			duration: getDuration(600),
 			easing: "easeOutBounce"
 		});
 
@@ -8302,15 +8294,29 @@ async function animateNewGameSetup()
 		],
 		interval = getDuration("shortInterval");
 	
+	$("#btnSkipSetup").click(function()
+	{
+		$(this).off("click").addClass("hidden");
+		skipSetup();
+	});
+	
 	for (let step of setupSteps)
 	{
 		highlightNextSetupStep();
-		await sleep(interval);
+		await sleep(getDuration(interval));
 		await step();
-		await sleep(interval)
+		await sleep(getDuration(interval))
 	}
 	
 	beginGame();
+}
+
+function skipSetup()
+{
+	data.skippingSetup = true;
+
+	$("#curtain").removeClass("hidden")
+		.children("#skippingSetupMsg").html("Skipping setup...").removeClass("hidden");
 }
 
 async function beginGame()
@@ -8325,20 +8331,31 @@ async function beginGame()
 	await animatePromise(
 	{
 		$elements: $setupProcedureContainer,
-		desiredProperties: { height: 0 }
+		desiredProperties: { height: 0 },
+		duration: getDuration(400)
 	});
 
 	$setupProcedureContainer.add("#setupContainer").remove();
 
 	const $containersToShow = $("#turnProcedureContainer, #indicatorContainer");
-	$containersToShow.slideDown(function()
+	$containersToShow.slideDown(getDuration(400), function()
 	{
 		unhide($containersToShow);
 		bindRoleCardHoverEvents();
 		bindPawnEvents();
 		data.currentStep.next();
-		$("#actionsContainer").slideDown(function() { unhide($(this)) });
+		$("#actionsContainer").slideDown(getDuration(400), function()
+		{
+			unhide($(this));
+			if (data.skippingSetup) doneSkippingSetup();
+		});
 	});
+}
+
+function doneSkippingSetup()
+{
+	data.skippingSetup = false;
+	$("#curtain").fadeOut(function() { $(this).addClass("hidden").removeAttr("style") });
 }
 
 async function animatePreparePlayerDeck()
@@ -8383,7 +8400,6 @@ async function showEpidemicsToShuffle($container)
 	const $cardbacks = $container.find("img"),
 		$epidemics = $container.find(".epidemic"),
 		epidemicWidth = $epidemics.first().width(),
-		duration = getDuration("revealCard"),
 		easing = data.easings.revealCard;
 	
 	$epidemics.addClass("hidden");
@@ -8393,7 +8409,7 @@ async function showEpidemicsToShuffle($container)
 		$elements: $cardbacks,
 		initialProperties: { opacity: 0 },
 		desiredProperties: { opacity: 1 },
-		duration
+		duration: getDuration("revealCard")
 	});
 	await sleep(getDuration("mediumInterval"));
 	$cardbacks.remove();
@@ -8403,7 +8419,7 @@ async function showEpidemicsToShuffle($container)
 		$elements: $epidemics.removeClass("hidden"),
 		initialProperties: { width: 0 },
 		desiredProperties: { width: epidemicWidth },
-		duration,
+		duration: getDuration("revealCard"),
 		easing
 	});
 }
@@ -8414,8 +8430,6 @@ async function dividePlayerDeckIntoEqualPiles($container)
 		$divs = $container.children("div"),
 		$deck = $("#imgPlayerDeck"),
 		initialProperties = $deck.offset(),
-		duration = getDuration("dealCard"),
-		interval = duration / 6,
 		easing = data.easings.dealCard,
 		desiredProps = [];
 
@@ -8452,7 +8466,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 			$elements: $cardback.appendTo($divs.eq(divIdx)),
 			initialProperties,
 			desiredProperties: desiredProps[divIdx],
-			duration,
+			duration: getDuration("dealCard"),
 			easing
 		});
 
@@ -8462,7 +8476,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 			setPlayerDeckImgSize(getMaxPlayerDeckImgSize() - data.numEpidemics);
 		}
 
-		await sleep(interval);
+		await sleep(getDuration("dealCard") / 6);
 
 		if (++divIdx === $divs.length)
 			divIdx = 0;
@@ -8493,7 +8507,6 @@ function shuffleEpidemicIntoPile($div)
 	{
 		const $epidemic = $div.children(".epidemic"),
 			initialEpidemicOffset = $epidemic.offset(),
-			duration = getDuration("dealCard"),
 			easing = data.easings.dealCard;
 		
 		let $cardbacks = $div.children("img");
@@ -8504,7 +8517,7 @@ function shuffleEpidemicIntoPile($div)
 		{
 			$elements: $epidemic,
 			desiredProperties: { width: 0 },
-			duration,
+			duration: getDuration("dealCard"),
 			easing
 		});
 
@@ -8516,7 +8529,7 @@ function shuffleEpidemicIntoPile($div)
 			$elements: $epidemicCardback,
 			initialProperties: { ...{ position: "absolute"}, ...{ initialEpidemicOffset } },
 			desiredProperties: { top: $cardbacks.last().offset().top },
-			duration: duration / 2,
+			duration: getDuration("dealCard") / 2,
 			easing
 		});
 
@@ -8534,16 +8547,14 @@ function placePileOntoPlayerDeck($div, deckPropertes)
 	return new Promise(async resolve =>
 	{
 		const $pile = $div.children("img"),
-			$deck = $("#imgPlayerDeck"),
-			duration = getDuration("dealCard"),
-			easing = data.easings.dealCard;
+			$deck = $("#imgPlayerDeck");
 
 		await animatePromise(
 		{
 			$elements: $pile,
 			desiredProperties: deckPropertes,
-			duration, 
-			easing
+			duration: getDuration("dealCard"), 
+			easing: data.easings.dealCard
 		});
 
 		if ($deck.hasClass("hidden")) unhide($deck);
@@ -8655,7 +8666,8 @@ async function placeResearchStationInAtlanta()
 		await animatePromise(
 		{
 			$elements: $cdcBlurb,
-			desiredProperties: { opacity: 0 }
+			desiredProperties: { opacity: 0 },
+			duration: getDuration(400)
 		});
 		$cdcBlurb.remove();
 
@@ -8665,9 +8677,7 @@ async function placeResearchStationInAtlanta()
 
 async function placePawnsInAtlanta()
 {
-	const duration = 400,
-		easing = "easeInQuart",
-		panelWidth = $(".playerPanel").first().width(),
+	const panelWidth = $(".playerPanel").first().width(),
 		$cdcBlurb = $(`<h4>Atlanta is home to the CDC, the Center for Disease Control and Prevention.</h4>`);
 	
 	let player,
@@ -8680,7 +8690,8 @@ async function placePawnsInAtlanta()
 	{
 		$elements: $cdcBlurb.prependTo("#setupContainer"),
 		initialProperties: { opacity: 0 },
-		desiredProperties: { opacity: 1 }
+		desiredProperties: { opacity: 1 },
+		duration: getDuration(400)
 	});
 
 	for (let rID in data.players)
@@ -8709,12 +8720,12 @@ async function placePawnsInAtlanta()
 			$elements: $pawn,
 			initialProperties: initialOffset,
 			desiredProperties: pawnOffsetInAtlanta,
-			duration,
-			easing
+			duration: getDuration(400),
+			easing: "easeInQuart"
 		});
 	}
 
-	return sleep(duration);
+	return sleep(getDuration(400));
 }
 
 async function animateDetermineTurnOrder()
@@ -8722,9 +8733,9 @@ async function animateDetermineTurnOrder()
 	const interval = getDuration("shortInterval");
 
 	await showStartingHandPopulations();
-	await sleep(interval);
+	await sleep(getDuration(interval));
 	data.turnOrder = await showTurnOrder();
-	await sleep(interval);
+	await sleep(getDuration(interval));
 	await arrangePlayerPanels();
 
 	$("#roleSetupContainer").addClass("hidden");
@@ -8739,7 +8750,7 @@ async function arrangePlayerPanels()
 	for (let rID of data.turnOrder)
 		await transformIntoPlayerPanel($roleContainers.filter(`[data-role='${rID}']`));
 	
-	return sleep(500);
+	return sleep(getDuration(500));
 }
 
 async function transformIntoPlayerPanel($roleContainer)
@@ -8783,7 +8794,7 @@ async function transformIntoPlayerPanel($roleContainer)
 		$elements: $roleContainer.appendTo($("#rightPanel")),
 		initialProperties,
 		desiredProperties,
-		duration: 500,
+		duration: getDuration(500),
 		easing: "easeInOutQuint"
 	});
 
@@ -8827,9 +8838,9 @@ function showTurnOrder()
 				$elements: $rank,
 				initialProperties: { opacity: 0.1 },
 				desiredProperties: { opacity: 1 },
-				duration: 500
+				duration: getDuration(500)
 			});
-			await sleep(500);
+			await sleep(getDuration(500));
 		}
 		resolve(turnOrder);
 	});
@@ -8874,7 +8885,9 @@ function showStartingHandPopulations()
 	return animatePromise(
 	{
 		$elements: $cards,
-		desiredProperties: { height: expandedCardHeight }
+		desiredProperties: { height: expandedCardHeight },
+		duration: getDuration(400),
+		easing: "easeInOutQuad"
 	});
 }
 
@@ -8934,7 +8947,7 @@ async function dealFaceDownStartingHands(startingHands, $roleContainers)
 	while (cardsDealt < numCardsToDeal)
 	{
 		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), { finalCardbackWidth, zIndex });
-		await sleep(interval);
+		await sleep(getDuration(interval));
 		
 		cardsDealt++;
 		if (roleIndex === $roleContainers.length - 1)
@@ -8979,7 +8992,7 @@ function makeRoomForStartingHands(startingHandSize, $roleContainers)
 		$elements: $roleContainers,
 		initialProperties: { height: initialHeight },
 		desiredProperties: { height: requiredHeight },
-		duration: 400,
+		duration: getDuration(400),
 		easing: "easeOutQuad"
 	});
 }
@@ -9007,7 +9020,13 @@ function removeCurtain()
 		sleep(75)
 		.then(() => {
 			const curtain = $("#curtain");
-			curtain.fadeOut(function() { resolve() });
+			curtain.fadeOut(function()
+			{
+				curtain.addClass("hidden").removeAttr("style")
+					.children().addClass("hidden");
+				
+				resolve();
+			});
 		});
 	});
 }

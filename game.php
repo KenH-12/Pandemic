@@ -27,6 +27,8 @@
 			<body>
 				<div id='curtain'>
 					<p>loading game...</p>
+					<h2 id='skippingSetupMsg' class='hidden'>Skipping setup...</h2>
+
 					<div id='victory' class='hidden'>
 						<h1>V I C T O R Y</h1>
 						<h2>Your team discovered cures for all 4 diseases!</h2>
@@ -195,7 +197,6 @@
 										<div></div>
 									</div>
 								</div>
-								<div class='button btnContinue hidden'>SKIP</div>
 							</div>
 						</div>
 

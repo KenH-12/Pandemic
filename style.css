@@ -1046,6 +1046,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	background-color: #1799d1;
 	cursor: pointer;
 }
+#skippingSetupMsg { margin-top: 100px }
 #roleSetupContainer, #preparePlayerDeckContainer
 {
 	padding: 2% 12%;
