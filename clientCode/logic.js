@@ -3253,12 +3253,15 @@ function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex } = {})
 		if (zIndex)
 			$cardback.css({ zIndex });
 
-		// Although data.numPlayerCardsRemaining is explicitly set after a card draw request,
-		// said request happens asynchronously with this function, therefore manually decrementing here ensures
-		// that setPlayerDeckImgSize chooses the correct img.
-		// This is especially important when 1 or 0 player cards remain in the deck.
-		data.numPlayerCardsRemaining--;
-		setPlayerDeckImgSize();
+		if (!currentStepIs("setup"))
+		{
+			// Although data.numPlayerCardsRemaining is explicitly set after a card draw request,
+			// said request happens asynchronously with this function, therefore manually decrementing here ensures
+			// that setPlayerDeckImgSize chooses the correct img.
+			// This is especially important when 1 or 0 player cards remain in the deck.
+			data.numPlayerCardsRemaining--;
+			setPlayerDeckImgSize();
+		}
 
 		$cardback
 			.appendTo("body")
@@ -8557,7 +8560,9 @@ function placePileOntoPlayerDeck($div, deckPropertes)
 			easing: data.easings.dealCard
 		});
 
-		if ($deck.hasClass("hidden")) unhide($deck);
+		if (getPlayerDeckImgSize($deck) != getMaxPlayerDeckImgSize())
+			unhide($deck);
+		
 		increasePlayerDeckImgSize();
 		$pile.remove();
 
