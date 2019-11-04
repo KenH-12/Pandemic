@@ -8358,7 +8358,11 @@ async function beginGame()
 function doneSkippingSetup()
 {
 	data.skippingSetup = false;
-	$("#curtain").fadeOut(function() { $(this).addClass("hidden").removeAttr("style") });
+	$("#curtain").fadeOut(function()
+	{
+		$(this).addClass("hidden").removeAttr("style")
+			.children("#skippingSetupMsg").remove();
+	});
 }
 
 async function animatePreparePlayerDeck()

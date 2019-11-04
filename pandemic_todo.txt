@@ -33,6 +33,8 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+when a cube is removed, bounce the width/height of the cube supply after the cube reaches it
+
 when stacking outbreak infection cubes on the origin city, use placeDiseaseCubes to animate them one at a time
 	use the destinationKeys as a param to give them that data attribute
 	OR...
@@ -56,9 +58,6 @@ forecast contingency planner special event tag is not hoverable
 fix wording of contingency planner's special ability ("on this card")
 
 when playercards are animated to the hand, the line-height of the card text seems off
-
-allow the setup animations to be skipped
-	when initial infections are skipped, the width of the cubes is not changed
 
 add a glowing arrow over the active player's pawn
 	when the dispatcher is active, add smaller glowing arrows over all other pawns
