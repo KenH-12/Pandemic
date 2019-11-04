@@ -1031,6 +1031,21 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	margin-bottom: 10px;
 	font-weight: 400;
 }
+#btnSkipSetup
+{
+	font-size: 13px;
+	font-family: 'Ropa Sans', sans-serif;
+	background-color: #1282b3;
+	padding: 2px 8px;
+	margin-top: -2px;
+	border-radius: 2px;
+	float: right;
+}
+#btnSkipSetup:hover
+{
+	background-color: #1799d1;
+	cursor: pointer;
+}
 #roleSetupContainer, #preparePlayerDeckContainer
 {
 	padding: 2% 12%;

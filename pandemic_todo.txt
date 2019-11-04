@@ -39,7 +39,7 @@ when stacking outbreak infection cubes on the origin city, use placeDiseaseCubes
 	allow the existing cubes to be passed to placeDiseaseCubes as an argument
 
 click on cube to treat disease
-cube animation time/easing feels a little weirdly
+cube animation time/easing feels a little weird
 
 cure special event timing between the banner and the cure vial seems weird
 
@@ -52,10 +52,13 @@ pinpoint atlanta during setup procedure pawn placement step
 immediately reveal forecasted cards after the facedown animation finishes
 
 resilient population prompt should indicate contingency
-government grant contingency planner special event tag is not hoverable
+forecast contingency planner special event tag is not hoverable
 fix wording of contingency planner's special ability ("on this card")
 
+when playercards are animated to the hand, the line-height of the card text seems off
+
 allow the setup animations to be skipped
+	when initial infections are skipped, the width of the cubes is not changed
 
 add a glowing arrow over the active player's pawn
 	when the dispatcher is active, add smaller glowing arrows over all other pawns
@@ -71,6 +74,8 @@ add tooltip for "eradicated" in discover cure and treat disease prompts
 
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated
+
+resign button
 
 compare client and server side hand sizes after drawing?
 
@@ -94,6 +99,9 @@ make sure the height limit on the expanded infection discards functions properly
 
 IDEAS
 -----
+trophy background or those fern things around the text on the victory screen
+skull background or something for defeat screen
+
 hovering over the player deck causes the cursor to become a "?".
 	clicking shows the explaination of what happens when the cards run out.
 

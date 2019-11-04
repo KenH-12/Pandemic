@@ -158,7 +158,7 @@
 					
 					<div id='rightPanel'>
 						<div id='setupProcedureContainer' class='procedureContainer hidden'>
-							<p class='title'>SETUP</p>
+							<p class='title'>SETUP<span id='btnSkipSetup'>SKIP</span></p>
 							<p class='step'>1. Determine roles</p>
 							<p class='step'>2. Give cards to each player</p>
 							<p class='step'>3. Determine turn order</p>
