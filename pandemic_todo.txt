@@ -35,8 +35,6 @@ dragging a disabled pawn should not change its z-index
 
 TO DO
 -----
-when a cube is removed, bounce the width/height of the cube supply after the cube reaches it
-
 when stacking outbreak infection cubes on the origin city, use placeDiseaseCubes to animate them one at a time
 	use the destinationKeys as a param to give them that data attribute
 	OR...

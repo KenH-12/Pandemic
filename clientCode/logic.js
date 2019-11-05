@@ -5716,6 +5716,7 @@ async function resolveOutbreaks(events)
 			$triggerCube = $triggerCube || appendNewCubeToBoard(color, originCity.key, { prepareAnimation: true });
 			
 			updateCubeSupplyCount(color, { addend: -1 });
+			supplyCubeBounceEffect(color);
 			await originCity.clusterDiseaseCubes({ animate: true });
 		}
 		else
@@ -5793,6 +5794,7 @@ async function resolveOutbreaks(events)
 		if (cubesToDisperse.length > 1)
 		{
 			updateCubeSupplyCount(color, { addend: -numInfected });
+			supplyCubeBounceEffect(color);
 			await originCity.cluster({ animateCubes: true });
 			await sleep(getDuration("mediumInterval"));
 		}
@@ -5910,7 +5912,7 @@ function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestin
 
 	if (prepareAnimation)
 	{
-		const $cubeSupply = $(`.cubeSupply .diseaseCube.${color}`),
+		const $cubeSupply = $(`#${color}SupplyCube`),
 			startingWidth = $cubeSupply.width(),
 			startingProperties = $cubeSupply.offset();
 		
@@ -5942,7 +5944,7 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } =
 	
 	$cubesToRemove.addClass("removing");
 
-	const $supplyCube = $(".cubeSupply .diseaseCube." + color),
+	const $supplyCube = $(`#${color}SupplyCube`),
 		desiredProperties = $supplyCube.offset(),
 		supplyCubeWidth = $supplyCube.width(),
 		duration = getDuration("cubePlacement") * 0.5;
@@ -5967,20 +5969,26 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } =
 
 		$cubesToRemove = $(`.diseaseCube.removing`);
 
-		await supplyCubeBounceEffect($supplyCube);
+		supplyCubeBounceEffect(color);
 	}
 
 	return city.clusterDiseaseCubes({ animate: true });
 }
 
-function supplyCubeBounceEffect($supplyCube)
+function supplyCubeBounceEffect(diseaseColor)
 {
 	return new Promise(async resolve =>
 	{
-		const $supplyContainer = $supplyCube.parent(),
-			supplyCubeOffset = $supplyCube.offset(),
+		const $supplyCube = $(`#${diseaseColor}SupplyCube`),
+			$supplyContainer = $(`#${diseaseColor}Supply`).parent();
+
+		// Reset supply cube in case it is still mid-animation.
+		$supplyCube.stop().removeAttr("style").appendTo($supplyContainer);
+		resizeCubeSupplies();
+
+		const supplyCubeOffset = $supplyCube.offset(),
 			supplyCubeWidth = $supplyCube.width(),
-			SIZE_INCREASE_FACTOR = 1.24,
+			SIZE_INCREASE_FACTOR = 1.2,
 			OFFSET_ADJUSTMENT = supplyCubeWidth * ((SIZE_INCREASE_FACTOR - 1) / 2),
 			expandedWidth = supplyCubeWidth * SIZE_INCREASE_FACTOR;
 
@@ -7415,7 +7423,7 @@ function placeDiseaseCubes({ cityKey, numCubes = 1 })
 	return new Promise(async resolve =>
 	{
 		const city = getCity(cityKey),
-			cubeSupplyOffset = $(`.cubeSupply .diseaseCube.${city.color}`).offset();
+			cubeSupplyOffset = $(`#${city.color}SupplyCube`).offset();
 		
 		for (let i = numCubes; i > 0; i--)
 		{
@@ -7440,12 +7448,15 @@ function placeDiseaseCube(city, cubeSupplyOffset)
 	return new Promise(async resolve =>
 	{
 		appendNewCubeToBoard(city.color, city.key, { prepareAnimation: true })
-			.offset(cubeSupplyOffset);
+			.offset(cubeSupplyOffset)
 		
 		city.incrementCubeCount();
 
 		if (!data.fastForwarding)
+		{
+			supplyCubeBounceEffect(city.color);
 			await city.clusterDiseaseCubes({ animate: true });
+		}
 		
 		resolve();
 	});
