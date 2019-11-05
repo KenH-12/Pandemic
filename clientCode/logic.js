@@ -2951,18 +2951,14 @@ async function treatDisease($cube, diseaseColor)
 {
 	disableActions();
 	
-	const player = getActivePlayer(),
-		city = player.getLocation();
+	const city = getActivePlayer().getLocation();
 
 	diseaseColor = diseaseColor || getCubeColor($cube);
-
-	if ($cube)
-		$cube.children().html("");
 
 	const events = await requestAction(eventTypes.treatDisease,
 		{
 			cityKey: city.key,
-			diseaseColor: diseaseColor
+			diseaseColor
 		});
 		
 	let numToRemove,
@@ -6063,29 +6059,58 @@ function updateCubeSupplyCount(cubeColor, { addend, newCount } = {})
 
 function bindDiseaseCubeEvents()
 {
-	const $cubes = $("#boardContainer").children(".diseaseCube");
+	unbindDiseaseCubeEvents();
 	
-	let $this, diseaseColor, player;
-	$cubes.off("click")
+	const player = getActivePlayer(),
+		{ cityKey } = player,
+		$cubes = $("#boardContainer").children(`.diseaseCube.${cityKey}`);
+	
+	$cubes.attr("title", "Click to Treat Disease")
+		.hover(function()
+		{
+			markTreatableDiseaseCubes($(this), cityKey);
+		},
+		function()
+		{
+			$cubes.removeClass("cubeToRemove")
+				.children(".cubeSlash").remove();
+		})
 		.click(function()
 		{
-			$cubes.off("click");
-
-			$this = $(this);
-			player = getActivePlayer();
-			diseaseColor = getCubeColor($this);
-
-			if (player.role === "Medic" || data.cures[diseaseColor] === "cured")
-				treatDisease($cubes.filter(`.${diseaseColor}`));
-			else
-				treatDisease($this);
+			unbindDiseaseCubeEvents();
+			treatDisease($(this));
 		});
+	
+	let $this;
+	$cubes.each(function()
+	{
+		$this = $(this);
+		if ($this.is(":hover"))
+			markTreatableDiseaseCubes($this, cityKey);
+	})
+}
+
+function markTreatableDiseaseCubes($hoveredCube, cityKey)
+{
+	const diseaseColor = getCubeColor($hoveredCube);
+	
+	let $cubesToMark;
+	if (getActivePlayer().role === "Medic" || data.cures[diseaseColor] === "cured")
+		$cubesToMark = $(`.${cityKey}.diseaseCube.${diseaseColor}`);
+	else
+		$cubesToMark = $hoveredCube;
+	
+	$cubesToMark.append("<div class='cubeSlash'></div>")
+		.addClass("cubeToRemove");
 }
 
 function unbindDiseaseCubeEvents()
 {
 	$("#boardContainer").children(".diseaseCube")
-		.unbind("click mouseenter mouseleave");
+		.unbind("click mouseenter mouseleave")
+		.removeAttr("title")
+		.removeClass("cubeToRemove")
+		.children(".cubeSlash").remove();
 }
 
 function highlightEpidemicStep($epidemic, epidemicStep)
@@ -9346,46 +9371,6 @@ function collapsePlayerDiscardPile()
 			});
 	});
 }
-
-/* function bindDiseaseCubeEvents({ on } = { on: true })
-{
-	let $cubes = $("#boardContainer > .diseaseCube");
-
-	$cubes.unbind("click mouseenter mouseleave");
-
-	if (on)
-	{
-		const player = getActivePlayer();
-
-		$cubes = $cubes.filter(`.${player.cityKey}`);
-
-		let $this,
-			diseaseColor,
-			$cubesToMark;
-		
-		$cubes.hover(function()
-			{
-				$this = $(this);
-				diseaseColor = getCubeColor($this);
-
-				if (player.role === "Medic" || data.cures[diseaseColor] === "cured")
-					$cubesToMark = $cubes.filter(`.${diseaseColor}`);
-				else
-					$cubesToMark = $this;
-				
-				$cubesToMark.html("<p>X</p>")
-					.children("p").css(
-					{
-						"font-size": data.cubeWidth * 1.7,
-						"margin-top": -(data.cubeWidth * 0.4)
-					});
-			},
-			function()
-			{
-				$cubes.html("");
-			});
-	}
-} */
 
 setup();
 });
