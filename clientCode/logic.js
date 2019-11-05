@@ -5686,8 +5686,7 @@ async function resolveOutbreaks(events)
 {
 	const { outbreak, outbreakInfection } = eventTypes,
 		pendingOutbreaks = events.filter(e => e.code === outbreak.code),
-		color = pendingOutbreaks[0].diseaseColor,
-		duration = getDuration("cubePlacement");
+		color = pendingOutbreaks[0].diseaseColor;
 	
 	let outbreakEvent,
 		originCity,
@@ -5722,7 +5721,8 @@ async function resolveOutbreaks(events)
 		else
 			$triggerCube = $(`.diseaseCube.${color}.${originCity.key}`).last();
 
-		await sleep(getDuration("longInterval"));
+		await outbreakTriggerCubeFlash($triggerCube);
+
 		await specialEventAlert(
 			{
 				title: "OUTBREAK!",
@@ -5787,6 +5787,7 @@ async function resolveOutbreaks(events)
 			// had an outbreak as part of resolving the current infection card and are therefore unaffected
 			// by this outbreak, which means the outbreak trigger cube must be returned to the supply
 			// as it has no destination.
+			removeOutbreakCubeHighlights(originCity.key);
 			await removeCubesFromBoard(originCity, { color });
 			continue;
 		}
@@ -5794,9 +5795,10 @@ async function resolveOutbreaks(events)
 		if (cubesToDisperse.length > 1)
 		{
 			updateCubeSupplyCount(color, { addend: -numInfected });
+			highlightOutbreakCubes(cubesToDisperse);
 			supplyCubeBounceEffect(color);
 			await originCity.cluster({ animateCubes: true });
-			await sleep(getDuration("mediumInterval"));
+			await sleep(getDuration("longInterval"));
 		}
 
 		if (preventionOccured)
@@ -5808,6 +5810,7 @@ async function resolveOutbreaks(events)
 				showMedicAutoTreatCircle({ fadeInMs: preventionVisualFadeInMs });
 		}
 
+		removeOutbreakCubeHighlights(originCity.key);
 		await disperseOutbreakCubes(originCity.key, cubesToDisperse);
 
 		if (preventionOccured)
@@ -5828,6 +5831,33 @@ async function resolveOutbreaks(events)
 	}
 
 	return sleep(getDuration("shortInterval"));
+}
+
+function outbreakTriggerCubeFlash($triggerCube)
+{
+	const $cubeFaces = $triggerCube.children().not(".cubeBackground"),
+		initialColor = $cubeFaces.css("background"),
+		strobeColor = "#00a94f";
+
+	return propertyStrobe($cubeFaces,
+		{
+			initialState: { background: initialColor },
+			strobeState: { background: strobeColor },
+			numFlashes: 5,
+			flashIntervalMs: 150,
+			endOnStrobeState: true
+		});
+}
+
+function highlightOutbreakCubes(cubesToDisperse)
+{
+	for (let $cube of cubesToDisperse)
+		$cube.children().not(".cubeBackground").css("background", "#00a94f");
+}
+
+function removeOutbreakCubeHighlights(cityKey)
+{
+	$(`.diseaseCube.${cityKey}`).children().removeAttr("style");
 }
 
 function tooManyOutbreaksOccured()

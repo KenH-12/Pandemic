@@ -118,16 +118,6 @@ have dragged pawns leave translucent duplicates that remain in the pawn's curren
 have an arrow between the pawn and the DestinationKeys
 	it should follow the dragged pawn's translucent image
 
-show outbreak icon on outbreaking city?
-
-display notes under infectioncard when an outbreak occurs, eg:
-	*RIYADH
-	-> OUTBREAK!
-		Affected Cities:
-		-> KARACHI
-		-> BAGHDAD (quarantined)
-		-> CARIO (quarantined)
-
 store eventTypeInfo in db?
 
 to keep the player panels from covering any cities, consider checking the bottom-right corner of the far-right panel
