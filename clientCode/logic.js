@@ -685,7 +685,7 @@ function disableActions()
 
 	disableEventCards();
 	disablePawnEvents();
-	// bindDiseaseCubeEvents({ on: false });
+	unbindDiseaseCubeEvents();
 	disableResearchStationDragging();
 }
 
@@ -703,7 +703,7 @@ function enableAvailableActions()
 	unhide($actionsContainer);
 	
 	enablePawnEvents();
-	// bindDiseaseCubeEvents();
+	bindDiseaseCubeEvents();
 
 	enableEventCards();
 }
@@ -1630,7 +1630,7 @@ const actionInterfacePopulator = {
 	[eventTypes.governmentGrant.name]({ targetCity, relocationKey })
 	{
 		disablePawnEvents();
-		// bindDiseaseCubeEvents({ on: false });
+		unbindDiseaseCubeEvents();
 		clusterAll(
 		{
 			pawns: true,
@@ -3020,7 +3020,7 @@ function finishActionStep()
 {
 	if (currentStepIs("action 4"))
 	{
-		// bindDiseaseCubeEvents({ on: false });
+		unbindDiseaseCubeEvents();
 		$("#actionsContainer").slideUp();
 	}
 	
@@ -3546,7 +3546,8 @@ function resizeAndRepositionPieces()
 	
 	data.cubeWidth = getDimension("cubeWidth");
 	$("#boardContainer > .diseaseCube").width(data.cubeWidth).height(data.cubeWidth);
-	// bindDiseaseCubeEvents({ on: actionStepInProgress() });
+
+	actionStepInProgress() ? bindDiseaseCubeEvents() : unbindDiseaseCubeEvents();
 
 	positionAutoTreatCircleComponents();
 	
@@ -6058,6 +6059,33 @@ function updateCubeSupplyCount(cubeColor, { addend, newCount } = {})
 		updatedCount = !isNaN(newCount) ? newCount : parseInt($supplyCount.html()) + addend;
 	
 	$supplyCount.html(updatedCount);
+}
+
+function bindDiseaseCubeEvents()
+{
+	const $cubes = $("#boardContainer").children(".diseaseCube");
+	
+	let $this, diseaseColor, player;
+	$cubes.off("click")
+		.click(function()
+		{
+			$cubes.off("click");
+
+			$this = $(this);
+			player = getActivePlayer();
+			diseaseColor = getCubeColor($this);
+
+			if (player.role === "Medic" || data.cures[diseaseColor] === "cured")
+				treatDisease($cubes.filter(`.${diseaseColor}`));
+			else
+				treatDisease($this);
+		});
+}
+
+function unbindDiseaseCubeEvents()
+{
+	$("#boardContainer").children(".diseaseCube")
+		.unbind("click mouseenter mouseleave");
 }
 
 function highlightEpidemicStep($epidemic, epidemicStep)
@@ -9355,18 +9383,6 @@ function collapsePlayerDiscardPile()
 			function()
 			{
 				$cubes.html("");
-			})
-			.click(function()
-			{
-				bindDiseaseCubeEvents({ on: false });
-
-				$this = $(this);
-				diseaseColor = getCubeColor($this);
-
-				if (player.role === "Medic" || data.cures[diseaseColor] === "cured")
-					treatDisease($cubes.filter(`.${diseaseColor}`));
-				else
-					treatDisease($this);
 			});
 	}
 } */
