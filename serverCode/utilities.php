@@ -811,7 +811,7 @@ function playerCardsWereDrawnThisTurn($mysqli, $game)
                                     FROM vw_event
                                     WHERE game = $game
                                     AND turnNum = $turnNum
-                                    AND eventType = '$EVENT_CODE")->fetch_assoc()["cardDrawEvent"] == 1;
+                                    AND eventType = '$EVENT_CODE'")->fetch_assoc()["cardDrawEvent"] == 1;
     
     return $cardsWereDrawn;
 }
