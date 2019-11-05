@@ -2908,7 +2908,7 @@ function animateAutoTreatDiseaseEvents(events)
 					color: e.diseaseColor,
 					numToRemove: "all"
 				});
-				city.decrementCubeCount(color, city.cubes[e.diseaseColor]);
+				city.decrementCubeCount(e.diseaseColor, city.cubes[e.diseaseColor]);
 
 				await sleep(interval);
 				await hideMedicAutoTreatCircle();
