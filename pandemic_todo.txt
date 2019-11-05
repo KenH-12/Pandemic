@@ -31,15 +31,8 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
-dragging a disabled pawn should not change its z-index
-
 TO DO
 -----
-when stacking outbreak infection cubes on the origin city, use placeDiseaseCubes to animate them one at a time
-	use the destinationKeys as a param to give them that data attribute
-	OR...
-	allow the existing cubes to be passed to placeDiseaseCubes as an argument
-
 click on cube to treat disease
 cube animation time/easing feels a little weird
 
@@ -98,6 +91,11 @@ make sure the height limit on the expanded infection discards functions properly
 
 IDEAS
 -----
+when stacking outbreak infection cubes on the origin city, use placeDiseaseCubes to animate them one at a time
+	use the destinationKeys as a param to give them that data attribute
+	OR...
+	allow the existing cubes to be passed to placeDiseaseCubes as an argument
+
 trophy background or those fern things around the text on the victory screen
 skull background or something for defeat screen
 

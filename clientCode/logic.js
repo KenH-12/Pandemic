@@ -4348,8 +4348,12 @@ function bindPawnEvents()
 			let fn = movementAction;
 			if (eventTypeIsBeingPrompted(eventTypes.airlift))
 				fn = tryAirlift;
+			else if (!actionStepInProgress()) // all pawns are disabled
+				return false;
 			else if (pawnRole !== activeRole && canDispatch)
 				fn = tryDispatchPawn;
+			else if (pawnRole !== activeRole) // the clicked pawn is disabled
+				return false;
 
 			$(window).off("mouseup")
 				.mouseup(function()
