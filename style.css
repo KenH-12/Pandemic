@@ -1035,7 +1035,8 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	margin-bottom: 10px;
 	font-weight: 400;
 }
-#btnSkipSetup
+#btnSkipSetup,
+.btnSkipSetupStep
 {
 	font-size: 13px;
 	font-family: 'Ropa Sans', sans-serif;
@@ -1045,7 +1046,13 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	border-radius: 2px;
 	float: right;
 }
-#btnSkipSetup:hover
+.btnSkipSetupStep
+{
+	padding: 2px 3px;
+	margin-right: -10px;
+}
+#btnSkipSetup:hover,
+.btnSkipSetupStep
 {
 	background-color: #1799d1;
 	cursor: pointer;

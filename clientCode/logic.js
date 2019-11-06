@@ -504,7 +504,7 @@ class Step
 			this.setDescription();
 
 		$container.children("#turnIndicator")
-			.html(`----- ${activePlayer.name}'s Turn -----`)
+			.html(`${activePlayer.name}'s Turn`)
 			.next() // role indicator
 			.html(activePlayer.role)
 			.attr("class", activePlayer.camelCaseRole)
@@ -3397,7 +3397,7 @@ function animateCardToHand($card, targetProperties, { isContingencyCard } = {})
 
 function getDuration(durationNameOrMs)
 {
-	if (data.skippingSetup)
+	if (data.skipping)
 		return 0;
 	
 	if (isNaN(durationNameOrMs))
@@ -5597,7 +5597,7 @@ function executePendingClusters(details)
 // shows a city's location by animating 2 rectangles such that their points overlap on the specified city's position
 function pinpointCity(cityKey, pinpointColor)
 {
-	if (data.skippingSetup)
+	if (data.skipping)
 		return;
 	
 	const city = getCity(cityKey),
@@ -7345,11 +7345,17 @@ function positionInfectionPanelComponents()
 		.css("left", veilLeft);
 }
 
-async function initialInfectionStep()
+function initialInfectionStep()
 {
-	prepareInitialInfections();
-	await dealInitialInfectionCards();
-	return finishInfectionStep();
+	return new Promise(async resolve =>
+	{
+		prepareInitialInfections();
+		await dealInitialInfectionCards();
+		await finishInfectionStep();
+
+		finishedSetupStep();
+		resolve();
+	})
 }
 
 function prepareInitialInfections()
@@ -8184,6 +8190,8 @@ async function animateRoleDetermination()
 		else
 			await slotMachine.extractResult();
 	}
+
+	finishedSetupStep();
 }
 
 class RoleSlotMachine
@@ -8289,7 +8297,7 @@ class RoleSlotMachine
 	{
 		await this.revolveOnce({ firstRevolution: true });
 
-		while (!data.skippingSetup && this.elapsedMs < this.duration)
+		while (!data.skipping && this.elapsedMs < this.duration)
 			await this.revolveOnce();
 		
 		await this.finalRevolution();
@@ -8456,7 +8464,9 @@ async function animateNewGameSetup()
 
 function skipSetup()
 {
+	data.skipping = true;
 	data.skippingSetup = true;
+	data.skippingSetupStep = false; // not skipping an individual setup step, but the whole setup procedure.
 
 	$("#curtain").removeClass("hidden")
 		.children("#skippingSetupMsg").html("Skipping setup...").removeClass("hidden");
@@ -8468,7 +8478,8 @@ async function beginGame()
 
 	$setupProcedureContainer.children(".title")
 		.html("SETUP COMPLETE").addClass("highlighted")
-		.siblings().removeClass("highlighted");
+		.siblings().removeClass("highlighted")
+		.children(".btnSkipSetupStep").remove();
 
 	await sleep(getDuration("longInterval"));
 	await animatePromise(
@@ -8497,6 +8508,7 @@ async function beginGame()
 
 function doneSkippingSetup()
 {
+	data.skipping = false;
 	data.skippingSetup = false;
 	$("#curtain").fadeOut(function()
 	{
@@ -8505,29 +8517,34 @@ function doneSkippingSetup()
 	});
 }
 
-async function animatePreparePlayerDeck()
+function animatePreparePlayerDeck()
 {
-	const $container = $("#preparePlayerDeckContainer").removeClass("hidden");
-
-	await showEpidemicsToShuffle($container);
-	await dividePlayerDeckIntoEqualPiles($container);
-
-	await animatePromise(
+	return new Promise(async resolve =>
 	{
-		$elements: $container.children("h4"),
-		desiredProperties: { opacity: 0 },
-		duration: getDuration("longInterval")
+		const $container = $("#preparePlayerDeckContainer").removeClass("hidden");
+	
+		await showEpidemicsToShuffle($container);
+		await dividePlayerDeckIntoEqualPiles($container);
+	
+		await animatePromise(
+		{
+			$elements: $container.children("h4"),
+			desiredProperties: { opacity: 0 },
+			duration: getDuration("longInterval")
+		});
+	
+		const $divs = $container.children("div"),
+			deckProperties = getPlayerDeckProperties();
+	
+		await shuffleEpidemicsIntoPiles($divs);
+	
+		for (let i = $divs.length - 1; i >= 0; i--)
+			await placePileOntoPlayerDeck($divs.eq(i), deckProperties);
+	
+		$container.addClass("hidden");
+		finishedSetupStep();
+		resolve();
 	});
-
-	const $divs = $container.children("div"),
-		deckProperties = getPlayerDeckProperties();
-
-	await shuffleEpidemicsIntoPiles($divs);
-
-	for (let i = $divs.length - 1; i >= 0; i--)
-		await placePileOntoPlayerDeck($divs.eq(i), deckProperties);
-
-	$container.addClass("hidden");
 }
 
 async function showEpidemicsToShuffle($container)
@@ -8807,9 +8824,11 @@ async function placeResearchStationInAtlanta()
 {
 	return new Promise(async resolve =>
 	{
-		const $cdcBlurb = $("#setupContainer").children("h4");
+		const ATLANTA_KEY = "atla",
+			$cdcBlurb = $("#setupContainer").children("h4");
 
-		await data.cities["atla"].buildResearchStation({ animate: true });
+		pinpointCity(ATLANTA_KEY);
+		await data.cities[ATLANTA_KEY].buildResearchStation({ animate: true });
 		await sleep(getDuration("longInterval"));
 		
 		await animatePromise(
@@ -8820,74 +8839,87 @@ async function placeResearchStationInAtlanta()
 		});
 		$cdcBlurb.remove();
 
+		finishedSetupStep();
 		resolve();
 	});
 }
 
-async function placePawnsInAtlanta()
+function placePawnsInAtlanta()
 {
-	const panelWidth = $(".playerPanel").first().width(),
-		$cdcBlurb = $(`<h4>Atlanta is home to the CDC, the Center for Disease Control and Prevention.</h4>`);
-	
-	let player,
-		$pawn,
-		$panel,
-		pawnOffsetInAtlanta,
-		initialOffset;
-	
-	await animatePromise(
+	return new Promise(async resolve =>
 	{
-		$elements: $cdcBlurb.prependTo("#setupContainer"),
-		initialProperties: { opacity: 0 },
-		desiredProperties: { opacity: 1 },
-		duration: getDuration(400)
-	});
-
-	for (let rID in data.players)
-	{
-		player = data.players[rID];
-		appendPawnToBoard(player);
-		queueCluster(player.cityKey);
-	}
-	executePendingClusters();
-	
-	for (let rID of data.turnOrder)
-	{
-		player = data.players[rID];
-		$pawn = player.getPawn();
-		$panel = player.getPanel();
+		const ATLANTA_KEY = "atla",
+			panelWidth = $(".playerPanel").first().width(),
+			$cdcBlurb = $(`<h4>Atlanta is home to the CDC, the Center for Disease Control and Prevention.</h4>`);
 		
-		pawnOffsetInAtlanta = $pawn.removeClass("hidden").offset();
-
-		initialOffset = $panel.offset();
-		initialOffset.top -= data.pawnHeight;
-		initialOffset.left += panelWidth / 2;
-		initialOffset.left -= data.pawnWidth / 2;
-
+		let player,
+			$pawn,
+			$panel,
+			pawnOffsetInAtlanta,
+			initialOffset;
+		
 		await animatePromise(
 		{
-			$elements: $pawn,
-			initialProperties: initialOffset,
-			desiredProperties: pawnOffsetInAtlanta,
-			duration: getDuration(400),
-			easing: "easeInQuart"
+			$elements: $cdcBlurb.prependTo("#setupContainer"),
+			initialProperties: { opacity: 0 },
+			desiredProperties: { opacity: 1 },
+			duration: getDuration(400)
 		});
-	}
-
-	return sleep(getDuration(400));
+	
+		for (let rID in data.players)
+		{
+			player = data.players[rID];
+			appendPawnToBoard(player);
+			queueCluster(player.cityKey);
+		}
+		executePendingClusters();
+		
+		for (let rID of data.turnOrder)
+		{
+			player = data.players[rID];
+			$pawn = player.getPawn();
+			$panel = player.getPanel();
+			
+			pawnOffsetInAtlanta = $pawn.removeClass("hidden").offset();
+	
+			initialOffset = $panel.offset();
+			initialOffset.top -= data.pawnHeight;
+			initialOffset.left += panelWidth / 2;
+			initialOffset.left -= data.pawnWidth / 2;
+	
+			pinpointCity(ATLANTA_KEY);
+			await animatePromise(
+			{
+				$elements: $pawn,
+				initialProperties: initialOffset,
+				desiredProperties: pawnOffsetInAtlanta,
+				duration: getDuration(400),
+				easing: "easeInQuart"
+			});
+		}
+	
+		await sleep(getDuration(400));
+		finishedSetupStep();
+		resolve();
+	});
 }
 
-async function animateDetermineTurnOrder()
+function animateDetermineTurnOrder()
 {
-	const interval = getDuration("shortInterval");
-
-	await showStartingHandPopulations();
-	await sleep(getDuration(interval));
-	data.turnOrder = await showTurnOrder();
-	await sleep(getDuration(interval));
-	await arrangePlayerPanels();
-
-	$("#roleSetupContainer").addClass("hidden");
+	return new Promise(async resolve =>
+	{
+		const interval = getDuration("shortInterval");
+	
+		await showStartingHandPopulations();
+		await sleep(getDuration(interval));
+		data.turnOrder = await showTurnOrder();
+		await sleep(getDuration(interval));
+		await arrangePlayerPanels();
+	
+		$("#roleSetupContainer").addClass("hidden");
+		finishedSetupStep();
+		resolve();
+	});
 }
 
 async function arrangePlayerPanels()
@@ -9068,16 +9100,21 @@ function getDecidingTurnOrderCardPopulations()
 	return turnOrderCards;
 }
 
-async function animateInitialDeal()
+function animateInitialDeal()
 {
-	const startingHands = getEventsOfTurn(eventTypes.startingHand),
-		$roleContainers = $("#roleSetupContainer").find(".roleContainer");
-		
-	await dealFaceDownStartingHands(startingHands, $roleContainers);
-	await sleep(getDuration("mediumInterval"));
-	await revealStartingHands(startingHands, $roleContainers);
-
-	return sleep(getDuration("longInterval"));
+	return new Promise(async resolve =>
+	{
+		const startingHands = getEventsOfTurn(eventTypes.startingHand),
+			$roleContainers = $("#roleSetupContainer").find(".roleContainer");
+			
+		await dealFaceDownStartingHands(startingHands, $roleContainers);
+		await sleep(getDuration("mediumInterval"));
+		await revealStartingHands(startingHands, $roleContainers);
+	
+		await sleep(getDuration("longInterval"));
+		finishedSetupStep();
+		resolve();
+	});
 }
 
 async function dealFaceDownStartingHands(startingHands, $roleContainers)
@@ -9154,6 +9191,8 @@ function highlightNextSetupStep()
 
 	if ($highlightedStep.length)
 	{
+		$procedureContainer.find(".btnSkipSetupStep").remove();
+
 		$highlightedStep
 			.removeClass(highlighted)
 			.next()
@@ -9161,6 +9200,29 @@ function highlightNextSetupStep()
 	}
 	else
 		$procedureContainer.children(".step").first().addClass(highlighted);	
+	
+	
+	$procedureContainer.children(`.${highlighted}`)
+		.append("<span class='btnSkipSetupStep'>SKIP</span>")
+		.children(".btnSkipSetupStep")
+		.click(function() { skipSetupStep($(this)) });
+}
+
+function skipSetupStep($btnSkipSetupStep)
+{
+	$btnSkipSetupStep.remove();
+
+	data.skipping = true;
+	data.skippingSetupStep = true;
+}
+
+function finishedSetupStep()
+{
+	if (data.skippingSetupStep)
+	{
+		data.skipping = false;
+		data.skippingSetupStep = false;
+	}
 }
 
 function removeCurtain()

@@ -43,8 +43,6 @@ infection prevention animations are too long, especially when they occur frequen
 
 in action prompts that show the special ability tag, make below text look more closely related to the tag
 
-pinpoint atlanta during setup procedure pawn placement step
-
 immediately reveal forecasted cards after the facedown animation finishes
 
 when playercards are animated to the hand, the line-height of the card text seems off
@@ -98,8 +96,6 @@ skull background or something for defeat screen
 
 hovering over the player deck causes the cursor to become a "?".
 	clicking shows the explaination of what happens when the cards run out.
-
-add checkmarks to completed setup steps?
 
 pinpointing should happen on mousover of playercards/infection cards?
 
