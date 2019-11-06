@@ -47,8 +47,6 @@ pinpoint atlanta during setup procedure pawn placement step
 
 immediately reveal forecasted cards after the facedown animation finishes
 
-fix wording of contingency planner's special ability ("on this card")
-
 when playercards are animated to the hand, the line-height of the card text seems off
 
 add a glowing arrow over the active player's pawn

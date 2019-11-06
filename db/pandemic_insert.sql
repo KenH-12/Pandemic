@@ -23,7 +23,7 @@ INSERT INTO STEP (description) VALUES ('infect cities');
 -- This step occurs when a player receives an eighth card through the Share Knowledge action.
 INSERT INTO STEP (description) VALUES ('hand limit');
 
-INSERT INTO ROLE (roleName, cardText) VALUES ('Contingency Planner', 'As an action, take any discarded Event card and store it on this card.&When you play the stored Event card, remove it from the game.&Limit: 1 Event card on this card at a time, which is not part of your hand.');
+INSERT INTO ROLE (roleName, cardText) VALUES ('Contingency Planner', 'As an action, take any discarded Event card and store it.&When you play the stored Event card, remove it from the game.&Limit: 1 stored Event card at a time, which is not part of your hand.');
 INSERT INTO ROLE (roleName, cardText) VALUES ('Dispatcher', 'Move another player''s pawn as if it were yours.&As an action, move any pawn to a city with another pawn.&Get permission before moving another player''s pawn.');
 INSERT INTO ROLE (roleName, cardText) VALUES ('Medic', 'Remove all cubes of one color when doing Treat Disease.&Automatically remove cubes of cured diseases from the city you are in (and prevent them from being placed there).');
 INSERT INTO ROLE (roleName, cardText) VALUES ('Operations Expert', 'As an action, build a research station in the city you are in (no City card needed).&Once per turn as an action, move from a research station to any city by discarding any City card.');
