@@ -1133,17 +1133,12 @@ const actionInterfacePopulator = {
 		
 		if (isContingencyCard)
 		{
-			promptMsg = getPlayer("Contingency Planner").newSpecialAbilityTag();
+			promptMsg = `${getPlayer("Contingency Planner").newSpecialAbilityTag()}<br />`;
 			buttonText = "PLAY AND REMOVE";
 		}
 
 		if (promptMsg)
-		{
 			$discardPrompt.append(`<p>${promptMsg}</p>`);
-
-			if (isContingencyCard)
-				bindRoleCardHoverEvents();
-		}
 
 		for (let key of ensureIsArray(cardKeys))
 			$discardPrompt.append(newPlayerCardElement(key));
@@ -1158,6 +1153,9 @@ const actionInterfacePopulator = {
 			});
 
 		actionInterfacePopulator.$actionInterface.append($discardPrompt);
+
+		if (isContingencyCard)
+			bindRoleCardHoverEvents();
 
 		return actionInterfacePopulator;
 	},
