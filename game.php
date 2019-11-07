@@ -160,7 +160,7 @@
 					
 					<div id='rightPanel'>
 						<div id='setupProcedureContainer' class='procedureContainer hidden'>
-							<p class='title'>SETUP<span id='btnSkipSetup'>SKIP ALL</span></p>
+							<p class='title'>SETUP</p>
 							<p class='step'>1. Determine roles</p>
 							<p class='step'>2. Give cards to each player</p>
 							<p class='step'>3. Determine turn order</p>
@@ -168,6 +168,13 @@
 							<p class='step'>5. Infect 9 cities</p>
 							<p class='step'>6. Place pawns in Atlanta</p>
 							<p class='step'>7. Place 1 research station in Atlanta</p>
+						</div>
+						<div id='skipSetupButtons'>
+							<div class='btnSkip' id='btnSkipSetupStep'>
+								SKIP THIS STEP
+							</div><div class='btnSkip' id='btnSkipSetup'>
+								SKIP ALL
+							</div>
 						</div>
 
 						<div id='setupContainer' class='hidden'>

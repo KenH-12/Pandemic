@@ -8466,11 +8466,8 @@ async function animateNewGameSetup()
 		],
 		interval = getDuration("shortInterval");
 	
-	$("#btnSkipSetup").click(function()
-	{
-		$(this).off("click").addClass("hidden");
-		skipSetup();
-	});
+	bindBtnSkipSetupStepClick();
+	bindBtnSkipSetupClick();
 	
 	for (let step of setupSteps)
 	{
@@ -8481,6 +8478,46 @@ async function animateNewGameSetup()
 	}
 	
 	beginGame();
+}
+
+function finishedSetupStep()
+{
+	if (data.skippingSetupStep)
+	{
+		data.skipping = false;
+		data.skippingSetupStep = false;
+
+		bindBtnSkipSetupStepClick();
+	}
+}
+
+function bindBtnSkipSetupStepClick()
+{
+	$("#btnSkipSetupStep")
+		.off("click")
+		.click(function()
+		{
+			$(this).off("click").addClass("btnDisabled");
+			skipSetupStep();
+		})
+		.removeClass("btnDisabled");
+}
+
+function skipSetupStep()
+{
+	data.skipping = true;
+	data.skippingSetupStep = true;
+}
+
+function bindBtnSkipSetupClick()
+{
+	$("#btnSkipSetup")
+		.off("click")
+		.click(function()
+		{
+			$(this).parent().remove();
+			skipSetup();
+		});
 }
 
 function skipSetup()
@@ -8497,6 +8534,7 @@ async function beginGame()
 {
 	const $setupProcedureContainer = $("#setupProcedureContainer");
 
+	$("#skipSetupButtons").remove();
 	$setupProcedureContainer.children(".title")
 		.html("SETUP COMPLETE").addClass("highlighted")
 		.siblings().removeClass("highlighted")
@@ -9212,8 +9250,6 @@ function highlightNextSetupStep()
 
 	if ($highlightedStep.length)
 	{
-		$procedureContainer.find(".btnSkipSetupStep").remove();
-
 		$highlightedStep
 			.removeClass(highlighted)
 			.next()
@@ -9221,29 +9257,6 @@ function highlightNextSetupStep()
 	}
 	else
 		$procedureContainer.children(".step").first().addClass(highlighted);	
-	
-	
-	$procedureContainer.children(`.${highlighted}`)
-		.append("<span class='btnSkipSetupStep'>SKIP</span>")
-		.children(".btnSkipSetupStep")
-		.click(function() { skipSetupStep($(this)) });
-}
-
-function skipSetupStep($btnSkipSetupStep)
-{
-	$btnSkipSetupStep.remove();
-
-	data.skipping = true;
-	data.skippingSetupStep = true;
-}
-
-function finishedSetupStep()
-{
-	if (data.skippingSetupStep)
-	{
-		data.skipping = false;
-		data.skippingSetupStep = false;
-	}
 }
 
 function removeCurtain()
