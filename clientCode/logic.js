@@ -8179,7 +8179,11 @@ async function animateRoleDetermination()
 		await sleep(getDuration(400));
 	}
 
-	await sleep(getDuration(6000));
+	const DOUBLE_SLOT_MACHINE_DURATION = getDuration(slotMachines[0].duration * 2);
+	await Promise.race([
+		sleep(DOUBLE_SLOT_MACHINE_DURATION),
+		detectSkipping(DOUBLE_SLOT_MACHINE_DURATION)
+	]);
 
 	let slotMachine;
 	for (let i = 0; i < slotMachines.length; i++)
@@ -8193,6 +8197,22 @@ async function animateRoleDetermination()
 	}
 
 	finishedSetupStep();
+}
+
+function detectSkipping(detectionWindowMs)
+{
+	return new Promise(async resolve =>
+	{
+		for (let i = 0; i < detectionWindowMs; i++)
+		{
+			if (data.skipping)
+				return resolve();
+			
+			await sleep(1);
+		}
+
+		resolve();
+	});
 }
 
 class RoleSlotMachine
@@ -8298,7 +8318,7 @@ class RoleSlotMachine
 	{
 		await this.revolveOnce({ firstRevolution: true });
 
-		while (!data.skipping && this.elapsedMs < this.duration)
+		while (this.elapsedMs < this.duration)
 			await this.revolveOnce();
 		
 		await this.finalRevolution();
@@ -8343,7 +8363,7 @@ class RoleSlotMachine
 		return new Promise(resolve =>
 		{
 			const self = this,
-				duration = getDuration(this.msPerRevolution / this.numOptions),
+				duration = this.msPerRevolution / this.numOptions,
 				easing = "linear";
 
 			this.$optionGroups.first()
@@ -8383,7 +8403,7 @@ class RoleSlotMachine
 		
 			this.$optionGroups.first()
 				.animate({ marginTop: "+=" + self.optionHeight * (self.numOptions - startingIndex) + "px" },
-					getDuration(self.duration),
+					self.duration,
 					"easeOutElastic",
 					resolve());
 		});
