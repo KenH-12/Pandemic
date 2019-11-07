@@ -7228,6 +7228,7 @@ async function finishInfectionStep()
 	
 	if (currentStepIs("setup"))
 	{
+		$(".drawnInfectionCard").remove(); // sometimes skipping setup leaves these unremoved.
 		$container.removeAttr("style").addClass("hidden");
 		return sleep(getDuration(500));
 	}
