@@ -227,18 +227,58 @@
 
 							<div class='actionCategory'>
 								<h2>MOVEMENT ACTIONS</h2>
-								<div class='button' id='btnDriveFerry'>DRIVE / FERRY</div>
-								<div class='button' id='btnDirectFlight'>DIRECT FLIGHT</div>
-								<div class='button' id='btnCharterFlight'>CHARTER FLIGHT</div>
-								<div class='button' id='btnShuttleFlight'>SHUTTLE FLIGHT</div>
+								<div class='button' id='btnDriveFerry'>
+									<div class='actionIcon'>
+										<img src='images/actionIcons/driveFerry.png' />
+									</div>
+									<div class='actionName'>DRIVE / FERRY</div>
+								</div>
+								<div class='button' id='btnDirectFlight'>
+									<div class='actionIcon'>
+										<img src='images/actionIcons/directFlight.png' />
+									</div>
+									<div class='actionName'>DIRECT FLIGHT</div>
+								</div>
+								<div class='button' id='btnCharterFlight'>
+									<div class='actionIcon'>
+										<img src='images/actionIcons/charterFlight.png' />
+									</div>
+									<div class='actionName'>CHARTER FLIGHT</div>
+								</div>
+								<div class='button' id='btnShuttleFlight'>
+									<div class='actionIcon'>
+										<img src='images/actionIcons/shuttleFlight.png' />
+									</div>
+									<div class='actionName'>SHUTTLE FLIGHT</div>
+								</div>
 							</div>
 
 							<div class='actionCategory'>
 								<h2>OTHER ACTIONS</h2>
-								<div class='button' id='btnBuildResearchStation'>BUILD A RESEARCH STATION</div>
-								<div class='button' id='btnTreatDisease'>TREAT DISEASE</div>
-								<div class='button' id='btnShareKnowledge'>SHARE KNOWLEDGE</div>
-								<div class='button' id='btnDiscoverCure'>DISCOVER A CURE</div>
+								<div class='button' id='btnBuildResearchStation'>
+									<div class='actionIcon'>
+										<img src='images/actionIcons/buildResearchStation.png' />
+									</div>
+									<div class='actionName'>BUILD<br />RESEARCH STATION</div>
+								</div>
+								<div class='button' id='btnTreatDisease'>
+									<div class='actionIcon'>
+										<img src='images/actionIcons/treatDisease.png' />
+									</div>
+									<div class='actionName'>TREAT DISEASE</div>
+								</div>
+								<div class='button' id='btnShareKnowledge'>
+									<div class='actionIcon'>
+										<img src='images/actionIcons/shareKnowledge.png' />
+									</div>
+									<div class='actionName'>SHARE KNOWLEDGE</div>
+								</div>
+								<div class='button' id='btnDiscoverCure'>
+									<div class='actionIcon'>
+										<img src='images/actionIcons/discoverCure.png' />
+									</div>
+									<div class='actionName'>DISCOVER A CURE</div>
+								</div>
 								<div class='button' id='btnPass'>PASS</div>
 							</div>
 							<div id='specialActionCategory' class='actionCategory'>

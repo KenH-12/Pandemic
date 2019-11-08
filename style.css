@@ -768,8 +768,6 @@ span.r {color: #ef282a}
 .button
 {
 	width: 75%;
-	font-size: 18px;
-	line-height: 18px;
 	text-align: center;
 	padding: 5px 0;
 	margin-left: 12.5%;
@@ -784,14 +782,14 @@ span.r {color: #ef282a}
 }
 .disabled, .btnDisabled
 {
-	color: #555;
+	color: #777;
 }
 .btnDisabled
 {
-	background-color: #0d445c;
+	background-color: #064058;
 	border: 1px solid #555;
 }
-.btnDisabled:hover { background-color: #0d445c }
+.btnDisabled:hover { background-color: #064058 }
 .actionCategory h2
 {
 	font-size: 18px;
@@ -802,9 +800,36 @@ span.r {color: #ef282a}
 	width: 100%;
 	margin: 0 0 2px 0;
 	border: none;
-	font-size: 16px;
+	font-size: 18px;
 }
 .actionCategory > .btnDisabled { cursor: help }
+.actionCategory .button
+{
+	padding: 0;
+}
+.actionCategory .button *
+{
+	display: inline-block;
+	vertical-align: middle;
+	pointer-events: none;
+}
+.actionCategory .button > .actionIcon
+{
+	width: 18%;
+	padding: 0;
+	margin-left: 2%;
+}
+.actionIcon img
+{
+	width: 96%;
+	padding: 2%;
+}
+.actionName
+{
+	width: 75%;
+	text-align: left;
+	margin-left: 2%;
+}
 #actionInterface > h2
 {
 	font-size: 20px;
