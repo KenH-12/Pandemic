@@ -8466,6 +8466,7 @@ async function animateNewGameSetup()
 		],
 		interval = getDuration("shortInterval");
 	
+	$("#skipSetupButtons").removeClass("hidden");
 	bindBtnSkipSetupStepClick();
 	bindBtnSkipSetupClick();
 	

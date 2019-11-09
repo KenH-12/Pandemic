@@ -169,7 +169,7 @@
 							<p class='step'>6. Place pawns in Atlanta</p>
 							<p class='step'>7. Place 1 research station in Atlanta</p>
 						</div>
-						<div id='skipSetupButtons'>
+						<div id='skipSetupButtons' class='hidden'>
 							<div class='btnSkip' id='btnSkipSetupStep'>
 								SKIP THIS STEP
 							</div><div class='btnSkip' id='btnSkipSetup'>
