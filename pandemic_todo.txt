@@ -33,6 +33,13 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+in action prompts...
+	use different fonts
+	include the action icons
+
+fix plan contingency rules
+when removing a contingency card from the game, the player discards scroll position should be at the very bottom
+
 provide descriptions as to why action buttons are disabled
 
 cube animation time/easing feels a little weird

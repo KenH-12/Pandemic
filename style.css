@@ -800,13 +800,11 @@ span.r {color: #ef282a}
 	width: 100%;
 	margin: 0 0 2px 0;
 	border: none;
+	padding: 0;
+	font-family: 'Exo 2', sans-serif;
 	font-size: 18px;
 }
 .actionCategory > .btnDisabled { cursor: help }
-.actionCategory .button
-{
-	padding: 0;
-}
 .actionCategory .button *
 {
 	display: inline-block;
@@ -815,9 +813,9 @@ span.r {color: #ef282a}
 }
 .actionCategory .button > .actionIcon
 {
-	width: 18%;
+	width: 17%;
 	padding: 0;
-	margin-left: 2%;
+	margin: 0 2%;
 }
 .actionIcon img
 {
@@ -826,9 +824,8 @@ span.r {color: #ef282a}
 }
 .actionName
 {
-	width: 75%;
+	width: 77%;
 	text-align: left;
-	margin-left: 2%;
 }
 #actionInterface > h2
 {
