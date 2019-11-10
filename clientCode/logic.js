@@ -6149,11 +6149,13 @@ function specialEventAlert({ title, description, eventClass, visibleMs })
 {
 	return new Promise(async resolve =>
 	{
-		const $banner = $("#specialEventBanner");
+		const $banner = $("#specialEventBanner"),
+			duration = getDuration("specialEventBannerReveal"),
+			easing = data.easings.specialEventBannerReveal;
 		
 		$banner.removeAttr("class").addClass(eventClass)
-		.children("#specialEventTitle").html(title)
-		.next().html(description || "");
+			.children("#specialEventTitle").html(title)
+			.next().html(description || "");
 		
 		// Important that this step is done after the banner's contents have been set
 		// and the banner is visible.
@@ -6166,16 +6168,18 @@ function specialEventAlert({ title, description, eventClass, visibleMs })
 			$elements: $banner,
 			initialProperties: { left: -($(window).width()) },
 			desiredProperties: { left: 0 },
-			duration: getDuration("specialEventBannerReveal"),
-			easing: data.easings.specialEventBannerReveal
+			duration,
+			easing
 		});
 		
-		await sleep(visibleMs || 2500);
+		await sleep(visibleMs || 1250);
 		
 		await animatePromise(
 		{
 			$elements: $banner,
-			desiredProperties: { opacity: 0 }
+			desiredProperties: { left: $(window).width() },
+			duration,
+			easing
 		});
 		
 		$banner.addClass("hidden").removeAttr("style");
@@ -6921,7 +6925,7 @@ async function diseaseIsEradicatedAnimation(cityKey)
 	return specialEventAlert(
 	{
 		title: "INFECTION PREVENTED",
-		description: `The ${getColorWord(color)} disease is eradicated`,
+		description: `The ${getColorWord(color)} disease is eradicated.`,
 		eventClass: color
 	});
 }
@@ -7078,16 +7082,17 @@ async function quarantineAnimation(cityKey)
 {
 	await showQuarantineArea(1000);
 
-	await sleep(getDuration("longInterval"));
+	await sleep(getDuration("mediumInterval"));
 
 	await specialEventAlert(
 	{
-		title: "INFECTION PREVENTED!",
-		description: `${getCity(cityKey).name} is Quarantined!`,
-		eventClass: "quarantineSpecialist"
+		title: "INFECTION PREVENTED",
+		description: `${getCity(cityKey).name} is quarantined.`,
+		eventClass: "quarantineSpecialist",
+		visibleMs: 1500
 	});
 
-	await sleep(getDuration("mediumInterval"));
+	await sleep(getDuration("shortInterval"));
 	
 	return hideQuarantineArea();
 }
