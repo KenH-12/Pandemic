@@ -6913,21 +6913,7 @@ async function infectionPreventionAnimation({ preventionCode, cityKey })
 	else if (preventionCode === medicAutoTreat)
 		return medicAutoTreatAnimation(cityKey);
 	else if (preventionCode === eradicated)
-		return diseaseIsEradicatedAnimation(cityKey);
-}
-
-async function diseaseIsEradicatedAnimation(cityKey)
-{
-	const color = getCity(cityKey).color;
-
-	await sleep(getDuration("longInterval"));
-	
-	return specialEventAlert(
-	{
-		title: "INFECTION PREVENTED",
-		description: `The ${getColorWord(color)} disease is eradicated.`,
-		eventClass: color
-	});
+		return sleep(0);
 }
 
 function diseaseIsEradicated(diseaseColor)
@@ -7185,18 +7171,25 @@ function loadInfCardsDrawnThisTurn()
 	{
 		// Insert the contents of any cards drawn this turn.
 		const $infectionContainer = $("#infectCitiesContainer");
-		let city;
+		let city,
+			isEradicated,
+			$card;
 		for (let i = 0; i < numCardsDrawnThisTurn; i++)
 		{
 			city = getCity(infectionEvents[i].cityKey);
-
-			$infectionContainer.find(".infectionCard").eq(i)
-				.attr("data-key", city.key)
+			isEradicated = diseaseIsEradicated(city.color)
+			$card = $infectionContainer.find(".infectionCard").eq(i);
+			
+			$card.attr("data-key", city.key)
 				.find(".infectionCardImg")
-				.attr("src", `images/cards/infectionCard_${city.color}${diseaseIsEradicated(city.color) ? "_eradicated" : ""}.png`)
+				.attr("src", `images/cards/infectionCard_${city.color}${isEradicated ? "_eradicated" : ""}.png`)
 				.siblings(".cityName")
 				.html(city.name.toUpperCase())
 				.siblings(".veil").remove();
+			
+			if (isEradicated)
+				$card.attr("title", getEradicatedDescription(city.color))
+					.addClass("eradicated");
 		}
 	}
 
@@ -7488,6 +7481,7 @@ async function revealInfectionCard({ cityKey, index, preventionCode }, { forecas
 	{
 		const $card = getInfectionContainer().find(".infectionCard").eq(index),
 			{name, color} = getCity(cityKey),
+			isEradicated = diseaseIsEradicated(color),
 			$veil = $card.find(".veil"),
 			$cardback = forecasting ? $(".drawnInfectionCard").eq(index) : $(".drawnInfectionCard").first();
 		
@@ -7496,9 +7490,13 @@ async function revealInfectionCard({ cityKey, index, preventionCode }, { forecas
 		
 		$card.attr("data-key", cityKey)
 			.find(".infectionCardImg")
-			.attr("src", `images/cards/infectionCard_${color}${diseaseIsEradicated(color) ? "_eradicated" : ""}.png`)
+			.attr("src", `images/cards/infectionCard_${color}${isEradicated ? "_eradicated" : ""}.png`)
 			.siblings(".cityName")
 			.html(name.toUpperCase());
+		
+		if (isEradicated)
+			$card.attr("title", getEradicatedDescription(color))
+				.addClass("eradicated");
 		
 		$veil.animate({ left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
 			getDuration("revealInfCard"),
@@ -7507,12 +7505,18 @@ async function revealInfectionCard({ cityKey, index, preventionCode }, { forecas
 			{
 				$veil.remove();
 
-				if (!data.fastForwarding && !forecasting)
+				if (!data.fastForwarding && !isEradicated && !forecasting)
 					pinpointCity(cityKey, getPinpointColor(preventionCode));
 				
 				resolve();
 			});
 	});
+}
+
+function getEradicatedDescription(color)
+{
+	return `The ${getColorWord(color)} disease is eradicated
+(no new disease cubes will be placed).`;
 }
 
 function placeDiseaseCubes({ cityKey, numCubes = 1 })

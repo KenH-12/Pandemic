@@ -474,6 +474,7 @@ span.r {color: #ef282a}
 .infectionCard *
 {
 	position: absolute;
+	pointer-events: none;
 }
 .infectionCardImg
 {
@@ -804,7 +805,9 @@ span.r {color: #ef282a}
 	font-family: 'Exo 2', sans-serif;
 	font-size: 18px;
 }
-.actionCategory > .btnDisabled { cursor: help }
+.actionCategory > .btnDisabled,
+.infectionCard.eradicated
+{ cursor: help }
 .actionCategory .button *
 {
 	display: inline-block;
