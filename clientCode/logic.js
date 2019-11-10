@@ -210,7 +210,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "pc",
 		propertyNames: ["cardKey"],
 		rules: [
-			"The Contingency Planner may, as an action, take <i>any</i> Event card from the Player Discard Pile and <i>store</i> it on his role card.",
+			"The Contingency Planner may, as an action, take <i>any</i> Event card from the Player Discard Pile and <i>store</i> it.",
 			"Only 1 Event card can be stored at a time. It does not count against his hand limit.",
 			"When the stored Event card is played, <i>remove it</i> from the game."
 		],
@@ -9420,7 +9420,8 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 				.animate(
 				{
 					height: expandedPileHeight,
-					top: data.boardHeight - expandedPileHeight
+					top: data.boardHeight - expandedPileHeight,
+					scrollTop: showRemovedCardsContainer ? document.getElementById("playerDiscard").scrollHeight : 0
 				},
 				getDuration("discardPileExpand"),
 				function() { resolve() });
