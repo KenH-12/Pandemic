@@ -417,7 +417,6 @@ span.r {color: #ef282a}
 	overflow: hidden;
 }
 #indicatorContainer span:not(.roleTag, .disabled) {margin-left: 15px;}
-#actions{background-color: #054583;}
 #indicatorContainer
 {
 	text-align: center;
@@ -830,15 +829,24 @@ span.r {color: #ef282a}
 	width: 77%;
 	text-align: left;
 }
+#actionPrompt
+{
+	background: linear-gradient(to top, #054583, #022242);
+	padding-bottom: 5px;
+}
 #actionInterface > h2
 {
-	font-size: 20px;
-	margin: 10px 0 5px 0;
-	background-color: #fff;
-	color: #09154f;
-	text-align: center;
+	font-size: 24px;
+	font-family: 'Exo 2', sans-serif;
+	margin-bottom: 5px;
+	padding: 0 5px;
+	border-bottom: 2px solid #fff;
 }
-#actionInterface > .instructions { margin-bottom: 25px; }
+#actionInterface > .instructions
+{
+	padding: 0 5px;
+	border-bottom: 2px solid #fff;
+}
 #actionInterface > .instructions > p
 {
 	text-align: left;
@@ -850,7 +858,6 @@ span.r {color: #ef282a}
 {
 	padding: 3%;
 	padding-bottom: none;
-	border-top: 1px solid #fff;
 }
 #actionPrompt .playerCard
 {

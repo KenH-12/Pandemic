@@ -33,8 +33,22 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+when certain roles are active, actions related to their special abilities should match the role color
+	operations expert -> build research station
+	medic -> treat disease
+		in the treat disease selection menu, replace the large cubes with actual disease icons
+	researcher -> share knowledge
+	scientist -> discover a cure
+
+figure out why the 'determine turn order' setup step is not showing the populations
+
+remove cursor: help from disabled action buttons when an action is in progress
+
+discover cure special event alert should be longer
+	as should the eradication alert
+	and probably medic auto-treat prevention
+
 in action prompts...
-	use different fonts
 	include the action icons
 
 provide descriptions as to why action buttons are disabled
@@ -44,8 +58,6 @@ cube animation time/easing feels a little weird
 use cursor: grab for draggables
 
 cure special event timing between the banner and the cure vial seems weird
-
-infection prevention animations are too long, especially when they occur frequently like quarantine
 
 in action prompts that show the special ability tag, make below text look more closely related to the tag
 
@@ -121,8 +133,6 @@ to keep the player panels from covering any cities, consider checking the bottom
 	if it's past a certain top/left percentage, reduce the width of .player and/or the height of contained elements
 
 use dotted underlines with the "?" cursor and a tooltip on mouseover to explain things that may be unclear
-
-in the treat disease selection menu, replace the large cubes with actual disease icons?
 
 instead of the space-consuming title, "RESEARCH STATION SUPPLY", use the station img as the title?
 
