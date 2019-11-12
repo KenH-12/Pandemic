@@ -160,7 +160,9 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "",
 		pathName: "buildResearchStation",
-		propertyNames: ["originKey", "destinationKey"]
+		propertyNames: ["originKey", "destinationKey"],
+		relatedRoleName: "Operations Expert",
+		relatedRoleRule: "The Operations Expert can do this action without discarding."
 	},
 	shareKnowledge: {
 		name: "Share Knowledge",
@@ -172,7 +174,9 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"The other player must also be in the city with you."
 		],
 		pathName: "shareKnowledge",
-		propertyNames: ["cardKey", "giverRoleID", "recipientRoleID"]
+		propertyNames: ["cardKey", "giverRoleID", "recipientRoleID"],
+		relatedRoleName: "Researcher",
+		relatedRoleRule: "The Researcher may <i>give</i> a City card without needing to be in the city that matches the card."
 	},
 	treatDisease: {
 		name: "Treat Disease",
@@ -183,7 +187,9 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "Select a Disease Color:",
 		pathName: "treatDisease",
-		propertyNames: ["cityKey", "diseaseColor", "prevCubeCount", "newCubeCount"]
+		propertyNames: ["cityKey", "diseaseColor", "prevCubeCount", "newCubeCount"],
+		relatedRoleName: "Medic",
+		relatedRoleRule: "The Medic removes all cubes of one color when doing this action."
 	},
 	autoTreatDisease: {
 		name: "Auto-Treat Disease",
@@ -198,7 +204,9 @@ The card must come from the Dispatcher&#39;s hand.`,
 			`If no cubes of this color are on the board, the disease becomes eradicated.`
 		],
 		pathName: "discoverCure",
-		propertyNames: ["cardKeys"]
+		propertyNames: ["cardKeys"],
+		relatedRoleName: "Scientist",
+		relatedRoleRule: "The Scientist needs only 4 cards of the same color to do this action."
 	},
 	eradication: {
 		name: "eradication",
@@ -243,10 +251,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "of",
 		isSpecialAction: true,
 		capableRoleName: "Operations Expert",
-		rules: [
-			"Once per turn, as an action,",
-			"the Operations Expert may move from a research station to any city by discarding any city card."
-		],
+		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
 		pathName: "movementAction",
 		propertyNames: ["originKey", "destinationKey", "cardKey"]
@@ -704,6 +709,8 @@ function enableAvailableActions()
 	$actionsContainer.find(".button").off("click mouseleave").addClass("btnDisabled");
 	$actionsContainer.find(".actionCategory").removeClass("hidden");
 	
+	useRoleColorForRelatedActionButtons(player.role);
+
 	unhide($actionsContainer);
 	enableAvailableActionButtons(player);
 	enableAvailableSpecialActionButtons($actionsContainer, player);
@@ -712,6 +719,33 @@ function enableAvailableActions()
 	bindDiseaseCubeEvents();
 
 	enableEventCards();
+}
+
+function useRoleColorForRelatedActionButtons(role)
+{
+	const {
+			buildResearchStation,
+			treatDisease,
+			shareKnowledge,
+			discoverACure
+		} = eventTypes,
+		actionsWithRelatedRoles = [
+			buildResearchStation,
+			treatDisease,
+			shareKnowledge,
+			discoverACure
+		];
+	
+	let $actionButton;
+	for (let action of actionsWithRelatedRoles)
+	{
+		$actionButton = $(`#btn${toPascalCase(action.name)}`);
+
+		if (role === action.relatedRoleName)
+			$actionButton.addClass(toCamelCase(role));
+		else
+			$actionButton.removeClass(toCamelCase(action.relatedRoleName));
+	}
 }
 
 function enableEventCards({ resilientPopulationOnly } = {})
@@ -965,8 +999,7 @@ function bindDisabledActionButtonEvents(actionButtonID)
 {
 	const $btn = $(`#${actionButtonID}`),
 		eventType = eventTypes[toCamelCase(actionButtonID.substring(3))],
-		initialHeight = $btn.height(),
-		initialHtml = $btn.html();
+		initialHeight = $btn.height();
 	
 	$btn.off("click")
 		.click(function()
@@ -984,11 +1017,15 @@ function bindDisabledActionButtonEvents(actionButtonID)
 
 function showActionRules($actionButton, eventType)
 {
-	const initialHeight = $actionButton.height();
+	const initialHeight = $actionButton.height(),
+		actionRules = [...eventType.rules];
+	
+	if (eventType.relatedRoleName === getActivePlayer().role)
+		actionRules.unshift(`<span class='specialAbilityRule'>${eventType.relatedRoleRule}</span>`);
 
 	$actionButton.stop().removeAttr("style")
 		.html(`${$actionButton.html()}<br />
-			<span class='disabledActionRules'><p>${eventType.rules.join("</p><p>")}</p></span>`);
+			<span class='disabledActionRules'><p>${actionRules.join("</p><p>")}</p></span>`);
 
 	const eventualHeight = $actionButton.height();
 
@@ -6517,7 +6554,7 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 
 		if (animate)
 		{
-			await sleep(getDuration("longInterval"));
+			await sleep(getDuration("mediumInterval"));
 			await highlightMarkerTrack(trackName, { off: true });
 		}
 		

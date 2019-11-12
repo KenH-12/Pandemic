@@ -31,16 +31,13 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
+prompt share knowledge with multiple participant options and click on a role tag
+	the role card remains visible after the role tag disappears
+
 TO DO
 -----
-when certain roles are active, actions related to their special abilities should match the role color
-	operations expert -> build research station
-	medic -> treat disease
-		in the treat disease selection menu, replace the large cubes with actual disease icons
-	researcher -> share knowledge
-	scientist -> discover a cure
-
-figure out why the 'determine turn order' setup step is not showing the populations
+in action prompts, include the related role rule when applicable
+	consider removing the role tags
 
 remove cursor: help from disabled action buttons when an action is in progress
 
@@ -159,6 +156,8 @@ make animation effects juicier
 
 SMALL FIXES
 -----------
+eventTypes that are actions should have a getActionButton method
+
 center gameEnd text vertically
 
 use a more straightforward way of retrieving the turn order in retrieveGameData.php

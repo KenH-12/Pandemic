@@ -845,6 +845,20 @@ span.r {color: #ef282a}
 	margin-top: 3px;
 	line-height: 16px;
 }
+.specialAbilityRule
+{
+	border-bottom: 1px solid #fff;
+}
+.specialAbilityRule::before
+{
+	content: "* ";
+}
+.button.scientist .disabledActionRules,
+.button.scientist .specialAbilityRule
+{
+	color : #000;
+	border-color: #000;
+}
 #actionPrompt
 {
 	background: linear-gradient(to bottom, #054583, #09154f);
