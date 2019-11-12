@@ -1612,10 +1612,11 @@ const actionInterfacePopulator = {
 	[eventTypes.discoverACure.name]()
 	{
 		const player = getActivePlayer(),
+			eventType = eventTypes.discoverACure,
 			useableCardKeys = player.getCardsForDiscoverACure(),
 			$cardSelectionPrompt = new DiscardPrompt(
 			{
-				eventTypeCode: eventTypes.discoverACure.code,
+				eventTypeCode: eventType.code,
 				buttonText: "DISCOVER CURE",
 				cardKeys: useableCardKeys,
 				numDiscardsRequired: player.role === "Scientist" ? 4 : 5,
@@ -1625,12 +1626,7 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.$actionInterface.append($cardSelectionPrompt);
 
 		if (player.role === "Scientist")
-		{
-			actionInterfacePopulator.replaceSubtitle(`${player.newSpecialAbilityTag()}<br />
-				You need only 4 cards of the same color to do this action.`);
-
-			bindRoleCardHoverEvents();
-		}
+			actionInterfacePopulator.appendSpecialAbilityRule(eventType);
 
 		return true;
 	},
