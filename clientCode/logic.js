@@ -1200,6 +1200,13 @@ const actionInterfacePopulator = {
 
 		actionInterfacePopulator.$actionInterface.append(html);
 	},
+	appendSpecialAbilityRule(eventType)
+	{
+		actionInterfacePopulator.$actionInterface.find(".instructions")
+			.append(`<p class='specialAbilityRule'>${getSpecialAbilityRule(eventType)}</p>`);
+		
+		bindRoleCardHoverEvents();
+	},
 	replaceSubtitle(newSubtitle, { lastParagraph } = {})
 	{
 		const $subtitle = actionInterfacePopulator.$actionInterface.find("p.actionPromptSubtitle");
@@ -1509,26 +1516,31 @@ const actionInterfacePopulator = {
 	[eventTypes.shareKnowledge.name]({ shareKnowledgeParticipant })
 	{
 		const $actionInterface = actionInterfacePopulator.$actionInterface,
-			player = getActivePlayer();
+			player = getActivePlayer(),
+			researcherRole = "Researcher";
 		
-		let participant = shareKnowledgeParticipant;
+		let participant = shareKnowledgeParticipant,
+			showResearcherSpecialAbilityRule = player.role === researcherRole;
 
 		if (!participant)
 		{
 			const validParticipants = getValidShareKnowledgeParticipants(player);
-			
+
 			if (validParticipants.length === 1)
 				participant = validParticipants[0];
 			else
 			{
-				$actionInterface.append(`<p class='actionPromptSubtitle'>
-											Share Knowledge with which player?
-										</p>`);
+				actionInterfacePopulator.replaceSubtitle("Share Knowledge with which player?");
 				
 				const $shareKnowledgePlayerOptions = $("<div class='playerOptions'></div>");
 				
 				for (let possibleParticipant of validParticipants)
+				{
 					$shareKnowledgePlayerOptions.append(possibleParticipant.newRoleTag());
+
+					if (possibleParticipant.role === researcherRole)
+						showResearcherSpecialAbilityRule = true;
+				}
 
 				$shareKnowledgePlayerOptions.children().click(function()
 				{
@@ -1547,23 +1559,18 @@ const actionInterfacePopulator = {
 		
 		if (participant)
 		{
-			const researcherRole = "Researcher";
-			
 			let $giveableContainer = false,
-				$takeableContainer = false,
-				selectCardString = "";
+				$takeableContainer = false;
+			
+			if (participant.role === researcherRole)
+				showResearcherSpecialAbilityRule = true;
 			
 			actionInterfacePopulator.replaceSubtitle(`Share Knowledge with:<br/>${participant.newRoleTag()}`);
 			
 			if (player.canGiveKnowledge())
 			{
-				if (player.role === researcherRole)
-					selectCardString += player.newSpecialAbilityTag() + "<br />";
-
-				selectCardString += `Select a card to <i>give</i> :`;
-				
 				$giveableContainer = $(`<div id='giveableCards' class='shareableCards'>
-											<p>${selectCardString}</p>
+											<p>Select a card to <i>give</i> :</p>
 										</div>`);
 				
 				for (let cardKey of player.getShareableCardKeys())
@@ -1575,18 +1582,10 @@ const actionInterfacePopulator = {
 			if (participant.canGiveKnowledge())
 			{
 				if ($giveableContainer)
-				{
 					actionInterfacePopulator.appendDivision(eventTypes.shareKnowledge);
-					selectCardString = "";
-				}
-				
-				if (participant.role === researcherRole)
-					selectCardString += participant.newSpecialAbilityTag() + "<br />";
-				
-				selectCardString += `Select a card to <i>take</i> :`;
 				
 				$takeableContainer = $(`<div id='takeableCards' class='shareableCards'>
-											<p>${selectCardString}</p>
+											<p>Select a card to <i>take</i> :</p>
 										</div>`);
 				
 				for (let cardKey of participant.getShareableCardKeys())
@@ -1604,6 +1603,10 @@ const actionInterfacePopulator = {
 
 			bindRoleCardHoverEvents();
 		}
+
+		if (showResearcherSpecialAbilityRule)
+			actionInterfacePopulator.appendSpecialAbilityRule(eventTypes.shareKnowledge);
+
 		return true;
 	},
 	[eventTypes.discoverACure.name]()
@@ -4316,6 +4319,13 @@ remove this Event card from the game (instead of discarding it).`;
 	}
 
 	return description;
+}
+
+function getSpecialAbilityRule(eventType)
+{
+	const { relatedRoleName, relatedRoleRule } = eventType;
+
+	return relatedRoleRule.replace(relatedRoleName, getPlayer(relatedRoleName).newRoleTag());
 }
 
 function operationsFlightWasUsedThisTurn()

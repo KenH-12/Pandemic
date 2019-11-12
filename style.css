@@ -845,7 +845,7 @@ span.r {color: #ef282a}
 	margin-top: 3px;
 	line-height: 16px;
 }
-.specialAbilityRule
+.disabledActionRules .specialAbilityRule
 {
 	border-bottom: 1px solid #fff;
 }
@@ -882,6 +882,11 @@ span.r {color: #ef282a}
 	text-align: left;
 	padding: 0 1%;
 	margin-bottom: 8px;
+}
+.instructions > p.specialAbilityRule
+{
+	border-top: 1px dashed #fff;
+	padding-top: 7px !important;
 }
 #actionInterface > .instructions li { margin-left: 3% }
 #actionInterface > .playerCard { cursor: pointer }
@@ -990,6 +995,7 @@ span.r {color: #ef282a}
 	padding-bottom: 5px;
 	margin-bottom: 10px;
 }
+.shareableCards .playerCard { cursor: pointer }
 .btnRelocateStation
 {
 	width: 98%;
@@ -1021,6 +1027,7 @@ span.r {color: #ef282a}
 	text-align: center;
 	border-radius: 0;
 	margin-bottom: 5px;
+	cursor: pointer;
 }
 .specialAbilityTag
 {
