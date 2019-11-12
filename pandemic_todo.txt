@@ -31,18 +31,22 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
-prompt share knowledge with multiple participant options and click on a role tag
-	the role card remains visible after the role tag disappears
-
 TO DO
 -----
-in action prompts, include the related role rule when applicable
-	consider removing the role tags
+consider using the Researcher's modifications on the Share Knowledge button
+when another player can take from the researcher
 
 remove cursor: help from disabled action buttons when an action is in progress
 
 in action prompts...
 	include the action icons
+	include the related role rule when applicable
+		consider removing the role tags
+
+use a gradient for the entire background
+	use a solid color for backgrounds on which infection cards are revealed
+	OR
+	use overflow: hidden and animate the width of the .infectionCard instead of removing a veil
 
 provide descriptions as to why action buttons are disabled
 

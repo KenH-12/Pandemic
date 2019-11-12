@@ -1532,6 +1532,7 @@ const actionInterfacePopulator = {
 
 				$shareKnowledgePlayerOptions.children().click(function()
 				{
+					$(".roleCard").remove();
 					promptAction(
 						{
 							eventType: eventTypes.shareKnowledge,
