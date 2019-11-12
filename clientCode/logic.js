@@ -208,6 +208,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	planContingency: {
 		name: "Plan Contingency",
 		code: "pc",
+		isSpecialAction: true,
 		propertyNames: ["cardKey"],
 		rules: [
 			"The Contingency Planner may, as an action, take <i>any</i> Event card from the Player Discard Pile and <i>store</i> it.",
@@ -220,6 +221,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	dispatchPawn: {
 		name: "Dispatch Pawn",
 		code: "dp",
+		isSpecialAction: true,
 		rules: [
 			"The Dispatcher may, as an action, either:",
 			"<li>move any pawn to any city containing another pawn, or</li>",
@@ -237,6 +239,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	operationsFlight: {
 		name: "Operations Flight",
 		code: "of",
+		isSpecialAction: true,
 		rules: [
 			"Once per turn, as an action,",
 			"the Operations Expert may move from a research station to any city by discarding any city card."
@@ -695,12 +698,12 @@ function enableAvailableActions()
 	const $actionsContainer = $("#actionsContainer"),
 		player = getActivePlayer();
 	
-	$actionsContainer.find(".button").off("click").addClass("btnDisabled");
+	$actionsContainer.find(".button").off("click mouseleave").addClass("btnDisabled");
 	$actionsContainer.find(".actionCategory").removeClass("hidden");
 	
+	unhide($actionsContainer);
 	enableAvailableActionButtons(player);
 	enableAvailableSpecialActionButtons($actionsContainer, player);
-	unhide($actionsContainer);
 	
 	enablePawnEvents();
 	bindDiseaseCubeEvents();
@@ -888,6 +891,8 @@ function enableAvailableActionButtons(player)
 	for (let action of actions)
 		if (player[`can${action}`]())
 			enableActionButton(`btn${action}`);
+		else
+			bindDisabledActionButtonEvents(`btn${action}`);
 }
 
 function enableAvailableSpecialActionButtons($actionsContainer, player)
@@ -909,6 +914,8 @@ function enableAvailableSpecialActionButtons($actionsContainer, player)
 		
 		if (player[`can${special.name}`]())
 			enableActionButton(`btn${special.name}`);
+		else
+			bindDisabledActionButtonEvents(`btn${special.name}`);
 	}
 
 	// if no special actions are available, hide the special action button group
@@ -931,6 +938,86 @@ function enableActionButton(buttonID)
 		{
 			promptAction({ eventType: eventTypes[actionName] });
 		});
+}
+
+function bindDisabledActionButtonEvents(actionButtonID)
+{
+	const $btn = $(`#${actionButtonID}`),
+		eventType = eventTypes[toCamelCase(actionButtonID.substring(3))],
+		initialHeight = $btn.height(),
+		initialHtml = $btn.html();
+	
+	$btn.off("click")
+		.click(function()
+		{
+			$btn.off("click")
+				.click(function()
+				{
+					$btn.off("click mouseleave");
+					hideActionRules($btn, initialHeight, eventType);
+				});
+			
+			showActionRules($btn, eventType);
+		});
+}
+
+function showActionRules($actionButton, eventType)
+{
+	const initialHeight = $actionButton.height();
+
+	$actionButton.stop().removeAttr("style")
+		.html(`${$actionButton.html()}<br />
+			<span class='disabledActionRules'><p>${eventType.rules.join("</p><p>")}</p></span>`);
+
+	const eventualHeight = $actionButton.height();
+
+	animatePromise(
+	{
+		$elements: $actionButton,
+		initialProperties: { height: initialHeight },
+		desiredProperties: { height: eventualHeight },
+		duration: 500,
+		easing: "easeOutQuad"
+	});
+	
+
+	$actionButton.off("mouseleave")
+		.mouseleave(function()
+		{
+			$actionButton.off("mouseleave");
+
+			hideActionRules($actionButton, initialHeight, eventType);
+		});
+}
+
+async function hideActionRules($actionButton, initialHeight, eventType)
+{
+	const expandedHeight = $actionButton.stop().height();
+
+	await animatePromise(
+	{
+		$elements: $actionButton,
+		initialProperties: { height: expandedHeight },
+		desiredProperties: { height: initialHeight },
+		duration: 200
+	});
+
+	$actionButton.html(getActionButtonContents(eventType)).removeAttr("style");
+	bindDisabledActionButtonEvents($actionButton.attr("id"));
+}
+
+function getActionButtonContents(eventType)
+{
+	const { name } = eventType;
+
+	// Special actions don't have icons.
+	if (eventType.isSpecialAction)
+		return name.toUpperCase();
+
+	return `<div class='actionIcon'>
+				<img src='images/actionIcons/${toCamelCase(name)}.png' />
+			</div>
+			<div class='actionName'>${name.toUpperCase()}</div>`;
 }
 
 function enableBtnCancelAction()

@@ -830,6 +830,21 @@ span.r {color: #ef282a}
 	width: 77%;
 	text-align: left;
 }
+.disabledActionRules
+{
+	font-family: 'Ropa Sans', sans-serif;
+	font-size: 16px;
+	text-align: left;
+	padding: 0 5px;
+	margin-top: 1px;
+	border-top: 1px solid #fff;
+	color: #fff;
+}
+.disabledActionRules > p
+{
+	margin-top: 3px;
+	line-height: 16px;
+}
 #actionPrompt
 {
 	background: linear-gradient(to bottom, #054583, #09154f);

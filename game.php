@@ -259,7 +259,7 @@
 									<div class='actionIcon'>
 										<img src='images/actionIcons/buildResearchStation.png' />
 									</div>
-									<div class='actionName'>BUILD<br />RESEARCH STATION</div>
+									<div class='actionName'>BUILD RESEARCH STATION</div>
 								</div>
 								<div class='button' id='btnTreatDisease'>
 									<div class='actionIcon'>
