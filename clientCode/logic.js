@@ -190,8 +190,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "at",
 		propertyNames: ["cityKey", "diseaseColor"]
 	},
-	discoverCure: {
-		name: "Discover Cure",
+	discoverACure: {
+		name: "Discover A Cure",
 		code: "dc",
 		rules: [
 			`At any research station, discard 5 city cards of the same color from your hand to cure the disease of that color.`,
@@ -209,6 +209,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Plan Contingency",
 		code: "pc",
 		isSpecialAction: true,
+		capableRoleName: "Contingency Planner",
 		propertyNames: ["cardKey"],
 		rules: [
 			"The Contingency Planner may, as an action, take <i>any</i> Event card from the Player Discard Pile and <i>store</i> it.",
@@ -222,6 +223,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Dispatch Pawn",
 		code: "dp",
 		isSpecialAction: true,
+		capableRoleName: "Dispatcher",
 		rules: [
 			"The Dispatcher may, as an action, either:",
 			"<li>move any pawn to any city containing another pawn, or</li>",
@@ -240,6 +242,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Operations Flight",
 		code: "of",
 		isSpecialAction: true,
+		capableRoleName: "Operations Expert",
 		rules: [
 			"Once per turn, as an action,",
 			"the Operations Expert may move from a research station to any city by discarding any city card."
@@ -399,7 +402,7 @@ eventCodes = {
 	// sa: "shareKnowledgeAccept",
 	td: "treatDisease",
 	at: "autoTreatDisease",
-	dc: "discoverCure",
+	dc: "discoverACure",
 	er: "eradication",
 	pc: "planContingency",
 	dp: "dispatchPawn",
@@ -874,48 +877,66 @@ function disableResearchStationDragging()
 
 function enableAvailableActionButtons(player)
 {
-	const actions = [
-		"DirectFlight",
-		"CharterFlight",
-		"ShuttleFlight",
-		"BuildResearchStation",
-		"TreatDisease",
-		"ShareKnowledge",
-		"DiscoverCure"
-	];
+	const {
+			directFlight,
+			charterFlight,
+			shuttleFlight,
+			buildResearchStation,
+			treatDisease,
+			shareKnowledge,
+			discoverACure
+		} = eventTypes,
+		actions = [
+			directFlight,
+			charterFlight,
+			shuttleFlight,
+			buildResearchStation,
+			treatDisease,
+			shareKnowledge,
+			discoverACure
+		];
 
 	// Some actions are always available
 	enableActionButton("btnDriveFerry");
 	enableActionButton("btnPass");
 
+	let actionName;
 	for (let action of actions)
-		if (player[`can${action}`]())
-			enableActionButton(`btn${action}`);
+	{
+		actionName = toPascalCase(action.name);
+		log("actionName: ", actionName);
+
+		if (player[`can${actionName}`]())
+			enableActionButton(`btn${actionName}`);
 		else
-			bindDisabledActionButtonEvents(`btn${action}`);
+			bindDisabledActionButtonEvents(`btn${actionName}`);
+	}
 }
 
 function enableAvailableSpecialActionButtons($actionsContainer, player)
 {
 	const specialActions = [
-			{ role: "Contingency Planner", name: "PlanContingency" },
-			{ role: "Dispatcher", name: "DispatchPawn" },
-			{ role: "Operations Expert", name: "OperationsFlight" }
+			eventTypes.planContingency,
+			eventTypes.dispatchPawn,
+			eventTypes.operationsFlight
 		],
 		$specialActionCategory = $actionsContainer.find("#specialActionCategory");
 
+	let actionName;
 	for (let special of specialActions)
 	{
-		if (player.role !== special.role)
+		actionName = toPascalCase(special.name);
+
+		if (player.role !== special.capableRoleName)
 		{
-			$specialActionCategory.children(`#btn${special.name}`).addClass("hidden");
+			$specialActionCategory.children(`#btn${actionName}`).addClass("hidden");
 			continue;
 		}
 		
-		if (player[`can${special.name}`]())
-			enableActionButton(`btn${special.name}`);
+		if (player[`can${actionName}`]())
+			enableActionButton(`btn${actionName}`);
 		else
-			bindDisabledActionButtonEvents(`btn${special.name}`);
+			bindDisabledActionButtonEvents(`btn${actionName}`);
 	}
 
 	// if no special actions are available, hide the special action button group
@@ -1547,17 +1568,17 @@ const actionInterfacePopulator = {
 		}
 		return true;
 	},
-	[eventTypes.discoverCure.name]()
+	[eventTypes.discoverACure.name]()
 	{
 		const player = getActivePlayer(),
-			useableCardKeys = player.getCardsForDiscoverCure(),
+			useableCardKeys = player.getCardsForDiscoverACure(),
 			$cardSelectionPrompt = new DiscardPrompt(
 			{
-				eventTypeCode: eventTypes.discoverCure.code,
+				eventTypeCode: eventTypes.discoverACure.code,
 				buttonText: "DISCOVER CURE",
 				cardKeys: useableCardKeys,
 				numDiscardsRequired: player.role === "Scientist" ? 4 : 5,
-				onConfirm: discoverCure
+				onConfirm: discoverACure
 			});
 		
 		actionInterfacePopulator.$actionInterface.append($cardSelectionPrompt);
@@ -4048,14 +4069,14 @@ class Player
 		return [];
 	}
 
-	canDiscoverCure()
+	canDiscoverACure()
 	{
 		// The player's current location must have a research station.
 		if (!this.getLocation().hasResearchStation)
 			return false;
 
 		// The other requirements are handled here.
-		if (this.getCardsForDiscoverCure())
+		if (this.getCardsForDiscoverACure())
 			return true;
 		
 		return false;
@@ -4065,7 +4086,7 @@ class Player
 	// and the disease color in question has not already been cured,
 	// returns an array of the cardKeys that can be used to discover a cure.
 	// Returns false otherwise.
-	getCardsForDiscoverCure()
+	getCardsForDiscoverACure()
 	{
 		// Discover A Cure requires:
 		// - The player must be holding 5 cards of the same color,
@@ -7719,7 +7740,7 @@ function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAut
 	return $cureMarker;
 }
 
-async function discoverCure(cardKeys)
+async function discoverACure(cardKeys)
 {
 	resetActionPrompt();
 	disableActions();
@@ -7728,9 +7749,9 @@ async function discoverCure(cardKeys)
 	await player.expandPanelIfCollapsed();
 	
 	const diseaseColor = getDiseaseColor(cardKeys[0]),
-		{ discoverCure, eradication, autoTreatDisease } = eventTypes,
+		{ discoverACure, eradication, autoTreatDisease } = eventTypes,
 		{ 0: events } = await Promise.all([
-			requestAction(discoverCure,
+			requestAction(discoverACure,
 			{
 				cityKey: player.cityKey,
 				diseaseColor: diseaseColor,
@@ -8090,7 +8111,7 @@ function getNumActionsRemaining()
 			buildResearchStation,
 			treatDisease,
 			shareKnowledge,
-			discoverCure,
+			discoverACure,
 			operationsFlight,
 			dispatchPawn,
 			planContingency
@@ -8103,7 +8124,7 @@ function getNumActionsRemaining()
 			buildResearchStation,
 			treatDisease,
 			shareKnowledge,
-			discoverCure,
+			discoverACure,
 			operationsFlight,
 			dispatchPawn,
 			planContingency

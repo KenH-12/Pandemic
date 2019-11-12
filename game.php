@@ -273,9 +273,9 @@
 									</div>
 									<div class='actionName'>SHARE KNOWLEDGE</div>
 								</div>
-								<div class='button' id='btnDiscoverCure'>
+								<div class='button' id='btnDiscoverACure'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/discoverCure.png' />
+										<img src='images/actionIcons/discoverACure.png' />
 									</div>
 									<div class='actionName'>DISCOVER A CURE</div>
 								</div>

@@ -153,6 +153,11 @@ function makeElementsSquare(cssSelector)
 	$elements.height($elements.first().width());
 }
 
+function removeWhitespace(string)
+{
+	return string.replace(/ /g,"");
+}
+
 // Capitalizes the first character of every word in the string, and returns the new string.
 function capitalizeWords(string)
 {
@@ -172,9 +177,14 @@ function capitalizeWords(string)
 
 function toCamelCase(string)
 {
-	const s = capitalizeWords(string);
+	const pascalCaseString = toPascalCase(string);
 
-	return s[0].toLowerCase() + s.substring(1).replace(/ /g,"");
+	return pascalCaseString[0].toLowerCase() + pascalCaseString.substring(1);
+}
+
+function toPascalCase(string)
+{
+	return removeWhitespace(capitalizeWords(string));
 }
 
 function typeOutString($element, string, { trailingEllipsis })
