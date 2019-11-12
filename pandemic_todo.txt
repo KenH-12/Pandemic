@@ -44,10 +44,6 @@ figure out why the 'determine turn order' setup step is not showing the populati
 
 remove cursor: help from disabled action buttons when an action is in progress
 
-discover cure special event alert should be longer
-	as should the eradication alert
-	and probably medic auto-treat prevention
-
 in action prompts...
 	include the action icons
 

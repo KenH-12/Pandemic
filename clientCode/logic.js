@@ -3267,7 +3267,8 @@ async function drawStep()
 		await specialEventAlert(
 		{
 			title: "EPIDEMIC!",
-			eventClass: "epidemic"
+			eventClass: "epidemic",
+			visibleMs: 1250
 		});
 	}
 
@@ -5834,7 +5835,8 @@ async function resolveOutbreaks(events)
 			{
 				title: "OUTBREAK!",
 				description: `Origin: ${originCity.name}`,
-				eventClass: "epidemic"
+				eventClass: "epidemic",
+				visibleMs: 1500
 			});
 
 		await moveOutbreaksMarker(outbreakEvent.outbreakCount, { animate: true });
@@ -6003,7 +6005,7 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 
 			if (animate)
 			{
-				await sleep(getDuration("longInterval"));
+				await sleep(getDuration("mediumInterval"));
 
 				if (tooManyOutbreaksOccured()) // defeat -- return early
 				{
@@ -6280,7 +6282,7 @@ function specialEventAlert({ title, description, eventClass, visibleMs })
 			easing
 		});
 		
-		await sleep(visibleMs || 1250);
+		await sleep(visibleMs || 2500);
 		
 		await animatePromise(
 		{
@@ -6473,7 +6475,7 @@ async function highlightMarkerTrack(trackName, { off } = {})
 			$elements: $elements.removeClass("hidden"),
 			initialProperties: { opacity: (off ? 0.5 : 0) },
 			desiredProperties: { opacity: (off ? 0 : 0.5) },
-			duration: 600
+			duration: (off ? 300 : 600)
 		}
 	);
 
@@ -7111,8 +7113,7 @@ async function medicAutoTreatAnimation()
 	{
 		title: "INFECTION PREVENTED!",
 		description: "The Medic prevents placing disease cubes of <i>cured</i> diseases in his location.",
-		eventClass: "medic",
-		visibleMs: 5000
+		eventClass: "medic"
 	});
 
 	await sleep(getDuration("shortInterval"));
@@ -7889,18 +7890,19 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 
 		let description = "";
 		if (data.cures.remaining > 0)
-			description = `Discover ${data.cures.remaining} more to win the game`;
+			description = `Discover ${data.cures.remaining} more to win the game.`;
 
 		await specialEventAlert(
 		{
-			title: "DISCOVERED CURE!",
+			title: "DISCOVERED A CURE!",
 			description,
 			eventClass: diseaseColor
+			
 		});
 
 		if (diseaseStatus === "eradicated")
 		{
-			description = `No new disease cubes of this color will be placed on the board`;
+			description = `No new disease cubes of this color will be placed on the board.`;
 			await specialEventAlert(
 				{
 					title: "DISEASE ERADICATED!",
