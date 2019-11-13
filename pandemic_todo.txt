@@ -74,8 +74,6 @@ highlight the active pawn in some way
 clicking on a player's role in the player panel should pinpoint their pawn's location
 clicking on an infection card in the discard pile should pinpoint the city
 
-add tooltip for "eradicated" in discover cure and treat disease prompts
-
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated
 
@@ -219,8 +217,6 @@ the stored procedure increment_gamephase...
 
 facedown infectioncards need to be repositioned by resizeBoard
 
-center disease color options in treat disease prompt
-
 contingency planner's color should be slightly darker to contrast the board and the white text
 dark gray background areas should be slighty lighter to contrast black cards
 
@@ -257,8 +253,6 @@ use css variables for colors n stuff
 not enough space for initial infections at smallest screen width (playerPanel gets in the way)
 
 some city coords are not centred
-
-fix z-index of pinpointers as it relates to pawns, cubes, and stations
 
 create trigger that updates a card's index after updating its location
 in movementAction.php and drawPlayerCards.php, set the cardIndex of discarded cards

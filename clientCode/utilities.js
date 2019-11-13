@@ -10,6 +10,12 @@ function sleep(ms)
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function delayExecution(fn, delayMs)
+{
+	await sleep(delayMs);
+	fn();
+}
+
 function getFilteredMemberArray(obj, filterFn)
 {
 	const filteredMembers = [];

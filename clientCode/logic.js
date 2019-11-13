@@ -1489,23 +1489,23 @@ const actionInterfacePopulator = {
 			const player = getActivePlayer();
 
 			if (player.role === "Medic")
-			{
-				actionInterfacePopulator.replaceSubtitle(`${player.newSpecialAbilityTag()}
-					The Medic removes <i>all</i> cubes of one color from his location when doing Treat Disease.
-					<br /><br />Select a Disease Color:`);
-				
-				bindRoleCardHoverEvents();
-			}
+				actionInterfacePopulator.appendSpecialAbilityRule(eventTypes.treatDisease);
 			
+			let $colorOptionCube;
 			for (let color of diseaseColorOptions)
-				$actionInterface.append(`<div class='diseaseColorOption ${color}' data-color='${color}'></div>`);
+			{
+				$colorOptionCube = newDiseaseCubeElement(color);
+				$colorOptionCube.data("color", color);
+				$actionInterface.append($colorOptionCube);
+			}
 
-			$actionInterface.children(".diseaseColorOption").click(function()
+			$actionInterface.children(".diseaseCube").click(function()
 			{
 				resetActionPrompt();
 				treatDisease(false, $(this).data("color"));
 			});
 
+			delayExecution(resizeTreatDiseaseOptions, 1);
 			return true;
 		}
 		
@@ -3665,6 +3665,13 @@ function resizeRightPanelElements()
 	
 	if ($("#infectionsContainer, #initialInfectionsContainer").not(".hidden").length)
 		positionInfectionPanelComponents();
+	
+	resizeTreatDiseaseOptions();
+}
+
+function resizeTreatDiseaseOptions()
+{
+	makeElementsSquare("#actionInterface .diseaseCube");
 }
 
 function repositionMarkers()
@@ -6082,12 +6089,7 @@ function disperseOutbreakCubes(originCityKey, cubesToDisperse)
 
 function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestinationKey } = {})
 {
-	const $newCube = $(`<div class='diseaseCube ${color} ${cityKey}'>
-						<div class='cubeBackground'></div>
-						<div class='cubeTop'></div>
-						<div class='cubeLeft'></div>
-						<div class='cubeRight'></div>
-					</div>`)
+	const $newCube = newDiseaseCubeElement(color, cityKey)
 		.appendTo("#boardContainer");
 	
 	if (outbreakDestinationKey)
@@ -6106,6 +6108,21 @@ function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestin
 	}
 	
 	return $newCube;
+}
+
+function newDiseaseCubeElement(color, cityKey)
+{
+	const $diseaseCube =  $(`<div class='diseaseCube ${color}'>
+								<div class='cubeBackground'></div>
+								<div class='cubeTop'></div>
+								<div class='cubeLeft'></div>
+								<div class='cubeRight'></div>
+							</div>`);
+	
+	if (cityKey)
+		$diseaseCube.addClass(cityKey);
+	
+	return $diseaseCube;
 }
 
 async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } = {})
