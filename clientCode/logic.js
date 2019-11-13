@@ -44,6 +44,7 @@ const data =
 		discardPileCollapse: 200,
 		moveMarker: 700,
 		pawnAnimation: 250,
+		pinpointCity: 300,
 		specialEventBannerReveal: 250,
 		cureMarkerAnimation: 700
 	}, fastForwarding: false,
@@ -59,7 +60,6 @@ const data =
 		specialEventBannerReveal: "easeOutQuint",
 		cureMarkerAnimation: "easeInOutQuart"
 	},
-	pinpointTimeout: false,
 	players: {},
 	cities: {},
 	pacificPaths: {
@@ -519,6 +519,7 @@ class Step
 			.next() // role indicator
 			.html(activePlayer.role)
 			.attr("class", activePlayer.camelCaseRole)
+			.click(function() { activePlayer.pinpointLocation() })
 			.next() // step indicator
 			.html(this.description);
 
@@ -3089,7 +3090,7 @@ async function treatDisease($cube, diseaseColor)
 	
 	const city = getActivePlayer().getLocation();
 
-	diseaseColor = diseaseColor || getCubeColor($cube);
+	diseaseColor = diseaseColor || getColorClass($cube);
 
 	const events = await requestAction(eventTypes.treatDisease,
 		{
@@ -3121,10 +3122,10 @@ async function treatDisease($cube, diseaseColor)
 	proceed();
 }
 
-function getCubeColor($cube)
+function getColorClass($element)
 {
 	const colors = ["y", "r", "u", "b"],
-		classes = $cube.attr("class").split(" ");
+		classes = $element.attr("class").split(" ");
 
 	for (let c of classes)
 		if (colors.includes(c))
@@ -3575,8 +3576,16 @@ function resizeBoard()
 	data.boardHeight = $("#boardImg").height();
 	$("#boardContainer").height(data.boardHeight);
 
-	$(".pinpointRect").height(data.boardHeight).width(data.boardWidth);
+	resetPinpointRectangles();
 	data.cityWidth = getDimension("cityWidth");
+}
+
+function resetPinpointRectangles()
+{
+	$(".pinpointRect").stop()
+		.removeAttr("style")
+		.height(data.boardHeight)
+		.width(data.boardWidth);
 }
 
 function resizeTopPanelElements()
@@ -3894,6 +3903,11 @@ class Player
 			destination.cluster({ animatePawns: true }),
 			origin.cluster({ animatePawns: true })
 		]);
+	}
+
+	pinpointLocation()
+	{
+		pinpointCity(this.cityKey, { pinpointClass: `${this.camelCaseRole}Border` });
 	}
 	
 	getPanel()
@@ -4410,7 +4424,12 @@ function appendPlayerPanel(player)
 					</div>`);
 	
 	$panel.appendTo("#playerPanelContainer")
-		.children(".btnCollapseExpand").click(function() { togglePlayerPanel($(this)) });
+		.children(".role")
+		.click(function()
+			{
+				player.pinpointLocation();
+			})
+		.siblings(".btnCollapseExpand").click(function() { togglePlayerPanel($(this)) });
 }
 
 function togglePlayerPanel($btnCollapseExpand)
@@ -4863,7 +4882,7 @@ class City
 		if (!$cubes.length)
 			return;
 		
-		$cubes.each(function(){ colors.add(getCubeColor($(this))) });
+		$cubes.each(function(){ colors.add(getColorClass($(this))) });
 
 		let topAdjustment;
 		if (numPawnsInCity > 2
@@ -5748,7 +5767,7 @@ function executePendingClusters(details)
 }
 
 // shows a city's location by animating 2 rectangles such that their points overlap on the specified city's position
-function pinpointCity(cityKey, pinpointColor)
+async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 {
 	if (data.skipping)
 		return;
@@ -5756,71 +5775,61 @@ function pinpointCity(cityKey, pinpointColor)
 	const city = getCity(cityKey),
 		cityOffset = city.getOffset(),
 		cWidth = data.cityWidth,
-		adj = data.boardWidth * 0.003, // slight adjustment needed for rectB coords
-		rects = $(".pinpointRect"),
-		rectA = rects.first(),
-		rectB = rects.last(),
-		duration = 300,
+		adj = data.boardWidth * 0.003, // slight adjustment needed for $rectB coords
+		$rects = $(".pinpointRect"),
+		$rectA = $rects.first(),
+		$rectB = $rects.last(),
+		duration = getDuration("pinpointCity"),
 		easing = data.easings.pinpointCity;
 
-	rects.css("border-color", pinpointColor || "red");
-	
-	if (data.pinpointTimeout !== false) // another pinpoint sequence is in progress
+	if (data.pinpointing !== false) // another pinpoint sequence is in progress
 	{
-		clearTimeout(data.pinpointTimeout);
-		rects.stop().css("opacity", 1);
+		$rects.stop();
+		resetPinpointRectangles();
 	}
+	data.pinpointing = true;
+
+	$rects.attr("class", "pinpointRect hidden");
+
+	if (pinpointClass)
+		$rects.addClass(pinpointClass);
+	else if (pinpointColor)
+		$rects.css("border-color", pinpointColor);
 	else
-		rects.removeClass("hidden");
+		$rects.css("border-color", "#fff");
 	
-	// prevent unwanted behaviour in the case of rapid consecutive calls
-	data.pinpointTimeout = true;
+	$rects.removeClass("hidden");
 	
-	// animate rectangles to pinpoint city location
-	rectA.animate(
-	{
-		left: cityOffset.left - cWidth,
-		top: cityOffset.top - cWidth
-	}, duration, easing);
-	
-	rectB.animate(
-	{
-		left: (cityOffset.left + cWidth) - data.boardWidth - adj,
-		top: (cityOffset.top + cWidth) - data.boardHeight - adj
-	}, duration, easing,
-	function()
-	{
-		// hide rectangles after 1 second
-		data.pinpointTimeout = setTimeout(function()
+	await Promise.all(
+	[
+		animatePromise(
 		{
-			rects.fadeTo(200, 0.1, function()
-			{
-				rects.offset(
-				{
-					left: 0,
-					top: 0
-				}).addClass("hidden").css("opacity", "1");
-				data.pinpointTimeout = false;
-			});
-		}, 1250);
+			$elements: $rectA,
+			desiredProperties: {
+				left: cityOffset.left - cWidth,
+				top: cityOffset.top - cWidth
+			}, duration, easing
+		}),
+		animatePromise(
+		{
+			$elements: $rectB,
+			desiredProperties: {
+				left: (cityOffset.left + cWidth) - data.boardWidth - adj,
+				top: (cityOffset.top + cWidth) - data.boardHeight - adj
+			}, duration, easing
+		})
+	]);
+
+	await sleep(500);
+
+	await animatePromise(
+	{
+		$elements: $rects,
+		desiredProperties: { opacity: 0 },
+		duration: 1250
 	});
-}
 
-function getPinpointColor(infectionPreventionCode)
-{
-	const codes = data.infectionPreventionCodes;
-
-	if (infectionPreventionCode == codes.notPrevented)
-		return "red";
-	
-	if (infectionPreventionCode == codes.eradicated)
-		return "green";
-	
-	if (infectionPreventionCode == codes.quarantine)
-		return "#006951";
-	
-	if (infectionPreventionCode == codes.medicAutoTreat)
-		return "#f68426";
+	data.pinpointing = false;
 }
 
 // binds click events of .playerCard elements
@@ -5828,9 +5837,10 @@ function bindPlayerCardEvents()
 {
 	$(".playerCard:not(.event, .epidemic)")
 		.off("click")
-		.click(function()
+		.click(function(event)
 		{
-			pinpointCity($(this).data("key"), "green");
+			event.stopPropagation();
+			pinpointCity($(this).data("key"), { pinpointClass: `${getColorClass($(this))}Border` });
 		});
 }
 
@@ -6254,7 +6264,7 @@ function bindDiseaseCubeEvents()
 
 function markTreatableDiseaseCubes($hoveredCube, cityKey)
 {
-	const diseaseColor = getCubeColor($hoveredCube);
+	const diseaseColor = getColorClass($hoveredCube);
 	
 	let $cubesToMark;
 	if (getActivePlayer().role === "Medic" || data.cures[diseaseColor] === "cured")
@@ -6439,6 +6449,7 @@ async function epidemicInfect()
 		
 	await sleep(interval);
 	await discardInfectionCard($("#epidemicContainer").find(".infectionCard"), 400);
+	bindInfectionDiscardClicks();
 	await sleep(interval);
 
 	proceed();
@@ -7386,6 +7397,8 @@ async function finishInfectionStep()
 		await discardInfectionCard($cards.first());
 		$cards = $container.find(".infectionCard");
 	}
+
+	bindInfectionDiscardClicks();
 	
 	if (currentStepIs("setup"))
 	{
@@ -7400,6 +7413,17 @@ async function finishInfectionStep()
 		$("#indicatorContainer").removeAttr("style").addClass("hidden");
 		nextTurn();
 	});
+}
+
+function bindInfectionDiscardClicks()
+{
+	$("#infectionDiscard").find(".infectionCard")
+		.off("click")
+		.click(function()
+		{
+			const city = getCity($(this).data("key"));
+			pinpointCity(city.key, { pinpointClass: `${city.color}Border` });
+		});
 }
 
 function getInfectionContainer()
@@ -7669,7 +7693,7 @@ async function revealInfectionCard({ cityKey, index, preventionCode }, { forecas
 				$veil.remove();
 
 				if (!data.fastForwarding && !isEradicated && !forecasting)
-					pinpointCity(cityKey, getPinpointColor(preventionCode));
+					pinpointCity(cityKey, { pinpointClass: `${color}Border` });
 				
 				resolve();
 			});
@@ -8117,6 +8141,8 @@ function loadInfectionDiscards(cards)
 
 	if ($removedCardsContainer.children(".infectionCard").length)
 		$removedCardsContainer.removeClass("hidden");
+	
+	bindInfectionDiscardClicks();
 }
 
 $("#imgInfectionDeck").click(function()

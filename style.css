@@ -136,18 +136,22 @@ body,
 .diseaseCube.y .cubeRight,
 .diseaseCube.y .cubeLeft
 { background: #fded3c }
+.yBorder { border-color: #fded3c }
 .diseaseCube.r .cubeTop,
 .diseaseCube.r .cubeRight,
 .diseaseCube.r .cubeLeft
 { background: #ef282a }
+.rBorder { border-color: #ef282a }
 .diseaseCube.u .cubeTop,
 .diseaseCube.u .cubeRight,
 .diseaseCube.u .cubeLeft
 { background: #405fb1 }
+.uBorder { border-color: #405fb1 }
 .diseaseCube.b .cubeTop,
 .diseaseCube.b .cubeRight,
 .diseaseCube.b .cubeLeft
 { background: #212121 }
+.bBorder { border-color: #212121 }
 
 .hidden{display:none;}
 .y{background-color:#fded3c;color:black;}
@@ -430,6 +434,7 @@ span.r {color: #ef282a}
 {
 	font-size: 20px;
 	font-weight: 700;
+	cursor: help
 }
 .action:not(.step), .destination
 {
@@ -584,7 +589,9 @@ span.r {color: #ef282a}
 	font-size: 14px;
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #fff;
+	cursor: help;
 }
+.role * { pointer-events: none }
 .btnCollapseExpand
 {
 	background-color: #353535;
@@ -627,6 +634,7 @@ span.r {color: #ef282a}
 	font-size: 14px;
 	overflow: hidden;
 }
+.playerCard * { pointer-events: none }
 .playerPanel > .playerCard:first-of-type { margin-top: 4px }
 .playerPanel .playerCard.event:not(.unavailable) { cursor: pointer }
 #cardDrawContainer .playerCard
@@ -694,15 +702,19 @@ span.r {color: #ef282a}
 	color: #000;
 }
 .roleCard.scientist { background-image: linear-gradient(to top, #f6f6f7, #9ccdd1) }
+.scientistBorder { border-color: #f6f6f7 }
 
 .researcher { background-image: linear-gradient(to bottom, #966c4b, #2a2017) }
 .roleCard.researcher { background-image: linear-gradient(to bottom, #966c4b, #2a2017) }
+.researcherBorder { border-color: #574319 }
 
 .quarantineSpecialist { background-image: linear-gradient(to bottom, #398044, #043d0a) }
 .roleCard.quarantineSpecialist { background-image: linear-gradient(to bottom, #398044, #043d0a) }
+.quarantineSpecialistBorder { border-color: #006951 }
 
 .operationsExpert, #btnOperationsFlight { background-image: linear-gradient(to bottom, #aad37a, #407f48) }
 .roleCard.operationsExpert { background-image: linear-gradient(to bottom, #aad37a, #407f48) }
+.operationsExpertBorder { border-color: #8dc73f }
 
 .medic, .autoTreatCircle { background-image: linear-gradient(to bottom, #ffb55c, #c56023) }
 .roleCard.medic { background-image: linear-gradient(to bottom, #ffb55c, #c56023) }
@@ -713,9 +725,11 @@ span.r {color: #ef282a}
 	opacity: 0;
 	z-index: 1;
 }
+.medicBorder { border-color: #f68426 }
 
 .dispatcher, #btnDispatchPawn { background-image: linear-gradient(to bottom, #ec84b5, #964967) }
 .roleCard.dispatcher { background-image: linear-gradient(to bottom, #ec84b5, #964967) }
+.dispatcherBorder { border-color: #ec84b5 }
 
 .contingencyPlanner, #btnPlanContingency { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
 .roleCard.contingencyPlanner { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
@@ -724,6 +738,7 @@ span.r {color: #ef282a}
 	font-family: 'Electrolize', 'Oswald', sans-serif;
 	border: 1px solid #fff;
 }
+.contingencyPlannerBorder { border-color: #67c8c6 }
 
 .roleCard
 {

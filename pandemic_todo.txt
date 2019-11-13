@@ -33,23 +33,11 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-in the discard prompt, give the x/y a red or green background with white text instead of colored text
+instead of checking whether the image exists, use a hasIcon property
 
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher
 
-use a gradient for the entire background
-	use a solid color for backgrounds on which infection cards are revealed
-	OR
-	use overflow: hidden and animate the width of the .infectionCard instead of removing a veil
-
-provide descriptions as to why action buttons are disabled
-
-cube animation time/easing feels a little weird
-
-cure special event timing between the banner and the cure vial seems weird
-
-in action prompts that show the special ability tag, make below text look more closely related to the tag
 when playercards are animated to the hand, the line-height of the card text seems off
 
 highlight the active pawn in some way
@@ -57,9 +45,6 @@ add a glowing arrow over the active player's pawn
 	when the dispatcher is active, add smaller glowing arrows over all other pawns
 
 standardize prompt appearance / button behaviour
-
-clicking on a player's role in the player panel should pinpoint their pawn's location
-clicking on an infection card in the discard pile should pinpoint the city
 
 when government grant is prompted, the research station supply should glow.
 	unless a station needs to be relocated
@@ -142,8 +127,7 @@ animate color on buttons that are waiting to be clicked ('continue' buttons)
 
 split data.currentStep into an object containing 'next' and 'current' keys
 
-make animation effects juicier
-	disease cube size bounce when adding to or taking from the cube supply
+in the discard prompt, give the x/y a red or green background with white text instead of colored text
 
 SMALL FIXES
 -----------
