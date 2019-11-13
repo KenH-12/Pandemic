@@ -1437,23 +1437,16 @@ const actionInterfacePopulator = {
 			playerIsOperationsExpert = player.role === "Operations Expert",
 			currentCity = player.getLocation();
 		
+		let newSubtitle;
+		if (stationRelocationKey)
+			newSubtitle = `Move the research station from ${getCity(stationRelocationKey).name} to ${currentCity.name}?`;
+		else
+			newSubtitle = `Build research station in ${currentCity.name}?`;
+		actionInterfacePopulator.replaceSubtitle(newSubtitle);
+
 		if (playerIsOperationsExpert) // no city card is required
 		{
-			let newSubtitle;
-			if (stationRelocationKey)
-			{
-				newSubtitle = `${player.newSpecialAbilityTag()}
-					<br />Move the research station from ${getCity(stationRelocationKey).name} to ${currentCity.name}?
-					<br />(city card not required)`;
-			}
-			else
-			{
-				newSubtitle = `${player.newSpecialAbilityTag()}
-					<br />Build research station in ${currentCity.name}?
-					<br />(city card not required)`;
-			}
-			actionInterfacePopulator.replaceSubtitle(newSubtitle);
-			bindRoleCardHoverEvents();
+			actionInterfacePopulator.appendSpecialAbilityRule(eventTypes.buildResearchStation);
 			
 			const $btnConfirm = $("<div class='button'>CONFIRM</div>");
 			$btnConfirm.click(function() { buildResearchStation(stationRelocationKey) });
@@ -1461,12 +1454,6 @@ const actionInterfacePopulator = {
 		}
 		else
 		{
-			if (stationRelocationKey)
-			{
-				actionInterfacePopulator.replaceSubtitle(`Discard the matching city card to move the research station 
-					from ${getCity(stationRelocationKey).name} to ${currentCity.name}.`);
-			}
-			
 			actionInterfacePopulator.appendDiscardPrompt(
 			{
 				cardKeys: currentCity.key,
