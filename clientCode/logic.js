@@ -3582,10 +3582,13 @@ function resizeBoard()
 
 function resetPinpointRectangles()
 {
-	$(".pinpointRect").stop()
+	const $pinpointers = $(".pinpointRect");
+
+	$pinpointers.stop()
 		.removeAttr("style")
 		.height(data.boardHeight)
-		.width(data.boardWidth);
+		.width(data.boardWidth)
+		.addClass("hidden");
 }
 
 function resizeTopPanelElements()
