@@ -38,12 +38,8 @@ in the discard prompt, give the x/y a red or green background with white text in
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher
 
-remove cursor: help from disabled action buttons when an action is in progress
-
 in action prompts...
 	include the action icons
-	include the related role rule when applicable
-		consider removing the role tags
 
 use a gradient for the entire background
 	use a solid color for backgrounds on which infection cards are revealed

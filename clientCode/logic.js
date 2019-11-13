@@ -692,7 +692,7 @@ function disableActions()
 	log("disableActions()");
 	const $actionsContainer = $("#actionsContainer");
 
-	$actionsContainer.find(".button").addClass("btnDisabled");
+	$actionsContainer.find(".button").addClass("btnDisabled noHelp");
 
 	disableEventCards();
 	disablePawnEvents();
@@ -706,7 +706,7 @@ function enableAvailableActions()
 	const $actionsContainer = $("#actionsContainer"),
 		player = getActivePlayer();
 	
-	$actionsContainer.find(".button").off("click mouseleave").addClass("btnDisabled");
+	$actionsContainer.find(".button").off("click mouseleave").addClass("btnDisabled").removeClass("noHelp");
 	$actionsContainer.find(".actionCategory").removeClass("hidden");
 	
 	useRoleColorForRelatedActionButtons(player.role);

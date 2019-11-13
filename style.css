@@ -805,7 +805,7 @@ span.r {color: #ef282a}
 	font-family: 'Exo 2', sans-serif;
 	font-size: 18px;
 }
-.actionCategory > .btnDisabled,
+.actionCategory > .btnDisabled:not(.noHelp),
 .infectionCard.eradicated
 { cursor: help }
 .actionCategory .button *
