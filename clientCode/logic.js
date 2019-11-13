@@ -1189,7 +1189,13 @@ const actionInterfacePopulator = {
 		if (eventType.code === eventTypes.chooseFlightType.code)
 			return;
 		
-		let html = `<h2>${ eventType.name.toUpperCase() }</h2><div class='instructions'>`;
+		const imgUrl = `images/actionIcons/${toCamelCase(eventType.name).replace("/", "")}.png`,
+			imgHtml = fileExists(imgUrl) ? `<img class='actionIcon' src='${imgUrl}' />` : "";
+		
+		let html = `<div class='actionTitle'>
+						${imgHtml}<h2>${ eventType.name.toUpperCase() }</h2>
+					</div>
+					<div class='instructions'>`;
 		
 		for (let paragraph of eventType.rules)
 			html += `<p>${paragraph}</p>`;

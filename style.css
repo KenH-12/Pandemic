@@ -864,17 +864,31 @@ span.r {color: #ef282a}
 	background: linear-gradient(to bottom, #054583, #09154f);
 	padding-bottom: 5px;
 }
-#actionInterface > h2
+.actionTitle { padding: 5px; }
+.actionTitle *
 {
+	display: inline-block;
+	vertical-align: middle;
+	
+}
+.actionTitle > h2
+{
+	
+	width: 80%;
 	font-size: 24px;
 	font-family: 'Exo 2', sans-serif;
-	margin-bottom: 5px;
-	padding: 0 5px;
-	border-bottom: 2px solid #fff;
+	padding-left: 2%;
+}
+.actionTitle > .actionIcon
+{
+	width: 20%;
+	
 }
 #actionInterface > .instructions
 {
-	padding: 0 5px;
+	padding: 5px;
+	padding-bottom: 0;
+	border-top: 2px solid #fff;
 	border-bottom: 2px solid #fff;
 }
 #actionInterface > .instructions > p

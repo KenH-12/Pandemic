@@ -38,9 +38,6 @@ in the discard prompt, give the x/y a red or green background with white text in
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher
 
-in action prompts...
-	include the action icons
-
 use a gradient for the entire background
 	use a solid color for backgrounds on which infection cards are revealed
 	OR
@@ -50,22 +47,16 @@ provide descriptions as to why action buttons are disabled
 
 cube animation time/easing feels a little weird
 
-use cursor: grab for draggables
-
 cure special event timing between the banner and the cure vial seems weird
 
 in action prompts that show the special ability tag, make below text look more closely related to the tag
-
-immediately reveal forecasted cards after the facedown animation finishes
-
 when playercards are animated to the hand, the line-height of the card text seems off
 
+highlight the active pawn in some way
 add a glowing arrow over the active player's pawn
 	when the dispatcher is active, add smaller glowing arrows over all other pawns
 
 standardize prompt appearance / button behaviour
-
-highlight the active pawn in some way
 
 clicking on a player's role in the player panel should pinpoint their pawn's location
 clicking on an infection card in the discard pile should pinpoint the city
@@ -262,12 +253,3 @@ use Object.freeze() on objects that should never change?
 consider using a locationID instead of cityKey + gameID
 
 probably don't need getDisplayName
-
-
-
-
-
-
-
-
-
