@@ -50,8 +50,6 @@ provide descriptions as to why action buttons are disabled
 
 cube animation time/easing feels a little weird
 
-use cursor: grab for draggables
-
 cure special event timing between the banner and the cure vial seems weird
 
 in action prompts that show the special ability tag, make below text look more closely related to the tag

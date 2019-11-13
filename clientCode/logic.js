@@ -692,7 +692,7 @@ function disableActions()
 	log("disableActions()");
 	const $actionsContainer = $("#actionsContainer");
 
-	$actionsContainer.find(".button").addClass("btnDisabled noHelp");
+	$actionsContainer.find(".button").addClass("btnDisabled wait");
 
 	disableEventCards();
 	disablePawnEvents();
@@ -706,7 +706,7 @@ function enableAvailableActions()
 	const $actionsContainer = $("#actionsContainer"),
 		player = getActivePlayer();
 	
-	$actionsContainer.find(".button").off("click mouseleave").addClass("btnDisabled").removeClass("noHelp");
+	$actionsContainer.find(".button").off("click mouseleave").addClass("btnDisabled").removeClass("wait");
 	$actionsContainer.find(".actionCategory").removeClass("hidden");
 	
 	useRoleColorForRelatedActionButtons(player.role);
@@ -3925,12 +3925,16 @@ class Player
 	
 	enablePawn()
 	{
-		this.getPawn().draggable("enable");
+		this.getPawn()
+			.css("cursor", "pointer")
+			.draggable("enable");
 	}
 
 	disablePawn()
 	{
-		this.getPawn().draggable({ disabled: true });
+		this.getPawn()
+			.css("cursor", "default")
+			.draggable({ disabled: true });
 	}
 
 	isHoldingCardKey(cardKey)
