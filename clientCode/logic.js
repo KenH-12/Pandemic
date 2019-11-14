@@ -5794,20 +5794,14 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 		cityOffset = city.getOffset(),
 		cWidth = data.cityWidth,
 		adj = data.boardWidth * 0.003, // slight adjustment needed for $rectB coords
-		$rects = $(".pinpointRect"),
+		$rects = $(".pinpointRect").stop(),
 		$rectA = $rects.first(),
 		$rectB = $rects.last(),
 		duration = getDuration("pinpointCity"),
 		easing = data.easings.pinpointCity;
 
-	if (data.pinpointing !== false) // another pinpoint sequence is in progress
-	{
-		$rects.stop();
-		resetPinpointRectangles();
-	}
-	data.pinpointing = true;
-
 	$rects.attr("class", "pinpointRect hidden");
+	resetPinpointRectangles();
 
 	if (pinpointClass)
 		$rects.addClass(pinpointClass);
@@ -5838,7 +5832,7 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 		})
 	]);
 
-	await sleep(500);
+	await sleep(750);
 
 	await animatePromise(
 	{
@@ -5846,8 +5840,6 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 		desiredProperties: { opacity: 0 },
 		duration: 1250
 	});
-
-	data.pinpointing = false;
 }
 
 // binds click events of .playerCard elements

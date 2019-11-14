@@ -31,9 +31,6 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
-pinpointing fails for consecutive infections
-	this could be why clicking .role or .playerCard sometimes does not pinpoint
-
 TO DO
 -----
 if the page is resized during initial infections, consider queueing clusters to reoccur afterward
