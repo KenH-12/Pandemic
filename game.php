@@ -219,7 +219,7 @@
 						<div id='indicatorContainer' class='hidden'>
 							<div id='indicatorVeil' class='hidden'></div>
 							<p id='turnIndicator'></p>
-							<p id='roleIndicator'></p>
+							<p id='roleIndicator' title='Click to locate pawn'></p>
 							<p id='stepIndicator'></p>
 						</div>
 

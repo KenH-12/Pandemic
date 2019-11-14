@@ -4432,7 +4432,7 @@ function appendPlayerPanel(player)
 		numPlayers = Object.keys(data.players).length,
 		$panel = $(`<div class='playerPanel playerPanel${numPlayers} hidden' id='${camelCaseRole}'>
 						<div class='name'>${name}</div>
-						<div class='role ${camelCaseRole}'>
+						<div class='role ${camelCaseRole}' title='Click to locate pawn'>
 							<p>${role}</p>
 						</div>
 						<div class='btnCollapseExpand collapse' title='collapse'>
@@ -7771,16 +7771,19 @@ function newPlayerCardElement(cardKey)
 {
 	let city,
 		cardType,
+		tooltip,
 		cardName;
 	
 	if (isEventCardKey(cardKey))
 	{
 		cardType = "event";
+		tooltip = "Event card";
 		cardName = data.eventCards[cardKey];
 	}
 	else if (isEpidemicKey(cardKey))
 	{
 		cardType = "epidemic";
+		tooltip = "Epidemic card";
 		cardName = "EPIDEMIC";
 	}
 	else
@@ -7788,9 +7791,11 @@ function newPlayerCardElement(cardKey)
 		city = getCity(cardKey);
 		cardType = city.color;
 		cardName = city.name;
+		tooltip = `City card
+Click to locate ${city.name}`;
 	}
 
-	return $(`<div class='playerCard ${cardType}' data-key='${cardKey}'>${cardName}</div>`);
+	return $(`<div class='playerCard ${cardType}' title='${tooltip}' data-key='${cardKey}'>${cardName}</div>`);
 }
 
 function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAutoTreat } = {})
