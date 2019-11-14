@@ -260,13 +260,3 @@ function lockElements($elements)
 			.width(initialWidth);
 	}
 }
-
-function fileExists(fileUrl)
-{
-	var http = new XMLHttpRequest();
-
-    http.open('HEAD', fileUrl, false);
-    http.send();
-
-    return http.status != 404;
-}

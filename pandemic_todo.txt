@@ -33,7 +33,7 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-instead of checking whether the image exists, use a hasIcon property
+DiscardPrompt could use some better styling
 
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher

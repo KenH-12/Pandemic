@@ -111,32 +111,35 @@ const data =
 eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
+		hasIcon: true,
 		code: "dr",
 		rules: ["Move to a city connected by a white line to the one you are in."],
 		instructions: "Select a Destination:",
-		pathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"]
+		actionPathName: "movementAction",
+		propertyNames: ["originKey", "destinationKey"],
 	},
 	directFlight: {
 		name: "Direct Flight",
+		hasIcon: true,
 		code: "df",
 		rules: ["Discard a city card to move to the city named on the card."],
 		instructions: "Select a Card:",
 		dispatchInstructions: `To dispatch a pawn via Direct Flight,
 discard the city card that matches the destination city.
 The card must come from the Dispatcher&#39;s hand.`,
-		pathName: "movementAction",
+		actionPathName: "movementAction",
 		propertyNames: ["originKey", "destinationKey"]
 	},
 	charterFlight: {
 		name: "Charter Flight",
+		hasIcon: true,
 		code: "cf",
 		rules: ["Discard the city card that <i>matches</i> the city you are in to move to <i>any</i> city."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
 		dispatchInstructions: `To dispatch a pawn via Charter Flight,
 discard the city card that matches the pawn&#39;s current location.
 The card must come from the Dispatcher&#39;s hand.`,
-		pathName: "movementAction",
+		actionPathName: "movementAction",
 		propertyNames: ["originKey", "destinationKey"]
 	},
 	chooseFlightType: {
@@ -145,27 +148,30 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	shuttleFlight: {
 		name: "Shuttle Flight",
+		hasIcon: true,
 		code: "sf",
 		rules: ["Move from a city with a research station to any other city that has a research station."],
 		instructions: "Select a Destination:",
-		pathName: "movementAction",
+		actionPathName: "movementAction",
 		propertyNames: ["originKey", "destinationKey"]
 	},
 	buildResearchStation: {
 		name: "Build Research Station",
+		hasIcon: true,
 		code: "rs",
 		rules: [
 			"Discard the city card that matches the city you are in to place a research station there.",
 			"If the research station supply is empty, take a research station from anywhere on the board."
 		],
 		instructions: "",
-		pathName: "buildResearchStation",
+		actionPathName: "buildResearchStation",
 		propertyNames: ["originKey", "destinationKey"],
 		relatedRoleName: "Operations Expert",
 		relatedRoleRule: "The Operations Expert can do this action without discarding."
 	},
 	shareKnowledge: {
 		name: "Share Knowledge",
+		hasIcon: true,
 		code: "sk",
 		rules: [
 			"You can do this action in two ways:",
@@ -173,20 +179,21 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"<i>take</i> the city card that matches the city you are in from another player.",
 			"The other player must also be in the city with you."
 		],
-		pathName: "shareKnowledge",
+		actionPathName: "shareKnowledge",
 		propertyNames: ["cardKey", "giverRoleID", "recipientRoleID"],
 		relatedRoleName: "Researcher",
 		relatedRoleRule: "The Researcher may <i>give</i> a City card without needing to be in the city that matches the card."
 	},
 	treatDisease: {
 		name: "Treat Disease",
+		hasIcon: true,
 		code: "td",
 		rules: [
 			"Remove 1 disease cube from the city you are in, placing it in the cube supply next to the board.",
 			"If the disease has been cured, remove all cubes of that color from the city you are in."
 		],
 		instructions: "Select a Disease Color:",
-		pathName: "treatDisease",
+		actionPathName: "treatDisease",
 		propertyNames: ["cityKey", "diseaseColor", "prevCubeCount", "newCubeCount"],
 		relatedRoleName: "Medic",
 		relatedRoleRule: "The Medic removes all cubes of one color when doing this action."
@@ -198,12 +205,13 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	discoverACure: {
 		name: "Discover A Cure",
+		hasIcon: true,
 		code: "dc",
 		rules: [
 			`At any research station, discard 5 city cards of the same color from your hand to cure the disease of that color.`,
 			`If no cubes of this color are on the board, the disease becomes eradicated.`
 		],
-		pathName: "discoverCure",
+		actionPathName: "discoverCure",
 		propertyNames: ["cardKeys"],
 		relatedRoleName: "Scientist",
 		relatedRoleRule: "The Scientist needs only 4 cards of the same color to do this action."
@@ -225,7 +233,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"When the stored Event card is played, <i>remove it</i> from the game."
 		],
 		instructions: "Select an Event card to store:",
-		pathName: "planContingency"
+		actionPathName: "planContingency"
 	},
 	dispatchPawn: {
 		name: "Dispatch Pawn",
@@ -238,13 +246,13 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"<li>move another player's pawn as if it were his own.</li>"
 		],
 		instructions: "To dispatch a pawn, drag and drop it onto a city.",
-		pathName: "movementAction",
+		actionPathName: "movementAction",
 		propertyNames: ["roleToDispatch", "originKey", "destinationKey", "movementType"]
 	},
 	rendezvous: {
 		name: "Rendezvous",
 		code: "rv",
-		pathName: "movementAction"
+		actionPathName: "movementAction"
 	},
 	operationsFlight: {
 		name: "Operations Flight",
@@ -253,7 +261,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		capableRoleName: "Operations Expert",
 		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
-		pathName: "movementAction",
+		actionPathName: "movementAction",
 		propertyNames: ["originKey", "destinationKey", "cardKey"]
 	},
 	pass: {
@@ -262,43 +270,43 @@ The card must come from the Dispatcher&#39;s hand.`,
 		propertyNames: [],
 		rules: [`Forfeit your remaining actions and proceed to the "Draw 2 cards" step.`],
 		instructions: "Pass on your remaining actions for this turn?",
-		pathName: "passActions",
+		actionPathName: "passActions",
 		propertyNames: []
 	},
 	cardDraw: {
 		name: "Card Draw",
 		code: "cd",
-		pathName: "drawPlayerCards",
+		actionPathName: "drawPlayerCards",
 		propertyNames: ["cardKeys"]
 	},
 	epidemicIncrease: {
 		name: "Epidemic Increase",
 		code: "ec",
-		pathName: "epidemicIncrease",
+		actionPathName: "epidemicIncrease",
 		propertyNames: ["epidemicCount"]
 	},
 	epidemicInfect: {
 		name: "Epidemic Infect",
 		code: "ef",
-		pathName: "epidemicInfect",
+		actionPathName: "epidemicInfect",
 		propertyNames: ["bottomInfCardKey", "prevCubeCount", "preventionCode"]
 	},
 	epidemicIntensify: {
 		name: "Epidemic Intensify",
 		code: "et",
-		pathName: "epidemicIntensify",
+		actionPathName: "epidemicIntensify",
 		propertyNames: ["numDiscardsShuffled"]
 	},
 	discard: {
 		name: "Discard",
 		code: "ds",
-		pathName: "discardPlayerCards",
+		actionPathName: "discardPlayerCards",
 		propertyNames: ["cardKeys"]
 	},
 	infectCity: {
 		name: "Infect City",
 		code: "ic",
-		pathName: "infectCity",
+		actionPathName: "infectCity",
 		propertyNames: ["cityKey", "preventionCode"],
 	},
 	initialInfection: {
@@ -332,7 +340,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "Select a card from INFECTION DISCARDS to remove from the game.",
 		propertyNames: ["removedCardKey"],
-		pathName: "resilientPopulation"
+		actionPathName: "resilientPopulation"
 	},
 	oneQuietNight: {
 		name: "One Quiet Night",
@@ -342,11 +350,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"Play at any time. Not an action.",
 			"Skip the next Infect Cities step (do not flip over any Infection cards)."
 		],
-		pathName: "oneQuietNight"
+		actionPathName: "oneQuietNight"
 	},
-	skipInfectionStep: { // this is here as a simple way to use the pathName in the requestAction function.
+	skipInfectionStep: { // this is here as a simple way to use the actionPathName in the requestAction function.
 		code: "",
-		pathName: "skipInfectionStep"
+		actionPathName: "skipInfectionStep"
 	},
 	forecast: {
 		name: "Forecast",
@@ -358,7 +366,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"Put them back on top."
 		],
 		propertyNames: ["cardKeys"],
-		pathName: "forecastDraw"
+		actionPathName: "forecastDraw"
 	},
 	forecastPlacement: {
 		name: "Forecast Place",
@@ -370,7 +378,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "Drag and drop to rearrange the cards.",
 		propertyNames: ["cardKeys"],
-		pathName: "forecastPlacement"
+		actionPathName: "forecastPlacement"
 	},
 	airlift: {
 		name: "Airlift",
@@ -379,7 +387,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: ["Play at any time. Not an action.", "Move any 1 pawn to any city."],
 		instructions: "To airlift a pawn, drag and drop it onto the destination city.",
 		propertyNames: ["roleToAirlift", "originKey", "destinationKey"],
-		pathName: "airlift"
+		actionPathName: "airlift"
 	},
 	governmentGrant: {
 		name: "Government Grant",
@@ -388,7 +396,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: ["Play at any time. Not an action.", "Add 1 research station to any city."],
 		instructions: "Drag and drop a research station from the research station supply onto the city of your choice.",
 		propertyNames: ["cityKey", "relocationKey"],
-		pathName: "buildResearchStation"
+		actionPathName: "buildResearchStation"
 	},
 	gameEnd: {
 		name: "Game End",
@@ -1190,33 +1198,37 @@ const actionInterfacePopulator = {
 		if (eventType.code === eventTypes.chooseFlightType.code)
 			return;
 		
-		const imgUrl = `images/actionIcons/${toCamelCase(eventType.name).replace("/", "")}.png`,
-			imgHtml = fileExists(imgUrl) ? `<img class='actionIcon' src='${imgUrl}' />` : "";
+		const $actionTitleContainer = $(`<div class='actionTitle'></div>`),
+			$rules = $("<div class='rules'></div>");
+
+		let actionTitleContents = `<h2>${ eventType.name.toUpperCase() }</h2>`;
+		// Simply prepending the icon will not work,
+		// because the opening h2 tag has to be on the same line as the img tag
+		// to avoid unwanted spacing when the document is rendered.
+		if (eventType.hasIcon)
+			actionTitleContents = `<img class='actionIcon' src='images/actionIcons/${toCamelCase(eventType.name).replace("/", "")}.png' alt='${eventType.name} icon'/>`
+				+ actionTitleContents;
 		
-		let html = `<div class='actionTitle'>
-						${imgHtml}<h2>${ eventType.name.toUpperCase() }</h2>
-					</div>
-					<div class='instructions'>`;
+		$actionTitleContainer.append(actionTitleContents);
 		
 		for (let paragraph of eventType.rules)
-			html += `<p>${paragraph}</p>`;
+			$rules.append(`<p>${paragraph}</p>`);
 		
-		html += `</div>`;
-
-		html += `<p class='actionPromptSubtitle'>${eventType.instructions || ""}</p>`;
-
-		actionInterfacePopulator.$actionInterface.append(html);
+		actionInterfacePopulator.$actionInterface
+			.append($actionTitleContainer)
+			.append($rules)
+			.append(`<p class='instructions'>${eventType.instructions || ""}</p>`);
 	},
 	appendSpecialAbilityRule(eventType)
 	{
-		actionInterfacePopulator.$actionInterface.find(".instructions")
+		actionInterfacePopulator.$actionInterface.find(".rules")
 			.append(`<p class='specialAbilityRule'>${getSpecialAbilityRule(eventType)}</p>`);
 		
 		bindRoleCardHoverEvents();
 	},
-	replaceSubtitle(newSubtitle, { lastParagraph } = {})
+	replaceInstructions(newSubtitle, { lastParagraph } = {})
 	{
-		const $subtitle = actionInterfacePopulator.$actionInterface.find("p.actionPromptSubtitle");
+		const $subtitle = actionInterfacePopulator.$actionInterface.find("p.instructions");
 
 		// There are cases where two action instructions are present.
 		if (lastParagraph)
@@ -1229,7 +1241,7 @@ const actionInterfacePopulator = {
 	concealSubtitle()
 	{
 		const $interface = actionInterfacePopulator.$actionInterface,
-			$subtitle = $interface.find("p.actionPromptSubtitle");
+			$subtitle = $interface.find("p.instructions");
 
 		$subtitle.css("color", $interface.css("background-color"));
 
@@ -1237,7 +1249,7 @@ const actionInterfacePopulator = {
 	},
 	showSubtitle()
 	{
-		actionInterfacePopulator.$actionInterface.find("p.actionPromptSubtitle").css("color", "#fff");
+		actionInterfacePopulator.$actionInterface.find("p.instructions").css("color", "#fff");
 
 		return actionInterfacePopulator;
 	},
@@ -1381,7 +1393,7 @@ const actionInterfacePopulator = {
 			destination = getCity(destinationKey);
 		
 		actionInterfacePopulator
-			.replaceSubtitle(`Destination: ${destination.name}`)
+			.replaceInstructions(`Destination: ${destination.name}`)
 			.appendDiscardPrompt(
 			{
 				cardKeys: currentCity.key,
@@ -1406,7 +1418,7 @@ const actionInterfacePopulator = {
 			// Charter Flight is usually the better option,
 			// therefore Direct Flight is always shown second, hence { lastParagraph: true }.
 			actionInterfacePopulator
-				.replaceSubtitle(`Destination: ${destination.name}`, { lastParagraph: true })
+				.replaceInstructions(`Destination: ${destination.name}`, { lastParagraph: true })
 				.appendDiscardPrompt(
 				{
 					cardKeys: destinationKey,
@@ -1449,7 +1461,7 @@ const actionInterfacePopulator = {
 			newSubtitle = `Move the research station from ${getCity(stationRelocationKey).name} to ${currentCity.name}?`;
 		else
 			newSubtitle = `Build research station in ${currentCity.name}?`;
-		actionInterfacePopulator.replaceSubtitle(newSubtitle);
+		actionInterfacePopulator.replaceInstructions(newSubtitle);
 
 		if (playerIsOperationsExpert) // no city card is required
 		{
@@ -1524,7 +1536,7 @@ const actionInterfacePopulator = {
 				participant = validParticipants[0];
 			else
 			{
-				actionInterfacePopulator.replaceSubtitle("Share Knowledge with which player?");
+				actionInterfacePopulator.replaceInstructions("Share Knowledge with which player?");
 				
 				const $shareKnowledgePlayerOptions = $("<div class='playerOptions'></div>");
 				
@@ -1559,7 +1571,7 @@ const actionInterfacePopulator = {
 			if (participant.role === researcherRole)
 				showResearcherSpecialAbilityRule = true;
 			
-			actionInterfacePopulator.replaceSubtitle(`Share Knowledge with:<br/>${participant.newRoleTag()}`);
+			actionInterfacePopulator.replaceInstructions(`Share Knowledge with:<br/>${participant.newRoleTag()}`);
 			
 			if (player.canGiveKnowledge())
 			{
@@ -1655,7 +1667,7 @@ const actionInterfacePopulator = {
 			useableCardKeys = player.cardKeys.filter(key => isCityKey(key)),
 			destination = getCity(destinationKey);
 		
-		actionInterfacePopulator.replaceSubtitle(`Destination: ${destination.name}
+		actionInterfacePopulator.replaceInstructions(`Destination: ${destination.name}
 			<br />Select a card to discard:`);
 
 		actionInterfacePopulator.appendOptionButtons("playerCard", useableCardKeys, function($clicked)
@@ -1715,7 +1727,7 @@ const actionInterfacePopulator = {
 				});
 			}
 
-			actionInterfacePopulator.replaceSubtitle(newSubtitle);
+			actionInterfacePopulator.replaceInstructions(newSubtitle);
 			bindRoleCardHoverEvents();
 		}
 
@@ -1744,7 +1756,7 @@ const actionInterfacePopulator = {
 		}
 		else
 		{
-			actionInterfacePopulator.replaceSubtitle(`Airlift ${playerToAirlift.newRoleTag()}<br />
+			actionInterfacePopulator.replaceInstructions(`Airlift ${playerToAirlift.newRoleTag()}<br />
 				from ${getCity(playerToAirlift.cityKey).name} to ${destination.name}?`);
 			
 			actionInterfacePopulator.appendDiscardPrompt(
@@ -1785,7 +1797,7 @@ const actionInterfacePopulator = {
 			else
 				newSubtitle = `Build Research Station in<br />${targetCity.name}?`;
 			
-			actionInterfacePopulator.replaceSubtitle(newSubtitle)
+			actionInterfacePopulator.replaceInstructions(newSubtitle)
 				.appendDiscardPrompt(
 				{
 					cardKeys: eventTypes.governmentGrant.cardKey,
@@ -1813,7 +1825,7 @@ const actionInterfacePopulator = {
 		{
 			const newSubtitle = `Remove ${getCity(cardKeyToRemove).name}'s infection card from the game?`;
 
-			actionInterfacePopulator.replaceSubtitle(newSubtitle)
+			actionInterfacePopulator.replaceInstructions(newSubtitle)
 				.appendDiscardPrompt(
 				{
 					cardKeys: eventType.cardKey,
@@ -1831,9 +1843,9 @@ const actionInterfacePopulator = {
 		// during the "infect cities" step is to disallow it. There is no point in allowing it because the card would not
 		// take effect until the next turn -- the player can simply wait until the "infect cities" step is over.
 		if (currentStepIs("infect cities") && getEventsOfTurn(eventTypes.infectCity).length)
-			actionInterfacePopulator.replaceSubtitle(`<span class='r'>This card skips the <i>next</i> Infect Cities step. Please wait until the the current Infect Cities step has completed.</span>`);
+			actionInterfacePopulator.replaceInstructions(`<span class='r'>This card skips the <i>next</i> Infect Cities step. Please wait until the the current Infect Cities step has completed.</span>`);
 		else if (isOneQuietNight())
-			actionInterfacePopulator.replaceSubtitle(`<span class='r'>One Quiet Night has already been played this turn! It cannot be played twice in the same turn.</span>`)
+			actionInterfacePopulator.replaceInstructions(`<span class='r'>One Quiet Night has already been played this turn! It cannot be played twice in the same turn.</span>`)
 		else
 		{
 			actionInterfacePopulator.appendDiscardPrompt(
@@ -1964,7 +1976,7 @@ function animateForecastDraw(cardKeys)
 		const { $container, $cardContainer } = newForecastContainer();
 		
 		actionInterfacePopulator
-			.replaceSubtitle("Click and drag to rearrange the cards. When done, the cards will be put back on top of the deck in order from bottom to top.")
+			.replaceInstructions("Click and drag to rearrange the cards. When done, the cards will be put back on top of the deck in order from bottom to top.")
 			.concealSubtitle()
 			.$actionInterface.append($container);
 
@@ -2080,7 +2092,7 @@ async function animateForecastPlacement($cardContainer)
 							alt='Infection Card' />`));
 	
 	const $cardbacks = $cardContainer.find(".forecastCardback").width(getDimension("diseaseIcon")),
-		$elementsToFadeOut = $(".actionPromptSubtitle")
+		$elementsToFadeOut = $(".instructions")
 			.add($cardContainer.siblings("p")) // Top/Bottom labels
 			.add($cards.children(".infectionCardContents"));
 	
@@ -2189,7 +2201,7 @@ function enableResilientPopulationSelection()
 			});
 	}
 	else
-		actionInterfacePopulator.replaceSubtitle("<span class='r'>The Infection Discard Pile is empty!<br />To play Resilient Population, there must be at least 1 card in the Infection Discard Pile.</span>");
+		actionInterfacePopulator.replaceInstructions("<span class='r'>The Infection Discard Pile is empty!<br />To play Resilient Population, there must be at least 1 card in the Infection Discard Pile.</span>");
 }
 
 function disableResilientPopulationSelection()
@@ -2338,7 +2350,7 @@ function resetGrantStation({ $researchStation, cancelled } = {})
 
 function promptGovernmentGrantStationRelocation()
 {
-	actionInterfacePopulator.replaceSubtitle(`<span class='r'>Research Station Supply is empty!</span>
+	actionInterfacePopulator.replaceInstructions(`<span class='r'>Research Station Supply is empty!</span>
 		<br />You may relocate any Research Station currently on the board.
 		<br />Drag and drop an existing Research Station onto the city of your choice.`);
 	
@@ -2709,7 +2721,7 @@ function requestAction(eventType, dataToPost)
 	log(`requestAction(${eventType.code})`);
 	return new Promise((resolve, reject) =>
 	{
-		$.post(`serverCode/actionPages/${eventType.pathName}.php`,
+		$.post(`serverCode/actionPages/${eventType.actionPathName}.php`,
 		{
 			...{
 				actionCode: eventType.code,
@@ -2875,7 +2887,7 @@ function promptResearchStationRelocation()
 {
 	const $actionInterface = actionInterfacePopulator.$actionInterface;
 	// Prompt the player to choose a city from which to relocate a research station.
-	actionInterfacePopulator.replaceSubtitle(`<span class='r'>Research Station Supply is empty!</span>
+	actionInterfacePopulator.replaceInstructions(`<span class='r'>Research Station Supply is empty!</span>
 	<br />Select a City from which to relocate a Research Station.`);
 
 	let city;

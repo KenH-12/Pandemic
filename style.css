@@ -900,27 +900,27 @@ span.r {color: #ef282a}
 	width: 20%;
 	
 }
-#actionInterface > .instructions
+#actionInterface > .rules
 {
 	padding: 5px;
 	padding-bottom: 0;
 	border-top: 2px solid #fff;
 	border-bottom: 2px solid #fff;
 }
-#actionInterface > .instructions > p
+#actionInterface > .rules > p
 {
 	text-align: left;
 	padding: 0 1%;
 	margin-bottom: 8px;
 }
-.instructions > p.specialAbilityRule
+.rules > p.specialAbilityRule
 {
 	border-top: 1px dashed #fff;
 	padding-top: 7px !important;
 }
-#actionInterface > .instructions li { margin-left: 3% }
+#actionInterface > .rules li { margin-left: 3% }
 #actionInterface > .playerCard { cursor: pointer }
-.actionPromptSubtitle 
+.instructions 
 {
 	padding: 3%;
 	padding-bottom: none;
