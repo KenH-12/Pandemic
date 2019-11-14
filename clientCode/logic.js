@@ -9134,6 +9134,7 @@ function placePawnsInAtlanta()
 			desiredProperties: { opacity: 1 },
 			duration: getDuration(400)
 		});
+		pinpointCity(ATLANTA_KEY);
 	
 		for (let rID in data.players)
 		{
@@ -9156,7 +9157,6 @@ function placePawnsInAtlanta()
 			initialOffset.left += panelWidth / 2;
 			initialOffset.left -= data.pawnWidth / 2;
 	
-			pinpointCity(ATLANTA_KEY);
 			await animatePromise(
 			{
 				$elements: $pawn,
