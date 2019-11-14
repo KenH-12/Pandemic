@@ -31,14 +31,18 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
+pinpointing fails for consecutive infections
+	this could be why clicking .role or .playerCard sometimes does not pinpoint
+
 TO DO
 -----
+if the page is resized during initial infections, consider queueing clusters to reoccur afterward
+	(cubes can appear misplaced until another resize event triggers clustering)
+
 DiscardPrompt could use some better styling
 
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher
-
-when playercards are animated to the hand, the line-height of the card text seems off
 
 highlight the active pawn in some way
 add a glowing arrow over the active player's pawn

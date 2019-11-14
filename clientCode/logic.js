@@ -3500,8 +3500,7 @@ function getDrawnPlayerCardTargetProperties({ isContingencyCard } = {})
 		width: $guide.width(),
 		height: exampleCardHeight || guideHeight,
 		top: top,
-		left: guideOffset.left,
-		lineHeight: $guide.css("font-size")
+		left: guideOffset.left
 	};
 
 	log("targetProperties: ", targetProperties);
