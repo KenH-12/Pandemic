@@ -33,6 +33,10 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+event history
+
+make sure infection card 'click to locate' works for dealt cards and forecasted cards
+
 in the initialInfectionsContainer, replace the white squares with white cubes
 
 if the page is resized during initial infections, consider queueing clusters to reoccur afterward

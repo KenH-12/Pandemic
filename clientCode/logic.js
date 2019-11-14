@@ -1289,7 +1289,7 @@ const actionInterfacePopulator = {
 		}
 
 		for (let key of cityKeys)
-			$interface.append(newElementFn(key));
+			$interface.append(newElementFn(key, { noTooltip: true }));
 		
 		if (typeof onClick === "function")
 			$interface.children(`.${buttonClass}`).click(function() { onClick($(this)) });
@@ -1313,6 +1313,9 @@ const actionInterfacePopulator = {
 
 		for (let key of ensureIsArray(cardKeys))
 			$discardPrompt.append(newPlayerCardElement(key));
+		
+		$discardPrompt.children(".playerCard")
+			.click(function() { pinpointCityFromCard($(this)) });
 
 		$discardPrompt.append(`<div class='button ${buttonClass}'>${buttonText || "DISCARD"}</div>`);
 
@@ -1580,7 +1583,7 @@ const actionInterfacePopulator = {
 										</div>`);
 				
 				for (let cardKey of player.getShareableCardKeys())
-					$giveableContainer.append(newPlayerCardElement(cardKey));
+					$giveableContainer.append(newPlayerCardElement(cardKey, { noTooltip: true }));
 
 				$actionInterface.append($giveableContainer);
 			}
@@ -1595,7 +1598,7 @@ const actionInterfacePopulator = {
 										</div>`);
 				
 				for (let cardKey of participant.getShareableCardKeys())
-					$takeableContainer.append(newPlayerCardElement(cardKey));
+					$takeableContainer.append(newPlayerCardElement(cardKey, { noTooltip: true }));
 
 				$actionInterface.append($takeableContainer);
 			}
@@ -2591,7 +2594,7 @@ class DiscardPrompt
 		if (cardKeys.length === numDiscardsRequired)
 		{
 			for (let key of cardKeys)
-				this.$discardsContainer.append(newPlayerCardElement(key));
+				this.$discardsContainer.append(newPlayerCardElement(key, { noTooltip: true }));
 
 			this.keeperCount = 0;
 			this.discardSelectionCount = cardKeys.length;
@@ -2603,7 +2606,7 @@ class DiscardPrompt
 		else
 		{
 			for (let key of cardKeys)
-				this.$keepersContainer.append(newPlayerCardElement(key));
+				this.$keepersContainer.append(newPlayerCardElement(key, { noTooltip: true }));
 
 			this.discardSelectionCount = 0;
 			this.keeperCount = cardKeys.length;
@@ -5784,6 +5787,12 @@ function executePendingClusters(details)
 	data.pendingClusters.clear();
 }
 
+function pinpointCityFromCard($card)
+{
+	const city = getCity($card.data("key"));
+	pinpointCity(city.key, { pinpointClass: `${city.color}Border` });
+}
+
 // shows a city's location by animating 2 rectangles such that their points overlap on the specified city's position
 async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 {
@@ -5847,10 +5856,9 @@ function bindPlayerCardEvents()
 {
 	$(".playerCard:not(.event, .epidemic)")
 		.off("click")
-		.click(function(event)
+		.click(function()
 		{
-			event.stopPropagation();
-			pinpointCity($(this).data("key"), { pinpointClass: `${getColorClass($(this))}Border` });
+			pinpointCityFromCard($(this));
 		});
 }
 
@@ -7428,11 +7436,12 @@ async function finishInfectionStep()
 function bindInfectionDiscardClicks()
 {
 	$("#infectionDiscard").find(".infectionCard")
+		.attr("title", `Infection card
+Click to locate city`)
 		.off("click")
 		.click(function()
 		{
-			const city = getCity($(this).data("key"));
-			pinpointCity(city.key, { pinpointClass: `${city.color}Border` });
+			pinpointCityFromCard($(this));
 		});
 }
 
@@ -7767,7 +7776,7 @@ function newCityButton(cityKey)
 			</div>`);
 }
 
-function newPlayerCardElement(cardKey)
+function newPlayerCardElement(cardKey, { noTooltip } = {})
 {
 	let city,
 		cardType,
@@ -7795,7 +7804,7 @@ function newPlayerCardElement(cardKey)
 Click to locate ${city.name}`;
 	}
 
-	return $(`<div class='playerCard ${cardType}' title='${tooltip}' data-key='${cardKey}'>${cardName}</div>`);
+	return $(`<div class='playerCard ${cardType}' title='${ noTooltip ? "" : tooltip }' data-key='${cardKey}'>${cardName}</div>`);
 }
 
 function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAutoTreat } = {})
