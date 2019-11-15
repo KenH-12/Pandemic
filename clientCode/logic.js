@@ -13,7 +13,7 @@ const data =
 		autoTreatCircleWidth:	["boardWidth", 0.036],
 		cubeWidth:				["boardWidth", 0.016],
 		infGroupAdj:			["boardHeight", 0.025],
-		groupInfRateCubeWidth:	["panelWidth", 0.1],
+		groupInfRateCubeWidth:	["panelWidth", 0.117],
 		infCardDiv:				["boardHeight",	0.047],
 		diseaseIcon:			["panelWidth",	0.1048],
 		discardDiseaseIcon:		["boardWidth",	0.023],
@@ -6133,12 +6133,15 @@ function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestin
 
 function newDiseaseCubeElement(color, cityKey)
 {
-	const $diseaseCube =  $(`<div class='diseaseCube ${color}'>
+	const $diseaseCube =  $(`<div class='diseaseCube'>
 								<div class='cubeBackground'></div>
 								<div class='cubeTop'></div>
 								<div class='cubeLeft'></div>
 								<div class='cubeRight'></div>
 							</div>`);
+	
+	if (color)
+		$diseaseCube.addClass(color);
 	
 	if (cityKey)
 		$diseaseCube.addClass(cityKey);
@@ -7623,6 +7626,9 @@ function showNextGroupInfRate()
 	return new Promise((resolve) => {
 		const $groupInfRate = $(".groupInfRate.hidden").first();
 		
+		for (let i = 0; i < $groupInfRate.attr("data-numCubes"); i++)
+			$groupInfRate.append(newDiseaseCubeElement());
+
 		$groupInfRate.removeClass("hidden");
 		makeElementsSquare($groupInfRate.children());
 

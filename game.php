@@ -187,22 +187,13 @@
 							<div id='initialInfectionsContainer' class='hidden'>
 
 								<div class='infGroup'>
-									<div class='groupInfRate hidden'>
-										<div></div>
-										<div></div>
-										<div></div>
-									</div>
+									<div class='groupInfRate hidden' data-numCubes='3'></div>
 								</div>
 								<div class='infGroup'>
-									<div class='groupInfRate hidden'>
-										<div></div>
-										<div></div>
-									</div>
+									<div class='groupInfRate hidden' data-numCubes='2'></div>
 								</div>
 								<div class='infGroup'>
-									<div class='groupInfRate hidden'>
-										<div></div>
-									</div>
+									<div class='groupInfRate hidden' data-numCubes='1'></div>
 								</div>
 							</div>
 						</div>

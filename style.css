@@ -153,6 +153,16 @@ body,
 { background: #212121 }
 .bBorder { border-color: #212121 }
 
+.groupInfRate .diseaseCube
+{
+	vertical-align: middle;
+	display: inline-block;
+	width: 9%;
+	margin-right: 4%;
+}
+.groupInfRate .diseaseCube * { background-color: #fff }
+.groupInfRate .diseaseCube .cubeBackground { background-color: #000 }
+
 .hidden{display:none;}
 .y{background-color:#fded3c;color:black;}
 .u{background-color:#405fb1;}
@@ -458,15 +468,6 @@ span.r {color: #ef282a}
 	width: 100%;
 	margin: 8px 0;
 	padding: 0;
-}
-.groupInfRate > div
-{
-	vertical-align: middle;
-	display: inline-block;
-	width: 7%;
-	margin-right: 3%;
-	background-color: #eee;
-	border-radius: 5px;
 }
 .infectionCard
 {
