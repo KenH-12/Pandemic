@@ -31,11 +31,11 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
+reloading changes the order of the infection discard pile
+
 TO DO
 -----
 event history
-
-make sure infection card 'click to locate' works for dealt cards and forecasted cards
 
 if the page is resized during initial infections, consider queueing clusters to reoccur afterward
 	(cubes can appear misplaced until another resize event triggers clustering)
