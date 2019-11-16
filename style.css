@@ -101,27 +101,21 @@ body,
 	z-index: 4;
 	width: 1.6%;
 }
-.activePawnArrow
+.pawnArrow
 {
 	width: 3%;
 	background-color: transparent;
 	z-index: 5;
-	
+	pointer-events: none;
 }
-.activePawnArrow *
+.pawnArrow.dispatch { width: 2% }
+.pawnArrow > div
 {
 	width: 100%;
 	height: 100%;
-	margin-bottom: -100%;
-	pointer-events: none;
+	clip-path: polygon(50% 30%, 100% 10%, 50% 100%, 0 10%);
 }
-.activePawnArrow > .arrowBackground
-{
-	background: #fff;
-	clip-path: polygon(50% 25%, 100% 0, 50% 85%, 0 0);
-}
-.activePawnArrow > .arrowForeground { clip-path: polygon(50% 28%, 95% 4%, 50% 79%, 5% 4%);
-background: #000;}
+.pawnArrow.dispatch > div { clip-path: polygon(50% 30%, 100% 10%, 50% 100%, 0 10%) }
 .researchStation
 {
 	z-index: 3;
@@ -193,6 +187,7 @@ background: #000;}
 .black{background-color:#000}
 .event {background-color: gray;}
 .event.unavailable:active { background-color: #8a181a }
+.pawnArrow.airlift > div { background: gray !important }
 .epidemic:not(.substep), .epidemicFull {background-color: #00a94f;}
 .brightGreen { color: #00a94f }
 
@@ -718,28 +713,35 @@ span.r {color: #ef282a}
 {
 	margin: 5px;
 }
-.scientist
+.scientist:not(.pawnArrow),
+.pawnArrow.scientist > div
 {
 	background-image: linear-gradient(to bottom, #f6f6f7, #9ccdd1);
 	color: #000;
 }
-.roleCard.scientist { background-image: linear-gradient(to top, #f6f6f7, #9ccdd1) }
+.roleCard.scientist{ background-image: linear-gradient(to top, #f6f6f7, #9ccdd1) }
 .scientistBorder { border-color: #f6f6f7 }
 
-.researcher { background-image: linear-gradient(to bottom, #966c4b, #2a2017) }
-.roleCard.researcher { background-image: linear-gradient(to bottom, #966c4b, #2a2017) }
+.researcher:not(.pawnArrow),
+.pawnArrow.researcher > div
+{ background-image: linear-gradient(to bottom, #966c4b, #2a2017) }
 .researcherBorder { border-color: #574319 }
 
-.quarantineSpecialist { background-image: linear-gradient(to bottom, #398044, #043d0a) }
-.roleCard.quarantineSpecialist { background-image: linear-gradient(to bottom, #398044, #043d0a) }
+.quarantineSpecialist:not(.pawnArrow),
+.pawnArrow.quarantineSpecialist > div
+{ background-image: linear-gradient(to bottom, #398044, #043d0a) }
 .quarantineSpecialistBorder { border-color: #006951 }
 
-.operationsExpert, #btnOperationsFlight { background-image: linear-gradient(to bottom, #aad37a, #407f48) }
-.roleCard.operationsExpert { background-image: linear-gradient(to bottom, #aad37a, #407f48) }
+.operationsExpert:not(.pawnArrow)
+.pawnArrow.operationsExpert > div,
+#btnOperationsFlight
+{ background-image: linear-gradient(to bottom, #aad37a, #407f48) }
 .operationsExpertBorder { border-color: #8dc73f }
 
-.medic, .autoTreatCircle { background-image: linear-gradient(to bottom, #ffb55c, #c56023) }
-.roleCard.medic { background-image: linear-gradient(to bottom, #ffb55c, #c56023) }
+.medic:not(.pawnArrow),
+.pawnArrow.medic > div,
+.autoTreatCircle
+{ background-image: linear-gradient(to bottom, #ffb55c, #c56023) }
 .autoTreatCircle
 {
 	position: absolute;
@@ -749,12 +751,17 @@ span.r {color: #ef282a}
 }
 .medicBorder { border-color: #f68426 }
 
-.dispatcher, #btnDispatchPawn { background-image: linear-gradient(to bottom, #ec84b5, #964967) }
-.roleCard.dispatcher { background-image: linear-gradient(to bottom, #ec84b5, #964967) }
+.dispatcher:not(.pawnArrow),
+.pawnArrow.dispatcher > div,
+.pawnArrow.dispatch > div,
+#btnDispatchPawn
+{ background-image: linear-gradient(to bottom, #ec84b5, #964967) }
 .dispatcherBorder { border-color: #ec84b5 }
 
-.contingencyPlanner, #btnPlanContingency { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
-.roleCard.contingencyPlanner { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
+.contingencyPlanner:not(.pawnArrow),
+.pawnArrow.contingencyPlanner > div,
+#btnPlanContingency
+{ background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
 .role.contingencyPlanner > .playerCard
 {
 	font-family: 'Electrolize', 'Oswald', sans-serif;

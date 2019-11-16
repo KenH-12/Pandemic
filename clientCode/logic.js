@@ -3752,7 +3752,7 @@ function positionPawnArrows()
 		player = data.players[rID];
 
 		if (!player.$pawnArrow.hasClass("hidden"))
-			player.positionPawnArrow();
+			player.animatePawnArrow();
 	}
 }
 
@@ -3964,53 +3964,60 @@ class Player
 			.css("cursor", "pointer")
 			.draggable("enable");
 		
-		if (getActivePlayer().role === this.role)
-			this.showPawnArrow();
+		this.animatePawnArrow();
 	}
 
-	async showPawnArrow()
+	async animatePawnArrow()
 	{
-		const { $pawnArrow } = this;
+		const $arrow = this.$pawnArrow,
+			initialOffset = this.getPawnOffset();
+	
+		let arrowClass = "",
+			dropShadowBlurRadiusFactor = .003,
+			initialOffsetTopAdj = data.pawnHeight * 2;
+		if (eventTypeIsBeingPrompted(eventTypes.airlift))
+			arrowClass = "airlift";
+		else if (getActivePlayer().role !== this.role)
+		{
+			arrowClass = "dispatch";
+			dropShadowBlurRadiusFactor = 0.002;
+			initialOffsetTopAdj -= data.pawnHeight / 3;
+		}
 
-		$pawnArrow.removeClass("hidden");
-		this.positionPawnArrow();
+		$arrow.stop()
+			.removeClass("airlift dispatch hidden")
+			.addClass(arrowClass)
+			.css("filter", `drop-shadow(0px 0px ${data.boardWidth*dropShadowBlurRadiusFactor}px #fff)`);
+		
+		makeElementsSquare($arrow);	
 
-		const initialProperties = $pawnArrow.offset(),
-			desiredProperties = {
-				left: initialProperties.left,
-				top: initialProperties.top + $pawnArrow.height() / 5
+		initialOffset.top -= initialOffsetTopAdj;
+		initialOffset.left -= $arrow.width() / 2;
+		$arrow.offset(initialOffset);
+
+		const desiredProperties = {
+				left: initialOffset.left,
+				top: initialOffset.top - $arrow.height() / 3
 			},
 			duration = 400,
 			easing = "easeInOutSine";
 
-		while (!$pawnArrow.hasClass("hidden"))
+		while (!$arrow.hasClass("hidden"))
 		{
 			await animatePromise({
-				$elements: $pawnArrow,
+				$elements: $arrow,
 				desiredProperties,
 				duration,
 				easing
 			});
 
 			await animatePromise({
-				$elements: $pawnArrow,
-				desiredProperties: initialProperties,
+				$elements: $arrow,
+				desiredProperties: initialOffset,
 				duration,
 				easing
 			});
 		}
-	}
-
-	positionPawnArrow()
-	{
-		const $arrow = this.$pawnArrow,
-			offset = this.getPawnOffset();
-		
-		offset.top -= data.pawnHeight * 2;
-		offset.left -= $arrow.width() / 2;
-
-		this.$pawnArrow.offset(offset);
-		makeElementsSquare(this.$pawnArrow);
 	}
 
 	disablePawn()
@@ -4018,6 +4025,8 @@ class Player
 		this.$pawn
 			.css("cursor", "default")
 			.draggable({ disabled: true });
+		
+		this.$pawnArrow.stop().addClass("hidden");
 	}
 
 	isHoldingCardKey(cardKey)
@@ -4472,10 +4481,7 @@ function appendPawnToBoard(player)
 							id='${camelCaseRole}Pawn'
 							data-role='${role}' />`);
 	
-	player.$pawnArrow = $(`<div class='activePawnArrow hidden'>
-							<div class='arrowBackground'></div>
-							<div class='arrowForeground'></div>
-						</div>`);
+	player.$pawnArrow = $(`<div class='pawnArrow ${camelCaseRole} hidden'><div></div></div>`);
 
 	$("#boardContainer")
 		.append(player.$pawn)
