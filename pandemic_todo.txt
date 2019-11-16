@@ -35,6 +35,9 @@ TO DO
 -----
 event history
 
+event card incons
+special action icons?
+
 if the page is resized during initial infections, consider queueing clusters to reoccur afterward
 	(cubes can appear misplaced until another resize event triggers clustering)
 

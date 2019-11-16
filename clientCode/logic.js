@@ -2441,7 +2441,7 @@ function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyTo
 	executePendingClusters(
 	{
 		animatePawns: pawns,
-		$pawnToExclude: playerToExcludePawn ? playerToExcludePawn.getPawn() : false,
+		$pawnToExclude: playerToExcludePawn ? playerToExcludePawn.$pawn : false,
 		animateResearchStation: researchStations,
 		stationKeyToExclude
 	});
@@ -2854,9 +2854,9 @@ function animateShareKnowledge(giver, receiver, cardKey)
 {
 	return new Promise(resolve =>
 	{
-		const $card = giver.getPanel().find(`.playerCard[data-key='${cardKey}']`),
+		const $card = giver.$panel.find(`.playerCard[data-key='${cardKey}']`),
 			initialProperties = $card.offset(),
-			$insertAfterMe = receiver.getPanel().children(".role, .playerCard").last(),
+			$insertAfterMe = receiver.$panel.children(".role, .playerCard").last(),
 			desiredOffset = $insertAfterMe.offset();
 
 		initialProperties.width = $card.width();
@@ -3486,7 +3486,7 @@ async function animateCardsToHand($cards)
 
 function getDrawnPlayerCardTargetProperties({ isContingencyCard } = {})
 {
-	const $rolePanel = getActivePlayer().getPanel(),
+	const $rolePanel = getActivePlayer().$panel,
 		$guide = $rolePanel.children().last(),
 		guideHeight = $guide.height(),
 		guideOffset = isContingencyCard ? $rolePanel.children(".role").offset() : $guide.offset(),
@@ -3516,7 +3516,7 @@ function animateCardToHand($card, targetProperties, { isContingencyCard } = {})
 		if ($card.hasClass("epidemic"))
 			return resolve();
 
-		const $rolePanel = getActivePlayer().getPanel();
+		const $rolePanel = getActivePlayer().$panel;
 		
 		let $insertAfterElement;
 		if (isContingencyCard) // Contingency cards are placed within the .role div
@@ -3836,7 +3836,7 @@ class Player
 
 	async showRoleCard($hoveredElement)
 	{
-		const $panel = this.getPanel(),
+		const $panel = this.$panel,
 			hoveredElementOffset = $hoveredElement.length ? $hoveredElement.offset() : false,
 			roleCardOffset = hoveredElementOffset || $panel.offset(),
 			CARD_MARGIN = 5,
@@ -3905,7 +3905,7 @@ class Player
 	{
 		const origin = this.getLocation();
 		
-		this.getPawn().removeClass(this.cityKey).addClass(destination.key);
+		this.$pawn.removeClass(this.cityKey).addClass(destination.key);
 		destination.setPawnIndices();
 		
 		this.cityKey = destination.key;
@@ -3921,33 +3921,21 @@ class Player
 	{
 		pinpointCity(this.cityKey, { pinpointClass: `${this.camelCaseRole}Border` });
 	}
-	
-	getPanel()
-	{
-		return $(`#${this.camelCaseRole}`);
-	}
 
 	expandPanelIfCollapsed()
 	{
 		return new Promise(async resolve =>
 		{
-			const panel = this.getPanel();
-
-			if (panel.hasClass("collapsed"))
-				await togglePlayerPanel(panel.find(".btnCollapseExpand"));
+			if (this.$panel.hasClass("collapsed"))
+				await togglePlayerPanel(this.$panel.find(".btnCollapseExpand"));
 		
 			resolve();
 		});
 	}
 
-	getPawn()
-	{
-		return $(`#${this.camelCaseRole}Pawn`);
-	}
-
 	getPawnOffset()
 	{
-		const offset = this.getPawn().offset();
+		const offset = this.$pawn.offset();
 
 		offset.left += data.pawnWidth / 2;
 		offset.top += data.pawnHeight;
@@ -3957,14 +3945,14 @@ class Player
 	
 	enablePawn()
 	{
-		this.getPawn()
+		this.$pawn
 			.css("cursor", "pointer")
 			.draggable("enable");
 	}
 
 	disablePawn()
 	{
-		this.getPawn()
+		this.$pawn
 			.css("cursor", "default")
 			.draggable({ disabled: true });
 	}
@@ -3981,14 +3969,14 @@ class Player
 
 	appendCardToHand($card)
 	{
-		$card.insertBefore(this.getPanel().children(".btnCollapseExpand"));
+		$card.insertBefore(this.$panel.children(".btnCollapseExpand"));
 	}
 
 	// Given a cardKey from the player's hand,
 	// returns a jQuery object containing the corresponding .playerCard element
 	getCardElementFromHand(cardKey)
 	{
-		return this.getPanel().find(`.playerCard[data-key='${cardKey}']`);
+		return this.$panel.find(`.playerCard[data-key='${cardKey}']`);
 	}
 
 	// Appends either a single cardKey or an array or cardKeys to this Player's cardKeys array.
@@ -4017,12 +4005,10 @@ class Player
 		log(`removeCardsFromHand()`);
 		this.logCardKeys();
 		
-		const panel = this.getPanel();
-		
 		for (let key of ensureIsArray(cardKeys))
 		{
 			log("removing card: ", key);
-			panel.find(`.playerCard[data-key='${key}']`).remove();
+			this.$panel.find(`.playerCard[data-key='${key}']`).remove();
 			this.cardKeys.splice(this.cardKeys.indexOf(key), 1);
 		}
 
@@ -4033,7 +4019,7 @@ class Player
 
 	updateCollapsedPanelCardCount()
 	{
-		this.getPanel().find(".numCardsInHand")
+		this.$panel.find(".numCardsInHand")
 			.html(`— ${this.cardKeys.length} card${this.cardKeys.length === 1 ? "" : "s"} in hand —`);
 	}
 
@@ -4415,13 +4401,15 @@ function getTurnOrder()
 
 function appendPawnToBoard(player)
 {
-	const { camelCaseRole, role, cityKey } = player;
+	const { camelCaseRole, role, cityKey } = player,
+		$pawn = $(`<img	src='images/pieces/pawns/${camelCaseRole}.png'
+						alt='${role} pawn'
+						class='pawn ${cityKey}${currentStepIs("setup") ? " hidden" : ""}'
+						id='${camelCaseRole}Pawn'
+						data-role='${role}' />`);
 
-	$("#boardContainer").append(`<img	src='images/pieces/pawns/${camelCaseRole}.png'
-										alt='${role} pawn'
-										class='pawn ${cityKey}${currentStepIs("setup") ? " hidden" : ""}'
-										id='${camelCaseRole}Pawn'
-										data-role='${role}' />`);
+	$("#boardContainer").append($pawn);
+	player.$pawn = $pawn;
 }
 
 function appendPlayerPanel(player)
@@ -4446,6 +4434,8 @@ function appendPlayerPanel(player)
 				player.pinpointLocation();
 			})
 		.siblings(".btnCollapseExpand").click(function() { togglePlayerPanel($(this)) });
+	
+	player.$panel = $panel;
 }
 
 function togglePlayerPanel($btnCollapseExpand)
@@ -4751,7 +4741,7 @@ class City
 	setPawnIndices()
 	{
 		const activePlayer = getActivePlayer(),
-			activePawn = activePlayer.getPawn();
+			activePawn = activePlayer.$pawn;
 		
 		if (activePlayer.cityKey == this.key && $(`.${this.key}.pawn`).length > 2)
 		{
@@ -9159,8 +9149,8 @@ function placePawnsInAtlanta()
 		for (let rID of data.turnOrder)
 		{
 			player = data.players[rID];
-			$pawn = player.getPawn();
-			$panel = player.getPanel();
+			$pawn = player.$pawn;
+			$panel = player.$panel;
 			
 			pawnOffsetInAtlanta = $pawn.removeClass("hidden").offset();
 	
