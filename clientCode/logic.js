@@ -2000,13 +2000,9 @@ function animateForecastDraw(cardKeys)
 function newForecastContainer()
 {
 	const $container = $(`<div id='forecastContainer'>
-							<p class='concealed'>
-								Top<sup class='hoverInfo concealed' title='The top card will be put back on the deck last.'>?</sup>
-							</p>
+							<p><span class='hoverInfo concealed' title='The top card will be put back on the deck last (and drawn from the deck first).'>Top</span></p>
 							<div id='forecastCards'></div>
-							<p class='concealed'>
-								Bottom<sup class='hoverInfo concealed' title='The bottom card will be put back on the deck first.'>?</sup>
-							</p>
+							<p><span class='hoverInfo concealed' title='The bottom card will be put back on the deck first (and drawn from the deck sixth).'>Bottom</span></p>
 						</div>`),
 		$cardContainer = $container.children("#forecastCards");
 	
