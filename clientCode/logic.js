@@ -2253,7 +2253,7 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 	return collapsenfectionDiscardPile();
 }
 
-function tryAirlift(playerToAirlift)
+async function tryAirlift(playerToAirlift)
 {
 	log("tryAirlift()");
 	const { airlift } = eventTypes,
@@ -2262,7 +2262,8 @@ function tryAirlift(playerToAirlift)
 	log("destination: ", destination);
 	if (!destination)
 	{
-		getCity(playerToAirlift.cityKey).cluster({ animatePawns: true });
+		await getCity(playerToAirlift.cityKey).cluster({ animatePawns: true });
+		enablePawnEvents();
 		return false;
 	}
 
@@ -2487,13 +2488,14 @@ function animateContingencyCardRemoval()
 	});
 }
 
-function tryDispatchPawn(playerToDispatch)
+async function tryDispatchPawn(playerToDispatch)
 {
 	const dispatchDetails = determineDispatchDetails(playerToDispatch);
 
 	if (!dispatchDetails)
 	{
-		getCity(playerToDispatch.cityKey).cluster({ animatePawns: true });
+		await getCity(playerToDispatch.cityKey).cluster({ animatePawns: true });
+		enablePawnEvents();
 		return false;
 	}
 	
@@ -2947,6 +2949,8 @@ async function buildResearchStation(relocationKey)
 
 async function movementAction(eventType, destination, { playerToDispatch, operationsFlightDiscardKey } = {})
 {
+	disablePawnEvents();
+
 	log(`movementAction(${eventType ? eventType.name : eventType},
 		${destination ? destination.name : destination},
 		${playerToDispatch ? playerToDispatch.role : playerToDispatch},
@@ -2992,7 +2996,10 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		destination = destination || getDestination(eventType);
 	
 	if (!destination) // Invalid move
-		player.getLocation().cluster({ animatePawns: true });
+	{
+		await player.getLocation().cluster({ animatePawns: true });
+		enablePawnEvents();
+	}
 	else // Move appears to be valid
 	{
 		resetActionPrompt();
@@ -3845,8 +3852,6 @@ class Player
 		this.cityKey = cityKey;
 		
 		this.cardKeys = [];
-
-		this.$pawnArrow = false;
 	}
 
 	async showRoleCard($hoveredElement)
@@ -4603,6 +4608,9 @@ function bindPawnEvents()
 				fn = tryDispatchPawn;
 			else if (pawnRole !== activeRole) // the clicked pawn is disabled
 				return false;
+			
+			// Pawns are disabled and pawn arrows are hidden until the attempted pawn movement is assessed.
+			disablePawnEvents();
 
 			$(window).off("mouseup")
 				.mouseup(function()

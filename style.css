@@ -105,7 +105,7 @@ body,
 {
 	width: 3%;
 	background-color: transparent;
-	z-index: 5;
+	z-index: 7;
 	pointer-events: none;
 }
 .pawnArrow.dispatch { width: 2% }
