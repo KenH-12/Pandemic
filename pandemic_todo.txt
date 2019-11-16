@@ -35,6 +35,8 @@ reloading changes the order of the infection discard pile
 
 TO DO
 -----
+in the forecast prompt, give the words "top" and "bottom" the hoverInfo class, and get rid of the "?"
+
 event history
 
 if the page is resized during initial infections, consider queueing clusters to reoccur afterward

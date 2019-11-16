@@ -65,7 +65,7 @@
 												FROM vw_infectionCard
 												WHERE game = $game
 												AND pile IN ('discard', 'removed')
-												ORDER BY cardIndex DESC");
+												ORDER BY cardIndex");
 			
 			$response["infectionDiscards"] = array();
 			while ($row = mysqli_fetch_assoc($infectionDiscards))
