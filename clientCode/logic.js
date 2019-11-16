@@ -3570,6 +3570,7 @@ function resizeAll()
 		resizeRightPanelElements();
 		repositionMarkers();
 		resizeAndRepositionPieces();
+		positionPawnArrows();
 		repositionSpecialEventBanner();
 
 		data.windowWidth = data.boardWidth + data.panelWidth;
@@ -3743,6 +3744,18 @@ function calibratePieceDimensions(pieceName)
 	$demoElement.addClass("hidden");
 }
 
+function positionPawnArrows()
+{
+	let player;
+	for (let rID in data.players)
+	{
+		player = data.players[rID];
+
+		if (!player.$pawnArrow.hasClass("hidden"))
+			player.positionPawnArrow();
+	}
+}
+
 // It is important to call this function after the specialEventBanner's content has been set
 // because its height is an essential part of the repostitioning formula.
 function repositionSpecialEventBanner()
@@ -3832,6 +3845,8 @@ class Player
 		this.cityKey = cityKey;
 		
 		this.cardKeys = [];
+
+		this.$pawnArrow = false;
 	}
 
 	async showRoleCard($hoveredElement)
@@ -3948,6 +3963,54 @@ class Player
 		this.$pawn
 			.css("cursor", "pointer")
 			.draggable("enable");
+		
+		if (getActivePlayer().role === this.role)
+			this.showPawnArrow();
+	}
+
+	async showPawnArrow()
+	{
+		const { $pawnArrow } = this;
+
+		$pawnArrow.removeClass("hidden");
+		this.positionPawnArrow();
+
+		const initialProperties = $pawnArrow.offset(),
+			desiredProperties = {
+				left: initialProperties.left,
+				top: initialProperties.top + $pawnArrow.height() / 5
+			},
+			duration = 400,
+			easing = "easeInOutSine";
+
+		while (!$pawnArrow.hasClass("hidden"))
+		{
+			await animatePromise({
+				$elements: $pawnArrow,
+				desiredProperties,
+				duration,
+				easing
+			});
+
+			await animatePromise({
+				$elements: $pawnArrow,
+				desiredProperties: initialProperties,
+				duration,
+				easing
+			});
+		}
+	}
+
+	positionPawnArrow()
+	{
+		const $arrow = this.$pawnArrow,
+			offset = this.getPawnOffset();
+		
+		offset.top -= data.pawnHeight * 2;
+		offset.left -= $arrow.width() / 2;
+
+		this.$pawnArrow.offset(offset);
+		makeElementsSquare(this.$pawnArrow);
 	}
 
 	disablePawn()
@@ -4401,15 +4464,22 @@ function getTurnOrder()
 
 function appendPawnToBoard(player)
 {
-	const { camelCaseRole, role, cityKey } = player,
-		$pawn = $(`<img	src='images/pieces/pawns/${camelCaseRole}.png'
-						alt='${role} pawn'
-						class='pawn ${cityKey}${currentStepIs("setup") ? " hidden" : ""}'
-						id='${camelCaseRole}Pawn'
-						data-role='${role}' />`);
+	const { camelCaseRole, role, cityKey } = player;
 
-	$("#boardContainer").append($pawn);
-	player.$pawn = $pawn;
+	player.$pawn = $(`<img	src='images/pieces/pawns/${camelCaseRole}.png'
+							alt='${role} pawn'
+							class='pawn ${cityKey}${currentStepIs("setup") ? " hidden" : ""}'
+							id='${camelCaseRole}Pawn'
+							data-role='${role}' />`);
+	
+	player.$pawnArrow = $(`<div class='activePawnArrow hidden'>
+							<div class='arrowBackground'></div>
+							<div class='arrowForeground'></div>
+						</div>`);
+
+	$("#boardContainer")
+		.append(player.$pawn)
+		.append(player.$pawnArrow);
 }
 
 function appendPlayerPanel(player)

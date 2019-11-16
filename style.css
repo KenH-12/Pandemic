@@ -101,6 +101,27 @@ body,
 	z-index: 4;
 	width: 1.6%;
 }
+.activePawnArrow
+{
+	width: 3%;
+	background-color: transparent;
+	z-index: 5;
+	
+}
+.activePawnArrow *
+{
+	width: 100%;
+	height: 100%;
+	margin-bottom: -100%;
+	pointer-events: none;
+}
+.activePawnArrow > .arrowBackground
+{
+	background: #fff;
+	clip-path: polygon(50% 25%, 100% 0, 50% 85%, 0 0);
+}
+.activePawnArrow > .arrowForeground { clip-path: polygon(50% 28%, 95% 4%, 50% 79%, 5% 4%);
+background: #000;}
 .researchStation
 {
 	z-index: 3;
