@@ -295,7 +295,7 @@ function normalizeVector(v)
 function getPointAtDistanceAlongLine(a, b, distanceFromA)
 {
 	const u = normalizeVector(getVector(a, b));
-	log("u", u);
+	
 	return {
 		left: a.left + (distanceFromA*u.left),
 		top: a.top + (distanceFromA*u.top)

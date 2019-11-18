@@ -1358,7 +1358,7 @@ const actionInterfacePopulator = {
 			});
 		return true;
 	},
-	[eventTypes.chooseFlightType.name]({ destinationKey })
+	[eventTypes.chooseFlightType.name]({ destination })
 	{
 		// If the player can reach the destination via Direct Flight,
 		// but also via one other flight type, present *two options.
@@ -1372,14 +1372,14 @@ const actionInterfacePopulator = {
 			firstOption = charterFlight;
 
 		actionInterfacePopulator.appendDescriptiveElements(firstOption)
-		actionInterfacePopulator[firstOption.name]({ destinationKey });
+		actionInterfacePopulator[firstOption.name]({ destination });
 		
 		actionInterfacePopulator.appendDivision(chooseFlightType).appendDescriptiveElements(directFlight);
-		actionInterfacePopulator[directFlight.name]({ destinationKey });
+		actionInterfacePopulator[directFlight.name]({ destination });
 
 		return true;
 	},
-	[eventTypes.charterFlight.name]({ destinationKey })
+	[eventTypes.charterFlight.name]({ destination })
 	{
 		const charterFlight = eventTypes.charterFlight;
 	
@@ -1392,8 +1392,7 @@ const actionInterfacePopulator = {
 		else
 			data.promptingEventType = false;
 		
-		const currentCity = getActivePlayer().getLocation(),
-			destination = getCity(destinationKey);
+		const currentCity = getActivePlayer().getLocation();
 		
 		actionInterfacePopulator
 			.replaceInstructions(`Destination: ${destination.name}`)
@@ -1408,13 +1407,12 @@ const actionInterfacePopulator = {
 			});
 		return true;
 	},
-	[eventTypes.directFlight.name]({ destinationKey })
+	[eventTypes.directFlight.name]({ destination })
 	{
 		const directFlight = eventTypes.directFlight;
 	
-		if (destinationKey)
+		if (destination)
 		{
-			const destination = getCity(destinationKey);
 			// NOTE: If a player drags and drops a pawn on a city
 			// which is a valid Direct Flight and Charter Flight destination,
 			// both action interfaces will be displayed.
@@ -1424,7 +1422,7 @@ const actionInterfacePopulator = {
 				.replaceInstructions(`Destination: ${destination.name}`, { lastParagraph: true })
 				.appendDiscardPrompt(
 				{
-					cardKeys: destinationKey,
+					cardKeys: destination.key,
 					onConfirm: function()
 					{
 						setDuration("pawnAnimation", 1000);
@@ -1442,7 +1440,7 @@ const actionInterfacePopulator = {
 			promptAction(
 				{
 					eventType: directFlight,
-					destinationKey: $clicked.data("key")
+					destination: getCity($clicked.data("key"))
 				});
 		});
 		
@@ -1653,11 +1651,11 @@ const actionInterfacePopulator = {
 
 		return true;
 	},
-	[eventTypes.operationsFlight.name]({ destinationKey })
+	[eventTypes.operationsFlight.name]({ destination })
 	{
 		const operationsFlight = eventTypes.operationsFlight;
 	
-		if (!destinationKey) // the user explicitly selected operations flight
+		if (!destination) // the user explicitly selected operations flight
 		{
 			// Remember the Operations Flight actionCode to avoid prompting Direct or Charter Flight when the pawn is dropped on a destination.
 			data.promptingEventType = operationsFlight;
@@ -1667,8 +1665,7 @@ const actionInterfacePopulator = {
 			data.promptingEventType = false;
 		
 		const player = getActivePlayer(),
-			useableCardKeys = player.cardKeys.filter(key => isCityKey(key)),
-			destination = getCity(destinationKey);
+			useableCardKeys = player.cardKeys.filter(key => isCityKey(key));
 		
 		actionInterfacePopulator.replaceInstructions(`Destination: ${destination.name}
 			<br />Select a card to discard:`);
@@ -2967,7 +2964,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		{
 			promptAction({
 				eventType: eventType,
-				destinationKey: destination.key
+				destination: destination
 			});
 			return false;
 		}
@@ -3232,7 +3229,7 @@ function getMovementDetails()
 				return {
 					waitingForConfirmation: true,
 					eventType: eventType,
-					destinationKey: destination.key
+					destination: destination
 				};
 			}
 			
@@ -3965,12 +3962,9 @@ class Player
 	
 	enablePawn()
 	{
-		const self = this;
-
 		this.$pawn
 			.css("cursor", "pointer")
-			.draggable("enable")
-			.on("drag", function() { positionTravelPathArrow(self) });
+			.draggable("enable");
 		
 		this.animatePawnArrow();
 	}
@@ -4587,38 +4581,40 @@ function togglePlayerPanel($btnCollapseExpand)
 	});
 }
 
-function positionTravelPathArrow(player)
+function positionTravelPathArrow(actionProperties)
 {
-	const originOffset = player.getLocation().getOffset(),
-		pawnOffset = player.getPawnOffset(),
+	const player = determinePlayerToMove(actionProperties),
+		originOffset = player.getLocation().getOffset(),
+		destinationOffset = actionProperties.destination.getOffset(),
 		arrowThickness = getDimension("cityWidth") * 0.75,
-		arrowBase = getPointAtDistanceAlongLine(originOffset, pawnOffset, arrowThickness),
-		arrowheadBase = getPointAtDistanceAlongLine(pawnOffset, originOffset, arrowThickness * 6),
-		arrowTip = getPointAtDistanceAlongLine(pawnOffset, originOffset, arrowThickness * 1.25),
+		arrowBase = getPointAtDistanceAlongLine(originOffset, destinationOffset, arrowThickness),
+		arrowheadBase = getPointAtDistanceAlongLine(destinationOffset, originOffset, arrowThickness * 6),
+		arrowTip = getPointAtDistanceAlongLine(destinationOffset, originOffset, arrowThickness * 1.25),
 		perpendicularSlope = (1 / getSlope(arrowBase, arrowheadBase)) * -1,
 		pointIngredients = [
-			{ a: arrowheadBase, xFactor: -4, thickness: 2 },
-			{ a: arrowheadBase, xFactor: -4, thickness: 1 },
-			{ a: arrowBase, xFactor: -4, thickness: 1 },
-			{ a: arrowBase, xFactor: 4, thickness: 1 },
-			{ a: arrowheadBase, xFactor: 4, thickness: 1 },
-			{ a: arrowheadBase, xFactor: 4, thickness: 2 }
+			{ a: arrowheadBase, xFactor: -1, thickness: 2 },
+			{ a: arrowheadBase, xFactor: -1, thickness: 1 },
+			{ a: arrowBase, xFactor: -1, thickness: 1 },
+			{ a: arrowBase, xFactor: 1, thickness: 1 },
+			{ a: arrowheadBase, xFactor: 1, thickness: 1 },
+			{ a: arrowheadBase, xFactor: 1, thickness: 2 }
 		],
 		points = [arrowTip];
 
 	let ingredients, 
 		someX,
-		someY;
+		somePoint;
 	for (let i = 0; i < pointIngredients.length; i++)
 	{
 		ingredients = pointIngredients[i];
-		someX = ingredients.a.left - arrowThickness*ingredients.xFactor;
 
-		log("perpendicularSlope", perpendicularSlope);
-		log("someX", someX);
-		someY = perpendicularSlope*someX + getYInterceptFromSlope(ingredients.a, perpendicularSlope);
-		log("someY", someY);
-		points.push(getPointAtDistanceAlongLine(ingredients.a, { left: someX, top: someY }, (arrowThickness*ingredients.thickness)));
+		someX = ingredients.a.left - arrowThickness*ingredients.xFactor;
+		somePoint = {
+			left: someX,
+			top: perpendicularSlope*someX + getYInterceptFromSlope(ingredients.a, perpendicularSlope)
+		};
+
+		points.push(getPointAtDistanceAlongLine(ingredients.a, somePoint, (arrowThickness*ingredients.thickness)));
 	}
 
 	log(points);
@@ -4633,11 +4629,11 @@ function positionTravelPathArrow(player)
 		});
 }
 
-function appendCubeAtPoint(point)
+function determinePlayerToMove(actionProperties)
 {
-	const $cube = appendNewCubeToBoard("y");
+	const { playerToAirlift, playerToDispatch } = actionProperties;
 
-	$cube.offset(point).addClass("pointCube");
+	return playerToAirlift || playerToDispatch || getActivePlayer();
 }
 
 function bindPawnEvents()
