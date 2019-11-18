@@ -33,6 +33,8 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+animate chevrons along the travel path arrow
+
 event history
 
 event card incons

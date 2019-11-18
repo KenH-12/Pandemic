@@ -1159,6 +1159,9 @@ function promptAction(actionProperties)
 		
 	if (interfaceIsRequired)
 	{
+		if (actionProperties.destination)
+			positionTravelPathArrow(actionProperties);
+		
 		if (!eventTypeIsBeingPrompted(eventTypes.forecastPlacement)) // Forecast can't be cancelled once the cards are drawn.
 			enableBtnCancelAction();
 		
@@ -2946,8 +2949,6 @@ async function buildResearchStation(relocationKey)
 
 async function movementAction(eventType, destination, { playerToDispatch, operationsFlightDiscardKey } = {})
 {
-	disablePawnEvents();
-
 	log(`movementAction(${eventType ? eventType.name : eventType},
 		${destination ? destination.name : destination},
 		${playerToDispatch ? playerToDispatch.role : playerToDispatch},
@@ -4620,7 +4621,7 @@ function positionTravelPathArrow(actionProperties)
 	log(points);
 	$("#travelPathArrow")
 		.removeAttr("class")
-		.addClass(player.camelCaseRole)
+		.addClass(actionProperties.playerToAirlift ? "airlift" : actionProperties.playerToDispatch ? "dispatcher" : player.camelCaseRole)
 		.css(
 		{
 			width: data.boardWidth,
@@ -4660,11 +4661,8 @@ function bindPawnEvents()
 				fn = tryDispatchPawn;
 			else if (pawnRole !== activeRole) // the clicked pawn is disabled
 				return false;
-			
-			// Pawns are disabled and pawn arrows are hidden until the attempted pawn movement is assessed.
-			disablePawnEvents();
 
-			const $placeHolderPawn = $this.clone()
+			const $placeHolderPawn = $this.clone();
 			
 			$placeHolderPawn.appendTo("#boardContainer")
 				.offset($this.offset())
