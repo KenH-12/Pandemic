@@ -227,11 +227,6 @@ function objectFromParallelArrays(names, values)
 	return obj;
 }
 
-function distanceBetweenPoints(pointA, pointB)
-{
-	return Math.sqrt(Math.pow(Math.abs(pointA.left - pointB.left), 2) + Math.pow(Math.abs(pointA.top - pointB.top), 2));
-}
-
 function randomNumberBetween(min, max)
 {
 	return Math.floor(Math.random() * max) + min;
@@ -259,4 +254,62 @@ function lockElements($elements)
 			.offset(initialOffset)
 			.width(initialWidth);
 	}
+}
+
+function distanceBetweenPoints(pointA, pointB)
+{
+	return Math.sqrt(Math.pow(Math.abs(pointA.left - pointB.left), 2) + Math.pow(Math.abs(pointA.top - pointB.top), 2));
+}
+
+function getSlope(a, b)
+{
+	return (a.top - b.top) / (a.left - b.left);
+}
+function getYIntercept(a, b)
+{
+	return a.top - getSlope(a, b)*a.left;
+}
+function getYInterceptFromSlope(point, slope)
+{
+	return point.top - slope*point.left;
+}
+function getVector(a, b)
+{
+	return {
+		left: b.left - a.left,
+		top: b.top - a.top
+	};
+}
+function getVectorLength(v)
+{
+	return Math.sqrt( Math.pow(v.left,2) + Math.pow(v.top,2) );
+}
+function normalizeVector(v)
+{
+	const vLength = getVectorLength(v);
+	return {
+		left: v.left / vLength,
+		top: v.top / vLength
+	};
+}
+function getPointAtDistanceAlongLine(a, b, distanceFromA)
+{
+	const u = normalizeVector(getVector(a, b));
+	log("u", u);
+	return {
+		left: a.left + (distanceFromA*u.left),
+		top: a.top + (distanceFromA*u.top)
+	};
+}
+function getClipPathFromPoints(containerWidth, containerHeight, points)
+{
+	let clipPath = "polygon(";
+
+	for (let point of points)
+		clipPath += `${(point.left / containerWidth * 100).toFixed(2)}% ${(point.top / containerHeight * 100).toFixed(2)}%,`;
+	
+	clipPath = clipPath.substring(0, clipPath.length - 1);
+	clipPath += ")";
+
+	return clipPath;
 }

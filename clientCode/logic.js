@@ -3965,9 +3965,12 @@ class Player
 	
 	enablePawn()
 	{
+		const self = this;
+
 		this.$pawn
 			.css("cursor", "pointer")
-			.draggable("enable");
+			.draggable("enable")
+			.on("drag", function() { positionTravelPathArrow(self) });
 		
 		this.animatePawnArrow();
 	}
@@ -4584,6 +4587,59 @@ function togglePlayerPanel($btnCollapseExpand)
 	});
 }
 
+function positionTravelPathArrow(player)
+{
+	const originOffset = player.getLocation().getOffset(),
+		pawnOffset = player.getPawnOffset(),
+		arrowThickness = getDimension("cityWidth") * 0.75,
+		arrowBase = getPointAtDistanceAlongLine(originOffset, pawnOffset, arrowThickness),
+		arrowheadBase = getPointAtDistanceAlongLine(pawnOffset, originOffset, arrowThickness * 6),
+		arrowTip = getPointAtDistanceAlongLine(pawnOffset, originOffset, arrowThickness * 1.25),
+		perpendicularSlope = (1 / getSlope(arrowBase, arrowheadBase)) * -1,
+		pointIngredients = [
+			{ a: arrowheadBase, xFactor: -4, thickness: 2 },
+			{ a: arrowheadBase, xFactor: -4, thickness: 1 },
+			{ a: arrowBase, xFactor: -4, thickness: 1 },
+			{ a: arrowBase, xFactor: 4, thickness: 1 },
+			{ a: arrowheadBase, xFactor: 4, thickness: 1 },
+			{ a: arrowheadBase, xFactor: 4, thickness: 2 }
+		],
+		points = [arrowTip];
+
+	let ingredients, 
+		someX,
+		someY;
+	for (let i = 0; i < pointIngredients.length; i++)
+	{
+		ingredients = pointIngredients[i];
+		someX = ingredients.a.left - arrowThickness*ingredients.xFactor;
+
+		log("perpendicularSlope", perpendicularSlope);
+		log("someX", someX);
+		someY = perpendicularSlope*someX + getYInterceptFromSlope(ingredients.a, perpendicularSlope);
+		log("someY", someY);
+		points.push(getPointAtDistanceAlongLine(ingredients.a, { left: someX, top: someY }, (arrowThickness*ingredients.thickness)));
+	}
+
+	log(points);
+	$("#travelPathArrow")
+		.removeAttr("class")
+		.addClass(player.camelCaseRole)
+		.css(
+		{
+			width: data.boardWidth,
+			height: data.boardHeight,
+			clipPath: getClipPathFromPoints(data.boardWidth, data.boardHeight, points)
+		});
+}
+
+function appendCubeAtPoint(point)
+{
+	const $cube = appendNewCubeToBoard("y");
+
+	$cube.offset(point).addClass("pointCube");
+}
+
 function bindPawnEvents()
 {
 	$(".pawn:not(#demoPawn)")
@@ -4611,6 +4667,12 @@ function bindPawnEvents()
 			
 			// Pawns are disabled and pawn arrows are hidden until the attempted pawn movement is assessed.
 			disablePawnEvents();
+
+			const $placeHolderPawn = $this.clone()
+			
+			$placeHolderPawn.appendTo("#boardContainer")
+				.offset($this.offset())
+				.addClass("placeholderPawn");
 
 			$(window).off("mouseup")
 				.mouseup(function()
@@ -4857,6 +4919,8 @@ class City
 			stationKeyToExclude
 		} = {})
 	{
+		$(`.placeholderPawn.${this.key}`).remove();
+		
 		const pawns = $(".pawn." + this.key).not($pawnToExclude)
 				.sort(function (a, b) { return $(a).data("pawnIndex") - $(b).data("pawnIndex") }),
 			pawnCount = pawns.length,

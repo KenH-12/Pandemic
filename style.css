@@ -96,6 +96,11 @@ body,
 {
 	position: absolute;
 }
+#travelPathArrow
+{
+	opacity: 0.7;
+	z-index: 3;
+}
 #boardContainer > .pawn
 {
 	z-index: 4;
@@ -116,6 +121,7 @@ body,
 	clip-path: polygon(50% 30%, 100% 10%, 50% 100%, 0 10%);
 }
 .pawnArrow.dispatch > div { clip-path: polygon(50% 30%, 100% 10%, 50% 100%, 0 10%) }
+.placeholderPawn { opacity: 0.7 }
 .researchStation
 {
 	z-index: 3;
