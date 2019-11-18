@@ -59,6 +59,7 @@
 						<div id='demoCube' class='diseaseCube hidden'></div>
 						<img id='demoPawn' src='images/pieces/pawns/medic.png' class='pawn hidden'/>
 						<img id='demoStation' src='images/pieces/researchStation.png' class='researchStation hidden'/>
+						<img id='placeholderPawn' class='pawn hidden'/>
 						
 						<div id='playerPanelContainer'></div>
 						

@@ -2267,13 +2267,14 @@ async function tryAirlift(playerToAirlift)
 	log("destination: ", destination);
 	if (!destination)
 	{
-		await getCity(playerToAirlift.cityKey).cluster({ animatePawns: true });
+		await playerToAirlift.getLocation().cluster();
 		enablePawnEvents();
 		return false;
 	}
 
 	clusterAll({ pawns: true, playerToExcludePawn: playerToAirlift });
 	promptAction({ eventType: airlift, playerToAirlift, destination });
+	await playerToAirlift.getLocation().cluster();
 }
 
 async function airlift(playerToAirlift, destination)
@@ -2499,7 +2500,7 @@ async function tryDispatchPawn(playerToDispatch)
 
 	if (!dispatchDetails)
 	{
-		await getCity(playerToDispatch.cityKey).cluster({ animatePawns: true });
+		await playerToDispatch.getLocation().cluster();
 		enablePawnEvents();
 		return false;
 	}
@@ -2522,6 +2523,7 @@ async function tryDispatchPawn(playerToDispatch)
 		actionDetails.dispatchMethod = dispatcherMustChooseMethod ? eventTypes.chooseFlightType : method;
 		
 		promptAction(actionDetails);
+		await playerToDispatch.getLocation().cluster();
 	}
 	else // The dispatch method can be executed immediately.
 		movementAction(method, destination, { playerToDispatch });
@@ -2959,7 +2961,8 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		${playerToDispatch ? playerToDispatch.role : playerToDispatch},
 		${operationsFlightDiscardKey})`);
 	
-	const player = playerToDispatch || getActivePlayer();
+	const player = playerToDispatch || getActivePlayer(),
+		originCity = player.getLocation();
 
 	if (data.promptingEventType)
 	{
@@ -2972,6 +2975,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 				eventType: eventType,
 				destination: destination
 			});
+			originCity.cluster();
 			return false;
 		}
 
@@ -2988,6 +2992,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			{
 				clusterAll({ pawns: true, playerToExcludePawn: player });
 				promptAction(movementDetails);
+				originCity.cluster();
 				return false;
 			}
 			
@@ -3000,7 +3005,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	
 	if (!destination) // Invalid move
 	{
-		await player.getLocation().cluster({ animatePawns: true });
+		await originCity.cluster();
 		enablePawnEvents();
 	}
 	else // Move appears to be valid
@@ -4612,16 +4617,22 @@ function positionTravelPathArrow(actionProperties)
 
 function getTravelPathVector(actionProperties)
 {
-	const { $pawn, destination } = actionProperties;
+	const {
+		$pawn,
+		playerToAirlift,
+		playerToDispatch,
+		destination
+	} = actionProperties;
+	
 	let player,
 		destinationOffset;
 
-	if (typeof $pawn == "undefined")
+	if (typeof $pawn == "undefined") // Determine player and destination directly from the actionProperties.
 	{
-		player = determinePlayerToMove(actionProperties);
+		player = actionProperties.player || playerToAirlift || playerToDispatch || getActivePlayer();
 		destinationOffset = destination.getOffset();
 	}
-	else
+	else // The pawn itself is the temporary destination.
 	{
 		player = getPlayer($pawn.data("role"));
 		destinationOffset = $pawn.offset();
@@ -4635,21 +4646,14 @@ function getTravelPathVector(actionProperties)
 	};
 }
 
-function determinePlayerToMove(actionProperties)
-{
-	const { player, playerToAirlift, playerToDispatch } = actionProperties;
-
-	return player || playerToAirlift || playerToDispatch || getActivePlayer();
-}
-
 function bindPawnEvents()
 {
-	$(".pawn:not(#demoPawn)")
+	$(".pawn:not(#demoPawn, #placeholderPawn)")
 		.draggable(
 		{
 			disabled: true, // pawn dragging is enabled and disabled according to the game state.
 			containment: $("#boardContainer"),
-			drag: function() { onPawnDrag($(this)) }
+			drag: function() { positionTravelPathArrow({ $pawn: $(this) }) }
 		})
 		.mousedown(function()
 		{
@@ -4668,23 +4672,21 @@ function bindPawnEvents()
 			else if (pawnRole !== activeRole) // the clicked pawn is disabled
 				return false;
 
-			/* const $placeHolderPawn = $this.clone();
-			
-			$placeHolderPawn.appendTo("#boardContainer")
-				.offset($this.offset())
-				.addClass("placeholderPawn"); */
+			showPlaceholderPawn($this);
 
 			$(window).off("mouseup")
 				.mouseup(function()
 				{
 					$(window).off("mouseup");
-					
+
 					const playerWhosePawnWasDropped = getPlayer(pawnRole);
 
 					if (fn === movementAction)
 						fn();
 					else
 						fn(playerWhosePawnWasDropped);
+					
+					hidePlaceholderPawn($this);
 				});
 
 			// The dragged pawn appear in front of other pawns and disease cubes.
@@ -4692,9 +4694,20 @@ function bindPawnEvents()
 		});
 }
 
-function onPawnDrag($pawn)
+function showPlaceholderPawn($originalPawn)
 {
-	positionTravelPathArrow({ $pawn });
+	$("#placeholderPawn")
+		.removeAttr("style")
+		.attr("src", $originalPawn.attr("src"))
+		.offset($originalPawn.offset())
+		.removeClass("hidden");
+	
+	$originalPawn.css("opacity", 0.7);
+}
+function hidePlaceholderPawn($originalPawn)
+{
+	$originalPawn.css("opacity", 1);
+	$("#placeholderPawn").addClass("hidden");
 }
 
 function getActivePlayer()
@@ -4982,7 +4995,7 @@ class City
 		}
 
 		const pawnAnimationDuration = getDuration("pawnAnimation");
-		let $this, currentOffset;
+		let $this, newOffset;
 		i = 0;
 		pawns.each(function()
 		{
@@ -4990,23 +5003,15 @@ class City
 			// pawns in the back row appear behind research stations
 			$this[0].style.zIndex = (pawnCount > 2 && i < 2) ? 2 : 4;
 			
+			newOffset = {
+				top: coordsArray[i][0],
+				left: coordsArray[i][1]
+			};
+			
 			if (animatePawns)
-			{
-				currentOffset = $this.offset();
-				$this.animate(
-				{
-					top: "+=" + (coordsArray[i][0] - currentOffset.top),
-					left: "+=" + (coordsArray[i][1] - currentOffset.left)
-				}, pawnAnimationDuration, data.easings.pawnAnimation);
-			}
+				$this.animate(newOffset, pawnAnimationDuration, data.easings.pawnAnimation);
 			else
-			{
-				$this.offset(
-				{
-					top: coordsArray[i][0],
-					left: coordsArray[i][1]
-				});
-			}
+				$this.offset(newOffset);
 			
 			i++;
 		});

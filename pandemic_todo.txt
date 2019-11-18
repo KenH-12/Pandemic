@@ -44,8 +44,17 @@ when a pawn is dropped on a valid destination...
 	the actual pawn should snap back to its original location (no animation)
 
 hovering over destination options in the action prompt should display the corresponding travel path arrow
+remove travel path arrow after...
+	direct flight
+	charter flight
+	drive/ferry
+	shuttle flight
+
 
 animate chevrons along the travel path arrow
+
+hovering over the treat disease button should show the Xs on the cubes that would be removed
+hovering over the color options in the treat disease prompt should do the same
 
 event history
 
