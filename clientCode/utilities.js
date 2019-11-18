@@ -261,13 +261,13 @@ function distanceBetweenPoints(pointA, pointB)
 	return Math.sqrt(Math.pow(Math.abs(pointA.left - pointB.left), 2) + Math.pow(Math.abs(pointA.top - pointB.top), 2));
 }
 
-function getSlope(a, b)
+function slopeOfLine(a, b)
 {
 	return (a.top - b.top) / (a.left - b.left);
 }
 function getYIntercept(a, b)
 {
-	return a.top - getSlope(a, b)*a.left;
+	return a.top - slopeOfLine(a, b)*a.left;
 }
 function getYInterceptFromSlope(point, slope)
 {
@@ -312,4 +312,45 @@ function getClipPathFromPoints(containerWidth, containerHeight, points)
 	clipPath += ")";
 
 	return clipPath;
+}
+
+function getArrowClipPath({ baseOffset, tipOffset, stemWidth, headWidth, headLength, containerWidth, containerHeight } = {})
+{
+	headWidth = headWidth || stemWidth * 3;
+	headLength = headLength || headWidth;
+	
+	const arrowheadBase = getPointAtDistanceAlongLine(tipOffset, baseOffset, headLength),
+		halfStemWidth = stemWidth / 2,
+		halfHeadWidth = headWidth / 2,
+		pointProperties = [
+			{ vectorPoint: arrowheadBase, directionFromVector: -1, distanceFromVector: halfHeadWidth },
+			{ vectorPoint: arrowheadBase, directionFromVector: -1, distanceFromVector: halfStemWidth },
+			{ vectorPoint: baseOffset, directionFromVector: -1, distanceFromVector: halfStemWidth },
+			{ vectorPoint: baseOffset, directionFromVector: 1, distanceFromVector: halfStemWidth },
+			{ vectorPoint: arrowheadBase, directionFromVector: 1, distanceFromVector: halfStemWidth },
+			{ vectorPoint: arrowheadBase, directionFromVector: 1, distanceFromVector: halfHeadWidth }
+		],
+		perpendicularSlope = (1 / slopeOfLine(baseOffset, tipOffset)) * -1,
+		points = [tipOffset];
+
+	let perpendicularX,
+		perpendicularPoint;
+	for (let i = 0; i < pointProperties.length; i++)
+	{
+		const {
+			vectorPoint,
+			directionFromVector,
+			distanceFromVector
+		} = pointProperties[i];
+
+		perpendicularX = vectorPoint.left - stemWidth*directionFromVector;
+		perpendicularPoint = {
+			left: perpendicularX,
+			top: perpendicularSlope*perpendicularX + getYInterceptFromSlope(vectorPoint, perpendicularSlope)
+		};
+
+		points.push(getPointAtDistanceAlongLine(vectorPoint, perpendicularPoint, distanceFromVector));
+	}
+
+	return getClipPathFromPoints(containerWidth, containerHeight, points);
 }

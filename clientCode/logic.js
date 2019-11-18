@@ -846,7 +846,8 @@ function enablePawnEvents()
 		airlifting = eventTypeIsBeingPrompted(eventTypes.airlift),
 		dispatcherIsActive = activePlayer.role === "Dispatcher";
 
-	let player;
+	let player,
+		pawnsAreEnabled = false;
 	for (let rID in data.players)
 	{
 		player = data.players[rID];
@@ -856,6 +857,7 @@ function enablePawnEvents()
 		{
 			log(`enabled ${player.role}'s pawn`);
 			player.enablePawn();
+			pawnsAreEnabled = true;
 		}
 		else
 		{
@@ -863,6 +865,9 @@ function enablePawnEvents()
 			player.disablePawn();
 		}
 	}
+
+	if (pawnsAreEnabled)
+		$("#travelPathArrow").attr("class", `hidden ${airlifting ? "airlift" : activePlayer.camelCaseRole}`);
 }
 
 function newResearchStationElement(cityKey)
@@ -4584,57 +4589,57 @@ function togglePlayerPanel($btnCollapseExpand)
 
 function positionTravelPathArrow(actionProperties)
 {
-	const player = determinePlayerToMove(actionProperties),
-		originOffset = player.getLocation().getOffset(),
-		destinationOffset = actionProperties.destination.getOffset(),
-		arrowThickness = getDimension("cityWidth") * 0.75,
-		arrowBase = getPointAtDistanceAlongLine(originOffset, destinationOffset, arrowThickness),
-		arrowheadBase = getPointAtDistanceAlongLine(destinationOffset, originOffset, arrowThickness * 6),
-		arrowTip = getPointAtDistanceAlongLine(destinationOffset, originOffset, arrowThickness * 1.25),
-		perpendicularSlope = (1 / getSlope(arrowBase, arrowheadBase)) * -1,
-		pointIngredients = [
-			{ a: arrowheadBase, xFactor: -1, thickness: 2 },
-			{ a: arrowheadBase, xFactor: -1, thickness: 1 },
-			{ a: arrowBase, xFactor: -1, thickness: 1 },
-			{ a: arrowBase, xFactor: 1, thickness: 1 },
-			{ a: arrowheadBase, xFactor: 1, thickness: 1 },
-			{ a: arrowheadBase, xFactor: 1, thickness: 2 }
-		],
-		points = [arrowTip];
+	const { originOffset, destinationOffset } = getTravelPathVector(actionProperties),
+		stemWidth = getDimension("cityWidth") * 1.2,
+		containerWidth = data.boardWidth,
+		containerHeight = data.boardHeight,
+		clipPath = getArrowClipPath({
+				stemWidth,
+				baseOffset: getPointAtDistanceAlongLine(originOffset, destinationOffset, stemWidth),
+				tipOffset: getPointAtDistanceAlongLine(destinationOffset, originOffset, stemWidth),
+				containerWidth,
+				containerHeight
+			});
 
-	let ingredients, 
-		someX,
-		somePoint;
-	for (let i = 0; i < pointIngredients.length; i++)
+	$("#travelPathArrow").css(
+		{
+			width: containerWidth,
+			height: containerHeight,
+			clipPath
+		})
+		.removeClass("hidden");
+}
+
+function getTravelPathVector(actionProperties)
+{
+	const { $pawn, destination } = actionProperties;
+	let player,
+		destinationOffset;
+
+	if (typeof $pawn == "undefined")
 	{
-		ingredients = pointIngredients[i];
-
-		someX = ingredients.a.left - arrowThickness*ingredients.xFactor;
-		somePoint = {
-			left: someX,
-			top: perpendicularSlope*someX + getYInterceptFromSlope(ingredients.a, perpendicularSlope)
-		};
-
-		points.push(getPointAtDistanceAlongLine(ingredients.a, somePoint, (arrowThickness*ingredients.thickness)));
+		player = determinePlayerToMove(actionProperties);
+		destinationOffset = destination.getOffset();
+	}
+	else
+	{
+		player = getPlayer($pawn.data("role"));
+		destinationOffset = $pawn.offset();
+		destinationOffset.left += data.pawnWidth * 0.5;
+		destinationOffset.top += data.pawnHeight * 0.8;
 	}
 
-	log(points);
-	$("#travelPathArrow")
-		.removeAttr("class")
-		.addClass(actionProperties.playerToAirlift ? "airlift" : actionProperties.playerToDispatch ? "dispatcher" : player.camelCaseRole)
-		.css(
-		{
-			width: data.boardWidth,
-			height: data.boardHeight,
-			clipPath: getClipPathFromPoints(data.boardWidth, data.boardHeight, points)
-		});
+	return {
+		originOffset: player.getLocation().getOffset(),
+		destinationOffset
+	};
 }
 
 function determinePlayerToMove(actionProperties)
 {
-	const { playerToAirlift, playerToDispatch } = actionProperties;
+	const { player, playerToAirlift, playerToDispatch } = actionProperties;
 
-	return playerToAirlift || playerToDispatch || getActivePlayer();
+	return player || playerToAirlift || playerToDispatch || getActivePlayer();
 }
 
 function bindPawnEvents()
@@ -4643,7 +4648,8 @@ function bindPawnEvents()
 		.draggable(
 		{
 			disabled: true, // pawn dragging is enabled and disabled according to the game state.
-			containment: $("#boardContainer")
+			containment: $("#boardContainer"),
+			drag: function() { onPawnDrag($(this)) }
 		})
 		.mousedown(function()
 		{
@@ -4662,11 +4668,11 @@ function bindPawnEvents()
 			else if (pawnRole !== activeRole) // the clicked pawn is disabled
 				return false;
 
-			const $placeHolderPawn = $this.clone();
+			/* const $placeHolderPawn = $this.clone();
 			
 			$placeHolderPawn.appendTo("#boardContainer")
 				.offset($this.offset())
-				.addClass("placeholderPawn");
+				.addClass("placeholderPawn"); */
 
 			$(window).off("mouseup")
 				.mouseup(function()
@@ -4684,6 +4690,11 @@ function bindPawnEvents()
 			// The dragged pawn appear in front of other pawns and disease cubes.
 			$this.css("z-index", data.dragPieceZindex);
 		});
+}
+
+function onPawnDrag($pawn)
+{
+	positionTravelPathArrow({ $pawn });
 }
 
 function getActivePlayer()

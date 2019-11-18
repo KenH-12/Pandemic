@@ -33,6 +33,18 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+when a pawn is dragged...
+	put a placeholder pawn in the pawn's place (opacity: 1)
+	change the pawn's opacity to .7
+	the travel path arrow should follow the pawn
+when a pawn is dropped on a valid destination...
+	the arrow should snap to the destination
+	the placeholder pawn should be removed
+	consider animating a placeholder (opacity: 0.7) from the drop location to the destination
+	the actual pawn should snap back to its original location (no animation)
+
+hovering over destination options in the action prompt should display the corresponding travel path arrow
+
 animate chevrons along the travel path arrow
 
 event history
