@@ -1165,7 +1165,7 @@ function promptAction(actionProperties)
 	if (interfaceIsRequired)
 	{
 		if (actionProperties.destination)
-			positionTravelPathArrow(actionProperties);
+			showTravelPathArrow(actionProperties);
 		
 		if (!eventTypeIsBeingPrompted(eventTypes.forecastPlacement)) // Forecast can't be cancelled once the cards are drawn.
 			enableBtnCancelAction();
@@ -1301,6 +1301,8 @@ const actionInterfacePopulator = {
 		
 		if (typeof onClick === "function")
 			$interface.children(`.${buttonClass}`).click(function() { onClick($(this)) });
+		
+		return actionInterfacePopulator;
 	},
 	appendDiscardPrompt({ cardKeys, promptMsg, onConfirm })
 	{
@@ -1389,7 +1391,7 @@ const actionInterfacePopulator = {
 	{
 		const charterFlight = eventTypes.charterFlight;
 	
-		if (!destinationKey) // the user explicitly selected charter flight
+		if (!destination) // the user explicitly selected charter flight
 		{
 			// Remember the Charter Flight actionCode to avoid prompting Direct Flight when the pawn is dropped on a destination.
 			data.promptingEventType = charterFlight;
@@ -1440,13 +1442,16 @@ const actionInterfacePopulator = {
 		const cardKeys = getActivePlayer()[`valid${directFlight.name}DestinationKeys`]();
 			
 		actionInterfacePopulator.appendOptionButtons("playerCard", cardKeys, function($clicked)
-		{
-			promptAction(
-				{
-					eventType: directFlight,
-					destination: getCity($clicked.data("key"))
-				});
-		});
+			{
+				promptAction(
+					{
+						eventType: directFlight,
+						destination: getCity($clicked.data("key"))
+					});
+			})
+			.$actionInterface.find(".playerCard")
+				.hover(function() { showTravelPathArrow({ destination: getCity($(this).attr("data-key")) }) },
+				function() { hideTravelPathArrow() });
 		
 		return true;
 	},
@@ -3010,7 +3015,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		if (!movementTypeRequiresDiscard(eventType))
 		{
 			originCity.cluster();
-			positionTravelPathArrow({ player, destination });
+			showTravelPathArrow({ player, destination });
 		}
 		
 		try
@@ -3768,7 +3773,7 @@ function positionPawnArrows()
 	{
 		player = data.players[rID];
 
-		if (!player.$pawnArrow.hasClass("hidden"))
+		if (player.hasOwnProperty("$pawnArrow") && !player.$pawnArrow.hasClass("hidden"))
 			player.animatePawnArrow();
 	}
 }
@@ -3947,7 +3952,7 @@ class Player
 				destination.cluster({ animatePawns: true }),
 				origin.cluster({ animatePawns: true })
 			]);
-			$("#travelPathArrow").addClass("hidden");
+			hideTravelPathArrow();
 
 			resolve();
 		});
@@ -4600,7 +4605,12 @@ function togglePlayerPanel($btnCollapseExpand)
 	});
 }
 
-function positionTravelPathArrow(actionProperties)
+function hideTravelPathArrow()
+{
+	$("#travelPathArrow").addClass("hidden");
+}
+
+function showTravelPathArrow(actionProperties)
 {
 	const { originOffset, destinationOffset } = getTravelPathVector(actionProperties),
 		stemWidth = getDimension("cityWidth") * 1.2,
@@ -4661,7 +4671,7 @@ function bindPawnEvents()
 		{
 			disabled: true, // pawn dragging is enabled and disabled according to the game state.
 			containment: $("#boardContainer"),
-			drag: function() { positionTravelPathArrow({ $pawn: $(this) }) }
+			drag: function() { showTravelPathArrow({ $pawn: $(this) }) }
 		})
 		.mousedown(function()
 		{
@@ -7922,9 +7932,16 @@ function placeDiseaseCube(city, cubeSupplyOffset)
 
 function newCityButton(cityKey)
 {
-	return $(`<div class='button actionPromptOption' data-key='${cityKey}'>
-				${getCity(cityKey).name}
-			</div>`);
+	const city = getCity(cityKey),
+		$btn = $(`<div class='button actionPromptOption' data-key='${cityKey}'>
+					${city.name}
+				</div>`);
+	
+	$btn.hover(function() { showTravelPathArrow({ destination: city }) },
+	function() { hideTravelPathArrow() })
+	.click(function() { $(this).off("mousenter mouseleave") }); // Prevents the travel path arrow from being hidden.
+
+	return $btn;
 }
 
 function newPlayerCardElement(cardKey, { noTooltip } = {})

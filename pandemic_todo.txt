@@ -33,13 +33,6 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-hovering over destination options in the action prompt should display the corresponding travel path arrow
-remove travel path arrow after...
-	direct flight
-	charter flight
-	drive/ferry
-	shuttle flight
-
 the travel path arrow should not appear until the pawn has been dragged a minimum distance
 	OR
 	the arrow should be small at first, but grow with increased distance to a max stemWidth
@@ -53,9 +46,13 @@ when resilient population is prompted, the infection discard tooltips should cha
 
 after buildResearchStation, the pawn arrow is slightly off
 
+for disabled action buttons...
+	fix the expand animation
+	explicitly let the user know they are disabled
+
 event history
 
-event card incons
+event card icons
 special action icons?
 
 if the page is resized during initial infections, consider queueing clusters to reoccur afterward
@@ -65,10 +62,6 @@ DiscardPrompt could use some better styling
 
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher
-
-highlight the active pawn in some way
-add a glowing arrow over the active player's pawn -- MAKE IT A GIF?
-	when the dispatcher is active, add smaller glowing arrows over all other pawns
 
 standardize prompt appearance / button behaviour
 

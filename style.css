@@ -529,7 +529,7 @@ span.r {color: #ef282a}
 	margin-top: 2px;
 }
 #infectionDiscard .infectionCardContents { width: 100%;  }
-#epidemicContainer .btnDisabled { cursor: wait }
+#epidemicContainer .btnDisabled { cursor: progress }
 .epidemicFull
 {
 	width: 98%;
