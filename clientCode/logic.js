@@ -2948,7 +2948,7 @@ async function buildResearchStation(relocationKey)
 	if (relocationKey)
 		getCity(relocationKey).relocateResearchStationTo(city);
 	else
-		city.buildResearchStation({ animate: true });
+		await city.buildResearchStation({ animate: true });
 	
 	proceed();
 }
@@ -4925,7 +4925,7 @@ class City
 		city.hasResearchStation = true;
 		data.researchStationKeys.add(city.key);
 
-		city.cluster({ animateResearchStation: true, stationInitialOffset, animatePawns: true });
+		return city.cluster({ animateResearchStation: true, stationInitialOffset, animatePawns: true });
 	}
 	
 	setPawnIndices()
@@ -5056,7 +5056,7 @@ class City
 		else if (animatePawns)
 			ms = pawnAnimationDuration;
 
-		return sleep(ms)
+		return sleep(ms);
 	}
 
 	clusterDiseaseCubes({ animate } = {})

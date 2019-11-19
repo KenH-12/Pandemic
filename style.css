@@ -770,7 +770,7 @@ span.r {color: #ef282a}
 .dispatcherBorder { border-color: #ec84b5 }
 
 .contingencyPlanner:not(.pawnArrow),
-.pawnArrow.contingencyPlanner > div,
+.pawnArrow.contingencyPlanner:not(.dispatch) > div,
 #btnPlanContingency
 { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
 .role.contingencyPlanner > .playerCard
