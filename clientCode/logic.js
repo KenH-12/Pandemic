@@ -2201,7 +2201,10 @@ function enableResilientPopulationSelection()
 					eventType: eventTypes.resilientPopulation,
 					cardKeyToRemove: $(this).data("key")
 				});
-			});
+			})
+			.css({ cursor: "pointer" })
+			.attr("title", `Infection card
+Select for removal?`);
 	}
 	else
 		actionInterfacePopulator.replaceInstructions("<span class='r'>The Infection Discard Pile is empty!<br />To play Resilient Population, there must be at least 1 card in the Infection Discard Pile.</span>");
@@ -2214,9 +2217,10 @@ function disableResilientPopulationSelection()
 
 async function resilientPopulation(cardKeyToRemove)
 {
+	resetInfectionDiscardClicksAndTooltips();
 	resetActionPrompt();
 	disableActions();
-
+	
 	const eventType = eventTypes.resilientPopulation,
 		events = await requestAction(eventType, { cardKeyToRemove });
 
@@ -2225,6 +2229,22 @@ async function resilientPopulation(cardKeyToRemove)
 
 	resizeInfectionDiscardElements();
 	resumeCurrentStep();
+}
+
+function resetInfectionDiscardClicksAndTooltips()
+{
+	let $this, city;
+	$("#infectionDiscard").children(".infectionCard")
+		.off("click")
+		.click(function() { pinpointCityFromCard($(this)) })
+		.each(function()
+		{
+			$this = $(this);
+			city = getCity($this.attr("data-key"));
+
+			setInfectionCardTitleAttribute($this, diseaseIsEradicated(city.color), city.name);
+		})
+		.css({ cursor: "help" });
 }
 
 async function resilientPopulationAnimation(cardKeyToRemove)

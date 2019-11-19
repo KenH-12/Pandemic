@@ -497,6 +497,7 @@ span.r {color: #ef282a}
 {
 	width: 100%;
 	margin-bottom: 5px;
+	cursor: help;
 }
 #infectCitiesContainer > .infectionCard, #infectCitiesContainer > .btnContinue { margin-top: 20px }
 .infectionCardContents { position: relative }
