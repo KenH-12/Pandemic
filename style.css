@@ -742,7 +742,7 @@ span.r {color: #ef282a}
 { background-image: linear-gradient(to bottom, #398044, #043d0a) }
 .quarantineSpecialistBorder { border-color: #006951 }
 
-.operationsExpert:not(.pawnArrow)
+.operationsExpert:not(.pawnArrow),
 .pawnArrow.operationsExpert > div,
 #btnOperationsFlight
 { background-image: linear-gradient(to bottom, #aad37a, #407f48) }

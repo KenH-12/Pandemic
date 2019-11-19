@@ -51,8 +51,6 @@ for disabled action buttons...
 
 rendezvous button
 
-infection discards needs to be scrollable
-
 event history
 
 event card icons
