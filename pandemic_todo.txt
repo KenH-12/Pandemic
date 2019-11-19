@@ -33,10 +33,6 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-the travel path arrow should not appear until the pawn has been dragged a minimum distance
-	OR
-	the arrow should be small at first, but grow with increased distance to a max stemWidth
-
 animate chevrons along the travel path arrow
 
 hovering over the treat disease button should show the Xs on the cubes that would be removed
@@ -54,6 +50,9 @@ event history
 
 event card icons
 special action icons?
+
+indicate invalid pawn drop somehow
+	maybe the travel path arrow can turn red briefly before disappearing
 
 if the page is resized during initial infections, consider queueing clusters to reoccur afterward
 	(cubes can appear misplaced until another resize event triggers clustering)

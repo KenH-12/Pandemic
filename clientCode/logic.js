@@ -4612,17 +4612,25 @@ function hideTravelPathArrow()
 
 function showTravelPathArrow(actionProperties)
 {
+	let stemWidth = getDimension("cityWidth") * 1.2;
 	const { originOffset, destinationOffset } = getTravelPathVector(actionProperties),
-		stemWidth = getDimension("cityWidth") * 1.2,
+		baseOffset = getPointAtDistanceAlongLine(originOffset, destinationOffset, stemWidth),
+		tipOffset = getPointAtDistanceAlongLine(destinationOffset, originOffset, stemWidth),
+		arrowLength = distanceBetweenPoints(baseOffset, tipOffset),
 		containerWidth = data.boardWidth,
-		containerHeight = data.boardHeight,
-		clipPath = getArrowClipPath({
-				stemWidth,
-				baseOffset: getPointAtDistanceAlongLine(originOffset, destinationOffset, stemWidth),
-				tipOffset: getPointAtDistanceAlongLine(destinationOffset, originOffset, stemWidth),
-				containerWidth,
-				containerHeight
-			});
+		containerHeight = data.boardHeight;
+	
+	// Avoid weird clip-paths that could occur when the arrow is very short.
+	if (arrowLength < stemWidth * 4)
+		stemWidth = arrowLength / 4;
+	
+	const clipPath = getArrowClipPath({
+			stemWidth,
+			baseOffset,
+			tipOffset,
+			containerWidth,
+			containerHeight
+		});
 
 	$("#travelPathArrow").css(
 		{
