@@ -96,10 +96,12 @@ body,
 {
 	position: absolute;
 }
-#travelPathArrow
+#travelPathArrowContainer
 {
-	opacity: 0.7;
 	z-index: 6;
+	opacity: 0.7;
+	filter: drop-shadow(0px 0px 3px #fff);
+	pointer-events: none;
 }
 #boardContainer > .pawn
 {
@@ -527,6 +529,7 @@ span.r {color: #ef282a}
 	margin-top: 2px;
 }
 #infectionDiscard .infectionCardContents { width: 100%;  }
+#epidemicContainer .btnDisabled { cursor: wait }
 .epidemicFull
 {
 	width: 98%;

@@ -119,7 +119,9 @@
 							</div>
 						</div>
 
-						<div id='travelPathArrow'></div>
+						<div id='travelPathArrowContainer'>
+							<div id='travelPathArrow'></div>
+						</div>
 						<div id='quarantineArea'></div>
 						
 						<div class='infectionRateHighlight top hidden'></div>

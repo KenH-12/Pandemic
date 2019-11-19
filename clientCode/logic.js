@@ -117,6 +117,7 @@ eventTypes = {
 		instructions: "Select a Destination:",
 		actionPathName: "movementAction",
 		propertyNames: ["originKey", "destinationKey"],
+		pawnAnimationDuration: 500
 	},
 	directFlight: {
 		name: "Direct Flight",
@@ -128,7 +129,8 @@ eventTypes = {
 discard the city card that matches the destination city.
 The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"]
+		propertyNames: ["originKey", "destinationKey"],
+		pawnAnimationDuration: 1000
 	},
 	charterFlight: {
 		name: "Charter Flight",
@@ -140,7 +142,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 discard the city card that matches the pawn&#39;s current location.
 The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"]
+		propertyNames: ["originKey", "destinationKey"],
+		pawnAnimationDuration: 1000
 	},
 	chooseFlightType: {
 		name: "Choose Flight Type",
@@ -153,7 +156,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: ["Move from a city with a research station to any other city that has a research station."],
 		instructions: "Select a Destination:",
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"]
+		propertyNames: ["originKey", "destinationKey"],
+		pawnAnimationDuration: 600
 	},
 	buildResearchStation: {
 		name: "Build Research Station",
@@ -252,7 +256,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 	rendezvous: {
 		name: "Rendezvous",
 		code: "rv",
-		actionPathName: "movementAction"
+		actionPathName: "movementAction",
+		pawnAnimationDuration: 600
 	},
 	operationsFlight: {
 		name: "Operations Flight",
@@ -262,7 +267,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey", "cardKey"]
+		propertyNames: ["originKey", "destinationKey", "cardKey"],
+		pawnAnimationDuration: 1000
 	},
 	pass: {
 		name: "Pass Actions",
@@ -387,7 +393,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: ["Play at any time. Not an action.", "Move any 1 pawn to any city."],
 		instructions: "To airlift a pawn, drag and drop it onto the destination city.",
 		propertyNames: ["roleToAirlift", "originKey", "destinationKey"],
-		actionPathName: "airlift"
+		actionPathName: "airlift",
+		pawnAnimationDuration: 1000
 	},
 	governmentGrant: {
 		name: "Government Grant",
@@ -1348,7 +1355,6 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.appendOptionButtons("city", destinationKeys,
 			function($clicked)
 			{
-				setDuration("pawnAnimation", 600);
 				movementAction(eventTypes.driveFerry, getCity($clicked.data("key")));
 			});
 		return true;
@@ -1361,7 +1367,6 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.appendOptionButtons("city", destinationKeys,
 			function($clicked)
 			{
-				setDuration("pawnAnimation", 1000);
 				movementAction(shuttleFlight, getCity($clicked.data("key")));
 			});
 		return true;
@@ -1409,7 +1414,6 @@ const actionInterfacePopulator = {
 				cardKeys: currentCity.key,
 				onConfirm: function()
 				{
-					setDuration("pawnAnimation", 1000);
 					movementAction(charterFlight, destination);
 				}
 			});
@@ -1433,7 +1437,6 @@ const actionInterfacePopulator = {
 					cardKeys: destination.key,
 					onConfirm: function()
 					{
-						setDuration("pawnAnimation", 1000);
 						movementAction(directFlight, destination);
 					}
 				});
@@ -1680,7 +1683,6 @@ const actionInterfacePopulator = {
 
 		actionInterfacePopulator.appendOptionButtons("playerCard", useableCardKeys, function($clicked)
 		{
-			setDuration("pawnAnimation", 1000);
 			movementAction(operationsFlight, destination, { operationsFlightDiscardKey: $clicked.data("key") });
 		});
 
@@ -2291,11 +2293,10 @@ async function airlift(playerToAirlift, destination)
 	
 	await discardOrRemoveEventCard(events.shift());
 
-	playerToAirlift.updateLocation(destination);
+	setDuration("pawnAnimation", eventType.pawnAnimationDuration);
+	await playerToAirlift.updateLocation(destination);
 
 	// If any events are left after shifting the airliftEvent, they are auto-treat disease events.
-	log("auto-treat events:");
-	log(events);
 	if (events.length)
 		await animateAutoTreatDiseaseEvents(events);
 	
@@ -3011,6 +3012,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	else // Move appears to be valid
 	{
 		resetActionPrompt();
+		disableActions();
 		
 		try
 		{
@@ -3032,6 +3034,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			
 			await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
+			setDuration("pawnAnimation", eventType.pawnAnimationDuration);
 			await player.updateLocation(destination);
 
 			if (events.length > 1)
@@ -3931,18 +3934,24 @@ class Player
 
 	updateLocation(destination)
 	{
-		const origin = this.getLocation();
-		
-		this.$pawn.removeClass(this.cityKey).addClass(destination.key);
-		destination.setPawnIndices();
-		
-		this.cityKey = destination.key;
+		return new Promise(async resolve =>
+		{
+			const origin = this.getLocation();
+			
+			this.$pawn.removeClass(this.cityKey).addClass(destination.key);
+			destination.setPawnIndices();
+			
+			this.cityKey = destination.key;
+	
+			await Promise.all(
+			[
+				destination.cluster({ animatePawns: true }),
+				origin.cluster({ animatePawns: true })
+			]);
+			$("#travelPathArrow").addClass("hidden");
 
-		return Promise.all(
-		[
-			destination.cluster({ animatePawns: true }),
-			origin.cluster({ animatePawns: true })
-		]);
+			resolve();
+		});
 	}
 
 	pinpointLocation()
