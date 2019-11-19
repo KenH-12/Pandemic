@@ -49,6 +49,10 @@ animate chevrons along the travel path arrow
 hovering over the treat disease button should show the Xs on the cubes that would be removed
 hovering over the color options in the treat disease prompt should do the same
 
+when resilient population is prompted, the infection discard tooltips should change
+
+after buildResearchStation, the pawn arrow is slightly off
+
 event history
 
 event card incons

@@ -116,8 +116,7 @@ eventTypes = {
 		rules: ["Move to a city connected by a white line to the one you are in."],
 		instructions: "Select a Destination:",
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"],
-		pawnAnimationDuration: 500
+		propertyNames: ["originKey", "destinationKey"]
 	},
 	directFlight: {
 		name: "Direct Flight",
@@ -129,8 +128,7 @@ eventTypes = {
 discard the city card that matches the destination city.
 The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"],
-		pawnAnimationDuration: 1000
+		propertyNames: ["originKey", "destinationKey"]
 	},
 	charterFlight: {
 		name: "Charter Flight",
@@ -142,8 +140,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 discard the city card that matches the pawn&#39;s current location.
 The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"],
-		pawnAnimationDuration: 1000
+		propertyNames: ["originKey", "destinationKey"]
 	},
 	chooseFlightType: {
 		name: "Choose Flight Type",
@@ -156,8 +153,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: ["Move from a city with a research station to any other city that has a research station."],
 		instructions: "Select a Destination:",
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"],
-		pawnAnimationDuration: 600
+		propertyNames: ["originKey", "destinationKey"]
 	},
 	buildResearchStation: {
 		name: "Build Research Station",
@@ -256,8 +252,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	rendezvous: {
 		name: "Rendezvous",
 		code: "rv",
-		actionPathName: "movementAction",
-		pawnAnimationDuration: 600
+		actionPathName: "movementAction"
 	},
 	operationsFlight: {
 		name: "Operations Flight",
@@ -267,8 +262,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey", "cardKey"],
-		pawnAnimationDuration: 1000
+		propertyNames: ["originKey", "destinationKey", "cardKey"]
 	},
 	pass: {
 		name: "Pass Actions",
@@ -393,8 +387,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: ["Play at any time. Not an action.", "Move any 1 pawn to any city."],
 		instructions: "To airlift a pawn, drag and drop it onto the destination city.",
 		propertyNames: ["roleToAirlift", "originKey", "destinationKey"],
-		actionPathName: "airlift",
-		pawnAnimationDuration: 1000
+		actionPathName: "airlift"
 	},
 	governmentGrant: {
 		name: "Government Grant",
@@ -2293,7 +2286,7 @@ async function airlift(playerToAirlift, destination)
 	
 	await discardOrRemoveEventCard(events.shift());
 
-	setDuration("pawnAnimation", eventType.pawnAnimationDuration);
+	setDuration("pawnAnimation", 1000);
 	await playerToAirlift.updateLocation(destination);
 
 	// If any events are left after shifting the airliftEvent, they are auto-treat disease events.
@@ -3013,6 +3006,12 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	{
 		resetActionPrompt();
 		disableActions();
+
+		if (!movementTypeRequiresDiscard(eventType))
+		{
+			originCity.cluster();
+			positionTravelPathArrow({ player, destination });
+		}
 		
 		try
 		{
@@ -3034,7 +3033,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			
 			await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
-			setDuration("pawnAnimation", eventType.pawnAnimationDuration);
+			setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
 			await player.updateLocation(destination);
 
 			if (events.length > 1)
