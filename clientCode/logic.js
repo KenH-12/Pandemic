@@ -2220,7 +2220,8 @@ async function resilientPopulation(cardKeyToRemove)
 	resetInfectionDiscardClicksAndTooltips();
 	resetActionPrompt();
 	disableActions();
-	
+	unbindInfectionDiscardHover();
+
 	const eventType = eventTypes.resilientPopulation,
 		events = await requestAction(eventType, { cardKeyToRemove });
 
@@ -2228,6 +2229,7 @@ async function resilientPopulation(cardKeyToRemove)
 	await resilientPopulationAnimation(cardKeyToRemove);
 
 	resizeInfectionDiscardElements();
+	bindInfectionDiscardHover();
 	resumeCurrentStep();
 }
 
@@ -2254,6 +2256,7 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 		$cardToRemove = $discardPile.children(`[data-key='${cardKeyToRemove}']`),
 		initialOffset = $cardToRemove.offset();
 
+	
 	await expandInfectionDiscardPile();
 	
 	$cardToRemove.appendTo("#boardContainer");
@@ -6818,7 +6821,7 @@ async function animateEpidemicIntensify()
 	const $container = $("#infectionDiscard"),
 		$title = $container.children(".title").first();
 	
-	bindInfectionDiscardHover({ unbind: true });
+	unbindInfectionDiscardHover();
 	
 	await sleep(getDuration("longInterval"));
 	await expandInfectionDiscardPile();
@@ -9775,25 +9778,15 @@ function bindInfectionDeckHover()
 	});
 }
 
-function bindInfectionDiscardHover({ unbind } = {})
+function bindInfectionDiscardHover()
 {
-	const $container = $("#infectionDiscard");
-
-	$container.unbind("mouseenter mouseleave");
-	
-	if (!unbind)
-	{
-		$container.hover(function()
-		{
-			expandInfectionDiscardPile();
-		},
-		function()
-		{
-			collapsenfectionDiscardPile();
-		});
-	}
+	$("#infectionDiscard")
+		.unbind("mouseenter mouseleave")
+		.hover(function() { expandInfectionDiscardPile() },
+		function() { collapsenfectionDiscardPile() });
 }
 bindInfectionDiscardHover();
+function unbindInfectionDiscardHover() { $("#infectionDiscard").unbind("mouseenter mouseleave") }
 
 $("#playerDiscard").hover(
 	function() { expandPlayerDiscardPile() },
