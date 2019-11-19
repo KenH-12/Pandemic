@@ -9690,14 +9690,14 @@ function expandInfectionDiscardPile()
 			$container.stop().css("height", "auto");
 			positionRemovedInfectionCards();
 
-			const expandedHeight = $container.height();
+			let expandedHeight = $container.height();
 		
 			if (expandedHeight < panelHeight)
 			{
 				$container.removeAttr("style")
 					.css({
-						"height": panelHeight,
-						"overflow-y": "hidden"
+						height: panelHeight,
+						overflowY: "hidden"
 					});
 				resolve();
 			}
@@ -9709,7 +9709,8 @@ function expandInfectionDiscardPile()
 					$container.css("overflow-y", "scroll");
 				}
 				
-				$container.css("height", panelHeight)
+				$container
+					.css({ height: panelHeight })
 					.animate({ height: expandedHeight + 2 },
 						getDuration("discardPileExpand"),
 						function() { resolve(); });
@@ -9724,7 +9725,7 @@ function collapsenfectionDiscardPile()
 			
 			$("#infectionDiscard")
 				.stop()
-				.css("overflow-y", "hidden")
+				.css({ overflowY: "hidden" })
 				.animate({
 					scrollTop: 0,
 					height: $("#topPanel").height()
@@ -9801,8 +9802,10 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 		{
 			if (!showRemovedCardsContainer)
 			{
-				$discardPile.css("overflow-y", "hidden");
-				$discardPile.css("height", panelHeight);
+				$discardPile.css({
+					overflowY: "hidden",
+					height: panelHeight
+				});
 			}
 			
 			resolve();
@@ -9817,7 +9820,8 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 			
 			$discardPile.css(
 				{
-					"height": panelHeight
+					height: panelHeight,
+					zIndex: 8 // The expanded container needs to cover .pawnArrows
 				})
 				.animate(
 				{
@@ -9857,7 +9861,8 @@ function collapsePlayerDiscardPile()
 			{
 				scrollTop: 0,
 				height: data.topPanelHeight,
-				top: data.boardHeight - data.topPanelHeight
+				top: data.boardHeight - data.topPanelHeight,
+				zIndex: 7
 			}, getDuration("discardPileCollapse"),
 			function()
 			{

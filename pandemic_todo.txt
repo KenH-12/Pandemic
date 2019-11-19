@@ -31,6 +31,9 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
+clicking a disease cube to treat disease while a prompt is open has undesired effects
+	(direct flight prompt was open)
+
 TO DO
 -----
 animate chevrons along the travel path arrow
@@ -45,6 +48,10 @@ after buildResearchStation, the pawn arrow is slightly off
 for disabled action buttons...
 	fix the expand animation
 	explicitly let the user know they are disabled
+
+rendezvous button
+
+infection discards needs to be scrollable
 
 event history
 
@@ -61,6 +68,8 @@ DiscardPrompt could use some better styling
 
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher
+
+the discover sure button needs gray text when the button is disabled and the scientist's turn
 
 standardize prompt appearance / button behaviour
 
