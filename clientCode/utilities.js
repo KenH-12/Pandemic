@@ -265,6 +265,10 @@ function slopeOfLine(a, b)
 {
 	return (a.top - b.top) / (a.left - b.left);
 }
+function getPerpendicularSlope(a, b)
+{
+	return (1 / slopeOfLine(a, b)) * -1;
+}
 function getYIntercept(a, b)
 {
 	return a.top - slopeOfLine(a, b)*a.left;
@@ -292,6 +296,58 @@ function normalizeVector(v)
 		top: v.top / vLength
 	};
 }
+function getArrowClipPath({ baseOffset, tipOffset, stemWidth, headWidth, headLength, containerWidth, containerHeight } = {})
+{
+	headWidth = headWidth || stemWidth * 3;
+	headLength = headLength || headWidth;
+	
+	const arrowheadBase = getPointAtDistanceAlongLine(tipOffset, baseOffset, headLength),
+		halfStemWidth = stemWidth / 2,
+		halfHeadWidth = headWidth / 2,
+		pointProperties = [
+			{ vectorPoint: arrowheadBase, belowLine: true, distanceFromVector: halfHeadWidth },
+			{ vectorPoint: arrowheadBase, belowLine: true, distanceFromVector: halfStemWidth },
+			{ vectorPoint: baseOffset, belowLine: true, distanceFromVector: halfStemWidth },
+			{ vectorPoint: baseOffset, belowLine: false, distanceFromVector: halfStemWidth },
+			{ vectorPoint: arrowheadBase, belowLine: false, distanceFromVector: halfStemWidth },
+			{ vectorPoint: arrowheadBase, belowLine: false, distanceFromVector: halfHeadWidth }
+		],
+		perpendicularSlope = getPerpendicularSlope(baseOffset, tipOffset);
+		points = [tipOffset];
+
+	for (let i = 0; i < pointProperties.length; i++)
+	{
+		const {
+			vectorPoint,
+			belowLine,
+			distanceFromVector
+		} = pointProperties[i];
+
+		points.push(getPointAtDistancePerpendicularToLine({ a: vectorPoint, distance: distanceFromVector }, {
+				perpendicularSlope,
+				belowLine
+			}));
+	}
+
+	return getClipPathPolygonFromPoints(containerWidth, containerHeight, points);
+}
+function getPointAtDistancePerpendicularToLine({ a, distance }, {
+		b,
+		perpendicularSlope,
+		belowLine
+	} = {})
+{
+	perpendicularSlope = perpendicularSlope || getPerpendicularSlope(a, b);
+	
+	const perpendicularDirection = belowLine ? -1 : 1,
+		somePerpendicularX = a.left - distance*perpendicularDirection,
+		somePerpendicularPoint = {
+			left: somePerpendicularX,
+			top: perpendicularSlope*somePerpendicularX + getYInterceptFromSlope(a, perpendicularSlope)
+		};
+	
+	return getPointAtDistanceAlongLine(a, somePerpendicularPoint, distance);
+}
 function getPointAtDistanceAlongLine(a, b, distanceFromA)
 {
 	const u = normalizeVector(getVector(a, b));
@@ -301,7 +357,70 @@ function getPointAtDistanceAlongLine(a, b, distanceFromA)
 		top: a.top + (distanceFromA*u.top)
 	};
 }
-function getClipPathFromPoints(containerWidth, containerHeight, points)
+
+function rotateClipPathPolygonIn2dSpace($element, radians, { containerWidth, containerHeight } = {})
+{
+	containerWidth = containerWidth || $element.parent().width();
+	containerHeight = containerHeight || $element.parent().height();
+	log("containerWidth", containerWidth);
+	log("containerHeight", containerHeight);
+
+	const initialPoints = convertClipPathPolygonToPoints($element, { containerWidth, containerHeight }),
+		rotatedPoints = rotatePointsIn2dSpace(initialPoints, radians, containerWidth, containerHeight);
+	
+	log("rotatedPoints", rotatedPoints);
+	return getClipPathPolygonFromPoints(containerWidth, containerHeight, rotatedPoints);
+}
+function convertClipPathPolygonToPoints($element, { containerWidth, containerHeight } = {})
+{
+	containerWidth = containerWidth || $element.parent().width();
+	containerHeight = containerHeight || $element.parent().height();
+	
+	const clipPath = $element.css("clip-path"),
+		clipPathWithoutUnits = clipPath.replace(/%|px/g, ""),
+		strippedClipPath = clipPathWithoutUnits.substring(clipPathWithoutUnits.indexOf("(") + 1, clipPathWithoutUnits.indexOf(")")),
+		splitClipPath = strippedClipPath.split(", "),
+		points = splitClipPath
+			.map(p => {
+				const splitPoint = p.split(" ");
+				
+				return {
+					left: splitPoint[0]/100 * containerWidth,
+					top: splitPoint[1]/100 * containerHeight
+				};
+			});
+
+	return points;
+}
+
+
+function rotatePointsIn2dSpace(points, radians, containerWidth, containerHeight)
+{
+	const centerAdjustmentVector = {
+		left: containerWidth / 2,
+		top: containerHeight / 2
+	};
+	log("centerAdjustmentVector", centerAdjustmentVector);
+	log("radians", radians);
+	for (let p of points)
+	{
+		log("point", p.left.toString(), p.top.toString());
+		
+		p.left -= centerAdjustmentVector.left;
+		p.top -= centerAdjustmentVector.top;
+
+		p.left = p.left*Math.cos(radians) - p.top*Math.sin(radians);
+		p.top = p.left*Math.sin(radians) + p.top*Math.cos(radians);
+		
+		p.left += centerAdjustmentVector.left;
+		p.top += centerAdjustmentVector.top;
+
+		log("rotatedPoint", p.left.toString(), p.top.toString());
+	}
+
+	return points;
+}
+function getClipPathPolygonFromPoints(containerWidth, containerHeight, points)
 {
 	let clipPath = "polygon(";
 
@@ -314,43 +433,7 @@ function getClipPathFromPoints(containerWidth, containerHeight, points)
 	return clipPath;
 }
 
-function getArrowClipPath({ baseOffset, tipOffset, stemWidth, headWidth, headLength, containerWidth, containerHeight } = {})
+function toRadians(degrees)
 {
-	headWidth = headWidth || stemWidth * 3;
-	headLength = headLength || headWidth;
-	
-	const arrowheadBase = getPointAtDistanceAlongLine(tipOffset, baseOffset, headLength),
-		halfStemWidth = stemWidth / 2,
-		halfHeadWidth = headWidth / 2,
-		pointProperties = [
-			{ vectorPoint: arrowheadBase, directionFromVector: -1, distanceFromVector: halfHeadWidth },
-			{ vectorPoint: arrowheadBase, directionFromVector: -1, distanceFromVector: halfStemWidth },
-			{ vectorPoint: baseOffset, directionFromVector: -1, distanceFromVector: halfStemWidth },
-			{ vectorPoint: baseOffset, directionFromVector: 1, distanceFromVector: halfStemWidth },
-			{ vectorPoint: arrowheadBase, directionFromVector: 1, distanceFromVector: halfStemWidth },
-			{ vectorPoint: arrowheadBase, directionFromVector: 1, distanceFromVector: halfHeadWidth }
-		],
-		perpendicularSlope = (1 / slopeOfLine(baseOffset, tipOffset)) * -1,
-		points = [tipOffset];
-
-	let perpendicularX,
-		perpendicularPoint;
-	for (let i = 0; i < pointProperties.length; i++)
-	{
-		const {
-			vectorPoint,
-			directionFromVector,
-			distanceFromVector
-		} = pointProperties[i];
-
-		perpendicularX = vectorPoint.left - stemWidth*directionFromVector;
-		perpendicularPoint = {
-			left: perpendicularX,
-			top: perpendicularSlope*perpendicularX + getYInterceptFromSlope(vectorPoint, perpendicularSlope)
-		};
-
-		points.push(getPointAtDistanceAlongLine(vectorPoint, perpendicularPoint, distanceFromVector));
-	}
-
-	return getClipPathFromPoints(containerWidth, containerHeight, points);
+	return degrees * (Math.PI / 180);
 }

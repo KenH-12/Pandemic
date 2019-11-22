@@ -37,6 +37,14 @@ clicking a disease cube to treat disease while a prompt is open has undesired ef
 TO DO
 -----
 animate chevrons along the travel path arrow
+	rotating the chevron clip-path requires matrix transformation
+
+	NEW PLAN:
+		get the stripped clip-path string
+		split it
+		loop through
+			rotate the individual point
+			concatenate it directly into the new clip-path string
 
 hovering over the treat disease button should show the Xs on the cubes that would be removed
 hovering over the color options in the treat disease prompt should do the same
