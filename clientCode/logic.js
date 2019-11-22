@@ -4740,6 +4740,14 @@ function stopTravelPathChevronAnimations()
 	$("#travelPathArrow").children(".travelPathChevron").stop().remove();
 }
 
+$("#imgInfectionDeck").click(function()
+{
+	log("clicked");
+	const $chevron = $("#testChevron").children().first();
+	
+	$chevron.css("clip-path", rotateClipPathPolygonIn2dSpace($chevron, toRadians(45), { containerWidth: data.boardWidth, containerHeight: data.boardHeight}));
+});
+
 async function animateTravelPathChevron(arrowBaseOffset, arrowTipOffset, arrowStemWidth, chevronLifespanMs)
 {
 	const arrowheadWidth = arrowStemWidth * 3,
@@ -4761,7 +4769,7 @@ async function animateTravelPathChevron(arrowBaseOffset, arrowTipOffset, arrowSt
 		initialClipPath = $chevron.css("clip-path");
 
 	log("arrowAngleInRadians", arrowAngleInRadians);
-	const rotatedClipPath = rotateClipPathPolygonIn2dSpace($chevron, arrowAngleInRadians);
+	const rotatedClipPath = rotateClipPathPolygonIn2dSpace($chevron, arrowAngleInRadians, { containerWidth: arrowheadWidth, containerHeight: arrowheadWidth });
 	
 		log("initialClipPath", initialClipPath);
 		log("rotatedClipPath", rotatedClipPath);

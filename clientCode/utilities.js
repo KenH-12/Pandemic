@@ -365,11 +365,11 @@ function rotateClipPathPolygonIn2dSpace($element, radians, { containerWidth, con
 	log("containerWidth", containerWidth);
 	log("containerHeight", containerHeight);
 
-	const initialPoints = convertClipPathPolygonToPoints($element, { containerWidth, containerHeight }),
-		rotatedPoints = rotatePointsIn2dSpace(initialPoints, radians, containerWidth, containerHeight);
-	
-	log("rotatedPoints", rotatedPoints);
-	return getClipPathPolygonFromPoints(containerWidth, containerHeight, rotatedPoints);
+	const initialPoints = convertClipPathPolygonToPoints($element),
+		rotatedPoints = rotatePointsIn2dSpaceAroundPoint(initialPoints, pointOfRotation, radians),
+		newClipPath = getClipPathPolygonFromPoints(containerWidth, containerHeight, rotatedPoints);
+	log("newClipPath", newClipPath);
+	return newClipPath;
 }
 function convertClipPathPolygonToPoints($element, { containerWidth, containerHeight } = {})
 {
@@ -383,39 +383,23 @@ function convertClipPathPolygonToPoints($element, { containerWidth, containerHei
 		points = splitClipPath
 			.map(p => {
 				const splitPoint = p.split(" ");
-				
+				log("splitPoint: ", splitPoint);
 				return {
 					left: splitPoint[0]/100 * containerWidth,
 					top: splitPoint[1]/100 * containerHeight
 				};
 			});
-
+	log("initialClipPath", clipPath);
 	return points;
 }
 
 
-function rotatePointsIn2dSpace(points, radians, containerWidth, containerHeight)
+function rotatePointsIn2dSpaceAroundPoint(points, pointOfRotation, radians)
 {
-	const centerAdjustmentVector = {
-		left: containerWidth / 2,
-		top: containerHeight / 2
-	};
-	log("centerAdjustmentVector", centerAdjustmentVector);
-	log("radians", radians);
 	for (let p of points)
 	{
-		log("point", p.left.toString(), p.top.toString());
-		
-		p.left -= centerAdjustmentVector.left;
-		p.top -= centerAdjustmentVector.top;
-
 		p.left = p.left*Math.cos(radians) - p.top*Math.sin(radians);
 		p.top = p.left*Math.sin(radians) + p.top*Math.cos(radians);
-		
-		p.left += centerAdjustmentVector.left;
-		p.top += centerAdjustmentVector.top;
-
-		log("rotatedPoint", p.left.toString(), p.top.toString());
 	}
 
 	return points;
@@ -436,4 +420,26 @@ function getClipPathPolygonFromPoints(containerWidth, containerHeight, points)
 function toRadians(degrees)
 {
 	return degrees * (Math.PI / 180);
+}
+
+function multiplyMatrices(mA, mB)
+{
+	const result = [];
+
+	let resultRow,
+		resultCell;
+	for (let aRow of mA)
+	{
+		resultRow = [];
+		for (let bRow of mB)
+		{
+			resultCell = 0;
+			for (let i = 0; i < aRow.length; i++)
+				resultCell += aRow[i] * bRow[i];
+		}
+		resultRow.push(resultCell);
+	}
+	result.push(resultRow);
+
+	return result;
 }
