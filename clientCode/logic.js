@@ -6513,6 +6513,8 @@ function unbindDiseaseCubeEvents()
 		.removeAttr("title")
 		.removeClass("cubeToRemove")
 		.children(".cubeSlash").remove();
+	
+	$("#btnTreatDisease").off("mouseenter mousleave");
 }
 
 function highlightEpidemicStep($epidemic, epidemicStep)

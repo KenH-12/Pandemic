@@ -31,8 +31,20 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
+SCENARIO:
+	click drive/ferry button from san francisco
+	tokyo button does not properly show the travel path arrow
+
 TO DO
 -----
+when the treat disease button becomes enabled, it should check whether it is hovered, and if it is, mark treatable cubes
+
+temporarily reduce the z-index of the travel path arrow while a pawn is animated along it
+
+temporarily reduce the z-index of whichever marker is not being highlighted (outbreak or infection rate)
+
+card templates have cursor:help during the draw step and the infection step
+
 for disabled action buttons...
 	fix the expand animation
 	explicitly let the user know they are disabled
