@@ -36,8 +36,9 @@ clicking a disease cube to treat disease while a prompt is open has undesired ef
 
 TO DO
 -----
-hovering over the treat disease button should show the Xs on the cubes that would be removed
 hovering over the color options in the treat disease prompt should do the same
+
+pawn arrows appear misplaced when pawns on the same city switch positions at the start of a turn
 
 for disabled action buttons...
 	fix the expand animation

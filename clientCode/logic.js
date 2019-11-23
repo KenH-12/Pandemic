@@ -952,7 +952,6 @@ function enableAvailableActionButtons(player)
 	for (let action of actions)
 	{
 		actionName = toPascalCase(action.name);
-		log("actionName: ", actionName);
 
 		if (player[`can${actionName}`]())
 			enableActionButton(`btn${actionName}`);
@@ -6450,18 +6449,14 @@ function bindDiseaseCubeEvents()
 	
 	const player = getActivePlayer(),
 		{ cityKey } = player,
-		$cubes = $("#boardContainer").children(`.diseaseCube.${cityKey}`);
+		$cubes = $("#boardContainer").children(`.${cityKey}.diseaseCube`);
 	
 	$cubes.attr("title", "Click to Treat Disease")
 		.hover(function()
 		{
 			markTreatableDiseaseCubes($(this), cityKey);
 		},
-		function()
-		{
-			$cubes.removeClass("cubeToRemove")
-				.children(".cubeSlash").remove();
-		})
+		function() { unmarkTreatableDiseaseCubes($cubes) })
 		.click(function()
 		{
 			unbindDiseaseCubeEvents();
@@ -6474,7 +6469,21 @@ function bindDiseaseCubeEvents()
 		$this = $(this);
 		if ($this.is(":hover"))
 			markTreatableDiseaseCubes($this, cityKey);
-	})
+	});
+
+	$(`#btnTreatDisease`).hover(function()
+	{
+		const city = getCity(cityKey);
+		let numDiseaseColorsOnCity = 0;
+
+		for (let color in city.cubes)
+			if (city.cubes[color] > 0)
+				numDiseaseColorsOnCity++;
+		
+		if (numDiseaseColorsOnCity === 1)
+			markTreatableDiseaseCubes($cubes.last(), cityKey);
+	},
+	function() { unmarkTreatableDiseaseCubes($cubes) });
 }
 
 function markTreatableDiseaseCubes($hoveredCube, cityKey)
@@ -6489,6 +6498,12 @@ function markTreatableDiseaseCubes($hoveredCube, cityKey)
 	
 	$cubesToMark.append("<div class='cubeSlash'></div>")
 		.addClass("cubeToRemove");
+}
+
+function unmarkTreatableDiseaseCubes($cubes)
+{
+	$cubes.removeClass("cubeToRemove")
+		.children(".cubeSlash").remove();
 }
 
 function unbindDiseaseCubeEvents()
