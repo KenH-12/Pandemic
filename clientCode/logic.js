@@ -1497,28 +1497,31 @@ const actionInterfacePopulator = {
 	[eventTypes.treatDisease.name]()
 	{
 		const $actionInterface = actionInterfacePopulator.$actionInterface,
-			diseaseColorOptions = getActivePlayer().getLocation().getDiseaseColorOptions();
+			player = getActivePlayer(),
+			city = player.getLocation(),
+			diseaseColorOptions = city.getDiseaseColorOptions();
 		
 		if (diseaseColorOptions.length > 1)
 		{
-			const player = getActivePlayer();
-
 			if (player.role === "Medic")
 				actionInterfacePopulator.appendSpecialAbilityRule(eventTypes.treatDisease);
 			
-			let $colorOptionCube;
 			for (let color of diseaseColorOptions)
-			{
-				$colorOptionCube = newDiseaseCubeElement(color);
-				$colorOptionCube.data("color", color);
-				$actionInterface.append($colorOptionCube);
-			}
+				$actionInterface.append(newDiseaseCubeElement(color));
 
-			$actionInterface.children(".diseaseCube").click(function()
-			{
-				resetActionPrompt();
-				treatDisease(false, $(this).data("color"));
-			});
+			const $cubes = $(`.${city.key}.diseaseCube`);
+			$actionInterface.children(".diseaseCube")
+				.hover(function()
+				{
+					const $cubesOfColor = $cubes.filter(`.${getColorClass($(this))}`);
+					markTreatableDiseaseCubes($cubesOfColor.last(), city.key);
+				},
+				function() { unmarkTreatableDiseaseCubes($cubes) })
+				.click(function()
+				{
+					resetActionPrompt();
+					treatDisease(false, getColorClass($(this)));
+				});
 
 			delayExecution(resizeTreatDiseaseOptions, 1);
 			return true;
@@ -6452,11 +6455,8 @@ function bindDiseaseCubeEvents()
 		$cubes = $("#boardContainer").children(`.${cityKey}.diseaseCube`);
 	
 	$cubes.attr("title", "Click to Treat Disease")
-		.hover(function()
-		{
-			markTreatableDiseaseCubes($(this), cityKey);
-		},
-		function() { unmarkTreatableDiseaseCubes($cubes) })
+		.hover(function() { markTreatableDiseaseCubes($(this), cityKey) },
+			function() { unmarkTreatableDiseaseCubes($cubes) })
 		.click(function()
 		{
 			unbindDiseaseCubeEvents();
