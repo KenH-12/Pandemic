@@ -6460,6 +6460,7 @@ function bindDiseaseCubeEvents()
 		.click(function()
 		{
 			unbindDiseaseCubeEvents();
+			resetActionPrompt();
 			treatDisease($(this));
 		});
 	

@@ -31,9 +31,6 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
-clicking a disease cube to treat disease while a prompt is open has undesired effects
-	(direct flight prompt was open)
-
 TO DO
 -----
 pawn arrows appear misplaced when pawns on the same city switch positions at the start of a turn
