@@ -365,7 +365,8 @@ function rotateClipPathPolygonIn2dSpace($element, radians, { containerWidth, con
 	log("containerWidth", containerWidth);
 	log("containerHeight", containerHeight);
 
-	const initialPoints = convertClipPathPolygonToPoints($element),
+	const pointOfRotation = { left: containerWidth / 2, top: containerHeight / 2 }
+		initialPoints = convertClipPathPolygonToPoints($element),
 		rotatedPoints = rotatePointsIn2dSpaceAroundPoint(initialPoints, pointOfRotation, radians),
 		newClipPath = getClipPathPolygonFromPoints(containerWidth, containerHeight, rotatedPoints);
 	log("newClipPath", newClipPath);
@@ -392,18 +393,6 @@ function convertClipPathPolygonToPoints($element, { containerWidth, containerHei
 	log("initialClipPath", clipPath);
 	return points;
 }
-
-
-function rotatePointsIn2dSpaceAroundPoint(points, pointOfRotation, radians)
-{
-	for (let p of points)
-	{
-		p.left = p.left*Math.cos(radians) - p.top*Math.sin(radians);
-		p.top = p.left*Math.sin(radians) + p.top*Math.cos(radians);
-	}
-
-	return points;
-}
 function getClipPathPolygonFromPoints(containerWidth, containerHeight, points)
 {
 	let clipPath = "polygon(";
@@ -415,31 +404,4 @@ function getClipPathPolygonFromPoints(containerWidth, containerHeight, points)
 	clipPath += ")";
 
 	return clipPath;
-}
-
-function toRadians(degrees)
-{
-	return degrees * (Math.PI / 180);
-}
-
-function multiplyMatrices(mA, mB)
-{
-	const result = [];
-
-	let resultRow,
-		resultCell;
-	for (let aRow of mA)
-	{
-		resultRow = [];
-		for (let bRow of mB)
-		{
-			resultCell = 0;
-			for (let i = 0; i < aRow.length; i++)
-				resultCell += aRow[i] * bRow[i];
-		}
-		resultRow.push(resultCell);
-	}
-	result.push(resultRow);
-
-	return result;
 }

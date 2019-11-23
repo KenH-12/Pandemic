@@ -4631,7 +4631,6 @@ function togglePlayerPanel($btnCollapseExpand)
 function hideTravelPathArrow()
 {
 	$("#travelPathArrow").addClass("hidden");
-	stopTravelPathChevronAnimations();
 }
 
 function showTravelPathArrow(actionProperties)
@@ -4665,31 +4664,6 @@ function showTravelPathArrow(actionProperties)
 			clipPath
 		})
 		.removeClass("hidden");
-	
-	//showTravelPathChevronAnimation(baseOffset, tipOffset, stemWidth, arrowLength);
-	$("#imgInfectionDeck").off("click").click(function()
-	{
-		showTravelPathChevronAnimation(baseOffset, tipOffset, stemWidth, arrowLength);
-	});
-}
-
-function displayRotatedChevron(degrees)
-{
-	const arrowheadWidth = 100,
-		$chevronContainer = $("<div class='travelPathChevron'><div></div></div>").appendTo("#boardContainer")
-			.css({
-				width: arrowheadWidth,
-				height: arrowheadWidth
-			})
-			.offset($(".pawn.quarantineSpecialist").offset()),
-		$chevron = $chevronContainer.children().first(),
-		initialClipPath = $chevron.css("clip-path"),
-		rotatedClipPath = rotateClipPathPolygonIn2dSpace($chevron, degrees, { containerWidth: arrowheadWidth });
-	
-		log("initialClipPath", initialClipPath);
-		log("rotatedClipPath", rotatedClipPath);
-
-	$chevron.css({ clipPath: rotatedClipPath });
 }
 
 function getTravelPathVector(actionProperties)
@@ -4721,71 +4695,6 @@ function getTravelPathVector(actionProperties)
 		originOffset: player.getLocation().getOffset(),
 		destinationOffset
 	};
-}
-
-async function showTravelPathChevronAnimation(baseOffset, tipOffset, stemWidth, arrowLength)
-{
-	/* const $travelPathArrow = $("#travelPathArrow"),
-		chevronLifespanMs = Math.ceil(arrowLength * 5);
-
-	while (!$travelPathArrow.hasClass("hidden"))
-	{
-		 */animateTravelPathChevron(baseOffset, tipOffset, stemWidth, 2000);//chevronLifespanMs);
-		/* await sleep(chevronLifespanMs / 2);
-	} */
-}
-
-function stopTravelPathChevronAnimations()
-{
-	$("#travelPathArrow").children(".travelPathChevron").stop().remove();
-}
-
-$("#imgInfectionDeck").click(function()
-{
-	log("clicked");
-	const $chevron = $("#testChevron").children().first();
-	
-	$chevron.css("clip-path", rotateClipPathPolygonIn2dSpace($chevron, toRadians(45), { containerWidth: data.boardWidth, containerHeight: data.boardHeight}));
-});
-
-async function animateTravelPathChevron(arrowBaseOffset, arrowTipOffset, arrowStemWidth, chevronLifespanMs)
-{
-	const arrowheadWidth = arrowStemWidth * 3,
-		halfArrowheadWidth = arrowheadWidth / 2,
-		baseOffset = getPointAtDistanceAlongLine(arrowBaseOffset, arrowTipOffset, -arrowheadWidth),
-		initialOffset = getPointAtDistancePerpendicularToLine({ a: baseOffset, distance: halfArrowheadWidth },
-			{ perpendicularSlope: getPerpendicularSlope(arrowBaseOffset, arrowTipOffset) }),
-		targetOffset = getPointAtDistancePerpendicularToLine({ a: arrowTipOffset, distance: halfArrowheadWidth },
-			{ b: initialOffset }),
-		vector = getVector(arrowBaseOffset, arrowTipOffset),
-		arrowAngleInRadians = Math.atan2(vector.left, vector.top),
-		$chevronContainer = $("<div class='travelPathChevron'><div></div></div>").appendTo("#travelPathArrow")
-			.css({
-				width: arrowheadWidth,
-				height: arrowheadWidth
-			})
-			.offset(initialOffset),
-		$chevron = $chevronContainer.children().first(),
-		initialClipPath = $chevron.css("clip-path");
-
-	log("arrowAngleInRadians", arrowAngleInRadians);
-	const rotatedClipPath = rotateClipPathPolygonIn2dSpace($chevron, arrowAngleInRadians, { containerWidth: arrowheadWidth, containerHeight: arrowheadWidth });
-	
-		log("initialClipPath", initialClipPath);
-		log("rotatedClipPath", rotatedClipPath);
-
-	$chevron.css({ clipPath: rotatedClipPath });
-
-	await animatePromise(
-		{
-			$elements: $chevronContainer,
-			initialProperties: initialOffset,
-			desiredProperties: targetOffset,
-			duration: chevronLifespanMs,
-			easing: "linear"
-		});
-	
-	$chevron.remove();
 }
 
 function bindPawnEvents()
