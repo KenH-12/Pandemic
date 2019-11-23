@@ -4468,7 +4468,7 @@ function operationsFlightWasUsedThisTurn()
 	return !currentStepIs("action 1") && getEventsOfTurn(eventTypes.operationsFlight).length > 0;
 }
 
-function nextTurn()
+async function nextTurn()
 {
 	log("nextTurn()");
 	data.turn = getActivePlayer().nextTurnID;
@@ -4477,8 +4477,7 @@ function nextTurn()
 	if (isOneQuietNight())
 		indicateOneQuietNightStep();
 
-	const player = getActivePlayer();
-	player.getLocation().setPawnIndices().cluster({ animatePawns: true });
+	await getActivePlayer().getLocation().setPawnIndices().cluster({ animatePawns: true });
 
 	proceed();
 }

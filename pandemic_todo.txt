@@ -33,8 +33,6 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-pawn arrows appear misplaced when pawns on the same city switch positions at the start of a turn
-
 for disabled action buttons...
 	fix the expand animation
 	explicitly let the user know they are disabled
