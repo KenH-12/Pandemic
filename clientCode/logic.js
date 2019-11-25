@@ -1514,7 +1514,7 @@ const actionInterfacePopulator = {
 				.hover(function()
 				{
 					const $cubesOfColor = $cubes.filter(`.${getColorClass($(this))}`);
-					markTreatableDiseaseCubes($cubesOfColor.last(), city.key);
+					markTreatableDiseaseCubes($cubesOfColor.last());
 				},
 				function() { unmarkTreatableDiseaseCubes($cubes) })
 				.click(function()
@@ -6454,7 +6454,7 @@ function bindDiseaseCubeEvents()
 		$cubes = $("#boardContainer").children(`.${cityKey}.diseaseCube`);
 	
 	$cubes.attr("title", "Click to Treat Disease")
-		.hover(function() { markTreatableDiseaseCubes($(this), cityKey) },
+		.hover(function() { markTreatableDiseaseCubes($(this)) },
 			function() { unmarkTreatableDiseaseCubes($cubes) })
 		.click(function()
 		{
@@ -6468,31 +6468,44 @@ function bindDiseaseCubeEvents()
 	{
 		$this = $(this);
 		if ($this.is(":hover"))
-			markTreatableDiseaseCubes($this, cityKey);
+			markTreatableDiseaseCubes($this);
 	});
 
-	$(`#btnTreatDisease`).hover(function()
+	const $btnTreatDisease = $(`#btnTreatDisease`);
+	$btnTreatDisease.hover(
+		function()
+		{
+			if (!$(this).hasClass("btnDisabled"))
+				markTreatableDiseaseCubes($cubes.last(), { hoveredOverButton: true });
+		},
+		function() { unmarkTreatableDiseaseCubes($cubes) });
+
+	if ($btnTreatDisease.is(":hover") && !$btnTreatDisease.hasClass("btnDisabled"))
+		markTreatableDiseaseCubes($cubes.last(), { hoveredOverButton: true });
+}
+
+function markTreatableDiseaseCubes($hoveredCube, { hoveredOverButton } = {})
+{
+	const player = getActivePlayer();
+
+	if (hoveredOverButton)
 	{
-		const city = getCity(cityKey);
+		const city = player.getLocation();
 		let numDiseaseColorsOnCity = 0;
 
 		for (let color in city.cubes)
 			if (city.cubes[color] > 0)
 				numDiseaseColorsOnCity++;
 		
-		if (numDiseaseColorsOnCity === 1)
-			markTreatableDiseaseCubes($cubes.last(), cityKey);
-	},
-	function() { unmarkTreatableDiseaseCubes($cubes) });
-}
-
-function markTreatableDiseaseCubes($hoveredCube, cityKey)
-{
+		if (numDiseaseColorsOnCity !== 1)
+			return false;
+	}
+	
 	const diseaseColor = getColorClass($hoveredCube);
 	
 	let $cubesToMark;
-	if (getActivePlayer().role === "Medic" || data.cures[diseaseColor] === "cured")
-		$cubesToMark = $(`.${cityKey}.diseaseCube.${diseaseColor}`);
+	if (player.role === "Medic" || data.cures[diseaseColor] === "cured")
+		$cubesToMark = $(`.${player.cityKey}.diseaseCube.${diseaseColor}`);
 	else
 		$cubesToMark = $hoveredCube;
 	
