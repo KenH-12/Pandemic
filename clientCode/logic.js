@@ -3972,6 +3972,7 @@ class Player
 			
 			this.cityKey = destination.key;
 	
+			$("#travelPathArrowContainer").css("z-index", 4);
 			await Promise.all(
 			[
 				destination.cluster({ animatePawns: true }),
@@ -4631,7 +4632,7 @@ function togglePlayerPanel($btnCollapseExpand)
 
 function hideTravelPathArrow()
 {
-	$("#travelPathArrow").addClass("hidden");
+	$("#travelPathArrow").addClass("hidden").removeAttr("style");
 }
 
 function showTravelPathArrow(actionProperties)
