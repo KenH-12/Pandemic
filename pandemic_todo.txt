@@ -31,10 +31,6 @@ clicking "DISCARD" on the df prompt cause movementAction to promptdf again with 
 
 discard step failed to getPlayerWithTooManyCards (8 cards)
 
-SCENARIO:
-	click drive/ferry button from san francisco
-	tokyo button does not properly show the travel path arrow
-
 TO DO
 -----
 when the treat disease button becomes enabled, it should check whether it is hovered, and if it is, mark treatable cubes

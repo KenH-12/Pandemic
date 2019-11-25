@@ -267,7 +267,12 @@ function slopeOfLine(a, b)
 }
 function getPerpendicularSlope(a, b)
 {
-	return (1 / slopeOfLine(a, b)) * -1;
+	const slope =  slopeOfLine(a, b);
+
+	if (slope === Infinity)
+		return 0;
+	
+	return -(1/slope);
 }
 function getYIntercept(a, b)
 {
@@ -312,7 +317,7 @@ function getArrowClipPath({ baseOffset, tipOffset, stemWidth, headWidth, headLen
 			{ vectorPoint: arrowheadBase, belowLine: false, distanceFromVector: halfStemWidth },
 			{ vectorPoint: arrowheadBase, belowLine: false, distanceFromVector: halfHeadWidth }
 		],
-		perpendicularSlope = getPerpendicularSlope(baseOffset, tipOffset);
+		perpendicularSlope = getPerpendicularSlope(baseOffset, tipOffset),
 		points = [tipOffset];
 
 	for (let i = 0; i < pointProperties.length; i++)
@@ -338,9 +343,18 @@ function getPointAtDistancePerpendicularToLine({ a, distance }, {
 	} = {})
 {
 	perpendicularSlope = perpendicularSlope || getPerpendicularSlope(a, b);
-	
-	const perpendicularDirection = belowLine ? -1 : 1,
-		somePerpendicularX = a.left - distance*perpendicularDirection,
+
+	const perpendicularDirection = belowLine ? -1 : 1;
+
+	if (perpendicularSlope === Infinity)
+	{
+		return {
+			left: a.left,
+			top: a.top + distance*perpendicularDirection
+		}
+	}
+
+	const somePerpendicularX = a.left - distance*perpendicularDirection,
 		somePerpendicularPoint = {
 			left: somePerpendicularX,
 			top: perpendicularSlope*somePerpendicularX + getYInterceptFromSlope(a, perpendicularSlope)
@@ -356,42 +370,6 @@ function getPointAtDistanceAlongLine(a, b, distanceFromA)
 		left: a.left + (distanceFromA*u.left),
 		top: a.top + (distanceFromA*u.top)
 	};
-}
-
-function rotateClipPathPolygonIn2dSpace($element, radians, { containerWidth, containerHeight } = {})
-{
-	containerWidth = containerWidth || $element.parent().width();
-	containerHeight = containerHeight || $element.parent().height();
-	log("containerWidth", containerWidth);
-	log("containerHeight", containerHeight);
-
-	const pointOfRotation = { left: containerWidth / 2, top: containerHeight / 2 }
-		initialPoints = convertClipPathPolygonToPoints($element),
-		rotatedPoints = rotatePointsIn2dSpaceAroundPoint(initialPoints, pointOfRotation, radians),
-		newClipPath = getClipPathPolygonFromPoints(containerWidth, containerHeight, rotatedPoints);
-	log("newClipPath", newClipPath);
-	return newClipPath;
-}
-function convertClipPathPolygonToPoints($element, { containerWidth, containerHeight } = {})
-{
-	containerWidth = containerWidth || $element.parent().width();
-	containerHeight = containerHeight || $element.parent().height();
-	
-	const clipPath = $element.css("clip-path"),
-		clipPathWithoutUnits = clipPath.replace(/%|px/g, ""),
-		strippedClipPath = clipPathWithoutUnits.substring(clipPathWithoutUnits.indexOf("(") + 1, clipPathWithoutUnits.indexOf(")")),
-		splitClipPath = strippedClipPath.split(", "),
-		points = splitClipPath
-			.map(p => {
-				const splitPoint = p.split(" ");
-				log("splitPoint: ", splitPoint);
-				return {
-					left: splitPoint[0]/100 * containerWidth,
-					top: splitPoint[1]/100 * containerHeight
-				};
-			});
-	log("initialClipPath", clipPath);
-	return points;
 }
 function getClipPathPolygonFromPoints(containerWidth, containerHeight, points)
 {
