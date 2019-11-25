@@ -269,7 +269,7 @@ function getPerpendicularSlope(a, b)
 {
 	const slope =  slopeOfLine(a, b);
 
-	if (slope === Infinity)
+	if (slope === Infinity || slope === -Infinity)
 		return 0;
 	
 	return -(1/slope);
@@ -347,7 +347,7 @@ function getPointAtDistancePerpendicularToLine({ a, distance }, {
 
 	const perpendicularDirection = belowLine ? -1 : 1;
 
-	if (perpendicularSlope === Infinity)
+	if (perpendicularSlope === Infinity || perpendicularSlope === -Infinity)
 	{
 		return {
 			left: a.left,
