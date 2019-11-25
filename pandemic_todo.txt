@@ -33,8 +33,6 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-temporarily reduce the z-index of whichever marker is not being highlighted (outbreak or infection rate)
-
 card templates have cursor:help during the draw step and the infection step
 
 for disabled action buttons...
