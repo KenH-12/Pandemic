@@ -616,7 +616,7 @@ span.r {color: #ef282a}
 	border-bottom: 1px solid #fff;
 	cursor: help;
 }
-.role * { pointer-events: none }
+.role *:not(.playerCard.event.contingency) { pointer-events: none }
 .btnCollapseExpand
 {
 	background-color: #353535;

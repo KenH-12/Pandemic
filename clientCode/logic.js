@@ -766,12 +766,14 @@ function enableEventCards({ resilientPopulationOnly } = {})
 	if (resilientPopulationOnly)
 	{
 		$eventCards.addClass("unavailable");
-		$eventCards = $eventCards.filter("[data-key='resi']");
+		$eventCards = $eventCards.filter(`[data-key='${eventTypes.resilientPopulation.cardKey}']`);
 	}
 	
 	$eventCards.removeClass("unavailable")
-		.click(function()
+		.click(function(event)
 		{
+			event.stopPropagation();
+			
 			const eventType = getEventCardEventType($(this).data("key"));
 			
 			indicatePromptingEventCard();
