@@ -33,8 +33,6 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-card templates have cursor:help during the draw step and the infection step
-
 for disabled action buttons...
 	fix the expand animation
 	explicitly let the user know they are disabled

@@ -496,7 +496,6 @@ span.r {color: #ef282a}
 {
 	width: 100%;
 	margin-bottom: 5px;
-	cursor: help;
 }
 #infectCitiesContainer > .infectionCard, #infectCitiesContainer > .btnContinue { margin-top: 20px }
 .infectionCardContents { position: relative }
@@ -659,7 +658,6 @@ span.r {color: #ef282a}
 	border: none;
 	font-size: 14px;
 	overflow: hidden;
-	cursor: help;
 }
 .playerCard * { pointer-events: none }
 .playerPanel > .playerCard:first-of-type { margin-top: 4px }
@@ -860,8 +858,7 @@ span.r {color: #ef282a}
 	font-family: 'Exo 2', sans-serif;
 	font-size: 18px;
 }
-.actionCategory > .btnDisabled:not(.wait),
-.infectionCard.eradicated
+.actionCategory > .btnDisabled:not(.wait)
 { cursor: help }
 .wait { cursor: wait }
 .actionCategory .button *
