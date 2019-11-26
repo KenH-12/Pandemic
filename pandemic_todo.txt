@@ -36,8 +36,6 @@ TO DO
 when a research station needs to be relocated, all research stations should glow
 	account for the normal buildResearchStation and government grant
 
-pawn arrow is misplaced after government grant (contingency)
-
 for disabled action buttons...
 	fix the expand animation
 	explicitly let the user know they are disabled

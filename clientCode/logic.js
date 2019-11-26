@@ -2470,9 +2470,9 @@ async function governmentGrant(targetCity, relocationKey)
 	await discardOrRemoveEventCard(events.shift());
 
 	if (relocationKey)
-		getCity(relocationKey).relocateResearchStationTo(targetCity);
+		await getCity(relocationKey).relocateResearchStationTo(targetCity);
 	else
-		targetCity.buildResearchStation({ animate: true, isGovernmentGrant: true });
+		await targetCity.buildResearchStation({ animate: true, isGovernmentGrant: true });
 	
 	resumeCurrentStep();
 }
@@ -3002,7 +3002,7 @@ async function buildResearchStation(relocationKey)
 	resetActionPrompt();
 
 	if (relocationKey)
-		getCity(relocationKey).relocateResearchStationTo(city);
+		await getCity(relocationKey).relocateResearchStationTo(city);
 	else
 		await city.buildResearchStation({ animate: true });
 	
