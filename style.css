@@ -363,10 +363,14 @@ span.r {color: #ef282a}
 	margin: 1.5% 32% 0.5% 32%;
 }
 .drawnInfectionCard, .drawnPlayerCard {position: absolute;z-index: 10;}
-
-#infectionRateMarker
+.marker
 {
 	position: absolute;
+	filter: drop-shadow(0px 0px 2px #fff);
+}
+.marker > img { width: 100% }
+#infectionRateMarker
+{
 	top: 18.4%;
 	left: 63.96%;
 	width: 3.15%;
@@ -405,7 +409,6 @@ span.r {color: #ef282a}
 #outbreaksMarker
 {
 	transform: rotate(45deg);
-	position: absolute;
 	top: 54.4%;
 	left: 2.8%;
 	width: 3%;
@@ -467,7 +470,6 @@ span.r {color: #ef282a}
 {
 	font-size: 20px;
 	font-weight: 700;
-	cursor: help
 }
 .action:not(.step), .destination
 {
@@ -614,7 +616,6 @@ span.r {color: #ef282a}
 	font-size: 14px;
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #fff;
-	cursor: help;
 }
 .role *:not(.playerCard.event.contingency) { pointer-events: none }
 .btnCollapseExpand

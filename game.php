@@ -128,13 +128,17 @@
 						<div class='infectionRateHighlight right hidden'></div>
 						<div class='infectionRateHighlight bottom hidden'></div>
 						<div class='infectionRateHighlight left hidden'></div>
-						<img id='infectionRateMarker' src='images/pieces/infectionRateMarker.png' alt='Infection Rate Marker'/>
+						<div id='infectionRateMarker' class='marker'>
+							<img src='images/pieces/infectionRateMarker.png' alt='Infection Rate Marker'/>
+						</div>
 						
 						<div id='outbreaksTrackHighlight' class='hidden'></div>
 						<div class='outbreaksHighlight top hidden'></div>
 						<div class='outbreaksHighlight right hidden'></div>
 						<div class='outbreaksHighlight bottom hidden'></div>
-						<img id='outbreaksMarker' src='images/pieces/outbreaksMarker.png' alt='Outbreaks Marker'/>
+						<div id='outbreaksMarker' class='marker'>
+							<img src='images/pieces/outbreaksMarker.png' alt='Outbreaks Marker'/>
+						</div>
 						
 						<div id='cureMarkerContainer' class='bottomPanelDiv'>
 							<p class='title'>
