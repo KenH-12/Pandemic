@@ -33,11 +33,14 @@ discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
+when a research station needs to be relocated, all research stations should glow
+	account for the normal buildResearchStation and government grant
+
+pawn arrow is misplaced after government grant (contingency)
+
 for disabled action buttons...
 	fix the expand animation
 	explicitly let the user know they are disabled
-
-white drop-shadow on infectionRate/outbreak markers
 
 rendezvous button
 
@@ -60,9 +63,6 @@ when another player can take from the researcher
 the discover sure button needs gray text when the button is disabled and the scientist's turn
 
 standardize prompt appearance / button behaviour
-
-when government grant is prompted, the research station supply should glow.
-	unless a station needs to be relocated
 
 resign button
 

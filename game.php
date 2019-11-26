@@ -149,7 +149,9 @@
 						<div id='researchStationSupply' class='bottomPanelDiv'>
 							<p class='title'>RESEARCH STATION SUPPLY</p>
 							<p id='researchStationSupplyCount'>$MAX_RESEARCH_STATION_COUNT</p>
-							<img src='images/pieces/researchStation.png' class='researchStation' id='imgResearchStationSupply'/>
+							<div class='imgContainer'>
+								<img src='images/pieces/researchStation.png' class='researchStation' id='imgResearchStationSupply'/>
+							</div>
 						</div>
 						<div id='playerDeck' class='bottomPanelDiv'>
 							<p class='title'>PLAYER DECK</p>

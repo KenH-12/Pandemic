@@ -128,7 +128,11 @@ body,
 	z-index: 3;
 	width: 3%;
 }
-.grantStation { z-index: 6 }
+.grantStation
+{
+	z-index: 6;
+	cursor: pointer;
+}
 .diseaseCube
 {
 	z-index: 5;
@@ -250,12 +254,16 @@ span.r {color: #ef282a}
 {
 	vertical-align: middle;
 }
-#researchStationSupply img
+#researchStationSupply .imgContainer
 {
 	display: inline-block;
 	width: 20%;
 	margin-left: 5%;
 }
+.smallGlow, .bigGlow { transition: filter 0.5s }
+.smallGlow { filter: drop-shadow(0px 0px 1px #fff) }
+.bigGlow { filter: drop-shadow(0px 0px 10px #fff) }
+#researchStationSupply .imgContainer img { width: 100% }
 #researchStationSupplyCount
 {
 	display: inline-block;
