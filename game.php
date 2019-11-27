@@ -58,8 +58,14 @@
 						
 						<div id='demoCube' class='diseaseCube hidden'></div>
 						<img id='demoPawn' src='images/pieces/pawns/medic.png' class='pawn hidden'/>
-						<img id='demoStation' src='images/pieces/researchStation.png' class='researchStation hidden'/>
+						<div id='demoStation' class='researchStation hidden'>
+							<img src='images/pieces/researchStation.png' />
+						</div>
+
 						<img id='placeholderPawn' class='pawn hidden'/>
+						<div id='placeholderStation' class='researchStation hidden'>
+							<img src='images/pieces/researchStation.png' />
+						</div>
 						
 						<div id='playerPanelContainer'></div>
 						

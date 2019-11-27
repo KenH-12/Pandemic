@@ -1,13 +1,13 @@
 BUGS
 ----
+clicking (but not dragging) a pawn while Government Grant is being prompted enables the pawn
 
 TO DO
 -----
-when a research station needs to be relocated via government grant...
-	all research stations should glow
-	the travel path arrow should be displayed between the rs origin and the dragged rs
-	the dragged rs should have a placeholder
-	the travel path arrow should snap to valid destinations on drop
+make city.clusterResearchStation method
+	this should fix the odd clustering behaviour that occurs when a pawn is on the city of a station which is asking to be relocated
+
+test grant station functionality again
 
 for disabled action buttons...
 	fix the expand animation
