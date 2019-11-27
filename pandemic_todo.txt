@@ -1,40 +1,13 @@
 BUGS
 ----
-sometimes hovering over a special ability tag causes the action buttons to become visible
-
-ensure consistency of cube counts (cities have had outbreaks showing 2 cubes)
-	solved after QS outbreak issue was solved?
-	if it happens when the QS is not in the game, fix it.
-
-"hand limit reached but cards are inconsistent"
-	which possibly means cardKeys are not added/removed properly somewhere
-	this happened after share knowledge
-		ways that players can pick up / discard:
-			starting hands
-			draw cards w/ epidemic(s)
-			hand limit discard
-			build research station
-			discover cure
-			dispatch df
-		
-		confirmed working:
-			draw cards w/o epidemics
-			draw cards w/ epidemic
-			charter flight
-			direct flight
-			share knowledge give/receive
-			dispatch cf
-			discard
-			play event card
-
-clicking "DISCARD" on the df prompt cause movementAction to promptdf again with the destination, eventType, and waitingForConfirmation = true.
-
-discard step failed to getPlayerWithTooManyCards (8 cards)
 
 TO DO
 -----
-when a research station needs to be relocated, all research stations should glow
-	account for the normal buildResearchStation and government grant
+when a research station needs to be relocated via government grant...
+	all research stations should glow
+	the travel path arrow should be displayed between the rs origin and the dragged rs
+	the dragged rs should have a placeholder
+	the travel path arrow should snap to valid destinations on drop
 
 for disabled action buttons...
 	fix the expand animation

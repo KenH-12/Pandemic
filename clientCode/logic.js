@@ -869,12 +869,14 @@ function enablePawnEvents()
 	}
 
 	if (pawnsAreEnabled)
-		$("#travelPathArrow").attr("class", `hidden ${airlifting ? "airlift" : activePlayer.camelCaseRole}`);
+		setTravelPathArrowColor({ airlifting });
 }
 
 function newResearchStationElement(cityKey)
 {
-	const $rs = $(`<img class='researchStation' data-key='${cityKey}' src='images/pieces/researchStation.png' />`),
+	const $rs = $(`<div class='researchStation' data-key='${cityKey}'>
+					<img src='images/pieces/researchStation.png' alt='Research Station' />
+				</div>`),
 		$boardContainer = $("#boardContainer"),
 		$window = $(window);
 
@@ -2470,7 +2472,11 @@ async function governmentGrant(targetCity, relocationKey)
 	await discardOrRemoveEventCard(events.shift());
 
 	if (relocationKey)
+	{
 		await getCity(relocationKey).relocateResearchStationTo(targetCity);
+		removeResearchStationHighlights();
+		hideTravelPathArrow();
+	}
 	else
 		await targetCity.buildResearchStation({ animate: true, isGovernmentGrant: true });
 	
@@ -2965,16 +2971,44 @@ function promptResearchStationRelocation()
 		}
 	}
 
-	$actionInterface.children(".btnRelocateStation").click(function()
-	{
-		promptAction(
+	$actionInterface.children(".btnRelocateStation")
+		.hover(function()
 		{
-			eventType: eventTypes.buildResearchStation,
-			stationRelocationKey: $(this).data("key")
+			const city = getCity($(this).data("key"));
+
+			highlightResearchStation(city);
+			setTravelPathArrowColor({ relocatingResearchStation: true });
+			showTravelPathArrow({
+				origin: city,
+				destination: getActivePlayer().getLocation()
+			});
+		},
+		function()
+		{
+			removeResearchStationHighlights();
+			hideTravelPathArrow();
+			setTravelPathArrowColor();
+		})
+		.click(function()
+		{
+			promptAction(
+			{
+				eventType: eventTypes.buildResearchStation,
+				stationRelocationKey: $(this).data("key")
+			});
 		});
-	});
 
 	return true;
+}
+
+function highlightResearchStation(city)
+{
+	city.getResearchStation().addClass("mediumGlow");
+}
+
+function removeResearchStationHighlights()
+{
+	$("#boardContainer > .researchStation").removeClass("mediumGlow");
 }
 
 async function buildResearchStation(relocationKey)
@@ -3002,7 +3036,11 @@ async function buildResearchStation(relocationKey)
 	resetActionPrompt();
 
 	if (relocationKey)
+	{
+		removeResearchStationHighlights();
 		await getCity(relocationKey).relocateResearchStationTo(city);
+		hideTravelPathArrow();
+	}
 	else
 		await city.buildResearchStation({ animate: true });
 	
@@ -4699,19 +4737,46 @@ function showTravelPathArrow(actionProperties)
 		.removeClass("hidden");
 }
 
+function setTravelPathArrowColor({ airlifting, relocatingResearchStation } = {})
+{
+	let cssClass;
+	if (airlifting)
+		cssClass = "airlift";
+	else if (relocatingResearchStation)
+		cssClass = "researchStationBackground";
+	else
+		cssClass = getActivePlayer().camelCaseRole;
+	
+	$("#travelPathArrow").attr("class", `hidden ${cssClass}`);
+}
+
 function getTravelPathVector(actionProperties)
 {
 	const {
+		origin,
 		$pawn,
 		playerToAirlift,
 		playerToDispatch,
 		destination
 	} = actionProperties;
 	
-	let player,
-		destinationOffset;
-
-	if (typeof $pawn == "undefined") // Determine player and destination directly from the actionProperties.
+	let originOffset,
+		destinationOffset,
+		player;
+	
+	if (origin) // Research station relocation
+	{
+		originOffset = origin.getOffset();
+		if (typeof $researchStation == "undefined")
+			destinationOffset = destination.getOffset();
+		else
+		{
+			destinationOffset = $researchStation.offset();
+			destinationOffset.left += $researchStation.width() * 0.5;
+			destinationOffset.top += $researchStation.height() * 0.5;
+		}
+	}
+	else if (typeof $pawn == "undefined") // Determine player and destination directly from the actionProperties.
 	{
 		player = actionProperties.player || playerToAirlift || playerToDispatch || getActivePlayer();
 		destinationOffset = destination.getOffset();
@@ -4725,7 +4790,7 @@ function getTravelPathVector(actionProperties)
 	}
 
 	return {
-		originOffset: player.getLocation().getOffset(),
+		originOffset: originOffset || player.getLocation().getOffset(),
 		destinationOffset
 	};
 }
@@ -4931,20 +4996,20 @@ class City
 	// Puts a research station on this city.
 	buildResearchStation({ animate, isGovernmentGrant } = {})
 	{
-		let $img,
+		let $rs,
 			stationInitialOffset = false;
 		if (isGovernmentGrant)
 		{
-			$img = $("#boardContainer > .researchStation.grantStation");
-			stationInitialOffset = $img.offset();
+			$rs = $("#boardContainer > .researchStation.grantStation");
+			stationInitialOffset = $rs.offset();
 
 			log("stationInitialOffset:", stationInitialOffset);
-			$img.replaceWith(newResearchStationElement(this.key))
+			$rs.replaceWith(newResearchStationElement(this.key))
 				.removeAttr("style");
 			data.researchStationKeys.delete("grantStation");
 		}
 		else
-			$img = newResearchStationElement(this.key);
+			$rs = newResearchStationElement(this.key);
 		
 		this.hasResearchStation = true;
 		data.researchStationKeys.add(this.key);
@@ -4952,7 +5017,7 @@ class City
 
 		if (animate)
 		{
-			stationInitialOffset = stationInitialOffset || $("#researchStationSupply img").offset();
+			stationInitialOffset = stationInitialOffset || $("#researchStationSupply .researchStation").offset();
 			return this.cluster(
 				{
 					stationInitialOffset,
