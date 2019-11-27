@@ -1820,12 +1820,6 @@ const actionInterfacePopulator = {
 	{
 		disablePawnEvents();
 		unbindDiseaseCubeEvents();
-		clusterAll(
-		{
-			pawns: true,
-			researchStations: true,
-			stationKeyToExclude: relocationKey
-		});
 		
 		data.promptingEventType = eventTypes.governmentGrant;
 		
@@ -2496,7 +2490,7 @@ function getGovernmentGrantTargetCity($researchStation)
 			if (relocating)
 			{
 				$researchStation.addClass("mediumGlow");
-				origin.cluster();
+				origin.clusterResearchStation();
 				showTravelPathArrow({ origin, destination: targetCity });
 			}
 			return promptAction({ eventType, targetCity, relocationKey });
@@ -2508,7 +2502,7 @@ function getGovernmentGrantTargetCity($researchStation)
 	if (relocating)
 	{
 		log("relocationKey:", relocationKey);
-		getCity(relocationKey).cluster();
+		getCity(relocationKey).clusterResearchStation();
 		data.promptingEventType = eventType;
 		highlightAllResearchStations();
 		hideTravelPathArrow();
@@ -5146,44 +5140,20 @@ class City
 			stationKeyToExclude
 		} = {})
 	{
-		$(`.placeholderPawn.${this.key}`).remove();
-		
 		const pawns = $(".pawn." + this.key).not($pawnToExclude)
 				.sort(function (a, b) { return $(a).data("pawnIndex") - $(b).data("pawnIndex") }),
 			pawnCount = pawns.length,
 			cityOffset = this.getOffset(),
 			coordsArray = [];
 		
-		let stationPlacementDuration,
-			pawnTop = cityOffset.top - data.pawnHeight,
+		let pawnTop = cityOffset.top - data.pawnHeight,
 			pawnLeft = cityOffset.left - data.pawnWidth,
 			i;
 		
-		log(`${this.name} hasResearchStation ? ${this.hasResearchStation}`);
 		if (this.hasResearchStation && this.key !== stationKeyToExclude)
 		{
-			const $researchStation = this.getResearchStation(),
-				desiredOffset = {
-					top: cityOffset.top - data.stationHeight * 0.85,
-					left: cityOffset.left - data.stationWidth * 0.8
-				}
-			
-			if (animateResearchStation)
-			{
-				if (stationInitialOffset)
-					$researchStation.offset(stationInitialOffset);
-				
-				stationPlacementDuration = getDuration("stationPlacement");
-				$researchStation.animate(
-				{
-					top: desiredOffset.top,
-					left: desiredOffset.left,
-					width: data.stationWidth
-				}, stationPlacementDuration, data.easings.stationPlacement);
-			}
-			else
-				$researchStation.offset(desiredOffset);
-			
+			this.clusterResearchStation({ animateResearchStation, stationInitialOffset });
+
 			// research station appears behind a single row of pawns
 			if (pawnCount < 3)
 			{
@@ -5234,13 +5204,41 @@ class City
 		// Return a Promise with the most relevant duration.
 		let ms = 0;
 		if (animateResearchStation) // Station animation takes the longest.
-			ms = stationPlacementDuration;
+			ms = getDuration("stationPlacement");
 		else if (animateCubes) // Cube animation takes longer than pawn animation.
 			ms = getDuration("cubePlacement");
 		else if (animatePawns)
 			ms = pawnAnimationDuration;
 
 		return sleep(ms);
+	}
+
+	clusterResearchStation({ animateResearchStation, stationInitialOffset } = {})
+	{
+		log(`clustering ${this.name}'s station`);
+		const $researchStation = this.getResearchStation(),
+			desiredOffset = this.getOffset(),
+			duration = getDuration("stationPlacement");
+		
+		desiredOffset.top -= data.stationHeight * 0.85;
+		desiredOffset.left -= data.stationWidth * 0.8;
+		
+		if (animateResearchStation)
+		{
+			if (stationInitialOffset)
+				$researchStation.offset(stationInitialOffset);
+			
+			$researchStation.animate(
+			{
+				top: desiredOffset.top,
+				left: desiredOffset.left,
+				width: data.stationWidth
+			}, duration, data.easings.stationPlacement);
+		}
+		else
+			$researchStation.offset(desiredOffset);
+		
+		return sleep(duration);
 	}
 
 	clusterDiseaseCubes({ animate } = {})
