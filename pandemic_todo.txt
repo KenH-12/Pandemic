@@ -1,7 +1,5 @@
 BUGS
 ----
-clicking (but not dragging) a pawn while Government Grant is being prompted enables the pawn
-
 clicking event card repeatedly can have odd effects
 
 TO DO
@@ -58,6 +56,8 @@ make sure the height limit on the expanded infection discards functions properly
 
 IDEAS
 -----
+istead of the disease cube background, try a 1px drop shadow filter
+
 when stacking outbreak infection cubes on the origin city, use placeDiseaseCubes to animate them one at a time
 	use the destinationKeys as a param to give them that data attribute
 	OR...

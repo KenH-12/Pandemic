@@ -4868,7 +4868,7 @@ function bindPawnEvents()
 			let fn = movementAction;
 			if (eventTypeIsBeingPrompted(eventTypes.airlift))
 				fn = tryAirlift;
-			else if (!actionStepInProgress()) // all pawns are disabled
+			else if (!actionStepInProgress() || eventTypeIsBeingPrompted(eventTypes.governmentGrant)) // all pawns are disabled
 				return false;
 			else if (pawnRole !== activeRole && canDispatch)
 				fn = tryDispatchPawn;
