@@ -919,7 +919,6 @@ function showPlaceholderStation($originalStation)
 	$("#placeholderStation")
 		.removeAttr("style")
 		.offset($originalStation.offset())
-		.addClass("mediumGlow")
 		.removeClass("hidden");
 	
 	$originalStation.css("opacity", 0.7);
@@ -927,7 +926,7 @@ function showPlaceholderStation($originalStation)
 function hidePlaceholderStation($originalStation)
 {
 	$originalStation.css("opacity", 1);
-	$("#placeholderStation").addClass("hidden").removeClass("mediumGlow");
+	$("#placeholderStation").addClass("hidden");
 }
 
 function getAllResearchStations()
@@ -1165,7 +1164,7 @@ function resetActionPrompt({ actionCancelled } = {})
 		{
 			disableResearchStationDragging();
 			clusterAll({ researchStations: true });
-			removeResearchStationHighlights();
+			turnOffResearchStationHighlights();
 			resetGrantStation({ cancelled: true });
 		}
 		else if (eventTypeIsBeingPrompted(resilientPopulation))
@@ -2447,6 +2446,11 @@ async function highlightAllResearchStations()
 {
 	const $researchStations = $("#boardContainer").children(".researchStation").not("#placeholderStation");
 
+	if ($researchStations.first().hasClass("glowing"))
+		return false;
+
+	$researchStations.addClass("glowing");
+	
 	while (eventTypeIsBeingPrompted(eventTypes.governmentGrant))
 	{
 		if ($researchStations.first().hasClass("mediumGlow"))
@@ -2461,7 +2465,7 @@ function turnOffResearchStationHighlights()
 {
 	$("#boardContainer").children(".researchStation")
 		.not("#placeholderStation")
-		.removeClass("mediumGlow smallGlow");
+		.removeClass("mediumGlow smallGlow glowing");
 	data.promptingEventType = false;
 }
 
@@ -2529,7 +2533,7 @@ async function governmentGrant(targetCity, relocationKey)
 	if (relocationKey)
 	{
 		await getCity(relocationKey).relocateResearchStationTo(targetCity);
-		removeResearchStationHighlights();
+		turnOffResearchStationHighlights();
 		hideTravelPathArrow();
 	}
 	else
@@ -3040,7 +3044,7 @@ function promptResearchStationRelocation()
 		},
 		function()
 		{
-			removeResearchStationHighlights();
+			$("#boardContainer").children(".researchStation").not("#placeholderStation").removeClass("mediumGlow");
 			hideTravelPathArrow();
 			setTravelPathArrowColor();
 		})
@@ -3054,11 +3058,6 @@ function promptResearchStationRelocation()
 		});
 
 	return true;
-}
-
-function removeResearchStationHighlights()
-{
-	$("#boardContainer > .researchStation").removeClass("mediumGlow");
 }
 
 async function buildResearchStation(relocationKey)
@@ -3087,7 +3086,7 @@ async function buildResearchStation(relocationKey)
 
 	if (relocationKey)
 	{
-		removeResearchStationHighlights();
+		$("#boardContainer").children(".researchStation").not("#placeholderStation").removeClass("mediumGlow");
 		await getCity(relocationKey).relocateResearchStationTo(city);
 		hideTravelPathArrow();
 	}

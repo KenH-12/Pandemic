@@ -63,7 +63,7 @@
 						</div>
 
 						<img id='placeholderPawn' class='pawn hidden'/>
-						<div id='placeholderStation' class='researchStation hidden'>
+						<div id='placeholderStation' class='researchStation mediumGlow hidden'>
 							<img src='images/pieces/researchStation.png' />
 						</div>
 						
