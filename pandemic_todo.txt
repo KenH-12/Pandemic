@@ -9,8 +9,6 @@ if a destination is selected (discard required) and the pawn is dragged again an
 	OR
 	the travel path arrow should return to the prompted destination
 
-dropping a pawn on an invalid airlift destination should do the red arrow thing
-
 for disabled action buttons...
 	fix the expand animation
 	explicitly let the user know they are disabled

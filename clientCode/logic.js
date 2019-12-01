@@ -2310,8 +2310,10 @@ async function tryAirlift(playerToAirlift)
 	log("destination: ", destination);
 	if (!destination)
 	{
-		animateInvalidTravelPath();
-		await playerToAirlift.getLocation().cluster();
+		await Promise.all([
+			animateInvalidTravelPath(),
+			playerToAirlift.getLocation().cluster()
+		]);
 		enablePawnEvents();
 		return false;
 	}
@@ -4846,19 +4848,24 @@ function getTravelPathVector(actionProperties)
 	};
 }
 
-async function animateInvalidTravelPath()
+function animateInvalidTravelPath()
 {
-	const $arrow = $("#travelPathArrow");
+	return new Promise(async resolve =>
+	{
+		const $arrow = $("#travelPathArrow"),
+			cssClasses = $arrow.attr("class");
 
-	await animatePromise({
-		$elements: $arrow.removeClass("hidden"),
-		initialProperties: { background: "darkred", opacity: .8 },
-		desiredProperties: { opacity: 0 },
-		duration: 500,
-		easing: "easeInQuint"
+		await animatePromise({
+			$elements: $arrow.removeClass("hidden airlift"),
+			initialProperties: { background: "darkred", opacity: .8 },
+			desiredProperties: { opacity: 0 },
+			duration: 500,
+			easing: "easeInQuint"
+		});
+
+		$arrow.attr("class", cssClasses).addClass("hidden").removeAttr("style");
+		resolve();
 	});
-
-	$arrow.addClass("hidden").removeAttr("style");
 }
 
 function bindPawnEvents()
