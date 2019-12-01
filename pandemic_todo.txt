@@ -2,12 +2,14 @@ BUGS
 ----
 clicking event card repeatedly can have odd effects
 
-dragging and dropping a pawn onto a valid destination when another pawn is at the origin city causes odd clustering behaviour
-
 TO DO
 -----
 if a destination is selected (discard required) and the pawn is dragged again and dropped on an invalid destination,
-the action prompt should be reset
+	the action prompt should be reset
+	OR
+	the travel path arrow should return to the prompted destination
+
+dropping a pawn on an invalid airlift destination should do the red arrow thing
 
 for disabled action buttons...
 	fix the expand animation

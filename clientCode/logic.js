@@ -1437,10 +1437,7 @@ const actionInterfacePopulator = {
 			.appendDiscardPrompt(
 			{
 				cardKeys: currentCity.key,
-				onConfirm: function()
-				{
-					movementAction(charterFlight, destination);
-				}
+				onConfirm: function() { movementAction(charterFlight, destination) }
 			});
 		return true;
 	},
@@ -1460,12 +1457,8 @@ const actionInterfacePopulator = {
 				.appendDiscardPrompt(
 				{
 					cardKeys: destination.key,
-					onConfirm: function()
-					{
-						movementAction(directFlight, destination);
-					}
+					onConfirm: function() { movementAction(directFlight, destination) }
 				});
-			
 			return true;
 		}
 		
@@ -2323,7 +2316,6 @@ async function tryAirlift(playerToAirlift)
 		return false;
 	}
 
-	clusterAll({ pawns: true, playerToExcludePawn: playerToAirlift });
 	promptAction({ eventType: airlift, playerToAirlift, destination });
 	await playerToAirlift.getLocation().cluster();
 }
@@ -3136,7 +3128,6 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		{
 			if (movementDetails.waitingForConfirmation)
 			{
-				clusterAll({ pawns: true, playerToExcludePawn: player });
 				promptAction(movementDetails);
 				originCity.cluster();
 				return false;
