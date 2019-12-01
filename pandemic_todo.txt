@@ -2,9 +2,14 @@ BUGS
 ----
 clicking event card repeatedly can have odd effects
 
+dragging and dropping a pawn onto a valid destination when another pawn is at the origin city causes odd clustering behaviour
+
 TO DO
 -----
 test grant station functionality again
+
+if a destination is selected (discard required) and the pawn is dragged again and dropped on an invalid destination,
+the action prompt should be reset
 
 for disabled action buttons...
 	fix the expand animation
@@ -16,9 +21,6 @@ event history
 
 event card icons
 special action icons?
-
-indicate invalid pawn drop somehow
-	maybe the travel path arrow can turn red briefly before disappearing
 
 if the page is resized during initial infections, consider queueing clusters to reoccur afterward
 	(cubes can appear misplaced until another resize event triggers clustering)

@@ -1169,6 +1169,8 @@ function resetActionPrompt({ actionCancelled } = {})
 		}
 		else if (eventTypeIsBeingPrompted(resilientPopulation))
 			disableResilientPopulationSelection();
+		
+		hideTravelPathArrow();
 	}
 
 	data.promptingEventType = false;
@@ -2315,6 +2317,7 @@ async function tryAirlift(playerToAirlift)
 	log("destination: ", destination);
 	if (!destination)
 	{
+		animateInvalidTravelPath();
 		await playerToAirlift.getLocation().cluster();
 		enablePawnEvents();
 		return false;
@@ -2620,6 +2623,7 @@ async function tryDispatchPawn(playerToDispatch)
 
 	if (!dispatchDetails)
 	{
+		animateInvalidTravelPath();
 		await playerToDispatch.getLocation().cluster();
 		enablePawnEvents();
 		return false;
@@ -3147,6 +3151,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	
 	if (!destination) // Invalid move
 	{
+		animateInvalidTravelPath();
 		await originCity.cluster();
 		enablePawnEvents();
 	}
@@ -4750,7 +4755,7 @@ function togglePlayerPanel($btnCollapseExpand)
 
 function hideTravelPathArrow()
 {
-	$("#travelPathArrow").addClass("hidden").removeAttr("style");
+	$("#travelPathArrow").stop().addClass("hidden").removeAttr("style");
 }
 
 function showTravelPathArrow(actionProperties)
@@ -4796,7 +4801,9 @@ function setTravelPathArrowColor({ airlifting, relocatingResearchStation } = {})
 	else
 		cssClass = getActivePlayer().camelCaseRole;
 	
-	$("#travelPathArrow").attr("class", `hidden ${cssClass}`);
+	const $arrow = $("#travelPathArrow");
+	
+	$arrow.attr("class", `${cssClass}${$arrow.hasClass("hidden") ? " hidden" : ""}`);
 }
 
 function getTravelPathVector(actionProperties)
@@ -4846,6 +4853,21 @@ function getTravelPathVector(actionProperties)
 		originOffset: originOffset || player.getLocation().getOffset(),
 		destinationOffset
 	};
+}
+
+async function animateInvalidTravelPath()
+{
+	const $arrow = $("#travelPathArrow");
+
+	await animatePromise({
+		$elements: $arrow.removeClass("hidden"),
+		initialProperties: { background: "darkred" },
+		desiredProperties: { opacity: 0 },
+		duration: 750,
+		easing: "easeInQuint"
+	});
+
+	$arrow.addClass("hidden").removeAttr("style");
 }
 
 function bindPawnEvents()
