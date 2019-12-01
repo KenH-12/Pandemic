@@ -4,10 +4,7 @@ clicking event card repeatedly can have odd effects
 
 TO DO
 -----
-if a destination is selected (discard required) and the pawn is dragged again and dropped on an invalid destination,
-	the action prompt should be reset
-	OR
-	the travel path arrow should return to the prompted destination
+create a function to handle invalid movements (DRY)
 
 for disabled action buttons...
 	fix the expand animation

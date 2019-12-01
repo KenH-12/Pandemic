@@ -342,7 +342,6 @@ function getPointAtDistancePerpendicularToLine({ a, distance }, {
 		belowLine
 	} = {})
 {
-	log("perpendicularSlope", perpendicularSlope);
 	perpendicularSlope = isNaN(perpendicularSlope) ? getPerpendicularSlope(a, b) : perpendicularSlope;
 
 	const perpendicularDirection = belowLine ? -1 : 1;

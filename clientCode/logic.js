@@ -1174,6 +1174,7 @@ function resetActionPrompt({ actionCancelled } = {})
 	}
 
 	data.promptingEventType = false;
+	data.promptedTravelPathProperties = false;
 
 	if (!actionStepInProgress())
 	{
@@ -1786,6 +1787,9 @@ const actionInterfacePopulator = {
 		{
 			clusterAll({ pawns: true });
 			data.promptingEventType = eventTypes.airlift;
+			data.promptedTravelPathProperties = false;
+			hideTravelPathArrow();
+
 			enablePawnEvents();
 		}
 		else
@@ -2318,7 +2322,10 @@ async function tryAirlift(playerToAirlift)
 		return false;
 	}
 
-	promptAction({ eventType: airlift, playerToAirlift, destination });
+	const airliftDetails = { eventType: airlift, playerToAirlift, destination };
+	data.promptedTravelPathProperties = airliftDetails;
+	promptAction(airliftDetails);
+
 	await playerToAirlift.getLocation().cluster();
 }
 
@@ -2617,8 +2624,10 @@ async function tryDispatchPawn(playerToDispatch)
 
 	if (!dispatchDetails)
 	{
-		animateInvalidTravelPath();
-		await playerToDispatch.getLocation().cluster();
+		await Promise.all([
+			animateInvalidTravelPath(),
+			playerToDispatch.getLocation().cluster()
+		]);
 		enablePawnEvents();
 		return false;
 	}
@@ -2640,7 +2649,9 @@ async function tryDispatchPawn(playerToDispatch)
 		
 		actionDetails.dispatchMethod = dispatcherMustChooseMethod ? eventTypes.chooseFlightType : method;
 		
+		data.promptedTravelPathProperties = actionDetails;
 		promptAction(actionDetails);
+
 		await playerToDispatch.getLocation().cluster();
 	}
 	else // The dispatch method can be executed immediately.
@@ -3104,6 +3115,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	const player = playerToDispatch || getActivePlayer(),
 		originCity = player.getLocation();
 
+	let movementDetails;
 	if (data.promptingEventType)
 	{
 		eventType = data.promptingEventType;
@@ -3111,10 +3123,14 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 
 		if (destination)
 		{
-			promptAction({
+			movementDetails = {
 				eventType: eventType,
 				destination: destination
-			});
+			};
+
+			data.promptedTravelPathProperties = movementDetails;
+			promptAction(movementDetails);
+
 			originCity.cluster();
 			return false;
 		}
@@ -3124,12 +3140,13 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	
 	if (!eventType)
 	{
-		const movementDetails = getMovementDetails();
+		movementDetails = getMovementDetails();
 
 		if (movementDetails)
 		{
 			if (movementDetails.waitingForConfirmation)
 			{
+				data.promptedTravelPathProperties = movementDetails;
 				promptAction(movementDetails);
 				originCity.cluster();
 				return false;
@@ -3144,54 +3161,57 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	
 	if (!destination) // Invalid move
 	{
-		animateInvalidTravelPath();
-		await originCity.cluster();
+		await Promise.all([
+			animateInvalidTravelPath(),
+			originCity.cluster()
+		]);
 		enablePawnEvents();
+		return false;
 	}
-	else // Move appears to be valid
+	
+	// Move appears to be valid
+	
+	resetActionPrompt();
+	disableActions();
+
+	if (!movementTypeRequiresDiscard(eventType))
 	{
-		resetActionPrompt();
-		disableActions();
-
-		if (!movementTypeRequiresDiscard(eventType))
-		{
-			originCity.cluster();
-			showTravelPathArrow({ player, destination });
-		}
+		originCity.cluster();
+		showTravelPathArrow({ player, destination });
+	}
+	
+	try
+	{
+		const dataToPost = {
+			originKey: player.cityKey,
+			destinationKey: destination.key
+		};
 		
-		try
-		{
-			const dataToPost = {
-				originKey: player.cityKey,
-				destinationKey: destination.key
-			};
-			
-			// The active player's role is used by default.
-			// The dispatched role must be used instead for dispatch events.
-			if (playerToDispatch)
-				dataToPost.role = playerToDispatch.rID;
+		// The active player's role is used by default.
+		// The dispatched role must be used instead for dispatch events.
+		if (playerToDispatch)
+			dataToPost.role = playerToDispatch.rID;
 
-			// The only uninferable discard key of any movement action:
-			if (operationsFlightDiscardKey)
-				dataToPost.discardKey = operationsFlightDiscardKey;
+		// The only uninferable discard key of any movement action:
+		if (operationsFlightDiscardKey)
+			dataToPost.discardKey = operationsFlightDiscardKey;
 
-			const events = await requestAction(eventType, dataToPost);
-			
-			await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
+		const events = await requestAction(eventType, dataToPost);
+		
+		await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
-			setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
-			await player.updateLocation(destination);
+		setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
+		await player.updateLocation(destination);
 
-			if (events.length > 1)
-				await animateAutoTreatDiseaseEvents(events);
-			
-			proceed();
-		}
-		catch(error)
-		{
-			console.error(error);
-			abortMovementAction(player);
-		}
+		if (events.length > 1)
+			await animateAutoTreatDiseaseEvents(events);
+		
+		proceed();
+	}
+	catch(error)
+	{
+		console.error(error);
+		abortMovementAction(player);
 	}
 }
 
@@ -4754,7 +4774,15 @@ function hideTravelPathArrow()
 function showTravelPathArrow(actionProperties)
 {
 	hideTravelPathArrow();
-
+	
+	if (!actionProperties)
+	{
+		if (!data.promptedTravelPathProperties)
+			return false;
+		
+		actionProperties = data.promptedTravelPathProperties;
+	}
+	
 	let stemWidth = getDimension("cityWidth") * 1.2;
 	const { originOffset, destinationOffset } = getTravelPathVector(actionProperties),
 		baseOffset = getPointAtDistanceAlongLine(originOffset, destinationOffset, stemWidth),
@@ -4864,6 +4892,10 @@ function animateInvalidTravelPath()
 		});
 
 		$arrow.attr("class", cssClasses).addClass("hidden").removeAttr("style");
+		
+		if (data.promptedTravelPathProperties)
+			showTravelPathArrow();
+
 		resolve();
 	});
 }
