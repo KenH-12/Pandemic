@@ -6,8 +6,6 @@ dragging and dropping a pawn onto a valid destination when another pawn is at th
 
 TO DO
 -----
-test grant station functionality again
-
 if a destination is selected (discard required) and the pawn is dragged again and dropped on an invalid destination,
 the action prompt should be reset
 

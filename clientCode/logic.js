@@ -2382,7 +2382,7 @@ function newGrantStation()
 			});
 		});
 	
-	highlightResearchStationSupply();
+	highlightResearchStationSupply($grantStation);
 }
 
 function resetGrantStation({ $researchStation, cancelled } = {})
@@ -2396,7 +2396,6 @@ function resetGrantStation({ $researchStation, cancelled } = {})
 	if (cancelled)
 		turnOffResearchStationSupplyHighlight();
 
-
 	$researchStation.animate($("#researchStationSupply img").offset(), getDuration("stationPlacement"),
 		function()
 		{
@@ -2409,10 +2408,9 @@ function resetGrantStation({ $researchStation, cancelled } = {})
 		});
 }
 
-async function highlightResearchStationSupply()
+async function highlightResearchStationSupply($grantStation)
 {
-	const $grantStation = $(".grantStation"),
-		$stationContainer = $("#researchStationSupply .imgContainer");
+	const $stationContainer = $("#researchStationSupply").children(".researchStation");
 
 	while ($grantStation.hasClass("glowing"))
 	{
@@ -2428,7 +2426,7 @@ async function highlightResearchStationSupply()
 }
 function turnOffResearchStationSupplyHighlight()
 {
-	$("#researchStationSupply .imgContainer").removeClass("bigGlow smallGlow");
+	$("#researchStationSupply").children(".researchStation").removeClass("bigGlow smallGlow");
 	$(".grantStation").removeClass("glowing");
 }
 
@@ -2479,7 +2477,6 @@ function getGovernmentGrantTargetCity($researchStation)
 		distanceThreshold = getDimension("piecePlacementThreshold"),
 		relocating = !$researchStation.hasClass("grantStation"),
 		relocationKey = relocating ? $researchStation.data("key") : false,
-		origin = getCity(relocationKey),
 		eventType = eventTypes.governmentGrant;
 
 	// Measure from what looks like the element's center.
@@ -2496,7 +2493,10 @@ function getGovernmentGrantTargetCity($researchStation)
 			log("target: ", targetCity.name);
 			if (relocating)
 			{
+				const origin = getCity(relocationKey);
+
 				$researchStation.addClass("mediumGlow");
+				
 				origin.clusterResearchStation();
 				showTravelPathArrow({ origin, destination: targetCity });
 			}
