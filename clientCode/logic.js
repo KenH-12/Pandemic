@@ -4861,9 +4861,9 @@ async function animateInvalidTravelPath()
 
 	await animatePromise({
 		$elements: $arrow.removeClass("hidden"),
-		initialProperties: { background: "darkred" },
+		initialProperties: { background: "darkred", opacity: .8 },
 		desiredProperties: { opacity: 0 },
-		duration: 750,
+		duration: 500,
 		easing: "easeInQuint"
 	});
 
