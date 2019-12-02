@@ -1,6 +1,5 @@
 BUGS
 ----
-clicking event card repeatedly can have odd effects
 
 TO DO
 -----
@@ -9,6 +8,11 @@ create a function to handle invalid movements (DRY)
 for disabled action buttons...
 	fix the expand animation
 	explicitly let the user know they are disabled
+
+hovering over the contingency planner's pawn should display the quarantine area
+	role tag also?
+
+give some sort of instructions for how to move cards between keep and discard
 
 rendezvous button
 

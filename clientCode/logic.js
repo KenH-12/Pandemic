@@ -776,6 +776,9 @@ function enableEventCards({ resilientPopulationOnly } = {})
 			
 			const eventType = getEventCardEventType($(this).data("key"));
 			
+			if (eventTypeIsBeingPrompted(eventType))
+				return false;
+			
 			indicatePromptingEventCard();
 			promptAction({ eventType });
 		});
