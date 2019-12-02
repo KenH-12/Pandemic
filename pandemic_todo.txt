@@ -3,8 +3,6 @@ BUGS
 
 TO DO
 -----
-create a function to handle invalid movements (DRY)
-
 for disabled action buttons...
 	fix the expand animation
 	explicitly let the user know they are disabled

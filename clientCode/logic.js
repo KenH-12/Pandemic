@@ -2310,20 +2310,11 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 
 async function tryAirlift(playerToAirlift)
 {
-	log("tryAirlift()");
 	const { airlift } = eventTypes,
 		destination = getDestination(airlift, { player: playerToAirlift });
 
-	log("destination: ", destination);
 	if (!destination)
-	{
-		await Promise.all([
-			animateInvalidTravelPath(),
-			playerToAirlift.getLocation().cluster()
-		]);
-		enablePawnEvents();
-		return false;
-	}
+		return invalidMovement(playerToAirlift.getLocation());
 
 	const airliftDetails = { eventType: airlift, playerToAirlift, destination };
 	data.promptedTravelPathProperties = airliftDetails;
@@ -2626,14 +2617,7 @@ async function tryDispatchPawn(playerToDispatch)
 	const dispatchDetails = determineDispatchDetails(playerToDispatch);
 
 	if (!dispatchDetails)
-	{
-		await Promise.all([
-			animateInvalidTravelPath(),
-			playerToDispatch.getLocation().cluster()
-		]);
-		enablePawnEvents();
-		return false;
-	}
+		return invalidMovement(playerToDispatch.getLocation());
 	
 	const { method, destination } = dispatchDetails;
 	
@@ -3162,15 +3146,8 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	else
 		destination = destination || getDestination(eventType);
 	
-	if (!destination) // Invalid move
-	{
-		await Promise.all([
-			animateInvalidTravelPath(),
-			originCity.cluster()
-		]);
-		enablePawnEvents();
-		return false;
-	}
+	if (!destination)
+		return invalidMovement(originCity);
 	
 	// Move appears to be valid
 	
@@ -3216,6 +3193,17 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		console.error(error);
 		abortMovementAction(player);
 	}
+}
+
+async function invalidMovement(originCity)
+{
+	await Promise.all([
+		animateInvalidTravelPath(),
+		originCity.cluster()
+	]);
+	enablePawnEvents();
+
+	return false;
 }
 
 function animateAutoTreatDiseaseEvents(events)
