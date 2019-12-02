@@ -854,7 +854,7 @@ span.r {color: #ef282a}
 	background-color: #1799d1;
 }
 .button * { pointer-events: none }
-.disabled, .btnDisabled
+.disabled, .btnDisabled, .scientist.button.btnDisabled
 {
 	color: #777;
 }

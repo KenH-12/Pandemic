@@ -25,8 +25,6 @@ DiscardPrompt could use some better styling
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher
 
-the discover sure button needs gray text when the button is disabled and the scientist's turn
-
 standardize prompt appearance / button behaviour
 
 resign button
@@ -53,7 +51,7 @@ make sure the height limit on the expanded infection discards functions properly
 
 IDEAS
 -----
-istead of the disease cube background, try a 1px drop shadow filter
+instead of the disease cube background, try a 1px drop shadow filter
 
 when stacking outbreak infection cubes on the origin city, use placeDiseaseCubes to animate them one at a time
 	use the destinationKeys as a param to give them that data attribute
