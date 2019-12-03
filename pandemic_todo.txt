@@ -3,10 +3,6 @@ BUGS
 
 TO DO
 -----
-for disabled action buttons...
-	fix the expand animation
-	explicitly let the user know they are disabled
-
 hovering over the contingency planner's pawn should display the quarantine area
 	role tag also?
 

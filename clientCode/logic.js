@@ -715,7 +715,11 @@ function enableAvailableActions()
 	const $actionsContainer = $("#actionsContainer"),
 		player = getActivePlayer();
 	
-	$actionsContainer.find(".button").off("click mouseleave").addClass("btnDisabled").removeClass("wait");
+	$actionsContainer.find(".button")
+		.off("click mouseleave")
+		.addClass("btnDisabled")
+		.removeClass("wait");
+	
 	$actionsContainer.find(".actionCategory").removeClass("hidden");
 	
 	useRoleColorForRelatedActionButtons(player.role);
@@ -1060,7 +1064,7 @@ function bindDisabledActionButtonEvents(actionButtonID)
 		});
 }
 
-function showActionRules($actionButton, eventType)
+async function showActionRules($actionButton, eventType)
 {
 	const initialHeight = $actionButton.height(),
 		actionRules = [...eventType.rules];
@@ -1070,11 +1074,14 @@ function showActionRules($actionButton, eventType)
 
 	$actionButton.stop().removeAttr("style")
 		.html(`${$actionButton.html()}<br />
-			<span class='disabledActionRules'><p>${actionRules.join("</p><p>")}</p></span>`);
+			<span class='actionNotPossible'>( this action is currently not possible )</span>
+			<span class='disabledActionRules'>
+				<p>${actionRules.join("</p><p>")}</p>
+			</span>`);
 
 	const eventualHeight = $actionButton.height();
 
-	animatePromise(
+	await animatePromise(
 	{
 		$elements: $actionButton,
 		initialProperties: { height: initialHeight },
@@ -1090,7 +1097,8 @@ function showActionRules($actionButton, eventType)
 			$actionButton.off("mouseleave");
 
 			hideActionRules($actionButton, initialHeight, eventType);
-		});
+		})
+		.removeAttr("style");
 }
 
 async function hideActionRules($actionButton, initialHeight, eventType)

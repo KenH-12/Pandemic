@@ -903,6 +903,15 @@ span.r {color: #ef282a}
 	width: 77%;
 	text-align: left;
 }
+.actionNotPossible
+{
+	font-size: 12px;
+	line-height: 12px;
+	width: 100%;
+	border-top: 1px solid #777;
+	border-bottom: 1px solid #777;
+	padding-bottom: 2px;
+}
 .disabledActionRules
 {
 	font-family: 'Ropa Sans', sans-serif;
@@ -910,7 +919,6 @@ span.r {color: #ef282a}
 	text-align: left;
 	padding: 0 5px;
 	margin-top: 1px;
-	border-top: 1px solid #fff;
 	color: #fff;
 }
 .disabledActionRules > p
