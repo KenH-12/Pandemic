@@ -553,6 +553,7 @@ span.r {color: #ef282a}
 {
 	width: 98%;
 	margin: 2px 1%;
+	overflow: hidden;
 }
 .epidemicFull h2
 {
@@ -675,6 +676,8 @@ span.r {color: #ef282a}
 	white-space: nowrap;
 	margin: 2px 1%;
 	border: none;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius: 5px;
 	font-size: 14px;
 	overflow: hidden;
 }
@@ -691,24 +694,27 @@ span.r {color: #ef282a}
 	font-weight: 700;
 	overflow: hidden;
 }
+#cardDrawContainer .playerCard,
+.epidemicFull
+{
+	border-top-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
 #cardDrawContainer h2
 {
 	text-align: center;
 	font-size: 24px;
 	font-family: 'Oswald', sans-serif;
 }
-.discardPrompt { border-top: 1px solid #fff; }
-.discardPrompt > div:not(.button)
+.discardPrompt
 {
-	background-color: #353535;
-	border-bottom: 1px solid #fff;
+	padding: 0 5% 5px 5%;
 }
-.discardPrompt p
+.cardsToKeep > .instructions
 {
-	padding: 0 5px;
+	font-size: 14px;
+	margin-bottom: 5px;
 	border-bottom: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-	background-color: #252525;
 }
 .discardPrompt p span
 {
@@ -717,8 +723,7 @@ span.r {color: #ef282a}
 }
 .discardPrompt .playerCard
 {
-	width: 76% !important;
-	margin: 3px 12% !important;
+	margin-bottom: 3px;
 }
 .discardSelections > p
 {
@@ -730,12 +735,13 @@ span.r {color: #ef282a}
 	margin: 0;
 	padding: 0;
 	min-height: 45px;
-	border-bottom: 1px solid #fff;
 }
 .discardPrompt .cardsToKeep
 {
 	min-height: 45px;
+	padding-bottom: 3px;
 }
+.cardsToKeep .playerCard:last-of-type { margin-bottom: 0 !important; }
 .btnConfirm
 {
 	margin: 5px;
@@ -940,11 +946,10 @@ span.r {color: #ef282a}
 	color : #000;
 	border-color: #000;
 }
-#actionPrompt
-{
-	background: linear-gradient(to bottom, #054583, #09154f);
-	padding-bottom: 5px;
-}
+#actionPrompt,
+#discardStepContainer > .discardPrompt
+{ background: linear-gradient(to bottom, #09154f, #054583, #09154f) }
+#actionPrompt { padding-bottom: 5px }
 .actionTitle { padding: 5px; }
 .actionTitle *
 {
@@ -963,7 +968,6 @@ span.r {color: #ef282a}
 .actionTitle > .actionIcon
 {
 	width: 20%;
-	
 }
 #actionInterface > .rules
 {
@@ -985,7 +989,7 @@ span.r {color: #ef282a}
 }
 #actionInterface > .rules li { margin-left: 3% }
 #actionInterface > .playerCard { cursor: pointer }
-.instructions 
+#actionInterface .instructions 
 {
 	padding: 3%;
 	padding-bottom: none;
@@ -1083,7 +1087,7 @@ span.r {color: #ef282a}
 	border: 2px solid #fff;
 }
 
-.discardSelections, .shareableCards
+.shareableCards
 {
 	width: 94%;
 	margin: 0 3%;
@@ -1196,6 +1200,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 .procedureContainer .highlighted
 {
 	color: #fff;
+	font-size: 15px;
 }
 
 #quarantineArea

@@ -2707,6 +2707,7 @@ class DiscardPrompt
 
 		this.$container = $(`<div class='discardPrompt'>
 								<div class='cardsToKeep'>
+									<p class='instructions'>Click a card to move it from "Keep" to "Discard" or vice versa.</p>
 									<p>Keep:<span></span></p>
 								</div>
 								<div class='discardSelections'>
