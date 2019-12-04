@@ -1480,10 +1480,12 @@ const actionInterfacePopulator = {
 			
 		actionInterfacePopulator.appendOptionButtons("playerCard", cardKeys, function($clicked)
 			{
+				const destination = getCity($clicked.data("key"));
+				data.promptedTravelPathProperties = { destination };
 				promptAction(
 					{
 						eventType: directFlight,
-						destination: getCity($clicked.data("key"))
+						destination
 					});
 			})
 			.$actionInterface.find(".playerCard")

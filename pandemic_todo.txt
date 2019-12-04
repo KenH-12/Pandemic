@@ -41,6 +41,8 @@ make sure the height limit on the expanded infection discards functions properly
 
 IDEAS
 -----
+skippable infection steps and epidemics
+
 hovering over the quarantine specialist's pawn should display the quarantine area
 	role tag also?
 
