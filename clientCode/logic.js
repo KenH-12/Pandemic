@@ -3888,29 +3888,33 @@ function positionCureMarkers()
 
 function resizeAndRepositionPieces()
 {
-	calibratePieceDimensions("pawn");
-	calibratePieceDimensions("station");
-	
-	data.cubeWidth = getDimension("cubeWidth");
-	$("#boardContainer > .diseaseCube").width(data.cubeWidth).height(data.cubeWidth);
-
-	actionStepInProgress() ? bindDiseaseCubeEvents() : unbindDiseaseCubeEvents();
-
-	positionAutoTreatCircleComponents();
-	
-	// a slight delay is required for all pending clusters to resolve properly
-	if (data.pendingClusters.size)
-		return sleep(50);
-	else // cluster all cities containing pawns, disease cubes, or research stations
+	return new Promise(async resolve =>
 	{
-		let city;
-		for (let key in data.cities)
+		calibratePieceDimensions("pawn");
+		calibratePieceDimensions("station");
+		
+		data.cubeWidth = getDimension("cubeWidth");
+		$("#boardContainer > .diseaseCube").width(data.cubeWidth).height(data.cubeWidth);
+	
+		actionStepInProgress() ? bindDiseaseCubeEvents() : unbindDiseaseCubeEvents();
+	
+		positionAutoTreatCircleComponents();
+		
+		// a slight delay is required for all pending clusters to resolve properly
+		if (data.pendingClusters.size)
+			return sleep(50);
+		else // cluster all cities containing pawns, disease cubes, or research stations
 		{
-			city = getCity(key);
-			if (city.containsPieces())
-				city.cluster();
+			let city;
+			for (let key in data.cities)
+			{
+				city = getCity(key);
+				if (city.containsPieces())
+					city.cluster();
+			}
 		}
-	}
+		resolve();
+	});
 }
 
 function calibratePieceDimensions(pieceName)
@@ -9210,7 +9214,11 @@ async function beginGame()
 		.siblings().removeClass("highlighted")
 		.children(".btnSkipSetupStep").remove();
 
-	await sleep(getDuration("longInterval"));
+	await Promise.all([
+		clusterAll(),
+		sleep(getDuration("longInterval"))
+	]);
+
 	await animatePromise(
 	{
 		$elements: $setupProcedureContainer,

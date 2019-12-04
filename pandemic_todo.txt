@@ -3,15 +3,14 @@ BUGS
 
 TO DO
 -----
+rules / instructions / FAQ
+
 rendezvous button
 
 event history
 
 event card icons
 special action icons?
-
-if the page is resized during initial infections, consider queueing clusters to reoccur afterward
-	(cubes can appear misplaced until another resize event triggers clustering)
 
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher
