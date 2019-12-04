@@ -1,7 +1,5 @@
 BUGS
 ----
-clicking build research station during the treat disease animation
-causes the action buttons to appear after the brs prompt is displayed
 
 TO DO
 -----

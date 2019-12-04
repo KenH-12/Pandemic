@@ -701,7 +701,9 @@ function disableActions()
 	log("disableActions()");
 	const $actionsContainer = $("#actionsContainer");
 
-	$actionsContainer.find(".button").addClass("btnDisabled wait");
+	$actionsContainer.find(".button")
+		.off("click")
+		.addClass("btnDisabled wait");
 
 	disableEventCards();
 	disablePawnEvents();
