@@ -2089,8 +2089,8 @@ function enableForecastSorting($cardContainer)
 	{
 		containment: $cardContainer.parent(),
 		axis: "y",
-		sort: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "100%") },
-		stop: function(e, ui) { ui.item.find(".infectionCardContents").css("width", "19.5%") },
+		sort: function(e, ui) { ui.item.addClass("sorting").find(".infectionCardContents").css("width", "100%") },
+		stop: function(e, ui) { ui.item.removeClass("sorting").find(".infectionCardContents").css("width", "19.5%") },
 		revert: 200
 	});
 }
@@ -6191,6 +6191,9 @@ function executePendingClusters(details)
 
 function pinpointCityFromCard($card)
 {
+	if ($card.hasClass("sorting"))
+		return false;
+	
 	const city = getCity($card.data("key"));
 	pinpointCity(city.key, { pinpointClass: `${city.color}Border` });
 }
