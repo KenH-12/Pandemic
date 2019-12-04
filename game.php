@@ -292,7 +292,12 @@
 								<h2>SPECIAL ACTIONS</h2>
 								<div class='button contingencyPlanner' id='btnPlanContingency'>PLAN CONTINGENCY</div>
 								<div class='button dispatcher' id='btnDispatchPawn'>DISPATCH PAWN</div>
-								<div class='button operationsExpert' id='btnOperationsFlight'>OPERATIONS FLIGHT</div>
+								<div class='button operationsExpert' id='btnOperationsFlight'>
+									<div class='actionIcon'>
+										<img src='images/actionIcons/operationsFlight.png' />
+									</div>
+									<div class='actionName'>OPERATIONS FLIGHT</div>
+								</div>
 							</div>
 
 							<div id='actionPrompt' class='hidden'>

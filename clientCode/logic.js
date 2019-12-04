@@ -224,7 +224,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	planContingency: {
 		name: "Plan Contingency",
 		code: "pc",
-		isSpecialAction: true,
 		capableRoleName: "Contingency Planner",
 		propertyNames: ["cardKey"],
 		rules: [
@@ -238,7 +237,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	dispatchPawn: {
 		name: "Dispatch Pawn",
 		code: "dp",
-		isSpecialAction: true,
 		capableRoleName: "Dispatcher",
 		rules: [
 			"The Dispatcher may, as an action, either:",
@@ -256,8 +254,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	operationsFlight: {
 		name: "Operations Flight",
+		hasIcon: true,
 		code: "of",
-		isSpecialAction: true,
 		capableRoleName: "Operations Expert",
 		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
@@ -1123,8 +1121,7 @@ function getActionButtonContents(eventType)
 {
 	const { name } = eventType;
 
-	// Special actions don't have icons.
-	if (eventType.isSpecialAction)
+	if (!eventType.hasIcon)
 		return name.toUpperCase();
 
 	return `<div class='actionIcon'>

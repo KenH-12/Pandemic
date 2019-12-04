@@ -3,14 +3,25 @@ BUGS
 
 TO DO
 -----
-rules / instructions / FAQ
+special action icons
+	plan contingency
+	dispatch pawn
+	rendezvous?
 
-rendezvous button
+event card icons
+	airlift
+	one quiet Night
+	resilient population
+	forecast
+	government grant
 
 event history
 
-event card icons
-special action icons?
+undo actions
+
+rendezvous button
+
+rules / instructions / FAQ
 
 consider using the Researcher's modifications on the Share Knowledge button
 when another player can take from the researcher
