@@ -389,6 +389,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	governmentGrant: {
 		name: "Government Grant",
+		hasIcon: true,
 		code: "gg",
 		cardKey: "gove",
 		rules: ["Play at any time. Not an action.", "Add 1 research station to any city."],

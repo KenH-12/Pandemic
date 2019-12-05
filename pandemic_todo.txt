@@ -1,5 +1,7 @@
 BUGS
 ----
+the grant station can be dropped and then caught, causing undesired behaviour
+	disable draggability until it returns to the supply location
 
 TO DO
 -----
