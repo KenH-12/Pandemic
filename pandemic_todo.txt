@@ -14,8 +14,6 @@ event card icons
 	airlift
 	one quiet Night
 	resilient population
-	forecast
-	government grant
 
 event history
 

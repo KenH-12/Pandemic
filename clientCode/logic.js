@@ -329,6 +329,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	resilientPopulation: {
 		name: "Resilient Population",
+		hasIcon: true,
 		code: "rp",
 		cardKey: "resi",
 		rules: [
@@ -356,6 +357,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	forecast: {
 		name: "Forecast",
+		hasIcon: true,
 		code: "fd",
 		cardKey: "fore",
 		rules: [
