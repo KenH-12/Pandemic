@@ -6,13 +6,11 @@ the grant station can be dropped and then caught, causing undesired behaviour
 The player deck showed 1 card left, but two cards were drawn (epi,cair)
 	the next turn, defeat occured (out of time)
 
+the government grant prompt is not cancelled if another event card is prompted
+	the grant station is stll draggable
+
 TO DO
 -----
-special action icons
-	plan contingency
-	dispatch pawn
-	rendezvous?
-
 event history
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
@@ -21,6 +19,11 @@ undo actions
 
 the resilient population animation should scroll the infection discards container to the bottom
 before placing the card in the "removed from game" container
+
+find some other way to convey that the cost of some actions is to discard whichever card(s)
+	e.g. "Cost:"
+
+the pinpointers should appear behind the player deck container
 
 rendezvous button
 
@@ -41,6 +44,8 @@ handle errors
 	retrieveEventHistory
 
 add tests
+
+include recently dealt infection cards / cardbacks in the resize event
 
 make sure things look ok for different screen sizes
 

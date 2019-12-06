@@ -214,7 +214,7 @@ body,
 		#3254af,	
 		#405fb1,
 		#405fb1,
-		#3254af);
+		#3254af)
 }
 .b:not(.diseaseCube)
 {
@@ -222,7 +222,7 @@ body,
 		#0e0e0e,	
 		#212121,
 		#212121,
-		#0e0e0e);
+		#0e0e0e)
 }
 .r:not(.diseaseCube)
 {
@@ -230,25 +230,50 @@ body,
 		#b10e10,	
 		#ef282a,
 		#ef282a,
-		#b10e10);
+		#b10e10)
 }
 .white{background-color:#fff}
 .black{background-color:#000}
-.pawnArrow.airlift > div,
-.airlift:not(.pawnArrow) { background: gray !important }
-.epidemic:not(.substep), .epidemicFull {background-color: #00a94f;}
+.epidemic:not(.substep),
+.epidemicFull
+{
+	background: linear-gradient(to right,
+		#007738,	
+		#00a94f,
+		#00a94f,
+		#007738)
+}
 .brightGreen { color: #00a94f }
 .researchStationBackground { background-color: #e9cf94 }
 span.r {color: #ef282a; background: none}
 .eventCard
 {
-	background: linear-gradient(to right, 
-		#e8d236,
-		#8c1809,
-		#8c1809,
-		#e8d236)
+	background: linear-gradient(30deg, 
+		gray,
+		#fff,
+		gray,
+		#fff,
+		gray,
+		#fff,
+		gray,
+		#fff,
+		gray);
+	color: #000;
 }
 .eventCard.unavailable:active { background-color: #8a181a }
+.pawnArrow.airlift > div,
+.airlift:not(.pawnArrow)
+{
+	background: linear-gradient(to bottom right, 
+		#fff,
+		gray,
+		#fff,
+		gray,
+		#fff,
+		gray,
+		#fff,
+		gray) !important
+}
 
 #topPanel, .bottomPanelDiv:not(#cureMarkerContainer)
 {
@@ -567,6 +592,7 @@ span.r {color: #ef282a; background: none}
 {
 	margin-left: 20%;
 	color: #000;
+	font-family: 'Audiowide', 'Electrolize', sans-serif;
 	font-weight: 700;
 }
 .veil
@@ -704,6 +730,9 @@ span.r {color: #ef282a; background: none}
 	background-color: #444;
 	cursor: pointer;
 }
+.playerCard,
+.epidemicFull > h2
+{ font-family: 'Audiowide', 'Electrolize', sans-serif; }
 .playerCard
 {
 	width: 98%;
@@ -833,7 +862,7 @@ span.r {color: #ef282a; background: none}
 { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
 .role.contingencyPlanner > .playerCard
 {
-	font-family: 'Electrolize', 'Oswald', sans-serif;
+	font-family: 'Audiowide', 'Electrolize', sans-serif;
 	border: 1px solid #fff;
 }
 .contingencyPlannerBorder { border-color: #67c8c6 }

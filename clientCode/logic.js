@@ -19,10 +19,10 @@ const data =
 		discardDiseaseIcon:		["boardWidth",	0.023],
 		infCardHeight:			["panelWidth", 0.105],
 		infCardFont:			["panelWidth",	0.063],
-		infCardNameTop:			["panelWidth", 0.0263],
+		infCardNameTop:			["panelWidth", 0.0205],
 		infDiscardHeight:		["boardWidth", 0.0192],
 		infDiscardFont:			["boardWidth",	0.0136],
-		infDiscardNameTop:		["boardWidth", 0.0042],
+		infDiscardNameTop:		["boardWidth", 0.0038],
 		outbreaksMarkerLeft:	["boardWidth", 0.028],
 		outbreaksMarkerRight:	["boardWidth", 0.067],
 		stationSupplyCountFont: ["boardWidth", 0.0208],
@@ -254,7 +254,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	operationsFlight: {
 		name: "Operations Flight",
-		hasIcon: true,
 		code: "of",
 		capableRoleName: "Operations Expert",
 		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
@@ -3819,7 +3818,7 @@ function resizeInfectionDiscardElements()
 		.find(".infectionCard")
 		.height(cardHeight)
 		.find(".cityName")
-		.css(getCityNameStyle());
+		.css(getInfectionCardTextStyle());
 	
 	$infDiscard.children("#infDiscardVeil").offset({ top: $infDiscard.children(".title").first().outerHeight() });
 }
@@ -7894,7 +7893,7 @@ function getInfectionContainer()
 	return $("#" + containerID);
 }
 
-function getCityNameStyle()
+function getInfectionCardTextStyle()
 {
 	return {
 		"top": getDimension("infDiscardNameTop") + "px",
@@ -7931,7 +7930,7 @@ function discardInfectionCard($card, duration)
 						.children(".infectionCardContents")
 						.removeAttr("style")
 						.children(".cityName")
-						.css(getCityNameStyle());
+						.css(getInfectionCardTextStyle());
 						
 					$card.height(getDimension("infDiscardHeight"));
 
@@ -8255,7 +8254,7 @@ function newPlayerCardElement(cardKey, { noTooltip } = {})
 Click to locate ${city.name}`;
 	}
 
-	return $(`<div class='playerCard ${cardType}' title='${ noTooltip ? "" : tooltip }' data-key='${cardKey}'>${cardName}</div>`);
+	return $(`<div class='playerCard ${cardType}' title='${ noTooltip ? "" : tooltip }' data-key='${cardKey}'>${cardName.toUpperCase()}</div>`);
 }
 
 function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAutoTreat } = {})
