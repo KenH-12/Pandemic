@@ -3,6 +3,9 @@ BUGS
 the grant station can be dropped and then caught, causing undesired behaviour
 	disable draggability until it returns to the supply location
 
+The player deck showed 1 card left, but two cards were drawn (epi,cair)
+	the next turn, defeat occured (out of time)
+
 TO DO
 -----
 special action icons
@@ -11,11 +14,11 @@ special action icons
 	rendezvous?
 
 event card icons
-	airlift
 	one quiet Night
-	resilient population
 
 event history
+
+when a piece lands behind part of a playerPanel, the panel should become transparent
 
 undo actions
 

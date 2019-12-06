@@ -382,6 +382,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	airlift: {
 		name: "Airlift",
+		hasIcon: true,
 		code: "ar",
 		cardKey: "airl",
 		rules: ["Play at any time. Not an action.", "Move any 1 pawn to any city."],
