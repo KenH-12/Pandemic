@@ -19,6 +19,9 @@ when a piece lands behind part of a playerPanel, the panel should become transpa
 
 undo actions
 
+the resilient population animation should scroll the infection discards container to the bottom
+before placing the card in the "removed from game" container
+
 rendezvous button
 
 rules / instructions / FAQ

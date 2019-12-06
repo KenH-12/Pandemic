@@ -770,7 +770,7 @@ function enableEventCards({ resilientPopulationOnly } = {})
 {
 	log("enableEventCards()");
 	
-	let $eventCards = $("#playerPanelContainer").find(".playerCard.event").off("click");
+	let $eventCards = $("#playerPanelContainer").find(".playerCard.eventCard").off("click");
 
 	if (resilientPopulationOnly)
 	{
@@ -833,7 +833,7 @@ function getEventCardEventType(cardKey)
 function disableEventCards()
 {
 	log("disableEventCards()");
-	$("#playerPanelContainer").find(".playerCard.event")
+	$("#playerPanelContainer").find(".playerCard.eventCard")
 		.off("click")
 		.addClass("unavailable");
 }
@@ -1930,7 +1930,7 @@ const actionInterfacePopulator = {
 function getContingencyOptionCardKeys()
 {
 	const cardKeys = [];
-	$("#playerDiscard").children(".playerCard.event").each(function()
+	$("#playerDiscard").children(".playerCard.eventCard").each(function()
 	{
 		cardKeys.push($(this).data("key"));
 	});
@@ -1967,7 +1967,7 @@ function isContingencyCardKey(cardKey)
 
 function getContingencyCardElement()
 {
-	return $("#contingencyPlanner").children(".role").children(`.playerCard.event.contingency`);
+	return $("#contingencyPlanner").children(".role").children(`.playerCard.eventCard.contingency`);
 }
 
 function forecastInProgress()
@@ -6269,7 +6269,7 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 // binds click events of .playerCard elements
 function bindPlayerCardEvents()
 {
-	$(".playerCard:not(.event, .epidemic)")
+	$(".playerCard:not(.eventCard, .epidemic)")
 		.off("click")
 		.click(function()
 		{
@@ -8236,7 +8236,7 @@ function newPlayerCardElement(cardKey, { noTooltip } = {})
 	
 	if (isEventCardKey(cardKey))
 	{
-		cardType = "event";
+		cardType = "eventCard";
 		tooltip = "Event card";
 		cardName = data.eventCards[cardKey];
 	}

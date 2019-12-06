@@ -205,8 +205,8 @@ body,
 .r:not(span){background-color:#ef282a;}
 .white{background-color:#fff}
 .black{background-color:#000}
-.event {background-color: gray;}
-.event.unavailable:active { background-color: #8a181a }
+.eventCard {background-color: gray;}
+.eventCard.unavailable:active { background-color: #8a181a }
 .pawnArrow.airlift > div,
 .airlift:not(.pawnArrow) { background: gray !important }
 .epidemic:not(.substep), .epidemicFull {background-color: #00a94f;}
@@ -636,7 +636,7 @@ span.r {color: #ef282a}
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #fff;
 }
-.role *:not(.playerCard.event.contingency) { pointer-events: none }
+.role *:not(.playerCard.eventCard.contingency) { pointer-events: none }
 .btnCollapseExpand
 {
 	background-color: #353535;
@@ -683,7 +683,7 @@ span.r {color: #ef282a}
 }
 .playerCard * { pointer-events: none }
 .playerPanel > .playerCard:first-of-type { margin-top: 4px }
-.playerPanel .playerCard.event:not(.unavailable) { cursor: pointer }
+.playerPanel .playerCard.eventCard:not(.unavailable) { cursor: pointer }
 #cardDrawContainer .playerCard
 {
 	width: 98%;
