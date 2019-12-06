@@ -199,10 +199,39 @@ body,
 .groupInfRate .diseaseCube .cubeBackground { background-color: #000 }
 
 .hidden{display:none;}
-.y{background-color:#fded3c;color:black;}
-.u{background-color:#405fb1;}
-.b{background-color:#212121;}
-.r:not(span){background-color:#ef282a;}
+.y:not(.diseaseCube)
+{
+	background: linear-gradient(to right,
+		#cab900,	
+		#fded3c,
+		#fded3c,
+		#cab900);
+	color:black;
+}
+.u:not(.diseaseCube)
+{
+	background: linear-gradient(to right,
+		#3254af,	
+		#405fb1,
+		#405fb1,
+		#3254af);
+}
+.b:not(.diseaseCube)
+{
+	background: linear-gradient(to right,
+		#0e0e0e,	
+		#212121,
+		#212121,
+		#0e0e0e);
+}
+.r:not(.diseaseCube)
+{
+	background: linear-gradient(to right,
+		#b10e10,	
+		#ef282a,
+		#ef282a,
+		#b10e10);
+}
 .white{background-color:#fff}
 .black{background-color:#000}
 .pawnArrow.airlift > div,
@@ -210,7 +239,7 @@ body,
 .epidemic:not(.substep), .epidemicFull {background-color: #00a94f;}
 .brightGreen { color: #00a94f }
 .researchStationBackground { background-color: #e9cf94 }
-span.r {color: #ef282a}
+span.r {color: #ef282a; background: none}
 .eventCard
 {
 	background: linear-gradient(to right, 
