@@ -205,15 +205,21 @@ body,
 .r:not(span){background-color:#ef282a;}
 .white{background-color:#fff}
 .black{background-color:#000}
-.eventCard {background-color: gray;}
-.eventCard.unavailable:active { background-color: #8a181a }
 .pawnArrow.airlift > div,
 .airlift:not(.pawnArrow) { background: gray !important }
 .epidemic:not(.substep), .epidemicFull {background-color: #00a94f;}
 .brightGreen { color: #00a94f }
 .researchStationBackground { background-color: #e9cf94 }
-
 span.r {color: #ef282a}
+.eventCard
+{
+	background: linear-gradient(to right, 
+		#e8d236,
+		#8c1809,
+		#8c1809,
+		#e8d236)
+}
+.eventCard.unavailable:active { background-color: #8a181a }
 
 #topPanel, .bottomPanelDiv:not(#cureMarkerContainer)
 {
