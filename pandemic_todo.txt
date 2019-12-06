@@ -13,9 +13,6 @@ special action icons
 	dispatch pawn
 	rendezvous?
 
-event card icons
-	one quiet Night
-
 event history
 
 when a piece lands behind part of a playerPanel, the panel should become transparent

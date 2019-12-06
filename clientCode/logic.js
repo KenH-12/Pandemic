@@ -343,6 +343,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	oneQuietNight: {
 		name: "One Quiet Night",
+		hasIcon: true,
 		code: "oq",
 		cardKey: "oneq",
 		rules: [
