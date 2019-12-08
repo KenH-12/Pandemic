@@ -6471,16 +6471,20 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 	return new Promise(async resolve =>
 		{
 			const topPercentages = [0.544, 0.5925, 0.634, 0.6798, 0.7235, 0.7685, 0.8118, 0.852, 0.896], // because the increase in distance from the top is nonlinear
-				leftDimension = outbreakCount % 2 === 0 ? "outbreaksMarkerLeft" : "outbreaksMarkerRight"; // because the outbreaks track zig-zags
+				leftDimension = outbreakCount % 2 === 0 ? "outbreaksMarkerLeft" : "outbreaksMarkerRight", // because the outbreaks track zig-zags
+				$marker = $("#outbreaksMarker");
 			
 			data.outbreakCount = outbreakCount;
 		
 			if (animate)
+			{
+				$marker.addClass("mediumGlow");
 				await highlightMarkerTrack("outbreaks");
+			}
 
 			await animatePromise(
 			{
-				$elements: $("#outbreaksMarker"),
+				$elements: $marker,
 				desiredProperties: {
 					top: (data.boardHeight * topPercentages[outbreakCount]),
 					left: getDimension(leftDimension)
@@ -6498,8 +6502,8 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 					data.gameEndCause = "outbreak";
 					return resolve();
 				}
-
 				await highlightMarkerTrack("outbreaks", { off: true });
+				$marker.removeClass("mediumGlow");
 			}
 
 			resolve();
@@ -6996,11 +7000,11 @@ function finishIntensifyStep($epidemic, $btn)
 
 async function highlightMarkerTrack(trackName, { off } = {})
 {
-	const $elements = $("." + trackName + "Highlight");
+	const $highlighters = $("." + trackName + "Highlight");
 
 	await animatePromise(
 		{
-			$elements: $elements.removeClass("hidden"),
+			$elements: $highlighters.removeClass("hidden"),
 			initialProperties: { opacity: (off ? 0.5 : 0) },
 			desiredProperties: { opacity: (off ? 0 : 0.5) },
 			duration: (off ? 300 : 600)
@@ -7008,7 +7012,7 @@ async function highlightMarkerTrack(trackName, { off } = {})
 	);
 
 	if (off)
-		$elements.addClass("hidden");
+		$highlighters.addClass("hidden");
 
 	return sleep(getDuration("shortInterval"));
 }
@@ -7029,7 +7033,8 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 		
 		if (animate)
 		{
-			$marker.offset({ left: (data.boardWidth * spaceLocations[epidemicCount - 1]) });
+			$marker.offset({ left: (data.boardWidth * spaceLocations[epidemicCount - 1]) })
+				.addClass("smallGlow");
 			await highlightMarkerTrack(trackName);
 		}
 		
@@ -7046,6 +7051,7 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 		if (animate)
 		{
 			await sleep(getDuration("mediumInterval"));
+			$marker.removeClass("smallGlow");
 			await highlightMarkerTrack(trackName, { off: true });
 		}
 		
