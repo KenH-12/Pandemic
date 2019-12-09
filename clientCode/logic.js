@@ -2223,7 +2223,7 @@ async function animateOneQuietNight()
 	{
 		title: "One Quiet Night",
 		description: "Skipping the Infect Cities step...",
-		eventClass: "event"
+		eventClass: "eventCard"
 	});
 }
 
