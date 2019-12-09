@@ -224,7 +224,7 @@ body,
 		#212121,
 		#0e0e0e)
 }
-.r:not(.diseaseCube)
+.r:not(.diseaseCube):not(span)
 {
 	background: linear-gradient(to right,
 		#b10e10,	
