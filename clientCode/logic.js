@@ -1182,7 +1182,7 @@ function resetActionPrompt({ actionCancelled } = {})
 			resetGrantStation({ cancelled: true });
 		}
 		else if (eventTypeIsBeingPrompted(resilientPopulation))
-			disableResilientPopulationSelection();
+			resetInfectionDiscardClicksAndTooltips();
 		
 		hideTravelPathArrow();
 	}
@@ -2248,11 +2248,6 @@ Select for removal?`);
 	}
 	else
 		actionInterfacePopulator.replaceInstructions("<span class='r'>The Infection Discard Pile is empty!<br />To play Resilient Population, there must be at least 1 card in the Infection Discard Pile.</span>");
-}
-
-function disableResilientPopulationSelection()
-{
-	$("#infectionDiscard").children(".infectionCard").off("click");
 }
 
 async function resilientPopulation(cardKeyToRemove)
