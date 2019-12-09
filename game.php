@@ -291,7 +291,12 @@
 							<div id='specialActionCategory' class='actionCategory'>
 								<h2>SPECIAL ACTIONS</h2>
 								<div class='button contingencyPlanner' id='btnPlanContingency'>PLAN CONTINGENCY</div>
-								<div class='button dispatcher' id='btnDispatchPawn'>DISPATCH PAWN</div>
+								<div class='button dispatcher' id='btnDispatchPawn'>
+									<div class='actionIcon'>
+									<img src='images/actionIcons/dispatchPawn.png' />
+								</div>
+								<div class='actionName'>DISPATCH PAWN</div>
+							</div>
 								<div class='button operationsExpert' id='btnOperationsFlight'>
 									<div class='actionIcon'>
 										<img src='images/actionIcons/operationsFlight.png' />

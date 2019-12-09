@@ -236,6 +236,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	dispatchPawn: {
 		name: "Dispatch Pawn",
+		hasIcon: true,
 		code: "dp",
 		capableRoleName: "Dispatcher",
 		rules: [
@@ -254,6 +255,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	operationsFlight: {
 		name: "Operations Flight",
+		hasIcon: true,
 		code: "of",
 		capableRoleName: "Operations Expert",
 		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
