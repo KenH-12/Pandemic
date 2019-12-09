@@ -6,9 +6,6 @@ the grant station can be dropped and then caught, causing undesired behaviour
 The player deck showed 1 card left, but two cards were drawn (epi,cair)
 	the next turn, defeat occured (out of time)
 
-the government grant prompt is not cancelled if another event card is prompted
-	the grant station is stll draggable
-
 TO DO
 -----
 event history

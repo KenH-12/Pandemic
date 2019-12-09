@@ -787,6 +787,7 @@ function enableEventCards({ resilientPopulationOnly } = {})
 			if (eventTypeIsBeingPrompted(eventType))
 				return false;
 			
+			resetActionPrompt({ actionCancelled: data.promptingEventType });
 			indicatePromptingEventCard();
 			promptAction({ eventType });
 		});
