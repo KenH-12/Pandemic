@@ -98,6 +98,7 @@ body,
 }
 #travelPathArrowContainer
 {
+	position: relative;
 	z-index: 6;
 	opacity: 0.7;
 	filter: drop-shadow(0px 0px 3px #fff);
