@@ -2401,7 +2401,9 @@ function resetGrantStation({ $researchStation, cancelled } = {})
 	if (cancelled)
 		turnOffResearchStationSupplyHighlight();
 
-	$researchStation.animate($("#researchStationSupply img").offset(), getDuration("stationPlacement"),
+	$researchStation
+		.draggable({ disabled: true })
+		.animate($("#researchStationSupply img").offset(), getDuration("stationPlacement"),
 		function()
 		{
 			data.researchStationKeys.delete("grantStation");
