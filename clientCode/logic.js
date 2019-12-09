@@ -3561,17 +3561,20 @@ async function finishDrawStep(cardKeys)
 	proceed();
 }
 
-async function dealFaceDownPlayerCards($container, numCardsToDeal)
+async function dealFaceDownPlayerCards($container, numCardsToDeal, { numCardsInDeck } = {})
 {
 	for (let i = 0; i < numCardsToDeal; i++)
 	{
-		await dealFaceDownPlayerCard($container);
+		if (!isNaN(numCardsInDeck))
+			numCardsInDeck--;
+		
+		await dealFaceDownPlayerCard($container, { numCardsInDeck });
 		await sleep(getDuration("dealCard") * 0.5);
 	}
 	return sleep(getDuration("longInterval"));
 }
 
-function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex } = {})
+function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex, numCardsInDeck } = {})
 {
 	return new Promise(resolve =>
 	{
@@ -3584,15 +3587,8 @@ function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex } = {})
 		if (zIndex)
 			$cardback.css({ zIndex });
 
-		if (!currentStepIs("setup"))
-		{
-			// Although data.numPlayerCardsRemaining is explicitly set after a card draw request,
-			// said request happens asynchronously with this function, therefore manually decrementing here ensures
-			// that setPlayerDeckImgSize chooses the correct img.
-			// This is especially important when 1 or 0 player cards remain in the deck.
-			data.numPlayerCardsRemaining--;
-			setPlayerDeckImgSize();
-		}
+		if (numCardsInDeck && !currentStepIs("setup"))
+			setPlayerDeckImgSize({ numCardsInDeck });
 
 		$cardback
 			.appendTo("body")
@@ -9382,7 +9378,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 		if (i === numCardsToDeal - 1) // deck is empty
 		{
 			$("#imgPlayerDeck").addClass("hidden");
-			setPlayerDeckImgSize(getMaxPlayerDeckImgSize() - data.numEpidemics);
+			setPlayerDeckImgSize({ size: getMaxPlayerDeckImgSize() - data.numEpidemics });
 		}
 
 		await sleep(getDuration("dealCard") / 6);
@@ -9502,14 +9498,14 @@ function increasePlayerDeckImgSize()
 		.removeClass("hidden");
 }
 
-function setPlayerDeckImgSize(size)
+function setPlayerDeckImgSize({ size, numCardsInDeck } = {})
 {
 	const $deck = $("#imgPlayerDeck");
 	
 	if (!size && $deck.hasClass("hidden"))
 		return;
 
-	size = size || calculatePlayerDeckImgSize();
+	size = size || calculatePlayerDeckImgSize(numCardsInDeck);
 	log("newSize: ", size);
 	if (size >= 0)
 		$deck.attr("src", `images/cards/playerDeck_${size}.png`);
@@ -9517,10 +9513,10 @@ function setPlayerDeckImgSize(size)
 		$deck.addClass("hidden");
 }
 
-function calculatePlayerDeckImgSize()
+function calculatePlayerDeckImgSize(numCardsInDeck)
 {
 	log("data.numPlayerCardsRemaining", data.numPlayerCardsRemaining);
-	const numCardsLeft = data.numPlayerCardsRemaining,
+	const numCardsLeft = !isNaN(numCardsInDeck) ? numCardsInDeck : data.numPlayerCardsRemaining,
 		ranges = [
 			{ maxCards: 0, deckSize: -1 },
 			{ maxCards: 1, deckSize: 0 },
@@ -9533,10 +9529,8 @@ function calculatePlayerDeckImgSize()
 		];
 	
 	for (let range of ranges)
-	{
 		if (numCardsLeft <= range.maxCards)
 			return range.deckSize;
-	}
 }
 
 function getPlayerDeckImgSize($imgDeck)
