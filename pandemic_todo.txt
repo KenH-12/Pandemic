@@ -9,8 +9,6 @@ The player deck showed 1 card left, but two cards were drawn (epi,cair)
 the government grant prompt is not cancelled if another event card is prompted
 	the grant station is stll draggable
 
-the plan contingency button should be visible and during the contingency planner's turn, even when it is disabled
-
 TO DO
 -----
 event history

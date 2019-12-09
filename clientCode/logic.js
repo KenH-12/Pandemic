@@ -1065,7 +1065,8 @@ function bindDisabledActionButtonEvents(actionButtonID)
 				});
 			
 			showActionRules($btn, eventType);
-		});
+		})
+		.removeClass("hidden");
 }
 
 async function showActionRules($actionButton, eventType)
