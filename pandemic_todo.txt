@@ -1,5 +1,6 @@
 BUGS
 ----
+player deck size does not decrease as cards are drawn
 
 TO DO
 -----

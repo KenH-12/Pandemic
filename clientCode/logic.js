@@ -223,6 +223,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	planContingency: {
 		name: "Plan Contingency",
+		hasIcon: true,
 		code: "pc",
 		capableRoleName: "Contingency Planner",
 		propertyNames: ["cardKey"],
