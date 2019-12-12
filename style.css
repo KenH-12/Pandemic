@@ -287,6 +287,13 @@ span.r {color: #ef282a; background: none}
 	vertical-align: top;
 }
 
+#eventHistory
+{
+	width: 27.6%;
+	border-right: 1px solid #fff;
+	border-left: none;
+}
+
 #cureMarkerContainer
 {
 	width: 20.3%;

@@ -3856,6 +3856,10 @@ function resizeBottomPanelElements()
 	$cureMarkerContainer
 		.height(data.topPanelHeight + titleHeight)
 		.offset({ top: panelOffsetTop - titleHeight });
+	
+	$("#eventHistory")
+		.height(data.topPanelHeight * 0.42)
+		.offset({ top: panelOffsetTop + data.topPanelHeight*0.58 });
 }
 
 function resizeRightPanelElements()

@@ -145,6 +145,8 @@
 						<div id='outbreaksMarker' class='marker'>
 							<img src='images/pieces/outbreaksMarker.png' alt='Outbreaks Marker'/>
 						</div>
+
+						<div id='eventHistory' class='bottomPanelDiv'></div>
 						
 						<div id='cureMarkerContainer' class='bottomPanelDiv'>
 							<p class='title'>
