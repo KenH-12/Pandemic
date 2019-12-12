@@ -2495,7 +2495,7 @@ function getGovernmentGrantTargetCity($researchStation)
 	const stationOffset = $researchStation.offset(),
 		distanceThreshold = getDimension("piecePlacementThreshold"),
 		relocating = !$researchStation.hasClass("grantStation"),
-		relocationKey = relocating ? $researchStation.data("key") : false,
+		relocationKey = relocating ? $researchStation.attr("data-key") : false,
 		eventType = eventTypes.governmentGrant;
 
 	// Measure from what looks like the element's center.
@@ -4871,7 +4871,7 @@ function getTravelPathVector(actionProperties)
 		}
 		else
 		{
-			originOffset = getCity($researchStation.data("key")).getOffset();
+			originOffset = getCity($researchStation.attr("data-key")).getOffset();
 			destinationOffset = $researchStation.offset();
 			destinationOffset.left += $researchStation.width() * 0.5;
 			destinationOffset.top += $researchStation.height() * 0.5;
