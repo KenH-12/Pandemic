@@ -3575,7 +3575,9 @@ async function finishDrawStep(cardKeys)
 
 async function dealFaceDownPlayerCards($container, numCardsToDeal)
 {
+	const deckOffset = $("#imgPlayerDeck").offset();
 	let numCardsInDeck = data.numPlayerCardsRemaining - 1;
+
 	for (let i = 0; i < numCardsToDeal; i++)
 	{
 		if (!currentStepIs("setup"))
@@ -3584,18 +3586,17 @@ async function dealFaceDownPlayerCards($container, numCardsToDeal)
 			numCardsInDeck--;
 		}
 
-		await dealFaceDownPlayerCard($container);
+		await dealFaceDownPlayerCard($container, deckOffset);
 		await sleep(getDuration("dealCard") * 0.5);
 	}
 	return sleep(getDuration("longInterval"));
 }
 
-function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex } = {})
+function dealFaceDownPlayerCard($container, deckOffset, { finalCardbackWidth, zIndex } = {})
 {
 	return new Promise(resolve =>
 	{
 		const $deck = $("#imgPlayerDeck"),
-			deckOffset = $deck.offset(),
 			$playerCard = $("<div class='playerCard'></div>").appendTo($container),
 			containerOffset = $playerCard.offset(),
 			$cardback = newFacedownPlayerCard().addClass("drawnPlayerCard");
@@ -9875,6 +9876,7 @@ async function dealFaceDownStartingHands(startingHands, $roleContainers)
 {
 	const startingHandSize = startingHands[0].cardKeys.length,
 		numCardsToDeal = startingHands.length * startingHandSize,
+		deckOffset = $("#imgPlayerDeck").offset(),
 		CARD_MARGIN_BOTTOM = 4,
 		finalCardbackWidth = data.STARTING_HAND_CARD_HEIGHT - CARD_MARGIN_BOTTOM,
 		interval = getDuration("dealCard") * 0.4;
@@ -9886,7 +9888,7 @@ async function dealFaceDownStartingHands(startingHands, $roleContainers)
 		zIndex = 10 + numCardsToDeal;
 	while (cardsDealt < numCardsToDeal)
 	{
-		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), { finalCardbackWidth, zIndex });
+		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), deckOffset, { finalCardbackWidth, zIndex });
 		await sleep(getDuration(interval));
 		
 		cardsDealt++;
