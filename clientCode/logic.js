@@ -111,6 +111,7 @@ const data =
 eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
+		iconFileName: "driveFerry",
 		hasIcon: true,
 		code: "dr",
 		rules: ["Move to a city connected by a white line to the one you are in."],
@@ -1134,9 +1135,17 @@ function getActionButtonContents(eventType)
 		return name.toUpperCase();
 
 	return `<div class='actionIcon'>
-				<img src='images/actionIcons/${toCamelCase(name)}.png' />
+				${getEventIcon(eventType)}
 			</div>
 			<div class='actionName'>${name.toUpperCase()}</div>`;
+}
+
+function getEventIcon(eventType)
+{
+	if (!eventType.hasIcon)
+		return "";
+	
+	return `<img src='images/actionIcons/${eventType.iconFileName || toCamelCase(eventType.name)}.png' />`;
 }
 
 function enableBtnCancelAction()

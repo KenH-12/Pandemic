@@ -289,9 +289,21 @@ span.r {color: #ef282a; background: none}
 
 #eventHistory
 {
+	left: 1px;
 	width: 27.6%;
 	border-right: 1px solid #fff;
-	border-left: none;
+	border-radius: 4px;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	white-space: nowrap;
+	overflow: hidden;
+}
+#eventHistory img
+{
+	display: inline-block;
+	width: 11.4%;
+	margin: 1px;
+	margin-left: 0;
 }
 
 #cureMarkerContainer
