@@ -3573,20 +3573,24 @@ async function finishDrawStep(cardKeys)
 	proceed();
 }
 
-async function dealFaceDownPlayerCards($container, numCardsToDeal, { numCardsInDeck } = {})
+async function dealFaceDownPlayerCards($container, numCardsToDeal)
 {
+	let numCardsInDeck = data.numPlayerCardsRemaining - 1;
 	for (let i = 0; i < numCardsToDeal; i++)
 	{
-		if (!isNaN(numCardsInDeck))
+		if (!currentStepIs("setup"))
+		{
+			setPlayerDeckImgSize({ numCardsInDeck });
 			numCardsInDeck--;
-		
-		await dealFaceDownPlayerCard($container, { numCardsInDeck });
+		}
+
+		await dealFaceDownPlayerCard($container);
 		await sleep(getDuration("dealCard") * 0.5);
 	}
 	return sleep(getDuration("longInterval"));
 }
 
-function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex, numCardsInDeck } = {})
+function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex } = {})
 {
 	return new Promise(resolve =>
 	{
@@ -3598,9 +3602,6 @@ function dealFaceDownPlayerCard($container, { finalCardbackWidth, zIndex, numCar
 		
 		if (zIndex)
 			$cardback.css({ zIndex });
-
-		if (numCardsInDeck && !currentStepIs("setup"))
-			setPlayerDeckImgSize({ numCardsInDeck });
 
 		$cardback
 			.appendTo("body")
@@ -8753,7 +8754,6 @@ function loadGamestate(gamestate)
 
 	delete gamestate.stepName;
 	Object.assign(data, gamestate);
-	log("gamestate pcr: ", gamestate.numPlayerCardsRemaining);
 }
 
 function loadDiseaseStatuses(diseaseStatuses)
@@ -8845,7 +8845,7 @@ function bindPlayerDeckHover()
 		{
 			if (currentStepIs("setup"))
 				return;
-
+			
 			$(this).attr("title", `${data.numPlayerCardsRemaining} card${data.numPlayerCardsRemaining != 1 ? "s" : ""}`);
 		});
 }
@@ -9522,7 +9522,7 @@ function setPlayerDeckImgSize({ size, numCardsInDeck } = {})
 		return;
 
 	size = size || calculatePlayerDeckImgSize(numCardsInDeck);
-	log("newSize: ", size);
+	
 	if (size >= 0)
 		$deck.attr("src", `images/cards/playerDeck_${size}.png`);
 	else
@@ -9531,8 +9531,7 @@ function setPlayerDeckImgSize({ size, numCardsInDeck } = {})
 
 function calculatePlayerDeckImgSize(numCardsInDeck)
 {
-	log("data.numPlayerCardsRemaining", data.numPlayerCardsRemaining);
-	const numCardsLeft = !isNaN(numCardsInDeck) ? numCardsInDeck : data.numPlayerCardsRemaining,
+	const numCardsLeft = isNaN(numCardsInDeck) ? data.numPlayerCardsRemaining : numCardsInDeck,
 		ranges = [
 			{ maxCards: 0, deckSize: -1 },
 			{ maxCards: 1, deckSize: 0 },
