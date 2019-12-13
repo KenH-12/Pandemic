@@ -466,10 +466,40 @@ function parseEvents(events)
 				
 				parsedEvents.push(new Event(e));
 			}
-			data.events = [...data.events, ...parsedEvents];
-
+			appendEventHistoryIcons(parsedEvents);
+			
 			return resolve(parsedEvents);
 		});
+}
+
+function appendEventHistoryIcons(newEvents)
+{
+	const $eventHistory = $("#eventHistory");
+	
+	data.events = [...data.events, ...newEvents];
+
+	let eventType;
+	for (let event of newEvents)
+	{
+		eventType = getEventType(event.code);
+		
+		if (!eventType.hasIcon)
+			continue;
+		
+		$eventHistory.append(getEventIcon(eventType));
+	}
+
+	setEventHistoryScrollPosition($eventHistory);
+}
+
+function setEventHistoryScrollPosition($eventHistory)
+{
+	const overflow = getHorizontalOverflow($eventHistory);
+	
+	if (overflow <= 0)
+		return false;
+	
+	$eventHistory.animate({ scrollLeft: overflow });
 }
 
 class Event

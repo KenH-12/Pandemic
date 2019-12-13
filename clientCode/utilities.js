@@ -256,6 +256,12 @@ function lockElements($elements)
 	}
 }
 
+function getHorizontalOverflow($element)
+{
+	const element = document.getElementById($element.attr("id"));
+	return element.scrollWidth - element.clientWidth;
+}
+
 function distanceBetweenPoints(pointA, pointB)
 {
 	return Math.sqrt(Math.pow(Math.abs(pointA.left - pointB.left), 2) + Math.pow(Math.abs(pointA.top - pointB.top), 2));
