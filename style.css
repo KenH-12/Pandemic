@@ -304,6 +304,7 @@ span.r {color: #ef282a; background: none}
 	width: 11.4%;
 	margin: 1px;
 	margin-left: 0;
+	border-radius: 20%;
 }
 
 #cureMarkerContainer
@@ -834,23 +835,23 @@ span.r {color: #ef282a; background: none}
 	color: #000;
 }
 .roleCard.scientist{ background-image: linear-gradient(to top, #f6f6f7, #9ccdd1) }
-.scientistBorder { border-color: #f6f6f7 }
+.scientistBorder { border: 2px solid #f6f6f7 }
 
 .researcher:not(.pawnArrow),
 .pawnArrow.researcher > div
 { background-image: linear-gradient(to bottom, #966c4b, #2a2017) }
-.researcherBorder { border-color: #574319 }
+.researcherBorder { border: 2px solid #574319 }
 
 .quarantineSpecialist:not(.pawnArrow),
 .pawnArrow.quarantineSpecialist > div
 { background-image: linear-gradient(to bottom, #398044, #043d0a) }
-.quarantineSpecialistBorder { border-color: #006951 }
+.quarantineSpecialistBorder { border: 2px solid #006951 }
 
 .operationsExpert:not(.pawnArrow),
 .pawnArrow.operationsExpert > div,
 #btnOperationsFlight
 { background-image: linear-gradient(to bottom, #aad37a, #407f48) }
-.operationsExpertBorder { border-color: #8dc73f }
+.operationsExpertBorder { border: 2px solid #8dc73f }
 
 .medic:not(.pawnArrow),
 .pawnArrow.medic > div,
@@ -863,7 +864,7 @@ span.r {color: #ef282a; background: none}
 	opacity: 0;
 	z-index: 1;
 }
-.medicBorder { border-color: #f68426 }
+.medicBorder { border: 2px solid #f68426 }
 
 .dispatcher:not(.pawnArrow),
 .pawnArrow.dispatcher > div,
@@ -871,7 +872,7 @@ span.r {color: #ef282a; background: none}
 .dispatch:not(.pawnArrow),
 #btnDispatchPawn
 { background-image: linear-gradient(to bottom, #ec84b5, #964967) }
-.dispatcherBorder { border-color: #ec84b5 }
+.dispatcherBorder { border: 2px solid #ec84b5 }
 
 .contingencyPlanner:not(.pawnArrow),
 .pawnArrow.contingencyPlanner:not(.dispatch) > div,
@@ -882,7 +883,7 @@ span.r {color: #ef282a; background: none}
 	font-family: 'Audiowide', 'Electrolize', sans-serif;
 	border: 1px solid #fff;
 }
-.contingencyPlannerBorder { border-color: #67c8c6 }
+.contingencyPlannerBorder { border: 2px solid #67c8c6 }
 
 .roleCard
 {

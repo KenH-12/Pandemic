@@ -461,12 +461,15 @@ function parseEvents(events)
 			
 			for (let e of events)
 			{
-				log(e);
 				if (!e) continue;
 				
 				parsedEvents.push(new Event(e));
 			}
-			appendEventHistoryIcons(parsedEvents);
+
+			data.events = [...data.events, ...parsedEvents];
+
+			if (Object.keys(data.players).length)
+				appendEventHistoryIcons(parsedEvents);
 			
 			return resolve(parsedEvents);
 		});
@@ -475,10 +478,12 @@ function parseEvents(events)
 function appendEventHistoryIcons(newEvents)
 {
 	const $eventHistory = $("#eventHistory");
+	let eventType,
+		role,
+		$icon;
 	
-	data.events = [...data.events, ...newEvents];
-
-	let eventType;
+	newEvents = newEvents || data.events;
+	log("newEvents", newEvents);
 	for (let event of newEvents)
 	{
 		eventType = getEventType(event.code);
@@ -486,7 +491,17 @@ function appendEventHistoryIcons(newEvents)
 		if (!eventType.hasIcon)
 			continue;
 		
-		$eventHistory.append(getEventIcon(eventType));
+		if (event.role)
+			role = event.role;
+
+		log("role,", role);
+
+		$icon = $(getEventIconHtml(eventType));
+
+		if (data.players[role])
+			$icon.addClass(`${data.players[role].camelCaseRole}Border`);
+		
+		$eventHistory.append($icon);
 	}
 
 	setEventHistoryScrollPosition($eventHistory);
@@ -1165,12 +1180,12 @@ function getActionButtonContents(eventType)
 		return name.toUpperCase();
 
 	return `<div class='actionIcon'>
-				${getEventIcon(eventType)}
+				${getEventIconHtml(eventType)}
 			</div>
 			<div class='actionName'>${name.toUpperCase()}</div>`;
 }
 
-function getEventIcon(eventType)
+function getEventIconHtml(eventType)
 {
 	const { hasIcon, iconFileName, name } = eventType;
 
@@ -8829,6 +8844,7 @@ async function setup()
 
 	data.startingHandPopulations = startingHandPopulations;
 	instantiatePlayers(players);
+	appendEventHistoryIcons();
 	loadDiseaseStatuses(diseaseStatuses);
 	loadInfectionDiscards(infectionDiscards);
 	loadPlayerCards(playerCards);
