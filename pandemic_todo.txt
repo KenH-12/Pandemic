@@ -1,12 +1,8 @@
 BUGS
 ----
-prompting dispatch when another pawn is at the origin city causes odd clustering behaviour
 
 TO DO
 -----
-allow the operations expert to choose charter flight over operations flight
-	because operations flight can be used only once per turn
-
 event history
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
