@@ -1172,10 +1172,14 @@ function getActionButtonContents(eventType)
 
 function getEventIcon(eventType)
 {
-	if (!eventType.hasIcon)
+	const { hasIcon, iconFileName, name } = eventType;
+
+	if (!hasIcon)
 		return "";
 	
-	return `<img src='images/actionIcons/${eventType.iconFileName || toCamelCase(eventType.name)}.png' />`;
+	return `<img	src='images/actionIcons/${iconFileName || toCamelCase(name)}.png'
+					alt='${name}'
+					title='${name}' />`;
 }
 
 function enableBtnCancelAction()
