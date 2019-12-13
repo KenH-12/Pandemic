@@ -3906,9 +3906,10 @@ function resizeBottomPanelElements()
 		.height(data.topPanelHeight + titleHeight)
 		.offset({ top: panelOffsetTop - titleHeight });
 	
-	$("#eventHistory")
-		.height(data.topPanelHeight * 0.42)
+	const $eventHistory = $("#eventHistory");
+	$eventHistory.height(data.topPanelHeight * 0.42)
 		.offset({ top: panelOffsetTop + data.topPanelHeight*0.58 });
+	setEventHistoryScrollPosition($eventHistory);
 }
 
 function resizeRightPanelElements()
