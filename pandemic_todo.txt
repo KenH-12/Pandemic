@@ -1,5 +1,6 @@
 BUGS
 ----
+prompting dispatch when another pawn is at the origin city causes odd clustering behaviour
 
 TO DO
 -----

@@ -2638,8 +2638,6 @@ async function tryDispatchPawn(playerToDispatch)
 	
 	if (movementTypeRequiresDiscard(method))
 	{
-		clusterAll({ pawns: true, playerToExcludePawn: playerToDispatch });
-		
 		// If both Direct Flight and Charter Flight are valid ways to reach the destination, the Dispatcher must choose between them.
 		const dispatcherMustChooseMethod = method.code === eventTypes.directFlight.code
 											&& getPlayer("Dispatcher").isHoldingCardKey(playerToDispatch.cityKey),
