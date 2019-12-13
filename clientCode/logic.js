@@ -1320,20 +1320,11 @@ const actionInterfacePopulator = {
 
 		return actionInterfacePopulator;
 	},
-	appendDivision(eventType)
+	appendDivision()
 	{
-		const { chooseFlightType, shareKnowledge, dispatchPawn } = eventTypes,
-			code = eventType.code;
-
-		let classPrefix;
-		if (code === chooseFlightType.code)
-			classPrefix = "actionInterface";
-		else if (code === shareKnowledge.code || code === dispatchPawn.code)
-			classPrefix = "discardPrompt";
-		
 		actionInterfacePopulator.$actionInterface.append(
-			`<div class='${classPrefix}Division'>
-				<div class='${classPrefix}DivisionLine'></div>
+			`<div class='actionInterfaceDivision'>
+				<div class='actionInterfaceDivisionLine'></div>
 				<p>OR</p>
 			<div>`);
 		
@@ -1430,7 +1421,7 @@ const actionInterfacePopulator = {
 		// If the player can reach the destination via Direct Flight,
 		// but also via one other flight type, present *two options.
 		// *See the comment in getMovementDetails as to why a maximum of two options are presented.
-		const { chooseFlightType, operationsFlight, charterFlight, directFlight } = eventTypes;
+		const { operationsFlight, charterFlight, directFlight } = eventTypes;
 		
 		let firstOption;
 		if (getActivePlayer().canOperationsFlight())
@@ -1441,7 +1432,7 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.appendDescriptiveElements(firstOption)
 		actionInterfacePopulator[firstOption.name]({ destination });
 		
-		actionInterfacePopulator.appendDivision(chooseFlightType).appendDescriptiveElements(directFlight);
+		actionInterfacePopulator.appendDivision().appendDescriptiveElements(directFlight);
 		actionInterfacePopulator[directFlight.name]({ destination });
 
 		return true;
@@ -1655,7 +1646,7 @@ const actionInterfacePopulator = {
 			if (participant.canGiveKnowledge())
 			{
 				if ($giveableContainer)
-					actionInterfacePopulator.appendDivision(eventTypes.shareKnowledge);
+					actionInterfacePopulator.appendDivision();
 				
 				$takeableContainer = $(`<div id='takeableCards' class='shareableCards'>
 											<p>Select a card to <i>take</i> :</p>
@@ -1745,7 +1736,7 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.dispatchPawn.name]({ playerToDispatch, destination, dispatchMethod })
 	{
-		const { chooseFlightType, directFlight, charterFlight, dispatchPawn } = eventTypes;
+		const { chooseFlightType, directFlight, charterFlight } = eventTypes;
 
 		if (destination)
 		{
@@ -1765,7 +1756,7 @@ const actionInterfacePopulator = {
 							movementAction(directFlight, destination, { playerToDispatch });
 						}
 					})
-					.appendDivision(dispatchPawn)
+					.appendDivision()
 					.appendDiscardPrompt(
 					{
 						cardKeys: playerToDispatch.cityKey,
