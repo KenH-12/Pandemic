@@ -300,6 +300,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	discard: {
 		name: "Discard",
+		hasIcon: true,
 		code: "ds",
 		actionPathName: "discardPlayerCards",
 		propertyNames: ["cardKeys"]
