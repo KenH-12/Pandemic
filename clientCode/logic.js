@@ -1188,12 +1188,13 @@ function getActionButtonContents(eventType)
 
 function getEventIconHtml(eventType)
 {
-	const { hasIcon, iconFileName, name } = eventType;
+	const { hasIcon, iconFileName, name, cardKey } = eventType,
+		fileExtension = cardKey && isEventCardKey(cardKey) ? "jpg" : "png";
 
 	if (!hasIcon)
 		return "";
 	
-	return `<img	src='images/actionIcons/${iconFileName || toCamelCase(name)}.png'
+	return `<img	src='images/actionIcons/${iconFileName || toCamelCase(name)}.${fileExtension}'
 					alt='${name}'
 					title='${name}' />`;
 }

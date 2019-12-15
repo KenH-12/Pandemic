@@ -5,6 +5,8 @@ TO DO
 -----
 event history
 
+fix action/event icon styles
+
 when a piece lands behind part of a playerPanel, the panel should become transparent
 
 undo actions
