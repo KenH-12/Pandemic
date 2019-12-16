@@ -275,7 +275,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		propertyNames: []
 	},
 	cardDraw: {
-		name: "Card Draw",
+		name: "Draw 2 Cards",
+		hasIcon: true,
 		code: "cd",
 		actionPathName: "drawPlayerCards",
 		propertyNames: ["cardKeys"]
