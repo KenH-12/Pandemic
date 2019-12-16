@@ -324,6 +324,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	outbreak: {
 		name: "Outbreak",
+		hasIcon: true,
 		code: "ob",
 		propertyNames: ["outbreakCount", "originKey", "diseaseColor"]
 	},
