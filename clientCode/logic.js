@@ -485,20 +485,15 @@ function appendEventHistoryIcons(newEvents)
 		$icon;
 	
 	newEvents = newEvents || data.events;
-	log("newEvents", newEvents);
+	
 	for (let event of newEvents)
 	{
 		eventType = getEventType(event.code);
-		
-		if (!eventType.hasIcon)
-			continue;
-		
+
+		$icon = $(getEventIconHtml(eventType, { event }));
+
 		if (event.role)
 			role = event.role;
-
-		log("role,", role);
-
-		$icon = $(getEventIconHtml(eventType));
 
 		if (data.players[role])
 			$icon.addClass(`${data.players[role].camelCaseRole}Border`);
@@ -1187,18 +1182,36 @@ function getActionButtonContents(eventType)
 			<div class='actionName'>${name.toUpperCase()}</div>`;
 }
 
-function getEventIconHtml(eventType, cssClasses)
+function getEventIconHtml(eventType, { cssClasses, event })
 {
-	const { hasIcon, name, cardKey } = eventType,
-		fileExtension = cardKey && isEventCardKey(cardKey) ? "jpg" : "png";
-
-	if (!hasIcon)
+	if (!eventType.hasIcon)
 		return "";
 	
-	return `<img	src='images/eventIcons/${toCamelCase(eventType.name).replace("/", "")}.${fileExtension}'
+	const { name, cardKey } = eventType,
+		fileExtension = cardKey && isEventCardKey(cardKey) ? "jpg" : "png",
+		fileName = getEventIconFileName(eventType, event);
+	
+	return `<img	src='images/eventIcons/${fileName}.${fileExtension}'
 					alt='${name}'
 					title='${name}'
 					${cssClasses ? `class='${cssClasses}'` : ""} />`;
+}
+
+function getEventIconFileName(eventType, event)
+{
+	let fileName = toCamelCase(eventType.name).replace("/", "");
+
+	if (!event)
+		return fileName;
+	
+	const {
+		treatDisease
+	} = eventTypes;
+
+	if (event.code === treatDisease.code)
+		fileName += `_${event.diseaseColor}`;
+	
+	return fileName;
 }
 
 function enableBtnCancelAction()
