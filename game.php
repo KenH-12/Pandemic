@@ -238,25 +238,25 @@
 								<h2>MOVEMENT ACTIONS</h2>
 								<div class='button' id='btnDriveFerry'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/driveFerry.png' />
+										<img src='images/eventIcons/driveFerry.png' />
 									</div>
 									<div class='actionName'>DRIVE / FERRY</div>
 								</div>
 								<div class='button' id='btnDirectFlight'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/directFlight.png' />
+										<img src='images/eventIcons/directFlight.png' />
 									</div>
 									<div class='actionName'>DIRECT FLIGHT</div>
 								</div>
 								<div class='button' id='btnCharterFlight'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/charterFlight.png' />
+										<img src='images/eventIcons/charterFlight.png' />
 									</div>
 									<div class='actionName'>CHARTER FLIGHT</div>
 								</div>
 								<div class='button' id='btnShuttleFlight'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/shuttleFlight.png' />
+										<img src='images/eventIcons/shuttleFlight.png' />
 									</div>
 									<div class='actionName'>SHUTTLE FLIGHT</div>
 								</div>
@@ -266,25 +266,25 @@
 								<h2>OTHER ACTIONS</h2>
 								<div class='button' id='btnBuildResearchStation'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/buildResearchStation.png' />
+										<img src='images/eventIcons/buildResearchStation.png' />
 									</div>
 									<div class='actionName'>BUILD RESEARCH STATION</div>
 								</div>
 								<div class='button' id='btnTreatDisease'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/treatDisease.png' />
+										<img src='images/eventIcons/treatDisease.png' />
 									</div>
 									<div class='actionName'>TREAT DISEASE</div>
 								</div>
 								<div class='button' id='btnShareKnowledge'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/shareKnowledge.png' />
+										<img src='images/eventIcons/shareKnowledge.png' />
 									</div>
 									<div class='actionName'>SHARE KNOWLEDGE</div>
 								</div>
 								<div class='button' id='btnDiscoverACure'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/discoverACure.png' />
+										<img src='images/eventIcons/discoverACure.png' />
 									</div>
 									<div class='actionName'>DISCOVER A CURE</div>
 								</div>
@@ -294,19 +294,19 @@
 								<h2>SPECIAL ACTIONS</h2>
 								<div class='button operationsExpert' id='btnPlanContingency'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/planContingency.png' />
+										<img src='images/eventIcons/planContingency.png' />
 									</div>
 									<div class='actionName'>PLAN CONTINGENCY</div>
 								</div>
 								<div class='button dispatcher' id='btnDispatchPawn'>
 									<div class='actionIcon'>
-									<img src='images/actionIcons/dispatchPawn.png' />
+									<img src='images/eventIcons/dispatchPawn.png' />
 								</div>
 								<div class='actionName'>DISPATCH PAWN</div>
 							</div>
 								<div class='button operationsExpert' id='btnOperationsFlight'>
 									<div class='actionIcon'>
-										<img src='images/actionIcons/operationsFlight.png' />
+										<img src='images/eventIcons/operationsFlight.png' />
 									</div>
 									<div class='actionName'>OPERATIONS FLIGHT</div>
 								</div>

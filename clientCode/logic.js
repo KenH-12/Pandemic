@@ -1130,7 +1130,7 @@ async function showActionRules($actionButton, eventType)
 
 	$actionButton.stop().removeAttr("style")
 		.html(`${$actionButton.html()}<br />
-			<span class='actionNotPossible'>( this action is currently not possible )</span>
+			<span class='actionNotPossible'>( this action is not currently possible )</span>
 			<span class='disabledActionRules'>
 				<p>${actionRules.join("</p><p>")}</p>
 			</span>`);
@@ -1194,7 +1194,7 @@ function getEventIconHtml(eventType)
 	if (!hasIcon)
 		return "";
 	
-	return `<img	src='images/actionIcons/${iconFileName || toCamelCase(name)}.${fileExtension}'
+	return `<img	src='images/eventIcons/${iconFileName || toCamelCase(name)}.${fileExtension}'
 					alt='${name}'
 					title='${name}' />`;
 }
@@ -1324,7 +1324,7 @@ const actionInterfacePopulator = {
 		// because the opening h2 tag has to be on the same line as the img tag
 		// to avoid unwanted spacing when the document is rendered.
 		if (eventType.hasIcon)
-			actionTitleContents = `<img class='actionIcon' src='images/actionIcons/${toCamelCase(eventType.name).replace("/", "")}.png' alt='${eventType.name} icon'/>`
+			actionTitleContents = `<img class='actionIcon' src='images/eventIcons/${toCamelCase(eventType.name).replace("/", "")}.png' alt='${eventType.name} icon'/>`
 				+ actionTitleContents;
 		
 		$actionTitleContainer.append(actionTitleContents);
