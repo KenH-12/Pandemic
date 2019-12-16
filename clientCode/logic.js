@@ -111,7 +111,6 @@ const data =
 eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
-		iconFileName: "driveFerry",
 		hasIcon: true,
 		code: "dr",
 		rules: ["Move to a city connected by a white line to the one you are in."],
@@ -1188,17 +1187,18 @@ function getActionButtonContents(eventType)
 			<div class='actionName'>${name.toUpperCase()}</div>`;
 }
 
-function getEventIconHtml(eventType)
+function getEventIconHtml(eventType, cssClasses)
 {
-	const { hasIcon, iconFileName, name, cardKey } = eventType,
+	const { hasIcon, name, cardKey } = eventType,
 		fileExtension = cardKey && isEventCardKey(cardKey) ? "jpg" : "png";
 
 	if (!hasIcon)
 		return "";
 	
-	return `<img	src='images/eventIcons/${iconFileName || toCamelCase(name)}.${fileExtension}'
+	return `<img	src='images/eventIcons/${toCamelCase(eventType.name).replace("/", "")}.${fileExtension}'
 					alt='${name}'
-					title='${name}' />`;
+					title='${name}'
+					${cssClasses ? `class='${cssClasses}'` : ""} />`;
 }
 
 function enableBtnCancelAction()
@@ -1326,8 +1326,7 @@ const actionInterfacePopulator = {
 		// because the opening h2 tag has to be on the same line as the img tag
 		// to avoid unwanted spacing when the document is rendered.
 		if (eventType.hasIcon)
-			actionTitleContents = `<img class='actionIcon' src='images/eventIcons/${toCamelCase(eventType.name).replace("/", "")}.png' alt='${eventType.name} icon'/>`
-				+ actionTitleContents;
+			actionTitleContents = $(getEventIconHtml(eventType, "actionIcon") + actionTitleContents);
 		
 		$actionTitleContainer.append(actionTitleContents);
 		
