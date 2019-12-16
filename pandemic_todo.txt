@@ -4,8 +4,16 @@ BUGS
 TO DO
 -----
 event history
-
-fix action/event icon styles
+	create icons
+		infection
+		medic auto-treat
+		quarantine
+		eradication
+	show all events in history
+		epidemic
+		all treat disease colors
+	slideshow buttons
+	detailed tooltips
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
 
