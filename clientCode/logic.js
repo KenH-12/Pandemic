@@ -307,6 +307,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	infectCity: {
 		name: "Infect City",
+		hasIcon: true,
 		code: "ic",
 		actionPathName: "infectCity",
 		propertyNames: ["cityKey", "preventionCode"],
@@ -1187,14 +1188,25 @@ function getEventIconHtml(eventType, { cssClasses, event })
 	if (!eventType.hasIcon)
 		return "";
 	
-	const { name, cardKey } = eventType,
-		fileExtension = cardKey && isEventCardKey(cardKey) ? "jpg" : "png",
+	const { name } = eventType,
+		fileExtension = getEventIconFileExtension(eventType),
 		fileName = getEventIconFileName(eventType, event);
 	
 	return `<img	src='images/eventIcons/${fileName}.${fileExtension}'
 					alt='${name}'
 					title='${name}'
 					${cssClasses ? `class='${cssClasses}'` : ""} />`;
+}
+
+function getEventIconFileExtension(eventType)
+{
+	const { code, cardKey } = eventType;
+
+	if (code === eventTypes.infectCity.code
+		|| cardKey && isEventCardKey(cardKey))
+		return "jpg";
+	
+	return "png";
 }
 
 function getEventIconFileName(eventType, event)
@@ -1205,11 +1217,14 @@ function getEventIconFileName(eventType, event)
 		return fileName;
 	
 	const {
-		treatDisease
+		treatDisease,
+		infectCity
 	} = eventTypes;
 
 	if (event.code === treatDisease.code)
 		fileName += `_${event.diseaseColor}`;
+	else if (event.code === infectCity.code)
+		fileName += `_${getCity(event.cityKey).color}`;
 	
 	return fileName;
 }
