@@ -2321,7 +2321,8 @@ function resetInfectionDiscardClicksAndTooltips()
 
 async function resilientPopulationAnimation(cardKeyToRemove)
 {
-	const $discardPile = $("#infectionDiscard"),
+	const discardPileID = "infectionDiscard",
+		$discardPile = $(`#${discardPileID}`),
 		$removedCardsContainer = $discardPile.children("#removedInfectionCards").removeClass("hidden"),
 		$cardToRemove = $discardPile.children(`[data-key='${cardKeyToRemove}']`),
 		initialOffset = $cardToRemove.offset();
@@ -2331,6 +2332,13 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 	
 	$cardToRemove.appendTo("#boardContainer");
 	
+	await animatePromise(
+	{
+		$elements: $discardPile,
+		desiredProperties: { scrollTop: document.getElementById(discardPileID).scrollHeight },
+		easing: "easeInOutQuad"
+	});
+
 	await animatePromise(
 	{
 		$elements: $cardToRemove,
