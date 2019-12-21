@@ -280,6 +280,13 @@ The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "drawPlayerCards",
 		propertyNames: ["cardKeys"]
 	},
+	// There is no "Epidemic" event.
+	// This is here to facilitate the merging of the 3 epidemic steps into a single event history icon.
+	epidemic: {
+		name: "Epidemic",
+		code: "ep",
+		hasIcon: true
+	},
 	epidemicIncrease: {
 		name: "Epidemic Increase",
 		code: "ec",
@@ -482,8 +489,7 @@ function appendEventHistoryIcons(newEvents)
 {
 	const $eventHistory = $("#eventHistory");
 	let eventType,
-		cssClass,
-		$icon;
+		cssClasses;
 	
 	newEvents = newEvents || data.events;
 	
@@ -492,14 +498,13 @@ function appendEventHistoryIcons(newEvents)
 		eventType = getEventType(event.code);
 
 		if (event.role && data.players[event.role])
-			cssClass = `${data.players[event.role].camelCaseRole}Border`;
+			cssClasses = `${data.players[event.role].camelCaseRole}Border`;
 		else
-			cssClass = "brightGreen";
+			cssClasses = "brightGreen";
 
-		$icon = $(getEventIconHtml(eventType, { event, cssClass }));
-
-		$icon.addClass(cssClass);
-		$eventHistory.append($icon);
+		$eventHistory.append(getEventIconHtml(eventType, { event, cssClasses }));
+		
+		addEpidemicEventIconIfNecessary($eventHistory, event);
 	}
 
 	setEventHistoryScrollPosition($eventHistory);
@@ -513,6 +518,16 @@ function setEventHistoryScrollPosition($eventHistory)
 		return false;
 	
 	$eventHistory.animate({ scrollLeft: overflow });
+}
+
+function addEpidemicEventIconIfNecessary($eventHistory, cardDrawEvent)
+{
+	if (cardDrawEvent.code !== eventTypes.cardDraw.code)
+		return false;
+	
+	for (let cardKey of cardDrawEvent.cardKeys)
+		if (isEpidemicKey(cardKey))
+			$eventHistory.append(getEventIconHtml(eventTypes.epidemic, { cssClasses: "brightGreen" }));
 }
 
 class Event
