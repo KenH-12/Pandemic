@@ -2325,34 +2325,46 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 		$discardPile = $(`#${discardPileID}`),
 		$removedCardsContainer = $discardPile.children("#removedInfectionCards").removeClass("hidden"),
 		$cardToRemove = $discardPile.children(`[data-key='${cardKeyToRemove}']`),
-		initialOffset = $cardToRemove.offset();
-
+		easing = "easeInOutQuad";
 	
 	await expandInfectionDiscardPile();
 	
-	$cardToRemove.appendTo("#boardContainer");
+	const pileScrollHeight = document.getElementById(discardPileID).scrollHeight,
+		pileIsOverflowing = pileScrollHeight > $discardPile.height();
 	
-	await animatePromise(
+	if (pileIsOverflowing)
 	{
-		$elements: $discardPile,
-		desiredProperties: { scrollTop: document.getElementById(discardPileID).scrollHeight },
-		easing: "easeInOutQuad"
-	});
+		const cardHeight = $cardToRemove.height();
+		$removedCardsContainer.height($removedCardsContainer.height() + cardHeight);
+
+		await animatePromise(
+		{
+			$elements: $discardPile,
+			desiredProperties: { scrollTop: pileScrollHeight + cardHeight },
+			duration: 500,
+			easing
+		});
+	}
+
+	const initialOffset = $cardToRemove.offset();
+	$cardToRemove.appendTo("#boardContainer")
+		.offset(initialOffset);
 
 	await animatePromise(
 	{
 		$elements: $cardToRemove,
 		initialProperties:
 		{
-			...{ position: "absolute", zIndex: 10 },
-			...initialOffset
+			position: "absolute",
+			zIndex: 10
 		},
 		desiredProperties: { top: $removedCardsContainer.offset().top + $removedCardsContainer.height() },
 		duration: 750,
-		easing: "easeInOutQuint"
+		easing
 	});
 
 	$cardToRemove.appendTo($removedCardsContainer)
+		.add($removedCardsContainer)
 		.removeAttr("style");
 
 	await sleep(getDuration("longInterval"));
