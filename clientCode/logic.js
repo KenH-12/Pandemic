@@ -1354,7 +1354,7 @@ const actionInterfacePopulator = {
 		// because the opening h2 tag has to be on the same line as the img tag
 		// to avoid unwanted spacing when the document is rendered.
 		if (eventType.hasIcon)
-			actionTitleContents = $(getEventIconHtml(eventType, "actionIcon") + actionTitleContents);
+			actionTitleContents = $(getEventIconHtml(eventType, { cssClasses: "actionIcon" }) + actionTitleContents);
 		
 		$actionTitleContainer.append(actionTitleContents);
 		
