@@ -482,7 +482,7 @@ function appendEventHistoryIcons(newEvents)
 {
 	const $eventHistory = $("#eventHistory");
 	let eventType,
-		role,
+		cssClass,
 		$icon;
 	
 	newEvents = newEvents || data.events;
@@ -491,14 +491,14 @@ function appendEventHistoryIcons(newEvents)
 	{
 		eventType = getEventType(event.code);
 
-		$icon = $(getEventIconHtml(eventType, { event }));
+		if (event.role && data.players[event.role])
+			cssClass = `${data.players[event.role].camelCaseRole}Border`;
+		else
+			cssClass = "brightGreen";
 
-		if (event.role)
-			role = event.role;
+		$icon = $(getEventIconHtml(eventType, { event, cssClass }));
 
-		if (data.players[role])
-			$icon.addClass(`${data.players[role].camelCaseRole}Border`);
-		
+		$icon.addClass(cssClass);
 		$eventHistory.append($icon);
 	}
 
