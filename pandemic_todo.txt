@@ -6,6 +6,7 @@ TO DO
 event history
 	create icons
 		infection
+			borders should match disease color
 		medic auto-treat
 		quarantine
 		eradication

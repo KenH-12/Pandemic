@@ -500,7 +500,7 @@ function appendEventHistoryIcons(newEvents)
 		if (event.role && data.players[event.role])
 			cssClasses = `${data.players[event.role].camelCaseRole}Border`;
 		else
-			cssClasses = "brightGreen";
+			cssClasses = "darkGreenBorder";
 
 		$eventHistory.append(getEventIconHtml(eventType, { event, cssClasses }));
 		
@@ -527,7 +527,7 @@ function addEpidemicEventIconIfNecessary($eventHistory, cardDrawEvent)
 	
 	for (let cardKey of cardDrawEvent.cardKeys)
 		if (isEpidemicKey(cardKey))
-			$eventHistory.append(getEventIconHtml(eventTypes.epidemic, { cssClasses: "brightGreen" }));
+			$eventHistory.append(getEventIconHtml(eventTypes.epidemic, { cssClasses: "darkGreenBorder" }));
 }
 
 class Event
