@@ -2386,7 +2386,7 @@ function resetInfectionDiscardClicksAndTooltips()
 			$this = $(this);
 			city = getCity($this.attr("data-key"));
 
-			setInfectionCardTitleAttribute($this, diseaseIsEradicated(city.color), city);
+			setInfectionCardTitleAttribute($this, city);
 		})
 		.css({ cursor: "help" });
 }
@@ -7920,23 +7920,21 @@ function loadInfCardsDrawnThisTurn()
 		// Insert the contents of any cards drawn this turn.
 		const $infectionContainer = $("#infectCitiesContainer");
 		let city,
-			diseaseColorIsEradicated,
 			$card;
 		for (let i = 0; i < numCardsDrawnThisTurn; i++)
 		{
 			city = getCity(infectionEvents[i].cityKey);
-			diseaseColorIsEradicated = diseaseIsEradicated(city.color)
 			$card = $infectionContainer.find(".infectionCard").eq(i);
 			
 			$card.attr("data-key", city.key)
 				.click(function() { pinpointCityFromCard($card) })
 				.find(".infectionCardImg")
-				.attr("src", `images/cards/infectionCard_${city.color}${diseaseColorIsEradicated ? "_eradicated" : ""}.png`)
+				.attr("src", `images/cards/infectionCard_${city.color}.png`)
 				.siblings(".cityName")
 				.html(city.name.toUpperCase())
 				.siblings(".veil").remove();
 			
-			setInfectionCardTitleAttribute($card, diseaseColorIsEradicated, city);
+			setInfectionCardTitleAttribute($card, city);
 		}
 	}
 
@@ -8241,14 +8239,11 @@ async function revealInfectionCard({ cityKey, index }, { forecasting } = {})
 		$card.attr("data-key", cityKey)
 			.click(function() { pinpointCityFromCard($card) })
 			.find(".infectionCardImg")
-			.attr("src", `images/cards/infectionCard_${city.color}${diseaseColorIsEradicated ? "_eradicated" : ""}.png`)
+			.attr("src", `images/cards/infectionCard_${city.color}.png`)
 			.siblings(".cityName")
 			.html(city.name.toUpperCase());
 		
-		if (diseaseColorIsEradicated)
-			$card.addClass("eradicated");
-		
-		setInfectionCardTitleAttribute($card, diseaseColorIsEradicated, city);
+		setInfectionCardTitleAttribute($card, city);
 		
 		$veil.animate({ left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
 			getDuration("revealInfCard"),
@@ -8265,18 +8260,10 @@ async function revealInfectionCard({ cityKey, index }, { forecasting } = {})
 	});
 }
 
-function setInfectionCardTitleAttribute($card, diseaseColorIsEradicated, city)
+function setInfectionCardTitleAttribute($card, city)
 {
-	let title = "Infection card";
-	if (diseaseColorIsEradicated)
-		title +=  `
-The ${getColorWord(city.color)} disease is eradicated
-(no new disease cubes will be placed).`;
-	else
-		title += `
-Click to locate ${city.name}`;
-
-	$card.attr("title", title);
+	$card.attr("title", `Infection card
+Click to locate ${city.name}`);
 }
 
 function placeDiseaseCubes({ cityKey, numCubes = 1 })
@@ -8651,53 +8638,17 @@ function loadPlayerCards(playerCards)
 	setPlayerDeckImgSize();
 }
 
-function getEradicationBlockedDiscardKeys()
-{
-	const { events } = data,
-		{ eradication, epidemicIntensify, infectCity } = eventTypes,
-		eradicationEvents = events.filter(e => e.code == eradication.code),
-		eradicatedColors = {},
-		blockedDiscardKeys = [];
-
-	for (let er of eradicationEvents)
-		eradicatedColors[er.diseaseColor] = { id: er.id };
-
-	let event, lastEpidemicIdx = 0;
-	for (let i = events.length - 1; i >= 0; i--)
-	{
-		event = events[i];
-		if (event.code === epidemicIntensify.code)
-		{
-			lastEpidemicIdx = i;
-			break;
-		}
-	}
-	
-	const relevantInfectionEvents = events.slice(lastEpidemicIdx + 1)
-		.filter(e => (e.code == infectCity.code)
-				&& (getCity(e.cityKey).color in eradicatedColors));
-
-	for (let inf of relevantInfectionEvents)
-	{
-		if (inf.id > eradicatedColors[getCity(inf.cityKey).color].id)
-			blockedDiscardKeys.push(inf.cityKey);
-	}
-	
-	return blockedDiscardKeys;
-}
-
 function loadInfectionDiscards(cards)
 {
 	if (typeof cards == "undefined")
 		return false;
 	
-	const eradicationBlockedDiscardKeys = getEradicationBlockedDiscardKeys(),
-		$discardPile = $("#infectionDiscard"),
+	const $discardPile = $("#infectionDiscard"),
 		$discardPileTitle = $discardPile.children(".title").first(),
 		$removedCardsContainer = $discardPile.children("#removedInfectionCards"),
 		infectionKeysDrawnThisTurn = getInfectCityEventsOfTurn().map(event => event.cityKey);
 	
-	let card, city, wasEradicated, $card;
+	let card, city, $card;
 	for (let i = 0; i < cards.length; i++)
 	{
 		card = cards[i];
@@ -8706,19 +8657,15 @@ function loadInfectionDiscards(cards)
 		if (infectionKeysDrawnThisTurn.includes(city.key))
 			continue;
 
-		// If the disease was eradicated before the card was drawn, include the eradication symbol on the card.
-		wasEradicated = card.pile === "discard"
-						&& eradicationBlockedDiscardKeys.includes(city.key) ? "_eradicated" : "";
-				
 		$card = $(`<div class='infectionCard' data-key='${city.key}'>
 					<div class='infectionCardContents'>
 						<img	class='infectionCardImg'
-								src='images/cards/infectionCard_${city.color}${wasEradicated}.png'/>
+								src='images/cards/infectionCard_${city.color}.png'/>
 						<p class='cityName'>${city.name.toUpperCase()}</p>
 					</div>
 				</div>`);
 		
-		setInfectionCardTitleAttribute($card, wasEradicated, city);
+		setInfectionCardTitleAttribute($card, city);
 		
 		if (card.pile === "discard")
 			$discardPileTitle.after($card);
@@ -8732,21 +8679,6 @@ function loadInfectionDiscards(cards)
 	$discardPile.find(".infectionCard")
 		.click(function() { pinpointCityFromCard($(this)) });
 }
-
-$("#imgInfectionDeck").click(function()
-{
-	const city = getCity("atla");
-	
-	$("#removedInfectionCards").append(`<div class='infectionCard'>
-							<div class='infectionCardContents'>
-								<img	class='infectionCardImg'
-										src='images/cards/infectionCard_${city.color}.png'/>
-								<p class='cityName'>${city.name.toUpperCase()}</p>
-							</div>
-						</div>`);
-	
-	resizeTopPanelElements();
-});
 
 // Returns the number of unresolved epidemics that were drawn this turn.
 function numEpidemicsToResolve()
