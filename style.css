@@ -172,22 +172,22 @@ body,
 .diseaseCube.y .cubeRight,
 .diseaseCube.y .cubeLeft
 { background: #fded3c }
-.yBorder { border-color: #fded3c }
+.yBorder { border: 2px solid #fded3c }
 .diseaseCube.r .cubeTop,
 .diseaseCube.r .cubeRight,
 .diseaseCube.r .cubeLeft
 { background: #ef282a }
-.rBorder { border-color: #ef282a }
+.rBorder { border: 2px solid #ef282a }
 .diseaseCube.u .cubeTop,
 .diseaseCube.u .cubeRight,
 .diseaseCube.u .cubeLeft
 { background: #405fb1 }
-.uBorder { border-color: #405fb1 }
+.uBorder { border: 2px solid #405fb1 }
 .diseaseCube.b .cubeTop,
 .diseaseCube.b .cubeRight,
 .diseaseCube.b .cubeLeft
 { background: #212121 }
-.bBorder { border-color: #212121 }
+.bBorder { border: 2px solid #212121 }
 
 .groupInfRate .diseaseCube
 {

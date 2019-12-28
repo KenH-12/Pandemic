@@ -15,6 +15,7 @@ event history
 		all treat disease colors
 	slideshow buttons
 	detailed tooltips
+	epidemic and outbreak icons should not appear prematurely
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
 

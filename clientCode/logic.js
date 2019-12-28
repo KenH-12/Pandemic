@@ -499,6 +499,8 @@ function appendEventHistoryIcons(newEvents)
 
 		if (event.role && data.players[event.role])
 			cssClasses = `${data.players[event.role].camelCaseRole}Border`;
+		else if (event.code === eventTypes.infectCity.code)
+			cssClasses = `${getCity(event.cityKey).color}Border`;
 		else
 			cssClasses = "darkGreenBorder";
 

@@ -69,7 +69,7 @@ try
 	$infectionPrevention = checkInfectionPrevention($mysqli, $game, $key, $diseaseColor);
 	
 	$eventDetails = "$key,$infectionPrevention";
-	$response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails, $role);
+	$response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails);
 
 	if ($infectionPrevention == "0")
 	{
