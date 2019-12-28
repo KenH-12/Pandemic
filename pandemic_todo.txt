@@ -6,11 +6,9 @@ TO DO
 event history
 	create icons
 		medic auto-treat
-		quarantine
-		eradication
 	slideshow buttons
 	detailed tooltips
-	epidemic and outbreak icons should not appear prematurely
+	new icons should not appear prematurely
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
 

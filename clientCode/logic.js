@@ -1241,14 +1241,34 @@ function getEventIconFileName(eventType, event)
 	if (event.code === treatDisease.code)
 		fileName += `_${event.diseaseColor}`;
 	else if (event.code === infectCity.code)
-	{
-		fileName += `_${getCity(event.cityKey).color}`;
-
-		if (event.preventionCode === data.infectionPreventionCodes.eradicated)
-			fileName += "_eradicated";
-	}
+		fileName += `_${getCity(event.cityKey).color}${infectionPreventionFileNameSuffix(event)}`;
 	
 	return fileName;
+}
+
+function infectionPreventionFileNameSuffix(infectCityEvent)
+{
+	const {
+			notPrevented,
+			eradicated,
+			quarantine,
+			medicAutoTreat
+		} = data.infectionPreventionCodes,
+		{ preventionCode } = infectCityEvent;
+	
+	if (preventionCode === notPrevented)
+		return "";
+	
+	if (preventionCode === eradicated)
+		return "_eradicated";
+	
+	if (preventionCode === quarantine)
+		return "_quarantine";
+	
+	if (preventionCode === medicAutoTreat)
+		return "";
+	
+	return "";
 }
 
 function enableBtnCancelAction()
