@@ -1271,10 +1271,10 @@ function infectionPreventionFileNameSuffix(infectCityEvent)
 		return "_eradicated";
 	
 	if (preventionCode === quarantine)
-		return "_quarantine";
+		return "_quarantined";
 	
 	if (preventionCode === medicAutoTreat)
-		return "";
+		return "_autoTreated";
 	
 	return "";
 }
