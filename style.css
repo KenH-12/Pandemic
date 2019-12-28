@@ -187,7 +187,7 @@ body,
 .diseaseCube.b .cubeRight,
 .diseaseCube.b .cubeLeft
 { background: #212121 }
-.bBorder { border: 2px solid #212121 }
+.bBorder { border: 2px solid #000 }
 
 .groupInfRate .diseaseCube
 {

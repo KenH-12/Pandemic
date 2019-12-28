@@ -5,14 +5,9 @@ TO DO
 -----
 event history
 	create icons
-		infection
-			borders should match disease color
 		medic auto-treat
 		quarantine
 		eradication
-	show all events in history
-		epidemic
-		all treat disease colors
 	slideshow buttons
 	detailed tooltips
 	epidemic and outbreak icons should not appear prematurely
