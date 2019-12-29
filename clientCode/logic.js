@@ -200,6 +200,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	autoTreatDisease: {
 		name: "Auto-Treat Disease",
+		hasIcon: true,
 		code: "at",
 		propertyNames: ["cityKey", "diseaseColor"]
 	},
@@ -1228,7 +1229,8 @@ function getEventIconFileExtension(eventType)
 	const { code, cardKey } = eventType;
 
 	if (code === eventTypes.infectCity.code
-		|| cardKey && isEventCardKey(cardKey))
+		|| cardKey && isEventCardKey(cardKey)
+		|| code === eventTypes.autoTreatDisease.code)
 		return "jpg";
 	
 	return "png";
@@ -1243,10 +1245,12 @@ function getEventIconFileName(eventType, event)
 	
 	const {
 		treatDisease,
-		infectCity
+		infectCity,
+		autoTreatDisease
 	} = eventTypes;
 
-	if (event.code === treatDisease.code)
+	if (event.code === treatDisease.code
+		|| event.code === autoTreatDisease.code)
 		fileName += `_${event.diseaseColor}`;
 	else if (event.code === infectCity.code)
 		fileName += `_${getCity(event.cityKey).color}${infectionPreventionFileNameSuffix(event)}`;

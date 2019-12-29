@@ -5,10 +5,12 @@ TO DO
 -----
 event history
 	create icons
-		medic auto-treat
+		eradication
+		auto-td and quarantine prevention icons should look more like the eradication prevention icons
 	slideshow buttons
 	detailed tooltips
 	new icons should not appear prematurely
+	an auto-treat disease event icon should appear after the icon of whichever action triggered it 
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
 
