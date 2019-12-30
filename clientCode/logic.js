@@ -219,6 +219,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	eradication: {
 		name: "eradication",
+		hasIcon: true,
 		code: "er",
 		propertyNames: ["diseaseColor"]
 	},
@@ -1230,7 +1231,8 @@ function getEventIconFileExtension(eventType)
 
 	if (code === eventTypes.infectCity.code
 		|| cardKey && isEventCardKey(cardKey)
-		|| code === eventTypes.autoTreatDisease.code)
+		|| code === eventTypes.autoTreatDisease.code
+		|| code === eventTypes.eradication.code)
 		return "jpg";
 	
 	return "png";
@@ -1250,7 +1252,8 @@ function getEventIconFileName(eventType, event)
 	} = eventTypes;
 
 	if (event.code === treatDisease.code
-		|| event.code === autoTreatDisease.code)
+		|| event.code === autoTreatDisease.code
+		|| event.code === eradication.code)
 		fileName += `_${event.diseaseColor}`;
 	else if (event.code === infectCity.code)
 		fileName += `_${getCity(event.cityKey).color}${infectionPreventionFileNameSuffix(event)}`;
