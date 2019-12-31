@@ -1230,9 +1230,15 @@ function getEventIconHtml(eventType, { cssClasses, event } = {})
 function getEventIconFileExtension(eventType)
 {
 	const { code, cardKey } = eventType,
-		{ infectCity, autoTreatDisease, eradication } = eventTypes;
+		{
+			discoverACure,
+			infectCity,
+			autoTreatDisease,
+			eradication
+		} = eventTypes;
 
-	if (code === infectCity.code
+	if (code === discoverACure.code
+		|| code === infectCity.code
 		|| cardKey && isEventCardKey(cardKey)
 		|| code === autoTreatDisease.code
 		|| code === eradication.code)
@@ -1250,6 +1256,7 @@ function getEventIconFileName(eventType, event)
 	
 	const {
 		treatDisease,
+		discoverACure,
 		autoTreatDisease,
 		eradication,
 		infectCity
@@ -1261,6 +1268,8 @@ function getEventIconFileName(eventType, event)
 		fileName += `_${event.diseaseColor}`;
 	else if (event.code === infectCity.code)
 		fileName += `_${getCity(event.cityKey).color}${infectionPreventionIconFileNameSuffix(event)}`;
+	else if (event.code === discoverACure.code)
+		fileName += `_${getCity(event.cardKeys[0]).color}`;
 	
 	return fileName;
 }
