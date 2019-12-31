@@ -511,6 +511,8 @@ function appendEventHistoryIcons(newEvents)
 			else
 				cssClasses = `${getCity(event.cityKey).color}Border`;
 		}
+		else if (event.code === eventTypes.eradication.code)
+			cssClasses = `${event.diseaseColor}Border`;
 		else
 			cssClasses = "darkGreenBorder";
 
@@ -1210,7 +1212,7 @@ function getActionButtonContents(eventType)
 			<div class='actionName'>${name.toUpperCase()}</div>`;
 }
 
-function getEventIconHtml(eventType, { cssClasses, event })
+function getEventIconHtml(eventType, { cssClasses, event } = {})
 {
 	if (!eventType.hasIcon)
 		return "";
@@ -1227,12 +1229,13 @@ function getEventIconHtml(eventType, { cssClasses, event })
 
 function getEventIconFileExtension(eventType)
 {
-	const { code, cardKey } = eventType;
+	const { code, cardKey } = eventType,
+		{ infectCity, autoTreatDisease, eradication } = eventTypes;
 
-	if (code === eventTypes.infectCity.code
+	if (code === infectCity.code
 		|| cardKey && isEventCardKey(cardKey)
-		|| code === eventTypes.autoTreatDisease.code
-		|| code === eventTypes.eradication.code)
+		|| code === autoTreatDisease.code
+		|| code === eradication.code)
 		return "jpg";
 	
 	return "png";
@@ -1247,8 +1250,9 @@ function getEventIconFileName(eventType, event)
 	
 	const {
 		treatDisease,
-		infectCity,
-		autoTreatDisease
+		autoTreatDisease,
+		eradication,
+		infectCity
 	} = eventTypes;
 
 	if (event.code === treatDisease.code
@@ -1256,12 +1260,12 @@ function getEventIconFileName(eventType, event)
 		|| event.code === eradication.code)
 		fileName += `_${event.diseaseColor}`;
 	else if (event.code === infectCity.code)
-		fileName += `_${getCity(event.cityKey).color}${infectionPreventionFileNameSuffix(event)}`;
+		fileName += `_${getCity(event.cityKey).color}${infectionPreventionIconFileNameSuffix(event)}`;
 	
 	return fileName;
 }
 
-function infectionPreventionFileNameSuffix(infectCityEvent)
+function infectionPreventionIconFileNameSuffix(infectCityEvent)
 {
 	const {
 			notPrevented,

@@ -4,13 +4,15 @@ BUGS
 TO DO
 -----
 event history
-	test eradication icons and decide border style
 	create icons
+		discover a cure
 		auto-td and quarantine prevention icons should look more like the eradication prevention icons
 	slideshow buttons
 	detailed tooltips
 	new icons should not appear prematurely
-	an auto-treat disease event icon should appear after the icon of whichever action triggered it 
+	event icons should appear after the icon of whichever action triggered them
+		eradication
+		auto-treat disease
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
 
