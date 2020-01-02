@@ -5,14 +5,17 @@ TO DO
 -----
 event history
 	create icons
-		discover a cure
-		auto-td and quarantine prevention icons should look more like the eradication prevention icons
+		epidemic -- an icon is needed for each step (resilient population can be played before intensify)
+			increase
+			infect
+			intensify
 	slideshow buttons
 	detailed tooltips
 	new icons should not appear prematurely
 	event icons should appear after the icon of whichever action triggered them
 		eradication
 		auto-treat disease
+	if the event history is not overflowing horizontally, animate new icons into view from right to left
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
 

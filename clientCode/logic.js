@@ -1218,7 +1218,7 @@ function getEventIconHtml(eventType, { cssClasses, event } = {})
 		return "";
 	
 	const { name } = eventType,
-		fileExtension = getEventIconFileExtension(eventType),
+		fileExtension = getEventIconFileExtension(eventType, event),
 		fileName = getEventIconFileName(eventType, event);
 	
 	return `<img	src='images/eventIcons/${fileName}.${fileExtension}'
@@ -1227,7 +1227,7 @@ function getEventIconHtml(eventType, { cssClasses, event } = {})
 					${cssClasses ? `class='${cssClasses}'` : ""} />`;
 }
 
-function getEventIconFileExtension(eventType)
+function getEventIconFileExtension(eventType, event)
 {
 	const { code, cardKey } = eventType,
 		{
@@ -1237,7 +1237,7 @@ function getEventIconFileExtension(eventType)
 			eradication
 		} = eventTypes;
 
-	if (code === discoverACure.code
+	if (code === discoverACure.code && event
 		|| code === infectCity.code
 		|| cardKey && isEventCardKey(cardKey)
 		|| code === autoTreatDisease.code
