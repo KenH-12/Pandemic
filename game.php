@@ -150,7 +150,7 @@
 						
 						<div id='cureMarkerContainer' class='bottomPanelDiv'>
 							<p class='title'>
-								<span class='brightGreen'>——</span> CURED DISEASES <span class='brightGreen'>——</span>
+								<span class='lightGreen'>——</span> CURED DISEASES <span class='lightGreen'>——</span>
 							</p>
 						</div>
 

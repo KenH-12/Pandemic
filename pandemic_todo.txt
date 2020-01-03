@@ -4,11 +4,6 @@ BUGS
 TO DO
 -----
 event history
-	create icons
-		epidemic -- an icon is needed for each step (resilient population can be played before intensify)
-			increase
-			infect
-			intensify
 	slideshow buttons
 	detailed tooltips
 	new icons should not appear prematurely
@@ -67,6 +62,8 @@ make sure the height limit on the expanded infection discards functions properly
 
 IDEAS
 -----
+make the current play step glow
+
 skippable infection steps and epidemics
 
 hovering over the quarantine specialist's pawn should display the quarantine area

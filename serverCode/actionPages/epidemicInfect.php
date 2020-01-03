@@ -51,7 +51,7 @@
         $infectionResult = addCubesToCity($mysqli, $game, $cardKey, $color, $cubesToAdd);
 
         $details = "$cardKey," . $infectionResult["prevCubeCount"] . ",$infectionPrevention";
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $details, $role);
+        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $details);
         
         if ($cubesToAdd > 0)
         {

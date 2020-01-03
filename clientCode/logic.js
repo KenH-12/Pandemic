@@ -286,26 +286,28 @@ The card must come from the Dispatcher&#39;s hand.`,
 	// This is here to facilitate the merging of the 3 epidemic steps into a single event history icon.
 	epidemic: {
 		name: "Epidemic",
-		code: "ep",
-		hasIcon: true
+		code: "ep"
 	},
 	epidemicIncrease: {
 		name: "Epidemic Increase",
 		code: "ec",
 		actionPathName: "epidemicIncrease",
-		propertyNames: ["epidemicCount"]
+		propertyNames: ["epidemicCount"],
+		hasIcon: true
 	},
 	epidemicInfect: {
 		name: "Epidemic Infect",
 		code: "ef",
 		actionPathName: "epidemicInfect",
-		propertyNames: ["bottomInfCardKey", "prevCubeCount", "preventionCode"]
+		propertyNames: ["cityKey", "prevCubeCount", "preventionCode"],
+		hasIcon: true
 	},
 	epidemicIntensify: {
 		name: "Epidemic Intensify",
 		code: "et",
 		actionPathName: "epidemicIntensify",
-		propertyNames: ["numDiscardsShuffled"]
+		propertyNames: ["numDiscardsShuffled"],
+		hasIcon: true
 	},
 	discard: {
 		name: "Discard",
@@ -489,37 +491,12 @@ function parseEvents(events)
 
 function appendEventHistoryIcons(newEvents)
 {
-	const $eventHistory = $("#eventHistory"),
-		{ quarantine, medicAutoTreat } = data.infectionPreventionCodes;
-	let eventType,
-		cssClasses;
+	const $eventHistory = $("#eventHistory");
 	
 	newEvents = newEvents || data.events;
 	
 	for (let event of newEvents)
-	{
-		eventType = getEventType(event.code);
-
-		if (event.role && data.players[event.role])
-			cssClasses = `${data.players[event.role].camelCaseRole}Border`;
-		else if (event.code === eventTypes.infectCity.code)
-		{
-			if (event.preventionCode === quarantine)
-				cssClasses = "quarantineSpecialistBorder";
-			else if (event.preventionCode === medicAutoTreat)
-				cssClasses = "medicBorder";
-			else
-				cssClasses = `${getCity(event.cityKey).color}Border`;
-		}
-		else if (event.code === eventTypes.eradication.code)
-			cssClasses = `${event.diseaseColor}Border`;
-		else
-			cssClasses = "darkGreenBorder";
-
-		$eventHistory.append(getEventIconHtml(eventType, { event, cssClasses }));
-		
-		addEpidemicEventIconIfNecessary($eventHistory, event);
-	}
+		$eventHistory.append(getEventIconHtml(getEventType(event.code), { event }));
 
 	setEventHistoryScrollPosition($eventHistory);
 }
@@ -532,16 +509,6 @@ function setEventHistoryScrollPosition($eventHistory)
 		return false;
 	
 	$eventHistory.animate({ scrollLeft: overflow });
-}
-
-function addEpidemicEventIconIfNecessary($eventHistory, cardDrawEvent)
-{
-	if (cardDrawEvent.code !== eventTypes.cardDraw.code)
-		return false;
-	
-	for (let cardKey of cardDrawEvent.cardKeys)
-		if (isEpidemicKey(cardKey))
-			$eventHistory.append(getEventIconHtml(eventTypes.epidemic, { cssClasses: "darkGreenBorder" }));
 }
 
 class Event
@@ -1212,14 +1179,15 @@ function getActionButtonContents(eventType)
 			<div class='actionName'>${name.toUpperCase()}</div>`;
 }
 
-function getEventIconHtml(eventType, { cssClasses, event } = {})
+function getEventIconHtml(eventType, { event } = {})
 {
 	if (!eventType.hasIcon)
 		return "";
 	
 	const { name } = eventType,
+		fileName = getEventIconFileName(eventType, event),
 		fileExtension = getEventIconFileExtension(eventType, event),
-		fileName = getEventIconFileName(eventType, event);
+		cssClasses = getEventIconCssClasses(event);
 	
 	return `<img	src='images/eventIcons/${fileName}.${fileExtension}'
 					alt='${name}'
@@ -1227,19 +1195,55 @@ function getEventIconHtml(eventType, { cssClasses, event } = {})
 					${cssClasses ? `class='${cssClasses}'` : ""} />`;
 }
 
+function getEventIconFileName(eventType, event)
+{
+	let fileName = toCamelCase(eventType.name).replace("/", "");
+	
+	if (!event)
+	return fileName;
+
+	const {
+		treatDisease,
+		autoTreatDisease,
+		eradication,
+		infectCity,
+		epidemicInfect,
+		discoverACure
+	} = eventTypes;
+
+	if (event.code === treatDisease.code
+		|| event.code === autoTreatDisease.code
+		|| event.code === eradication.code)
+		fileName += `_${event.diseaseColor}`;
+	else if (event.code === infectCity.code
+			|| event.code === epidemicInfect.code)
+	{
+		if (event.code === epidemicInfect.code)
+			fileName = toCamelCase(infectCity.name);
+		
+		fileName += `_${getCity(event.cityKey).color}`;
+		if (event.preventionCode !== data.infectionPreventionCodes.notPrevented)
+			fileName += `_${event.preventionCode}`;
+	}
+	else if (event.code === discoverACure.code)
+		fileName += `_${getCity(event.cardKeys[0]).color}`;
+	
+	return fileName;
+}
+
 function getEventIconFileExtension(eventType, event)
 {
 	const { code, cardKey } = eventType,
 		{
 			discoverACure,
-			infectCity,
+			epidemicIntensify,
 			autoTreatDisease,
 			eradication
 		} = eventTypes;
 
 	if (code === discoverACure.code && event
-		|| code === infectCity.code
 		|| cardKey && isEventCardKey(cardKey)
+		|| code === epidemicIntensify.code
 		|| code === autoTreatDisease.code
 		|| code === eradication.code)
 		return "jpg";
@@ -1247,56 +1251,26 @@ function getEventIconFileExtension(eventType, event)
 	return "png";
 }
 
-function getEventIconFileName(eventType, event)
+function getEventIconCssClasses(event)
 {
-	let fileName = toCamelCase(eventType.name).replace("/", "");
+	if (!event) return false;
 
-	if (!event)
-		return fileName;
-	
 	const {
-		treatDisease,
-		discoverACure,
-		autoTreatDisease,
-		eradication,
-		infectCity
+		infectCity,
+		epidemicInfect,
+		eradication
 	} = eventTypes;
 
-	if (event.code === treatDisease.code
-		|| event.code === autoTreatDisease.code
-		|| event.code === eradication.code)
-		fileName += `_${event.diseaseColor}`;
+	if (event.role && data.players[event.role])
+		return `${data.players[event.role].camelCaseRole}Border`;
 	else if (event.code === infectCity.code)
-		fileName += `_${getCity(event.cityKey).color}${infectionPreventionIconFileNameSuffix(event)}`;
-	else if (event.code === discoverACure.code)
-		fileName += `_${getCity(event.cardKeys[0]).color}`;
+		return `${getCity(event.cityKey).color}Border darkBlueBackground`;
+	else if (event.code === epidemicInfect.code)
+		return `${getCity(event.cityKey).color}Border lightGreenBackground`;
+	else if (event.code === eradication.code)
+		return `${event.diseaseColor}Border`;
 	
-	return fileName;
-}
-
-function infectionPreventionIconFileNameSuffix(infectCityEvent)
-{
-	const {
-			notPrevented,
-			eradicated,
-			quarantine,
-			medicAutoTreat
-		} = data.infectionPreventionCodes,
-		{ preventionCode } = infectCityEvent;
-	
-	if (preventionCode === notPrevented)
-		return "";
-	
-	if (preventionCode === eradicated)
-		return "_eradicated";
-	
-	if (preventionCode === quarantine)
-		return "_quarantined";
-	
-	if (preventionCode === medicAutoTreat)
-		return "_autoTreated";
-	
-	return "";
+	return "darkGreenBorder";
 }
 
 function enableBtnCancelAction()
@@ -7031,11 +7005,11 @@ async function epidemicInfect()
 			requestAction(eventTypes.epidemicInfect),
 			sleep(interval) // minumum wait time so things don't happen too quickly
 		]),
-		{ bottomInfCardKey, prevCubeCount, preventionCode } = events.shift(), // epInfect event
+		{ cityKey, prevCubeCount, preventionCode } = events.shift(), // epInfect event
 		triggeredOutbreakEvents = events, // any remaining events were triggered by the infection.
 		$MAX_NUM_CUBES = 3,	
 		card = {
-			cityKey: bottomInfCardKey,
+			cityKey,
 			numCubes: $MAX_NUM_CUBES - prevCubeCount,
 			preventionCode: preventionCode,
 			index: 0

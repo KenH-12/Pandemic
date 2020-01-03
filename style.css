@@ -32,7 +32,8 @@ body
 }
 body,
 #curtain,
-.veil
+.veil,
+.darkBlueBackground
 {
 	background-color: #09154f;
 }
@@ -244,7 +245,8 @@ body,
 		#00a94f,
 		#007738)
 }
-.brightGreen { color: #00a94f }
+.lightGreen { color: #00a94f }
+.lightGreenBackground { background-color: #00a94f }
 .darkGreenBorder { border: 2px solid #01863f }
 .researchStationBackground { background-color: #e9cf94 }
 span.r {color: #ef282a; background: none}
