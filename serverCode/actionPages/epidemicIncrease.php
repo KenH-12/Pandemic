@@ -40,7 +40,7 @@
         if ($mysqli->affected_rows != 1)
             throw new Exception("Failed to update epidemic count / infection rate: " . $mysqli->error);
 
-        $response["events"] = recordEvent($mysqli, $game, $EVENT_CODE, "$newEpidemicCount", $role);
+        $response["events"] = recordEvent($mysqli, $game, $EVENT_CODE, "$newEpidemicCount");
 
         $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $NEXT_STEP, $role);
     }

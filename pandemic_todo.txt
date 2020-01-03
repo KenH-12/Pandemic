@@ -1,7 +1,6 @@
 BUGS
 ----
 drive/ferry icon is huge in action prompt
-epidemic increase/intensify icons should have the dark green border
 
 TO DO
 -----

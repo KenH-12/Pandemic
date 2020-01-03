@@ -59,7 +59,7 @@
 
         $eventType = "et";
         $details = count($infectionDiscardKeys);
-        $response["events"] = recordEvent($mysqli, $game, $eventType, $details, $role);
+        $response["events"] = recordEvent($mysqli, $game, $eventType, $details);
         
         // Determine next step...
         $turnNum = getTurnNumber($mysqli, $game);
