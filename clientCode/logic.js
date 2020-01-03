@@ -282,12 +282,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "drawPlayerCards",
 		propertyNames: ["cardKeys"]
 	},
-	// There is no "Epidemic" event.
-	// This is here to facilitate the merging of the 3 epidemic steps into a single event history icon.
-	epidemic: {
-		name: "Epidemic",
-		code: "ep"
-	},
 	epidemicIncrease: {
 		name: "Epidemic Increase",
 		code: "ec",
@@ -475,6 +469,7 @@ function parseEvents(events)
 			
 			for (let e of events)
 			{
+				log("parsing event: ", e);
 				if (!e) continue;
 				
 				parsedEvents.push(new Event(e));
@@ -3315,7 +3310,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			dataToPost.discardKey = operationsFlightDiscardKey;
 
 		const events = await requestAction(eventType, dataToPost);
-		
+		log("events: ", events);
 		await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
 		setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);

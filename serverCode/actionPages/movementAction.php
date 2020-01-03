@@ -85,14 +85,6 @@
 
 				updateRoleLocation($mysqli, $game, $role, $originKey, $destinationKey);
 				
-				if (getRoleName($mysqli, $role) === "Medic")
-				{
-					$autoTreatEvents = getAutoTreatDiseaseEvents($mysqli, $game, $destinationKey);
-
-					if ($autoTreatEvents)
-						$response["events"] = $autoTreatEvents;
-				}
-				
 				$response["nextStep"] = nextStep($mysqli, $game, $currentStep, $activeRole);
 				
 				$eventDetails = "$originKey,$destinationKey";
@@ -106,6 +98,14 @@
 					$eventDetails .= ",$cardKey";
 				
 				$response["events"][] = recordEvent($mysqli, $game, $actionCode, $eventDetails, $activeRole);
+
+				if (getRoleName($mysqli, $role) === "Medic")
+				{
+					$autoTreatEvents = getAutoTreatDiseaseEvents($mysqli, $game, $destinationKey);
+
+					if ($autoTreatEvents)
+						$response["events"] = array_merge($response["events"], $autoTreatEvents);
+				}
 			}
 			catch(Exception $e)
 			{
