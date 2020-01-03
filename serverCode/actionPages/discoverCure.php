@@ -56,17 +56,17 @@
 
         discardPlayerCards($mysqli, $game, $role, $cardKeys);
         
+        // Record "discover cure" event
+        $eventType = "dc";
+        $details = implode(",", $cardKeys);
+        $response["events"][] = recordEvent($mysqli, $game, $eventType, $details, $role);
+
         // If there are 0 cubes of a cured disease color on the board, the disease becomes eradicated.
         // Determine and update the disease status.
         if (numDiseaseCubesOnBoard($mysqli, $game, $diseaseColor) > 0)
             setDiseaseStatus($mysqli, $game, $diseaseColor, "cured");
         else // Add any "eradication" events to the response.
             $response["events"][] = setDiseaseStatus($mysqli, $game, $diseaseColor, "eradicated");
-        
-        // Record "discover cure" event
-        $eventType = "dc";
-        $details = implode(",", $cardKeys);
-        $response["events"][] = recordEvent($mysqli, $game, $eventType, $details, $role);
 
         $playersAreVictorious = checkVictory($mysqli, $game);
 
