@@ -43,15 +43,14 @@
         discardInfectionCards($mysqli, $game, $cardKey);
 
         // Add 3 cubes to the corresponding city, unless the infection will be prevented somehow.
-        $cubesToAdd = 3;
+        $cubeCountBeforeInfection = getCubeCount($mysqli, $game, $cardKey, getCubeColumnName($color));
         $infectionPrevention = checkInfectionPrevention($mysqli, $game, $cardKey, $color);
-        if ($infectionPrevention != "0")
-            $cubesToAdd = 0;
+        $cubesToAdd = $infectionPrevention == "0" ? 3 : 0;
+        
+        $details = "$cardKey,$cubeCountBeforeInfection,$infectionPrevention";
+        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $details);
 
         $infectionResult = addCubesToCity($mysqli, $game, $cardKey, $color, $cubesToAdd);
-
-        $details = "$cardKey," . $infectionResult["prevCubeCount"] . ",$infectionPrevention";
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $details);
         
         if ($cubesToAdd > 0)
         {

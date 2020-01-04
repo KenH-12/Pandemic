@@ -1,5 +1,7 @@
 BUGS
 ----
+quarantine event icons get the wrong file extension -- export them as pngs
+
 drive/ferry icon is huge in action prompt
 
 TO DO
@@ -8,10 +10,6 @@ event history
 	slideshow buttons
 	detailed tooltips
 	new icons should not appear prematurely
-	event icons should appear after the icon of whichever action triggered them
-		outbreak
-			from infect city
-			from epidemic infect
 	if the event history is not overflowing horizontally, animate new icons into view from right to left
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
