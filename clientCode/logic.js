@@ -487,11 +487,17 @@ function parseEvents(events)
 function appendEventHistoryIcons(newEvents)
 {
 	const $eventHistory = $("#eventHistory");
+
+	let $icon;
 	
 	newEvents = newEvents || data.events;
 	
 	for (let event of newEvents)
-		$eventHistory.append(getEventIconHtml(getEventType(event.code), { event }));
+	{
+		$icon = $(getEventIconHtml(getEventType(event.code), { event }));
+		bindEventIconHoverEvents($icon, event);
+		$eventHistory.append($icon);
+	}
 
 	setEventHistoryScrollPosition($eventHistory);
 }
@@ -1186,7 +1192,6 @@ function getEventIconHtml(eventType, { event } = {})
 	
 	return `<img	src='images/eventIcons/${fileName}.${fileExtension}'
 					alt='${name}'
-					title='${name}'
 					${cssClasses ? `class='${cssClasses}'` : ""} />`;
 }
 
@@ -1266,6 +1271,45 @@ function getEventIconCssClasses(event)
 		return `${event.diseaseColor}Border`;
 	
 	return "darkGreenBorder";
+}
+
+function bindEventIconHoverEvents($icon, event)
+{
+	$icon.off("mouseenter mouseleave")
+		.hover(function() { showEventIconDetails($icon, event) },
+			function() { hideEventIconDetails() });
+}
+
+function showEventIconDetails($icon, event)
+{
+	const eventType = getEventType(event.code),
+		$eventHistory = $("#eventHistory"),
+		$detailsContainer = $(`<div class='eventDetails'>
+									<p>${eventType.name}</p>
+
+									<div class='eventDetailsArrow'></div>
+								</div>`).appendTo("#boardContainer"),
+		containerHeight = $detailsContainer.height(),
+		halfContainerWidth = Math.ceil($detailsContainer.width() / 2),
+		iconWidth = $icon.width();
+
+	$detailsContainer
+		.offset(
+		{
+			top: $eventHistory.offset().top - containerHeight - iconWidth,
+			left: $icon.offset().left - halfContainerWidth + iconWidth / 2
+		})
+		.children(".eventDetailsArrow")
+		.css({
+			width: iconWidth,
+			height: iconWidth,
+			left: halfContainerWidth - iconWidth / 2
+		});
+}
+
+function hideEventIconDetails()
+{
+	$(".eventDetails").remove();
 }
 
 function enableBtnCancelAction()
