@@ -320,6 +320,11 @@ span.r {color: #ef282a; background: none}
 	color: #fff;
 	padding: 5px;
 }
+.eventDetails .title
+{
+	font-size: 17px;
+	border-bottom: 1px solid #fff;
+}
 
 .eventDetailsArrow
 {

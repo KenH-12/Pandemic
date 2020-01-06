@@ -22,7 +22,7 @@
 				<script src='clientCode/jquery.easing.1.3.js'></script>
 				<script src='clientCode/utilities.js'></script>
 				<script src='clientCode/setup.js'></script>
-				<script src='clientCode/logic.js'></script>
+				<script type='module' src='clientCode/logic.js'></script>
 			</head>
 			<body>
 				<div id='curtain'>

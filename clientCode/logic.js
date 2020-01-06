@@ -1,4 +1,8 @@
 "use strict";
+
+import { cities, getCity, getPacificPath } from "./city.js";
+import Event, { eventTypes, DriveFerry, getEventType } from "./event.js";
+
 $(function(){
 const data =
 {
@@ -61,25 +65,10 @@ const data =
 		cureMarkerAnimation: "easeInOutQuart"
 	},
 	players: {},
-	cities: {},
-	pacificPaths: {
-		"sanf-toky": { percentFromTop: 0.328, percentFromLeft: 0 },
-		"sanf-mani": { percentFromTop: 0.349, percentFromLeft: 0 },
-		"losa-sydn": { percentFromTop: 0.491, percentFromLeft: 0 },
-		"toky-sanf": { percentFromTop: 0.331, percentFromLeft: 1 },
-		"mani-sanf": { percentFromTop: 0.554, percentFromLeft: 1 },
-		"sydn-losa": { percentFromTop: 0.774, percentFromLeft: 1 },
-		"top-left": { percentFromTop: 0, percentFromLeft: 0 },
-		"top-right": { percentFromTop: 0, percentFromLeft: 1 },
-		"bottom-left": { percentFromTop: 1, percentFromLeft: 0 },
-		"bottom-right": { percentFromTop: 1, percentFromLeft: 1 }
-	},
-	researchStationKeys: new Set(),
 	eventCards: {},
 	HAND_LIMIT: 7,
 	STARTING_HAND_CARD_HEIGHT: 24,
 	playerCardAnimationInterval: 0.4,
-	dragPieceZindex: 6,
 	stationZindex: 3,
 	cures: {
 		remaining: 4,
@@ -107,353 +96,6 @@ const data =
 	currentStep: -1,
 	steps: {},
 	events: []
-},
-eventTypes = {
-	driveFerry: {
-		name: "Drive/Ferry",
-		hasIcon: true,
-		code: "dr",
-		rules: ["Move to a city connected by a white line to the one you are in."],
-		instructions: "Select a Destination:",
-		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"]
-	},
-	directFlight: {
-		name: "Direct Flight",
-		hasIcon: true,
-		code: "df",
-		rules: ["Discard a city card to move to the city named on the card."],
-		instructions: "Select a Card:",
-		dispatchInstructions: `To dispatch a pawn via Direct Flight,
-discard the city card that matches the destination city.
-The card must come from the Dispatcher&#39;s hand.`,
-		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"]
-	},
-	charterFlight: {
-		name: "Charter Flight",
-		hasIcon: true,
-		code: "cf",
-		rules: ["Discard the city card that <i>matches</i> the city you are in to move to <i>any</i> city."],
-		instructions: "To select a destination, drag and drop your pawn onto a city.",
-		dispatchInstructions: `To dispatch a pawn via Charter Flight,
-discard the city card that matches the pawn&#39;s current location.
-The card must come from the Dispatcher&#39;s hand.`,
-		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"]
-	},
-	chooseFlightType: {
-		name: "Choose Flight Type",
-		code: "ft"
-	},
-	shuttleFlight: {
-		name: "Shuttle Flight",
-		hasIcon: true,
-		code: "sf",
-		rules: ["Move from a city with a research station to any other city that has a research station."],
-		instructions: "Select a Destination:",
-		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey"]
-	},
-	buildResearchStation: {
-		name: "Build Research Station",
-		hasIcon: true,
-		code: "rs",
-		rules: [
-			"Discard the city card that matches the city you are in to place a research station there.",
-			"If the research station supply is empty, take a research station from anywhere on the board."
-		],
-		instructions: "",
-		actionPathName: "buildResearchStation",
-		propertyNames: ["originKey", "destinationKey"],
-		relatedRoleName: "Operations Expert",
-		relatedRoleRule: "The Operations Expert can do this action without discarding."
-	},
-	shareKnowledge: {
-		name: "Share Knowledge",
-		hasIcon: true,
-		code: "sk",
-		rules: [
-			"You can do this action in two ways:",
-			"<i>give</i> the city card that matches the city you are in to another player, or",
-			"<i>take</i> the city card that matches the city you are in from another player.",
-			"The other player must also be in the city with you."
-		],
-		actionPathName: "shareKnowledge",
-		propertyNames: ["cardKey", "giverRoleID", "recipientRoleID"],
-		relatedRoleName: "Researcher",
-		relatedRoleRule: "The Researcher may <i>give</i> a City card without needing to be in the city that matches the card."
-	},
-	treatDisease: {
-		name: "Treat Disease",
-		hasIcon: true,
-		code: "td",
-		rules: [
-			"Remove 1 disease cube from the city you are in, placing it in the cube supply next to the board.",
-			"If the disease has been cured, remove all cubes of that color from the city you are in."
-		],
-		instructions: "Select a Disease Color:",
-		actionPathName: "treatDisease",
-		propertyNames: ["cityKey", "diseaseColor", "prevCubeCount", "newCubeCount"],
-		relatedRoleName: "Medic",
-		relatedRoleRule: "The Medic removes all cubes of one color when doing this action."
-	},
-	autoTreatDisease: {
-		name: "Auto-Treat Disease",
-		hasIcon: true,
-		code: "at",
-		propertyNames: ["cityKey", "diseaseColor"]
-	},
-	discoverACure: {
-		name: "Discover A Cure",
-		hasIcon: true,
-		code: "dc",
-		rules: [
-			`At any research station, discard 5 city cards of the same color from your hand to cure the disease of that color.`,
-			`If no cubes of this color are on the board, the disease becomes eradicated.`
-		],
-		actionPathName: "discoverCure",
-		propertyNames: ["cardKeys"],
-		relatedRoleName: "Scientist",
-		relatedRoleRule: "The Scientist needs only 4 cards of the same color to do this action."
-	},
-	eradication: {
-		name: "eradication",
-		hasIcon: true,
-		code: "er",
-		propertyNames: ["diseaseColor"]
-	},
-	planContingency: {
-		name: "Plan Contingency",
-		hasIcon: true,
-		code: "pc",
-		capableRoleName: "Contingency Planner",
-		propertyNames: ["cardKey"],
-		rules: [
-			"The Contingency Planner may, as an action, take <i>any</i> Event card from the Player Discard Pile and <i>store</i> it.",
-			"Only 1 Event card can be stored at a time. It does not count against his hand limit.",
-			"When the stored Event card is played, <i>remove it</i> from the game."
-		],
-		instructions: "Select an Event card to store:",
-		actionPathName: "planContingency"
-	},
-	dispatchPawn: {
-		name: "Dispatch Pawn",
-		hasIcon: true,
-		code: "dp",
-		capableRoleName: "Dispatcher",
-		rules: [
-			"The Dispatcher may, as an action, either:",
-			"<li>move any pawn to any city containing another pawn, or</li>",
-			"<li>move another player's pawn as if it were his own.</li>"
-		],
-		instructions: "To dispatch a pawn, drag and drop it onto a city.",
-		actionPathName: "movementAction",
-		propertyNames: ["roleToDispatch", "originKey", "destinationKey", "movementType"]
-	},
-	rendezvous: {
-		name: "Rendezvous",
-		code: "rv",
-		actionPathName: "movementAction"
-	},
-	operationsFlight: {
-		name: "Operations Flight",
-		hasIcon: true,
-		code: "of",
-		capableRoleName: "Operations Expert",
-		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
-		instructions: "To select a destination, drag and drop your pawn onto a city.",
-		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey", "cardKey"]
-	},
-	pass: {
-		name: "Pass Actions",
-		code: "pa",
-		propertyNames: [],
-		rules: [`Forfeit your remaining actions and proceed to the "Draw 2 cards" step.`],
-		instructions: "Pass on your remaining actions for this turn?",
-		actionPathName: "passActions",
-		propertyNames: []
-	},
-	cardDraw: {
-		name: "Draw 2 Cards",
-		hasIcon: true,
-		code: "cd",
-		actionPathName: "drawPlayerCards",
-		propertyNames: ["cardKeys"]
-	},
-	epidemicIncrease: {
-		name: "Epidemic Increase",
-		code: "ec",
-		actionPathName: "epidemicIncrease",
-		propertyNames: ["epidemicCount"],
-		hasIcon: true
-	},
-	epidemicInfect: {
-		name: "Epidemic Infect",
-		code: "ef",
-		actionPathName: "epidemicInfect",
-		propertyNames: ["cityKey", "prevCubeCount", "preventionCode"],
-		hasIcon: true
-	},
-	epidemicIntensify: {
-		name: "Epidemic Intensify",
-		code: "et",
-		actionPathName: "epidemicIntensify",
-		propertyNames: ["numDiscardsShuffled"],
-		hasIcon: true
-	},
-	discard: {
-		name: "Discard",
-		hasIcon: true,
-		code: "ds",
-		actionPathName: "discardPlayerCards",
-		propertyNames: ["cardKeys"]
-	},
-	infectCity: {
-		name: "Infect City",
-		hasIcon: true,
-		code: "ic",
-		actionPathName: "infectCity",
-		propertyNames: ["cityKey", "preventionCode"],
-	},
-	initialInfection: {
-		name: "Initial Infection",
-		code: "ii",
-		propertyNames: ["cityKey", "numCubes"]
-	},
-	startingHand: {
-		name: "Starting Hand",
-		code: "sh",
-		propertyNames: ["cardKeys"]
-	},
-	outbreak: {
-		name: "Outbreak",
-		hasIcon: true,
-		code: "ob",
-		propertyNames: ["outbreakCount", "originKey", "diseaseColor"]
-	},
-	outbreakInfection: {
-		name: "Outbreak Infection",
-		code: "oi",
-		propertyNames: ["originKey", "infectedKey", "diseaseColor", "preventionCode"]
-	},
-	resilientPopulation: {
-		name: "Resilient Population",
-		hasIcon: true,
-		code: "rp",
-		cardKey: "resi",
-		rules: [
-			"Play at any time. Not an action.",
-			"Remove any 1 card in the Infection Discard Pile from the game.",
-			"You may play this between the Infect and Intensify steps of an epidemic."
-		],
-		instructions: "Select a card from INFECTION DISCARDS to remove from the game.",
-		propertyNames: ["removedCardKey"],
-		actionPathName: "resilientPopulation"
-	},
-	oneQuietNight: {
-		name: "One Quiet Night",
-		hasIcon: true,
-		code: "oq",
-		cardKey: "oneq",
-		rules: [
-			"Play at any time. Not an action.",
-			"Skip the next Infect Cities step (do not flip over any Infection cards)."
-		],
-		actionPathName: "oneQuietNight"
-	},
-	skipInfectionStep: { // this is here as a simple way to use the actionPathName in the requestAction function.
-		code: "",
-		actionPathName: "skipInfectionStep"
-	},
-	forecast: {
-		name: "Forecast",
-		hasIcon: true,
-		code: "fd",
-		cardKey: "fore",
-		rules: [
-			"Play at any time. Not an action.",
-			"Draw, look at, and rearrange the top 6 cards of the Infection Deck.",
-			"Put them back on top."
-		],
-		propertyNames: ["cardKeys"],
-		actionPathName: "forecastDraw"
-	},
-	forecastPlacement: {
-		name: "Forecast Place",
-		code: "fp",
-		rules: [
-			"Play at any time. Not an action.",
-			"Draw, look at, and rearrange the top 6 cards of the Infection Deck.",
-			"Put them back on top."
-		],
-		instructions: "Drag and drop to rearrange the cards.",
-		propertyNames: ["cardKeys"],
-		actionPathName: "forecastPlacement"
-	},
-	airlift: {
-		name: "Airlift",
-		hasIcon: true,
-		code: "ar",
-		cardKey: "airl",
-		rules: ["Play at any time. Not an action.", "Move any 1 pawn to any city."],
-		instructions: "To airlift a pawn, drag and drop it onto the destination city.",
-		propertyNames: ["roleToAirlift", "originKey", "destinationKey"],
-		actionPathName: "airlift"
-	},
-	governmentGrant: {
-		name: "Government Grant",
-		hasIcon: true,
-		code: "gg",
-		cardKey: "gove",
-		rules: ["Play at any time. Not an action.", "Add 1 research station to any city."],
-		instructions: "Drag and drop a research station from the research station supply onto the city of your choice.",
-		propertyNames: ["cityKey", "relocationKey"],
-		actionPathName: "buildResearchStation"
-	},
-	gameEnd: {
-		name: "Game End",
-		code: "ge",
-		propertyNames: ["reason"]
-	}
-},
-eventCodes = {
-	dr: "driveFerry",
-	df: "directFlight",
-	cf: "charterFlight",
-	ft: "chooseFlightType",
-	sf: "shuttleFlight",
-	rs: "buildResearchStation",
-	sk: "shareKnowledge",
-	// sa: "shareKnowledgeAccept",
-	td: "treatDisease",
-	at: "autoTreatDisease",
-	dc: "discoverACure",
-	er: "eradication",
-	pc: "planContingency",
-	dp: "dispatchPawn",
-	// da: "dispatchAccept",
-	of: "operationsFlight",
-	pa: "pass",
-	cd: "cardDraw",
-	ec: "epidemicIncrease",
-	ef: "epidemicInfect",
-	et: "epidemicIntensify",
-	ds: "discard",
-	ic: "infectCity",
-	ii: "initialInfection",
-	sh: "startingHand",
-	ob: "outbreak",
-	oi: "outbreakInfection",
-	rp: "resilientPopulation",
-	oq: "oneQuietNight",
-	fd: "forecast",
-	fp: "forecastPlacement",
-	ar: "airlift",
-	// aa: "airliftAccept",
-	gg: "governmentGrant",
-	ge: "gameEnd"
 };
 
 function parseEvents(events)
@@ -472,7 +114,10 @@ function parseEvents(events)
 				log("parsing event: ", e);
 				if (!e) continue;
 				
-				parsedEvents.push(new Event(e));
+				if (e.code === eventTypes.driveFerry.code)
+					parsedEvents.push(new DriveFerry(e, cities));
+				else
+					parsedEvents.push(new Event(e));
 			}
 
 			data.events = [...data.events, ...parsedEvents];
@@ -512,7 +157,7 @@ function setEventHistoryScrollPosition($eventHistory)
 	$eventHistory.animate({ scrollLeft: overflow });
 }
 
-class Event
+/* class Event
 {
 	constructor({ code, id, turnNum, role, details })
 	{
@@ -542,12 +187,7 @@ class Event
 	{
 		return this.code === eventType.code;
 	}
-}
-
-function getEventType(eventCode)
-{
-	return eventTypes[eventCodes[eventCode]];
-}
+} */
 
 class Step
 {
@@ -928,48 +568,6 @@ function enablePawnEvents()
 		setTravelPathArrowColor({ airlifting });
 }
 
-function newResearchStationElement(cityKey)
-{
-	const $rs = $(`<div class='researchStation' data-key='${cityKey}'>
-					<img src='images/pieces/researchStation.png' alt='Research Station' />
-				</div>`),
-		$boardContainer = $("#boardContainer"),
-		$window = $(window);
-
-	$rs.appendTo($boardContainer)
-		.draggable(
-		{
-			confinement: $boardContainer,
-			disabled: true,
-			drag: function()
-			{
-				setTravelPathArrowColor({ relocatingResearchStation: true });
-				showTravelPathArrow({ $researchStation: $(this) });
-			}
-		})
-		.mousedown(function()
-		{
-			const $this = $(this);
-
-			if ($this.draggable("option", "disabled"))
-				return false;
-
-			turnOffResearchStationHighlights();
-			$this.stop().css("z-index", data.dragPieceZindex);
-			showPlaceholderStation($this);
-
-			$window.off("mouseup").mouseup(function()
-			{
-				$window.off("mouseup");
-				getGovernmentGrantTargetCity($this);
-				hidePlaceholderStation($this);
-				$this.css("z-index", 3);
-			});
-		});
-	
-	return $rs;
-}
-
 function showPlaceholderStation($originalStation)
 {
 	$("#placeholderStation")
@@ -987,7 +585,7 @@ function hidePlaceholderStation($originalStation)
 
 function getAllResearchStations()
 {
-	return [...data.researchStationKeys]
+	return [...researchStationKeys]
 		.filter(key => isCityKey(key))
 		.map(key => getCity(key).getResearchStation());
 }
@@ -1285,8 +883,7 @@ function showEventIconDetails($icon, event)
 	const eventType = getEventType(event.code),
 		$eventHistory = $("#eventHistory"),
 		$detailsContainer = $(`<div class='eventDetails'>
-									<p>${eventType.name}</p>
-
+									${event instanceof DriveFerry ? event.getDetails() : eventType.name}
 									<div class='eventDetailsArrow'></div>
 								</div>`).appendTo("#boardContainer"),
 		containerHeight = $detailsContainer.height(),
@@ -1350,7 +947,7 @@ function resetActionPrompt({ actionCancelled } = {})
 		if (activePlayer.role === "Dispatcher" || eventTypeIsBeingPrompted(airlift))
 			clusterAll({ pawns: true });
 		else
-			activePlayer.getLocation().cluster({ animatePawns });
+			activePlayer.getLocation().cluster(data, { animatePawns });
 
 		if (eventTypeIsBeingPrompted(governmentGrant))
 		{
@@ -2201,7 +1798,7 @@ function animateForecastDraw(cardKeys)
 		for (let card of cards)
 			revealInfectionCard(card, { forecasting: true });
 		// ...but revealed simultaneously after the following duration:
-		await sleep(getDuration("mediumInterval"));
+		await sleep(getDuration(data, "mediumInterval"));
 	
 		enableForecastSorting($cardContainer);
 		$container.find(".concealed").removeClass("concealed");
@@ -2302,7 +1899,7 @@ async function animateForecastPlacement($cardContainer)
 							src='images/cards/infectionCardback.png'
 							alt='Infection Card' />`));
 	
-	const $cardbacks = $cardContainer.find(".forecastCardback").width(getDimension("diseaseIcon")),
+	const $cardbacks = $cardContainer.find(".forecastCardback").width(getDimension(data, "diseaseIcon")),
 		$elementsToFadeOut = $(".instructions")
 			.add($cardContainer.siblings("p")) // Top/Bottom labels
 			.add($cards.children(".infectionCardContents"));
@@ -2323,7 +1920,7 @@ async function animateForecastPlacement($cardContainer)
 		})
 	]);
 
-	await sleep(getDuration("shortInterval"));
+	await sleep(getDuration(data, "shortInterval"));
 
 	const cardbackInitialWidth = $cardbacks.first().width(),
 		$deck = $("#imgInfectionDeck"),
@@ -2480,7 +2077,7 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 	$cardToRemove.appendTo($removedCardsContainer)
 		.removeAttr("style");
 
-	await sleep(getDuration("longInterval"));
+	await sleep(getDuration(data, "longInterval"));
 	return collapsenfectionDiscardPile();
 }
 
@@ -2496,7 +2093,7 @@ async function tryAirlift(playerToAirlift)
 	data.promptedTravelPathProperties = airliftDetails;
 	promptAction(airliftDetails);
 
-	await playerToAirlift.getLocation().cluster();
+	await playerToAirlift.getLocation().cluster(data);
 }
 
 async function airlift(playerToAirlift, destination)
@@ -2537,7 +2134,7 @@ function newGrantStation()
 	
 	$boardContainer.append($grantStation);
 
-	data.researchStationKeys.add("grantStation");
+	researchStationKeys.add("grantStation");
 	$grantStation.offset($("#researchStationSupply img").offset());
 	
 	$grantStation.draggable({ containment: $boardContainer })
@@ -2569,10 +2166,10 @@ function resetGrantStation({ $researchStation, cancelled } = {})
 
 	$researchStation
 		.draggable({ disabled: true })
-		.animate($("#researchStationSupply img").offset(), getDuration("stationPlacement"),
+		.animate($("#researchStationSupply img").offset(), getDuration(data, "stationPlacement"),
 		function()
 		{
-			data.researchStationKeys.delete("grantStation");
+			researchStationKeys.delete("grantStation");
 			updateResearchStationSupplyCount();
 			$(this).remove();
 			
@@ -2647,7 +2244,7 @@ function getGovernmentGrantTargetCity($researchStation)
 {
 	log("getGovernmentGrantTargetCity()");
 	const stationOffset = $researchStation.offset(),
-		distanceThreshold = getDimension("piecePlacementThreshold"),
+		distanceThreshold = getDimension(data, "piecePlacementThreshold"),
 		relocating = !$researchStation.hasClass("grantStation"),
 		relocationKey = relocating ? $researchStation.attr("data-key") : false,
 		eventType = eventTypes.governmentGrant;
@@ -2657,11 +2254,11 @@ function getGovernmentGrantTargetCity($researchStation)
 	stationOffset.left += $researchStation.width() / 3;
 
 	let targetCity;
-	for (let key in data.cities)
+	for (let key in cities)
 	{
 		targetCity = getCity(key);
 		if (!targetCity.hasResearchStation
-			&& distanceBetweenPoints(stationOffset, targetCity.getOffset()) < distanceThreshold)
+			&& distanceBetweenPoints(stationOffset, targetCity.getOffset(data)) < distanceThreshold)
 		{
 			log("target: ", targetCity.name);
 			if (relocating)
@@ -2670,7 +2267,7 @@ function getGovernmentGrantTargetCity($researchStation)
 
 				$researchStation.addClass("mediumGlow");
 				
-				origin.clusterResearchStation();
+				origin.clusterResearchStation(data);
 				showTravelPathArrow({ origin, destination: targetCity });
 			}
 			return promptAction({ eventType, targetCity, relocationKey });
@@ -2682,7 +2279,7 @@ function getGovernmentGrantTargetCity($researchStation)
 	if (relocating)
 	{
 		log("relocationKey:", relocationKey);
-		getCity(relocationKey).clusterResearchStation();
+		getCity(relocationKey).clusterResearchStation(data);
 		data.promptingEventType = eventType;
 		highlightAllResearchStations();
 		hideTravelPathArrow();
@@ -2734,7 +2331,7 @@ function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyTo
 
 	if (researchStations)
 	{
-		const rsKeys = [...data.researchStationKeys]
+		const rsKeys = [...researchStationKeys]
 			.filter(key => isCityKey(key) && key !== stationKeyToExclude);
 
 		for (let cityKey of rsKeys)
@@ -2783,7 +2380,7 @@ function animateContingencyCardRemoval()
 
 		await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
 		await animateDiscardPlayerCard($card, { removingContingencyCard: true });
-		await sleep(getDuration("longInterval"));
+		await sleep(getDuration(data, "longInterval"));
 		await collapsePlayerDiscardPile();
 
 		resolve();
@@ -2815,7 +2412,7 @@ async function tryDispatchPawn(playerToDispatch)
 		data.promptedTravelPathProperties = actionDetails;
 		promptAction(actionDetails);
 
-		await playerToDispatch.getLocation().cluster();
+		await playerToDispatch.getLocation().cluster(data);
 	}
 	else // The dispatch method can be executed immediately.
 		movementAction(method, destination, { playerToDispatch });
@@ -3084,7 +2681,7 @@ async function passActions()
 function getValidShareKnowledgeParticipants(player)
 {
 	// Begin by creating an array of all other players in the same city as the initiating player. 
-	const playersInSameCity = player.getLocation().getOccupants()
+	const playersInSameCity = player.getLocation().getOccupants(data.players)
 		.filter(p => p.rID !== player.rID);
 
 	// If the initiating player can give, then all players in the same city are valid participants.
@@ -3174,7 +2771,7 @@ function animateShareKnowledge(giver, receiver, cardKey)
 				}
 			})
 			.animate(desiredOffset,
-			getDuration("dealCard"),
+			getDuration(data, "dealCard"),
 			function()
 			{
 				$card.removeAttr("style").insertAfter($insertAfterMe);
@@ -3191,7 +2788,7 @@ function promptResearchStationRelocation()
 	<br />Select a City from which to relocate a Research Station.`);
 
 	let city;
-	for (let key in data.cities)
+	for (let key in cities)
 	{
 		city = getCity(key);
 		if (city.hasResearchStation)
@@ -3295,7 +2892,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			data.promptedTravelPathProperties = movementDetails;
 			promptAction(movementDetails);
 
-			originCity.cluster();
+			originCity.cluster(data);
 			return false;
 		}
 
@@ -3312,7 +2909,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			{
 				data.promptedTravelPathProperties = movementDetails;
 				promptAction(movementDetails);
-				originCity.cluster();
+				originCity.cluster(data);
 				return false;
 			}
 			
@@ -3333,7 +2930,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 
 	if (!movementTypeRequiresDiscard(eventType))
 	{
-		originCity.cluster();
+		originCity.cluster(data);
 		showTravelPathArrow({ player, destination });
 	}
 	
@@ -3376,7 +2973,7 @@ async function invalidMovement(originCity)
 {
 	await Promise.all([
 		animateInvalidTravelPath(),
-		originCity.cluster()
+		originCity.cluster(data)
 	]);
 	enablePawnEvents();
 
@@ -3392,7 +2989,7 @@ function animateAutoTreatDiseaseEvents(events)
 			autoTreatEvents = events.filter(e => e.code === autoTreatDisease.code
 												|| e.code === eradication.code),
 			city = getPlayer("Medic").getLocation(),
-			interval = getDuration("shortInterval");
+			interval = getDuration(data, "shortInterval");
 
 		for (let e of autoTreatEvents)
 		{
@@ -3406,7 +3003,7 @@ function animateAutoTreatDiseaseEvents(events)
 					color: e.diseaseColor,
 					numToRemove: "all"
 				});
-				city.decrementCubeCount(e.diseaseColor, city.cubes[e.diseaseColor]);
+				city.decrementCubeCount(data.diseaseCubeSupplies, e.diseaseColor, city.cubes[e.diseaseColor]);
 
 				await sleep(interval);
 				await hideMedicAutoTreatCircle();
@@ -3475,24 +3072,12 @@ async function treatDisease($cube, diseaseColor)
 		color: diseaseColor,
 		numToRemove
 	});
-	city.decrementCubeCount(diseaseColor, numToRemove);
+	city.decrementCubeCount(data.diseaseCubeSupplies, diseaseColor, numToRemove);
 	
 	if (eradicated)
 		await eradicationEvent(diseaseColor);
 	
 	proceed();
-}
-
-function getColorClass($element)
-{
-	const colors = ["y", "r", "u", "b"],
-		classes = $element.attr("class").split(" ");
-
-	for (let c of classes)
-		if (colors.includes(c))
-			return c;
-
-	return false;
 }
 
 async function eradicationEvent(diseaseColor)
@@ -3523,7 +3108,7 @@ function finishActionStep()
 
 function abortMovementAction(player)
 {
-	player.getLocation().cluster();
+	player.getLocation().cluster(data);
 
 	// TODO: handle different types of failure
 	// such as the location or turn being incorrect,
@@ -3611,14 +3196,14 @@ function getDestination(eventType, { player, dispatching } = {})
 	
 	const validDestinationKeys = player[methodName]({ dispatching }),
 		pawnOffset = player.getPawnOffset(),
-		distanceThreshold = getDimension("piecePlacementThreshold");
+		distanceThreshold = getDimension(data, "piecePlacementThreshold");
 
 	// If the pawn was dropped close enough to a valid destination city, return that city
 	let city;
 	for (let key of validDestinationKeys)
 	{
 		city = getCity(key);
-		if (distanceBetweenPoints(pawnOffset, city.getOffset()) < distanceThreshold)
+		if (distanceBetweenPoints(pawnOffset, city.getOffset(data)) < distanceThreshold)
 			return city;
 	}
 	
@@ -3701,14 +3286,14 @@ async function performDrawStep()
 		
 		if (data.gameEndCause) // not enough player cards remain in the deck -- the players lose.
 		{
-			await sleep(getDuration("longInterval"));
+			await sleep(getDuration(data, "longInterval"));
 			reject("Out of player cards -- the players lose.");
 			return outOfPlayerCardsDefeatAnimation($container);
 		}
 
 		bindPlayerCardEvents();
 		
-		await sleep(getDuration("mediumInterval"));
+		await sleep(getDuration(data, "mediumInterval"));
 		resolve(cardDrawEvent.cardKeys);
 	});
 }
@@ -3739,9 +3324,9 @@ async function dealFaceDownPlayerCards($container, numCardsToDeal)
 		}
 
 		await dealFaceDownPlayerCard($container, deckOffset);
-		await sleep(getDuration("dealCard") * 0.5);
+		await sleep(getDuration(data, "dealCard") * 0.5);
 	}
-	return sleep(getDuration("longInterval"));
+	return sleep(getDuration(data, "longInterval"));
 }
 
 function dealFaceDownPlayerCard($container, deckOffset, { finalCardbackWidth, zIndex } = {})
@@ -3770,7 +3355,7 @@ function dealFaceDownPlayerCard($container, deckOffset, { finalCardbackWidth, zI
 					top: containerOffset.top,
 					left: containerOffset.left
 				},
-				getDuration("dealCard"),
+				getDuration(data, "dealCard"),
 				data.easings.dealCard,
 				resolve());
 	});
@@ -3784,7 +3369,7 @@ function newFacedownPlayerCard()
 async function revealPlayerCard(cardKey, $container)
 {
 	const $card = newPlayerCardElement(cardKey),
-		duration = getDuration("revealPlayerCard"),
+		duration = getDuration(data, "revealPlayerCard"),
 		easing = data.easings.revealCard;
 
 	if ($container.hasClass("roleContainer"))
@@ -3827,7 +3412,7 @@ async function animateCardsToHand($cards)
 	// If there are 0 epidemics, the cards are animated to the hand simultaneously.
 	// If $cards.first() is an epidemic, await the same duration to finish the draw animation before expanding the epidemic.
 	if ($cards.first().hasClass("epidemic"))
-		await sleep(getDuration("dealCard"));
+		await sleep(getDuration(data, "dealCard"));
 	// Returning the second Promise (instead of Promise.all) avoids an issue where the cards
 	// can swap positions after being inserted into the hand.
 	return animateCardToHand($cards.first(), targetProperties);
@@ -3884,29 +3469,13 @@ function animateCardToHand($card, targetProperties, { isContingencyCard } = {})
 				...initialOffset
 			})
 			.animate(targetProperties,
-			getDuration("dealCard"),
+			getDuration(data, "dealCard"),
 			function()
 			{
 				$card.removeAttr("style").insertAfter($insertAfterElement);
 				resolve();
 			});
 	});
-}
-
-function getDuration(durationNameOrMs)
-{
-	if (data.skipping)
-		return 0;
-	
-	if (isNaN(durationNameOrMs))
-		return data.durations[durationNameOrMs];
-	
-	return durationNameOrMs;
-}
-
-function setDuration(durationName, ms)
-{
-	data.durations[durationName] = ms;
 }
 
 function resizeAll()
@@ -3936,7 +3505,7 @@ function resizeBoard()
 	$("#boardContainer").height(data.boardHeight);
 
 	resetPinpointRectangles();
-	data.cityWidth = getDimension("cityWidth");
+	data.cityWidth = getDimension(data, "cityWidth");
 }
 
 function resetPinpointRectangles()
@@ -3963,14 +3532,14 @@ function resizeTopPanelElements()
 
 function resizeCubeSupplies()
 {
-	$(".cubeSupply").css("margin-top", getDimension("cubeSupplyMarginTop") + "px");
+	$(".cubeSupply").css("margin-top", getDimension(data, "cubeSupplyMarginTop") + "px");
 	makeElementsSquare(".cubeSupply .diseaseCube");
 }
 
 function resizeInfectionDiscardElements()
 {
 	const $infDiscard = $("#infectionDiscard"),
-		cardHeight = getDimension("infDiscardHeight"),
+		cardHeight = getDimension(data, "infDiscardHeight"),
 		panelHeight = $("#topPanel").height();
 
 	positionRemovedInfectionCards("collapse");
@@ -4010,9 +3579,9 @@ function resizeBottomPanelElements()
 		.height(data.topPanelHeight)
 		.offset({ top: panelOffsetTop });
 
-	$("#researchStationSupply").css("font-size", getDimension("stationSupplyCountFont") + "px");
+	$("#researchStationSupply").css("font-size", getDimension(data, "stationSupplyCountFont") + "px");
 
-	$("#playerCards, .playerPile").height(getDimension("bottomPanelDivs"));
+	$("#playerCards, .playerPile").height(getDimension(data, "bottomPanelDivs"));
 
 	const $cureMarkerContainer = $("#cureMarkerContainer"),
 		titleHeight = $cureMarkerContainer.children(".title").height() + 10;
@@ -4052,7 +3621,7 @@ function repositionMarkers()
 
 function positionCureMarkers()
 {
-	$(".cureMarker").css("margin-top", getDimension("cureMarkerMarginTop"));
+	$(".cureMarker").css("margin-top", getDimension(data, "cureMarkerMarginTop"));
 }
 
 function resizeAndRepositionPieces()
@@ -4062,8 +3631,9 @@ function resizeAndRepositionPieces()
 		calibratePieceDimensions("pawn");
 		calibratePieceDimensions("station");
 		
-		data.cubeWidth = getDimension("cubeWidth");
-		$("#boardContainer > .diseaseCube").width(data.cubeWidth).height(data.cubeWidth);
+		const cubeWidth = getDimension(data, "cubeWidth");
+		$("#boardContainer > .diseaseCube").width(cubeWidth).height(cubeWidth);
+		data.cubeWidth = cubeWidth;
 	
 		actionStepInProgress() ? bindDiseaseCubeEvents() : unbindDiseaseCubeEvents();
 	
@@ -4075,11 +3645,11 @@ function resizeAndRepositionPieces()
 		else // cluster all cities containing pawns, disease cubes, or research stations
 		{
 			let city;
-			for (let key in data.cities)
+			for (let key in cities)
 			{
 				city = getCity(key);
 				if (city.containsPieces())
-					city.cluster();
+					city.cluster(data);
 			}
 		}
 		resolve();
@@ -4126,30 +3696,8 @@ function repositionSpecialEventBanner()
 	$(".specialEventImg").css(
 	{
 		top: data.boardHeight / 2 + bannerHeight / 4,
-		left: getDimension("specialEventImgMarginLeft")
+		left: getDimension(data, "specialEventImgMarginLeft")
 	});
-}
-
-// Facilitates responsiveness where simple css rules fail
-// Returns a dimension value calculated using data.sizeRatios
-function getDimension(dimension,
-	{
-		compliment,
-		getFactor,
-		format
-	} = {})
-{
-	const ratio = data.sizeRatios[dimension],
-		base = data[ratio[0]]; // some value that is updated on resize events
-	let factor = compliment ? 1 - ratio[1] : ratio[1]; // the ratio to the base value, or optionally the compliment of that ratio
-	
-	if (format == "percent")
-		factor *= 100;
-	
-	if (getFactor)
-		return factor;
-	
-	return Math.round(base * factor);
 }
 
 function bindRoleCardHoverEvents()
@@ -4279,15 +3827,15 @@ class Player
 			const origin = this.getLocation();
 			
 			this.$pawn.removeClass(this.cityKey).addClass(destination.key);
-			destination.setPawnIndices();
+			destination.setPawnIndices(getActivePlayer);
 			
 			this.cityKey = destination.key;
 	
 			$("#travelPathArrowContainer").css("z-index", 4);
 			await Promise.all(
 			[
-				destination.cluster({ animatePawns: true }),
-				origin.cluster({ animatePawns: true })
+				destination.cluster(data, { animatePawns: true }),
+				origin.cluster(data, { animatePawns: true })
 			]);
 			hideTravelPathArrow();
 
@@ -4491,8 +4039,8 @@ class Player
 		if (!this.getLocation().hasResearchStation)
 			return false;
 		// - At least one other city must have a research station.
-		for (let key in data.cities)
-			if (data.cities[key].hasResearchStation && key != this.cityKey)
+		for (let key in cities)
+			if (cities[key].hasResearchStation && key != this.cityKey)
 				return true;
 		
 		return false;
@@ -4523,7 +4071,7 @@ class Player
 
 	canShareKnowledge()
 	{
-		const playersAtCurrentLocation = this.getLocation().getOccupants();
+		const playersAtCurrentLocation = this.getLocation().getOccupants(data.players);
 		
 		// Share Knowledge requires:
 		// - Another pawn at the current location.
@@ -4636,7 +4184,7 @@ class Player
 	{
 		// Both the origin and destination must have a research station.
 		if (this.getLocation().hasResearchStation)
-			return [...data.researchStationKeys].filter(key => key != this.cityKey);
+			return [...researchStationKeys].filter(key => key != this.cityKey);
 		else
 			return [];
 	}
@@ -4663,7 +4211,7 @@ class Player
 		if (discarder.isHoldingCardKey(this.cityKey))
 		{
 			// Any city besides the current city is a valid destination.
-			for (let key in data.cities)
+			for (let key in cities)
 				if (key !== this.cityKey)
 					destinationKeys.push(key);
 		}
@@ -4678,7 +4226,7 @@ class Player
 		if (this.role === "Operations Expert" && this.getLocation().hasResearchStation)
 		{
 			// Any city besides the current city is a valid destination.
-			for (let key in data.cities)
+			for (let key in cities)
 				if (key !== this.cityKey)
 					destinationKeys.push(key);
 		}
@@ -4713,7 +4261,7 @@ class Player
 		const destinationKeys = [];
 
 		// Any city besides the current city is a valid destination.
-		for (let key in data.cities)
+		for (let key in cities)
 			if (key !== this.cityKey)
 				destinationKeys.push(key);
 
@@ -4789,7 +4337,10 @@ async function nextTurn()
 	if (isOneQuietNight())
 		indicateOneQuietNightStep();
 
-	await getActivePlayer().getLocation().setPawnIndices().cluster({ animatePawns: true });
+	const activePlayer = getActivePlayer();
+	await activePlayer.getLocation()
+		.setPawnIndices(activePlayer)
+		.cluster(data, { animatePawns: true });
 
 	proceed();
 }
@@ -4958,7 +4509,7 @@ function showTravelPathArrow(actionProperties)
 		actionProperties = data.promptedTravelPathProperties;
 	}
 	
-	let stemWidth = getDimension("cityWidth") * 1.2;
+	let stemWidth = getDimension(data, "cityWidth") * 1.2;
 	const { originOffset, destinationOffset } = getTravelPathVector(actionProperties),
 		baseOffset = getPointAtDistanceAlongLine(originOffset, destinationOffset, stemWidth),
 		tipOffset = getPointAtDistanceAlongLine(destinationOffset, originOffset, stemWidth),
@@ -5021,12 +4572,12 @@ function getTravelPathVector(actionProperties)
 	{
 		if (typeof $researchStation == "undefined")
 		{
-			originOffset = origin.getOffset();
-			destinationOffset = destination.getOffset();
+			originOffset = origin.getOffset(data);
+			destinationOffset = destination.getOffset(data);
 		}
 		else
 		{
-			originOffset = getCity($researchStation.attr("data-key")).getOffset();
+			originOffset = getCity($researchStation.attr("data-key")).getOffset(data);
 			destinationOffset = $researchStation.offset();
 			destinationOffset.left += $researchStation.width() * 0.5;
 			destinationOffset.top += $researchStation.height() * 0.5;
@@ -5035,7 +4586,7 @@ function getTravelPathVector(actionProperties)
 	else if (typeof $pawn == "undefined") // Determine player and destination directly from the actionProperties.
 	{
 		player = actionProperties.player || playerToAirlift || playerToDispatch || getActivePlayer();
-		destinationOffset = destination.getOffset();
+		destinationOffset = destination.getOffset(data);
 	}
 	else // The pawn itself is the temporary destination.
 	{
@@ -5046,7 +4597,7 @@ function getTravelPathVector(actionProperties)
 	}
 
 	return {
-		originOffset: originOffset || player.getLocation().getOffset(),
+		originOffset: originOffset || player.getLocation().getOffset(data),
 		destinationOffset
 	};
 }
@@ -5119,7 +4670,7 @@ function bindPawnEvents()
 				});
 
 			// The dragged pawn appear in front of other pawns and disease cubes.
-			$this.css("z-index", data.dragPieceZindex);
+			$this.css("z-index", 6);
 		});
 }
 
@@ -5144,1139 +4695,10 @@ function getActivePlayer()
 	return data.players[data.turn];
 }
 
-function getCity(key)
-{
-	if (key in data.cities)
-		return data.cities[key];
-	
-	if (!(key in data.pacificPaths))
-		console.error(`cityKey does not exist: '${key}'`);
-	
-	return false;
-}
-
-function getPacificPath(key)
-{
-	if (key in data.pacificPaths)
-		return data.pacificPaths[key];
-	
-	return console.error(`pacificPath does not exist: '${key}'`);
-}
-
-function getPacificTraversalPoints({ direction })
-{
-	if (direction === "east")
-	{
-		return [
-			{ key: "bottom-left", points: ["bl"] },
-			{ key: "bottom-right", points: ["br"] }
-		];
-	}
-	
-	if (direction === "west")
-	{
-		return [
-			{ key: "bottom-right", points: ["br"] },
-			{ key: "bottom-left", points: ["bl"] }
-		];
-	}
-}
-
 function getDiseaseColor(key)
 {
 	return getCity(key).color;
 }
-
-class City
-{
-	constructor({ key, name, percentFromTop, percentFromLeft, connectedCityKeys, quarantineBoundaries, color })
-	{
-		this.key = key;
-		this.name = capitalizeWords(name);
-		this.color = color;
-		this.percentFromTop = percentFromTop;
-		this.percentFromLeft = percentFromLeft;
-		this.connectedCityKeys = connectedCityKeys; // string array
-		this.quarantineBoundaries = quarantineBoundaries;
-		
-		this.hasResearchStation = false;
-		
-		// disease cubes
-		this.cubes = {
-			u: 0, // blue
-			y: 0, // yellow
-			b: 0, // black
-			r: 0 // red
-		};
-	}
-
-	incrementCubeCount(color = this.color)
-	{
-		const MAX_CUBES_OF_COLOR_PER_CITY = 3;
-
-		if (this.cubes[color] < MAX_CUBES_OF_COLOR_PER_CITY)
-		{
-			this.cubes[color]++;
-			data.diseaseCubeSupplies[color]--;
-		}
-	}
-
-	decrementCubeCount(color, numCubesRemoved)
-	{
-		this.cubes[color] -= numCubesRemoved;
-		data.diseaseCubeSupplies[color] += numCubesRemoved;
-	}
-	
-	isConnectedTo(cityKey)
-	{
-		return this.connectedCityKeys.includes(cityKey);
-	}
-
-	// Returns the left and top offsets values of the city on the board (responsive).
-	// Optionally adjusts to center a piece on the city ("cube" or "pawn")
-	getOffset(pieceToCenter)
-	{
-		let x = data.boardWidth * this.percentFromLeft,
-			y = data.boardHeight * this.percentFromTop;
-		
-		if (pieceToCenter)
-		{
-			if (pieceToCenter == "cube")
-			{
-				const adj = data.cubeWidth / 2;
-				x -= adj;
-				y -= adj;
-			}
-			else if (pieceToCenter == "pawn")
-			{
-				y -= data.pawnHeight * 0.8;
-				x -= data.pawnWidth / 2;
-			}
-		}
-		return { left: x, top: y };
-	}
-
-	getDiseaseColorOptions()
-	{
-		const diseaseColorOptions = [];
-
-		for (let color in this.cubes)
-			if (this.cubes[color] > 0)
-				diseaseColorOptions.push(color);
-
-		return diseaseColorOptions;
-	}
-
-	getOccupants()
-	{
-		return getFilteredMemberArray(data.players,
-			player => player.cityKey === this.key);
-	}
-	
-	// Puts a research station on this city.
-	buildResearchStation({ animate, isGovernmentGrant } = {})
-	{
-		let $rs,
-			stationInitialOffset = false;
-		if (isGovernmentGrant)
-		{
-			$rs = $("#boardContainer > .researchStation.grantStation");
-			stationInitialOffset = $rs.offset();
-
-			log("stationInitialOffset:", stationInitialOffset);
-			$rs.replaceWith(newResearchStationElement(this.key))
-				.removeAttr("style");
-			data.researchStationKeys.delete("grantStation");
-		}
-		else
-			$rs = newResearchStationElement(this.key);
-		
-		this.hasResearchStation = true;
-		data.researchStationKeys.add(this.key);
-		updateResearchStationSupplyCount();
-
-		if (animate)
-		{
-			stationInitialOffset = stationInitialOffset || $("#researchStationSupply .researchStation").offset();
-			return this.cluster(
-				{
-					stationInitialOffset,
-					animateResearchStation: true,
-					animatePawns: true,
-					animateCubes: true
-				});
-		}
-	}
-
-	getResearchStation()
-	{
-		return $(`.researchStation[data-key='${this.key}']`);
-	}
-
-	relocateResearchStationTo(city)
-	{
-		const $rs = this.getResearchStation(),
-			stationInitialOffset = $rs.offset();
-
-		$rs.removeAttr("data-key")
-			.attr("data-key", city.key)
-			.removeAttr("style");
-		
-		this.hasResearchStation = false;
-		data.researchStationKeys.delete(this.key);
-
-		city.hasResearchStation = true;
-		data.researchStationKeys.add(city.key);
-
-		return city.cluster({ animateResearchStation: true, stationInitialOffset, animatePawns: true });
-	}
-	
-	setPawnIndices()
-	{
-		const activePlayer = getActivePlayer(),
-			activePawn = activePlayer.$pawn;
-		
-		if (activePlayer.cityKey == this.key && $(`.${this.key}.pawn`).length > 2)
-		{
-			activePawn.data("pawnIndex", "1");
-			
-			const otherPawns = $(`.${this.key}.pawn`).not(`#${activePawn.attr("id")}`);
-			otherPawns.data("pawnIndex", "0");
-		}
-
-		return this;
-	}
-
-	containsPieces()
-	{
-		return $(`.pawn.${this.key}`).length
-			|| this.getResearchStation().length
-			|| $(`.diseaseCube.${this.key}`).length;
-	}
-
-	// Positions any pawns and disease cubes on this city into a cluster.
-	// Returns a Promise with after the most relevant animation duration.
-	cluster(
-		{
-			animatePawns,
-			$pawnToExclude,
-			animateCubes,
-			animateResearchStation,
-			stationInitialOffset,
-			stationKeyToExclude
-		} = {})
-	{
-		const pawns = $(".pawn." + this.key).not($pawnToExclude)
-				.sort(function (a, b) { return $(a).data("pawnIndex") - $(b).data("pawnIndex") }),
-			pawnCount = pawns.length,
-			cityOffset = this.getOffset(),
-			coordsArray = [];
-		
-		let pawnTop = cityOffset.top - data.pawnHeight,
-			pawnLeft = cityOffset.left - data.pawnWidth,
-			i;
-		
-		if (this.hasResearchStation && this.key !== stationKeyToExclude)
-		{
-			this.clusterResearchStation({ animateResearchStation, stationInitialOffset });
-
-			// research station appears behind a single row of pawns
-			if (pawnCount < 3)
-			{
-				pawnTop += data.pawnHeight * 0.3;
-				pawnLeft += data.pawnWidth * 0.5;
-			}
-		}
-		
-		for (i = 0; i < pawnCount; i++)
-		{
-			if (pawnCount > 2 && i == 2) // second row moves down a touch and the is offset slightly to the right
-			{
-				pawnTop += data.pawnHeight * 0.3;
-				pawnLeft -= data.pawnWidth * 1.5;
-			}
-			
-			coordsArray.push([pawnTop, pawnLeft]);
-			pawnLeft += data.pawnWidth; // move over a pawn's width with each iteration
-		}
-
-		const pawnAnimationDuration = getDuration("pawnAnimation");
-		let $this, newOffset;
-		i = 0;
-		pawns.each(function()
-		{
-			$this = $(this);
-			// pawns in the back row appear behind research stations
-			$this[0].style.zIndex = (pawnCount > 2 && i < 2) ? 2 : 4;
-			
-			newOffset = {
-				top: coordsArray[i][0],
-				left: coordsArray[i][1]
-			};
-			
-			if (animatePawns)
-				$this.animate(newOffset, pawnAnimationDuration, data.easings.pawnAnimation);
-			else
-				$this.offset(newOffset);
-			
-			i++;
-		});
-
-		// reset to default
-		setDuration("pawnAnimation", 250);
-
-		this.clusterDiseaseCubes({ animate: (animateCubes || animatePawns) });
-
-		// Return a Promise with the most relevant duration.
-		let ms = 0;
-		if (animateResearchStation) // Station animation takes the longest.
-			ms = getDuration("stationPlacement");
-		else if (animateCubes) // Cube animation takes longer than pawn animation.
-			ms = getDuration("cubePlacement");
-		else if (animatePawns)
-			ms = pawnAnimationDuration;
-
-		return sleep(ms);
-	}
-
-	clusterResearchStation({ animateResearchStation, stationInitialOffset } = {})
-	{
-		log(`clustering ${this.name}'s station`);
-		const $researchStation = this.getResearchStation(),
-			desiredOffset = this.getOffset(),
-			duration = getDuration("stationPlacement");
-		
-		desiredOffset.top -= data.stationHeight * 0.85;
-		desiredOffset.left -= data.stationWidth * 0.8;
-		
-		if (animateResearchStation)
-		{
-			if (stationInitialOffset)
-				$researchStation.offset(stationInitialOffset);
-			
-			$researchStation.animate(
-			{
-				top: desiredOffset.top,
-				left: desiredOffset.left,
-				width: data.stationWidth
-			}, duration, data.easings.stationPlacement);
-		}
-		else
-			$researchStation.offset(desiredOffset);
-		
-		return sleep(duration);
-	}
-
-	clusterDiseaseCubes({ animate } = {})
-	{
-		const $cubes = $(`.diseaseCube.${this.key}`),
-			colors = new Set(),
-			coordinates = {},
-			cityOffset = this.getOffset("cube"),
-			cubeWidth = getDimension("cubeWidth"),
-			numPawnsInCity = this.getOccupants().length,
-			duration = animate ? getDuration("cubePlacement") : 0;
-		
-		if (!$cubes.length)
-			return;
-		
-		$cubes.each(function(){ colors.add(getColorClass($(this))) });
-
-		let topAdjustment;
-		if (numPawnsInCity > 2
-			|| (this.hasResearchStation && ($cubes.length > 1 || numPawnsInCity > 0)))
-			topAdjustment = cubeWidth * 1.25;
-		else
-			topAdjustment = cubeWidth / 2;
-
-		// Get y values to create a column for each color.
-		let top;
-		for (let color of [...colors])
-		{
-			top = cityOffset.top + topAdjustment;
-			coordinates[color] = [];
-			
-			for (let i = 0; i < $cubes.filter(`.${color}`).length; i++)
-			{
-				top -= cubeWidth * 0.5
-				coordinates[color].push({ top });
-			}
-		}
-
-		// Sort colors by column size ascending.
-		const colorOrder = [],
-			MIN_COL_HEIGHT = 1,
-			MAX_CUBES_OF_COLOR_ON_CITY = 3, // 4th cube causes an outbreak.
-			MAX_INFECTIONS_PER_OUTBREAK = 6, // Hong Kong / Istanbul both have 6 neighbouring cities.
-			MAX_COL_HEIGHT = MAX_CUBES_OF_COLOR_ON_CITY + MAX_INFECTIONS_PER_OUTBREAK;
-
-		for (let i = MIN_COL_HEIGHT; i <= MAX_COL_HEIGHT; i++)
-			for (let color in coordinates)
-				if (coordinates[color].length === i)
-					colorOrder.push(color);
-
-		// Get x values to separate each column.
-		let left = cityOffset.left;
-		if (colors.size > 1)
-			left -= (colors.size - 1) * (cubeWidth / 2);
-		
-		for (let color of colorOrder)
-		{
-			for (let coord of coordinates[color])
-			{
-				coord.left = left;
-				coord.width = cubeWidth;
-				coord.height = cubeWidth;
-			}
-			
-			left += cubeWidth;
-		}
-
-		let $cubesOfColor;
-		for (let color in coordinates)
-		{
-			$cubesOfColor = $cubes.filter(`.${color}`);
-
-			for (let i = 0; i < $cubesOfColor.length; i++)
-			{
-				if (animate)
-					$cubesOfColor.eq(i).animate(coordinates[color][i], getDuration(duration), data.easings.cubePlacement);
-				else
-					$cubesOfColor.eq(i).offset(coordinates[color][i]);
-			}
-		}
-		return sleep(getDuration(duration));
-	}
-}
-
-// instantiate city objects
-(function ()
-{
-	const cityInfo = [
-		{
-			name: "san francisco",
-			color: "u",
-			percentFromTop: 0.332,
-			percentFromLeft: 0.047,
-			connectedCityKeys: ["toky", "mani", "chic", "losa"],
-			quarantineBoundaries: [
-				...[
-					{ key: "sanf-mani", points: ["b"] },
-					{ key: "sanf", points: ["bl"] },
-					{ key: "losa", points: ["bl", "br"] },
-					{ key: "chic", points: ["br", "tr", "tl"] },
-					{ key: "sanf", points: ["t"] },
-					{ key: "sanf-toky", points: ["t"] }
-				],
-				...getPacificTraversalPoints({ direction: "east" }),
-				...[
-					{ key: "toky-sanf", points: ["t"] },
-					{ key: "toky", points: ["tl", "bl"] },
-					{ key: "toky-sanf", points: ["b"] },
-					{ key: "mani-sanf", points: ["t"] },
-					{ key: "mani", points: ["tl", "bl", "br"] },
-					{ key: "mani-sanf", points: ["b"] }
-				],
-				...getPacificTraversalPoints({ direction: "west" })	
-			] 
-		},
-		{
-			name: "chicago",
-			color: "u",
-			percentFromTop: 0.293,
-			percentFromLeft: 0.143,
-			connectedCityKeys: ["atla", "mont", "sanf", "losa", "mexi"],
-			quarantineBoundaries: [
-				{ key: "chic", points: ["t"] },
-				{ key: "sanf", points: ["tl"] },
-				{ key: "losa", points: ["bl"] },
-				{ key: "mexi", points: ["bl", "br"] },
-				{ key: "mont", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "montreal",
-			color: "u",
-			percentFromTop: 0.288,
-			percentFromLeft: 0.217,
-			connectedCityKeys: ["chic", "wash", "newy"],
-			quarantineBoundaries: [
-				{ key: "chic", points: ["tl", "bl"] },
-				{ key: "mont", points: ["bl"] },
-				{ key: "wash", points: ["bl", "br"] },
-				{ key: "newy", points: ["br", "tr"] },
-				{ key: "mont", points: ["t"] }
-			]
-		},
-		{
-			name: "new york",
-			color: "u",
-			percentFromTop: 0.299,
-			percentFromLeft: 0.275,
-			connectedCityKeys: ["mont", "wash", "lond", "madr"],
-			quarantineBoundaries: [
-				{ key: "mont", points: ["tl", "bl"] },
-				{ key: "wash", points: ["bl"] },
-				{ key: "madr", points: ["br"] },
-				{ key: "lond", points: ["tr"] }
-			]
-		},
-		{
-			name: "atlanta",
-			color: "u",
-			percentFromTop: 0.372,
-			percentFromLeft: 0.172,
-			connectedCityKeys: ["chic", "wash", "miam"],
-			quarantineBoundaries: [
-				{ key: "chic", points: ["tr", "tl", "bl"] },
-				{ key: "atla", points: ["l"] },
-				{ key: "miam", points: ["bl", "br"] },
-				{ key: "wash", points: ["br", "tr", "tl"] },
-				{ key: "atla", points: ["tr"] }
-			]
-		},
-		{
-			name: "washington",
-			color: "u",
-			percentFromTop: 0.365,
-			percentFromLeft: 0.250,
-			connectedCityKeys: ["atla", "mont", "newy", "miam"],
-			quarantineBoundaries: [
-				{ key: "mont", points: ["tl"] },
-				{ key: "atla", points: ["tl", "bl"] },
-				{ key: "miam", points: ["bl", "br"] },
-				{ key: "wash", points: ["r"] },
-				{ key: "newy", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "london",
-			color: "u",
-			percentFromTop: 0.237,
-			percentFromLeft: 0.415,
-			connectedCityKeys: ["newy", "madr", "esse", "pari"],
-			quarantineBoundaries: [
-				{ key: "newy", points: ["tl", "bl"] },
-				{ key: "madr", points: ["bl", "br"] },
-				{ key: "pari", points: ["br"] },
-				{ key: "esse", points: ["br", "tr"] },
-				{ key: "lond", points: ["t"] }
-			]
-		},
-		{
-			name: "essen",
-			color: "u",
-			percentFromTop: 0.217,
-			percentFromLeft: 0.489,
-			connectedCityKeys: ["lond", "pari", "mila", "stpe"],
-			quarantineBoundaries: [
-				{ key: "lond", points: ["tl", "bl"] },
-				{ key: "pari", points: ["bl", "br"] },
-				{ key: "mila", points: ["br"] },
-				{ key: "stpe", points: ["br", "tr"] },
-				{ key: "esse", points: ["t"] }
-			]
-		},
-		{
-			name: "st petersburg",
-			color: "u",
-			percentFromTop: 0.197,
-			percentFromLeft: 0.573,
-			connectedCityKeys: ["esse", "ista", "mosc"],
-			quarantineBoundaries: [
-				{ key: "esse", points: ["tl", "bl", "br"] },
-				{ key: "stpe", points: ["bl"] },
-				{ key: "ista", points: ["bl", "br"] },
-				{ key: "mosc", points: ["br", "tr"] },
-				{ key: "stpe", points: ["tr", "tl"] }
-			]
-		},
-		{
-			name: "madrid",
-			color: "u",
-			percentFromTop: 0.342,
-			percentFromLeft: 0.405,
-			connectedCityKeys: ["newy", "lond", "pari", "algi", "saop"],
-			quarantineBoundaries: [
-				{ key: "newy", points: ["tl", "bl"] },
-				{ key: "madr", points: ["bl"] },
-				{ key: "saop", points: ["tl", "bl", "br"] },
-				{ key: "madr", points: ["b"] },
-				{ key: "algi", points: ["bl", "br", "tr"] },
-				{ key: "pari", points: ["tr"] },
-				{ key: "lond", points: ["tr", "tl"] }
-			]
-		},
-		{
-			name: "paris",
-			color: "u",
-			percentFromTop: 0.289,
-			percentFromLeft: 0.471,
-			connectedCityKeys: ["lond", "madr", "algi", "mila", "esse"],
-			quarantineBoundaries: [
-				{ key: "lond", points: ["tl"] },
-				{ key: "madr", points: ["bl"] },
-				{ key: "algi", points: ["bl", "br", "tr"] },
-				{ key: "mila", points: ["br", "tr"] },
-				{ key: "esse", points: ["tr"] }
-			]
-		},
-		{
-			name: "milan",
-			color: "u",
-			percentFromTop: 0.270,
-			percentFromLeft: 0.521,
-			connectedCityKeys: ["esse", "pari", "ista"],
-			quarantineBoundaries: [
-				{ key: "esse", points: ["tr", "tl"] },
-				{ key: "pari", points: ["tl", "bl"] },
-				{ key: "ista", points: ["bl", "br", "tr"] }
-			]
-		},
-		{
-			name: "los angeles",
-			color: "y",
-			percentFromTop: 0.438,
-			percentFromLeft: 0.063,
-			connectedCityKeys: ["sydn", "sanf", "mexi", "chic"],
-			quarantineBoundaries: 
-			[
-				...[
-					{ key: "losa-sydn", points: ["b"] },
-					{ key: "losa", points: ["b"] },
-					{ key: "mexi", points: ["bl", "br"] },
-					{ key: "chic", points: ["br", "tr", "tl"] },
-					{ key: "sanf", points: ["tl", "bl"] },
-					{ key: "losa", points: ["l"] },
-					{ key: "losa-sydn", points: ["t"] }
-				],
-				...getPacificTraversalPoints({ direction: "east" }),
-				...[
-					{ key: "bottom-left", points: ["bl"] },
-					{ key: "bottom-right", points: ["br"] },
-					{ key: "sydn-losa", points: ["b"] },
-					{ key: "sydn", points: ["br", "bl", "tl"] },
-					{ key: "sydn-losa", points: ["t"] }
-				],
-				...getPacificTraversalPoints({ direction: "west" })
-			]
-		},
-		{
-			name: "mexico city",
-			color: "y",
-			percentFromTop: 0.475,
-			percentFromLeft: 0.133,
-			connectedCityKeys: ["losa", "lima", "bogo", "miam", "chic"],
-			quarantineBoundaries: [
-				{ key: "losa", points: ["tl", "bl"] },
-				{ key: "lima", points: ["bl", "br"] },
-				{ key: "bogo", points: ["r"] },
-				{ key: "miam", points: ["r", "tr", "tl"] },
-				{ key: "mexi", points: ["tr"] },
-				{ key: "chic", points: ["tr", "tl"] }
-			]
-		},
-		{
-			name: "miami",
-			color: "y",
-			percentFromTop: 0.458,
-			percentFromLeft: 0.219,
-			connectedCityKeys: ["atla", "mexi", "bogo", "wash"],
-			quarantineBoundaries: [
-				{ key: "atla", points: ["tr", "tl"] },
-				{ key: "mexi", points: ["tl", "bl"] },
-				{ key: "bogo", points: ["bl", "br"] },
-				{ key: "wash", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "bogota",
-			color: "y",
-			percentFromTop: 0.566,
-			percentFromLeft: 0.212,
-			connectedCityKeys: ["mexi", "lima", "buen", "saop", "miam"],
-			quarantineBoundaries: [
-				{ key: "mexi", points: ["tl", "bl"] },
-				{ key: "lima", points: ["bl"] },
-				{ key: "buen", points: ["bl", "br"] },
-				{ key: "saop", points: ["br", "tr"] },
-				{ key: "miam", points: ["tr", "tl"] }
-			]
-		},
-		{
-			name: "lima",
-			color: "y",
-			percentFromTop: 0.681,
-			percentFromLeft: 0.185,
-			connectedCityKeys: ["mexi", "bogo", "sant"],
-			quarantineBoundaries: [
-				{ key: "mexi", points: ["tr", "tl", "bl"] },
-				{ key: "sant", points: ["bl", "br"] },
-				{ key: "bogo", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "santiago",
-			color: "y",
-			percentFromTop: 0.799,
-			percentFromLeft: 0.195,
-			connectedCityKeys: ["lima"],
-			quarantineBoundaries: [
-				{ key: "lima", points: ["tr", "tl", "bl"] },
-				{ key: "sant", points: ["bl", "br", "tr"] }
-			]
-		},
-		{
-			name: "buenos aires",
-			color: "y",
-			percentFromTop: 0.777,
-			percentFromLeft: 0.274,
-			connectedCityKeys: ["bogo", "saop"],
-			quarantineBoundaries: [
-				{ key: "bogo", points: ["tr", "tl", "bl"] },
-				{ key: "buen", points: ["bl", "br"] },
-				{ key: "saop", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "sao paulo",
-			color: "y",
-			percentFromTop: 0.698,
-			percentFromLeft: 0.318,
-			connectedCityKeys: ["bogo", "buen", "lago", "madr"],
-			quarantineBoundaries: [
-				{ key: "bogo", points: ["tr", "tl", "bl"] },
-				{ key: "buen", points: ["bl", "br"] },
-				{ key: "saop", points: ["br"] },
-				{ key: "lago", points: ["br", "tr", "tl"] },
-				{ key: "saop", points: ["tr"] },
-				{ key: "madr", points: ["br", "tr", "tl"] },
-				{ key: "saop", points: ["t"] }
-			]
-		},
-		{
-			name: "lagos",
-			color: "y",
-			percentFromTop: 0.547,
-			percentFromLeft: 0.463,
-			connectedCityKeys: ["saop", "kins", "khar"],
-			quarantineBoundaries: [
-				{ key: "lago", points: ["tl"] },
-				{ key: "saop", points: ["tl", "bl", "br"] },
-				{ key: "lago", points: ["b"] },
-				{ key: "kins", points: ["bl", "br"] },
-				{ key: "khar", points: ["br", "tr", "tl"] }
-			]
-		},
-		{
-			name: "khartoum",
-			color: "y",
-			percentFromTop: 0.527,
-			percentFromLeft: 0.559,
-			connectedCityKeys: ["lago", "kins", "joha", "cair"],
-			quarantineBoundaries: [
-				{ key: "cair", points: ["tr", "tl"] },
-				{ key: "lago", points: ["tl", "bl"] },
-				{ key: "kins", points: ["bl"] },
-				{ key: "joha", points: ["bl", "br"] },
-				{ key: "khar", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "kinshasa",
-			color: "y",
-			percentFromTop: 0.620,
-			percentFromLeft: 0.511,
-			connectedCityKeys: ["lago", "khar", "joha"],
-			quarantineBoundaries: [
-				{ key: "lago", points: ["tl", "bl"] },
-				{ key: "joha", points: ["bl", "br"] },
-				{ key: "khar", points: ["r", "tr"] }
-			]
-		},
-		{
-			name: "johannesburg",
-			color: "y",
-			percentFromTop: 0.728,
-			percentFromLeft: 0.553,
-			connectedCityKeys: ["kins", "khar"],
-			quarantineBoundaries: [
-				{ key: "kins", points: ["tl", "bl"] },
-				{ key: "joha", points: ["bl", "br"] },
-				{ key: "khar", points: ["r", "tr", "tl"] }
-			]
-		},
-		{
-			name: "algiers",
-			color: "b",
-			percentFromTop: 0.402,
-			percentFromLeft: 0.487,
-			connectedCityKeys: ["madr", "pari", "ista", "cair"],
-			quarantineBoundaries: [
-				{ key: "pari", points: ["br", "tr", "tl"] },
-				{ key: "madr", points: ["tl", "bl"] },
-				{ key: "algi", points: ["bl"] },
-				{ key: "cair", points: ["bl", "br"] },
-				{ key: "ista", points: ["br", "tr", "tl"] },
-				{ key: "algi", points: ["tr"] }
-			]
-		},
-		{
-			name: "istanbul",
-			color: "b",
-			percentFromTop: 0.331,
-			percentFromLeft: 0.554,
-			connectedCityKeys: ["algi", "mila", "stpe", "mosc", "bagh", "cair"],
-			quarantineBoundaries: [
-				{ key: "mila", points: ["tl"] },
-				{ key: "algi", points: ["tl", "bl"] },
-				{ key: "cair", points: ["bl", "br"] },
-				{ key: "bagh", points: ["br"] },
-				{ key: "mosc", points: ["br", "tr"] },
-				{ key: "stpe", points: ["tr", "tl"] }
-			]
-		},
-		{
-			name: "moscow",
-			color: "b",
-			percentFromTop: 0.270,
-			percentFromLeft: 0.613,
-			connectedCityKeys: ["stpe", "ista", "tehr"],
-			quarantineBoundaries: [
-				{ key: "stpe", points: ["tr", "tl"] },
-				{ key: "ista", points: ["tl", "bl", "br"] },
-				{ key: "tehr", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "cairo",
-			color: "b",
-			percentFromTop: 0.423,
-			percentFromLeft: 0.544,
-			connectedCityKeys: ["algi", "ista", "bagh", "riya", "khar"],
-			quarantineBoundaries: [
-				{ key: "algi", points: ["tl", "bl"] },
-				{ key: "khar", points: ["bl", "br"] },
-				{ key: "riya", points: ["br", "tr"] },
-				{ key: "bagh", points: ["tr"] },
-				{ key: "ista", points: ["tr", "tl"] }
-			]
-		},
-		{
-			name: "baghdad",
-			color: "b",
-			percentFromTop: 0.387,
-			percentFromLeft: 0.606,
-			connectedCityKeys: ["ista", "cair", "riya", "kara", "tehr"],
-			quarantineBoundaries: [
-				{ key: "ista", points: ["tl"] },
-				{ key: "cair", points: ["tl", "bl"] },
-				{ key: "riya", points: ["bl", "br"] },
-				{ key: "kara", points: ["br", "tr"] },
-				{ key: "tehr", points: ["tr"] }
-			]
-		},
-		{
-			name: "tehran",
-			color: "b",
-			percentFromTop: 0.320,
-			percentFromLeft: 0.664,
-			connectedCityKeys: ["mosc", "bagh", "kara", "delh"],
-			quarantineBoundaries: [
-				{ key: "mosc", points: ["tr", "tl"] },
-				{ key: "bagh", points: ["bl"] },
-				{ key: "kara", points: ["b"] },
-				{ key: "delh", points: ["br", "tr"] },
-				{ key: "tehr", points: ["tr"] }
-			]
-		},
-		{
-			name: "riyadh",
-			color: "b",
-			percentFromTop: 0.484,
-			percentFromLeft: 0.616,
-			connectedCityKeys: ["cair", "bagh", "kara"],
-			quarantineBoundaries: [
-				{ key: "bagh", points: ["tr", "tl"] },
-				{ key: "cair", points: ["tl", "bl"] },
-				{ key: "riya", points: ["bl", "br"] },
-				{ key: "kara", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "karachi",
-			color: "b",
-			percentFromTop: 0.422,
-			percentFromLeft: 0.679,
-			connectedCityKeys: ["riya", "bagh", "tehr", "delh", "mumb"],
-			quarantineBoundaries: [
-				{ key: "tehr", points: ["tr", "tl"] },
-				{ key: "bagh", points: ["tl", "bl"] },
-				{ key: "riya", points: ["tl", "bl"] },
-				{ key: "mumb", points: ["bl", "br"] },
-				{ key: "delh", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "delhi",
-			color: "b",
-			percentFromTop: 0.392,
-			percentFromLeft: 0.733,
-			connectedCityKeys: ["tehr", "kara", "mumb", "chen", "kolk"],
-			quarantineBoundaries: [
-				{ key: "tehr", points: ["tr", "tl", "bl"] },
-				{ key: "mumb", points: ["bl"] },
-				{ key: "chen", points: ["bl", "br", "tr"] },
-				{ key: "kolk", points: ["bl", "br", "tr"] }
-			]
-		},
-		{
-			name: "kolkata",
-			color: "b",
-			percentFromTop: 0.418,
-			percentFromLeft: 0.786,
-			connectedCityKeys: ["delh", "chen", "bang", "hong"],
-			quarantineBoundaries: [
-				{ key: "delh", points: ["tr", "tl", "bl"] },
-				{ key: "chen", points: ["bl", "br"] },
-				{ key: "bang", points: ["br"] },
-				{ key: "hong", points: ["br", "tr"] },
-				{ key: "kolk", points: ["tr"] }
-			]
-		},
-		{
-			name: "mumbai",
-			color: "b",
-			percentFromTop: 0.500,
-			percentFromLeft: 0.686,
-			connectedCityKeys: ["kara", "delh", "chen"],
-			quarantineBoundaries: [
-				{ key: "kara", points: ["tl", "bl"] },
-				{ key: "mumb", points: ["bl"] },
-				{ key: "chen", points: ["bl", "br", "tr"] },
-				{ key: "delh", points: ["tr", "tl"] }
-			]
-		},
-		{
-			name: "chennai",
-			color: "b",
-			percentFromTop: 0.557,
-			percentFromLeft: 0.744,
-			connectedCityKeys: ["mumb", "delh", "kolk", "bang", "jaka"],
-			quarantineBoundaries: [
-				{ key: "delh", points: ["tr", "tl"] },
-				{ key: "mumb", points: ["tl", "bl"] },
-				{ key: "jaka", points: ["bl", "br"] },
-				{ key: "bang", points: ["tr"] },
-				{ key: "kolk", points: ["tr"] }
-			]
-		},
-		{
-			name: "beijing",
-			color: "r",
-			percentFromTop: 0.295,
-			percentFromLeft: 0.829,
-			connectedCityKeys: ["seou", "shan"],
-			quarantineBoundaries: [
-				{ key: "beij", points: ["tl"] },
-				{ key: "shan", points: ["bl", "br"] },
-				{ key: "seou", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "seoul",
-			color: "r",
-			percentFromTop: 0.289,
-			percentFromLeft: 0.896,
-			connectedCityKeys: ["beij", "shan", "toky"],
-			quarantineBoundaries: [
-				{ key: "beij", points: ["tl"] },
-				{ key: "shan", points: ["bl", "br"] },
-				{ key: "toky", points: ["br", "tr"] },
-				{ key: "seou", points: ["tr"] }
-			]
-		},
-		{
-			name: "shanghai",
-			color: "r",
-			percentFromTop: 0.370,
-			percentFromLeft: 0.834,
-			connectedCityKeys: ["beij", "seou", "toky", "taip", "hong"],
-			quarantineBoundaries: [
-				{ key: "beij", points: ["tl"] },
-				{ key: "shan", points: ["l"] },
-				{ key: "hong", points: ["bl", "br"] },
-				{ key: "taip", points: ["br", "r"] },
-				{ key: "toky", points: ["b", "br", "tr"] },
-				{ key: "seou", points: ["tr"] }
-			]
-		},
-		{
-			name: "tokyo",
-			color: "r",
-			percentFromTop: 0.332,
-			percentFromLeft: 0.948,
-			connectedCityKeys: ["seou", "shan", "osak", "sanf"],
-			quarantineBoundaries: [
-				...[
-					{ key: "top-right", points: ["tr"] },
-					{ key: "toky-sanf", points: ["t"] },
-					{ key: "toky", points: ["tl"] },
-					{ key: "seou", points: ["tr", "tl"] },
-					{ key: "shan", points: ["tl", "bl", "br"] },
-					{ key: "osak", points: ["bl", "br", "tr"] },
-					{ key: "toky", points: ["br"] },
-					{ key: "toky-sanf", points: ["b"] }
-				],
-				...getPacificTraversalPoints({ direction: "west" }),
-				...[
-					{ key: "sanf-toky", points: ["b"] },
-					{ key: "sanf", points: ["br", "tr"] },
-					{ key: "sanf-toky", points: ["t"] }
-				],
-				...getPacificTraversalPoints({ direction: "east" })
-			]
-		},
-		{
-			name: "bangkok",
-			color: "r",
-			percentFromTop: 0.506,
-			percentFromLeft: 0.797,
-			connectedCityKeys: ["chen", "kolk", "hong", "hoch", "jaka"],
-			quarantineBoundaries: [
-				{ key: "kolk", points: ["tr", "tl"] },
-				{ key: "chen", points: ["tl", "bl"] },
-				{ key: "jaka", points: ["bl", "br"] },
-				{ key: "hoch", points: ["br"] },
-				{ key: "hong", points: ["tr"] }
-			]
-		},
-		{
-			name: "hong kong",
-			color: "r",
-			percentFromTop: 0.460,
-			percentFromLeft: 0.840,
-			connectedCityKeys: ["shan", "taip", "mani", "hoch", "bang", "kolk"],
-			quarantineBoundaries: [
-				{ key: "shan", points: ["tr", "tl"] },
-				{ key: "kolk", points: ["tl", "bl"] },
-				{ key: "bang", points: ["bl"] },
-				{ key: "hoch", points: ["bl"] },
-				{ key: "mani", points: ["br", "tr"] },
-				{ key: "taip", points: ["tr"] }
-			]
-		},
-		{
-			name: "taipei",
-			color: "r",
-			percentFromTop: 0.444,
-			percentFromLeft: 0.900,
-			connectedCityKeys: ["osak", "mani", "hong", "shan"],
-			quarantineBoundaries: [
-				{ key: "shan", points: ["tr", "tl"] },
-				{ key: "hong", points: ["bl"] },
-				{ key: "mani", points: ["bl", "br"] },
-				{ key: "osak", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "osaka",
-			color: "r",
-			percentFromTop: 0.413,
-			percentFromLeft: 0.955,
-			connectedCityKeys: ["toky", "taip"],
-			quarantineBoundaries: [
-				{ key: "toky", points: ["tr", "tl"] },
-				{ key: "taip", points: ["tl", "bl", "br"] },
-				{ key: "osak", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "jakarta",
-			color: "r",
-			percentFromTop: 0.650,
-			percentFromLeft: 0.797,
-			connectedCityKeys: ["chen", "bang", "hoch", "sydn"],
-			quarantineBoundaries: [
-				{ key: "bang", points: ["tr", "tl"] },
-				{ key: "chen", points: ["tl", "bl"] },
-				{ key: "jaka", points: ["bl"] },
-				{ key: "sydn", points: ["bl", "br", "tr"] },
-				{ key: "hoch", points: ["tr"] }
-			]
-		},
-		{
-			name: "ho chi minh city",
-			color: "r",
-			percentFromTop: 0.583,
-			percentFromLeft: 0.843,
-			connectedCityKeys: ["jaka", "bang", "hong", "mani"],
-			quarantineBoundaries: [
-				{ key: "hong", points: ["tr", "tl"] },
-				{ key: "bang", points: ["tl"] },
-				{ key: "jaka", points: ["bl", "br"] },
-				{ key: "mani", points: ["br", "tr"] }
-			]
-		},
-		{
-			name: "manila",
-			color: "r",
-			percentFromTop: 0.576,
-			percentFromLeft: 0.917,
-			connectedCityKeys: ["sydn", "hoch", "hong", "taip", "sanf"],
-			quarantineBoundaries: [
-				...[
-					{ key: "mani-sanf", points: ["t"] },
-					{ key: "mani", points: ["tr"] },
-					{ key: "taip", points: ["tr", "tl"] },
-					{ key: "hong", points: ["tl"] },
-					{ key: "hoch", points: ["bl"] },
-					{ key: "sydn", points: ["bl", "br", "tr"] },
-					{ key: "mani", points: ["br"] },
-					{ key: "mani-sanf", points: ["b"] }
-				],
-				...getPacificTraversalPoints({ direction: "west" }),
-				...[
-					{ key: "sanf-mani", points: ["b"] },
-					{ key: "sanf", points: ["br", "tr"] },
-					{ key: "sanf-mani", points: ["t"] }
-				],
-				...getPacificTraversalPoints({ direction: "east" })
-			]
-		},
-		{
-			name: "sydney",
-			color: "r",
-			percentFromTop: 0.794,
-			percentFromLeft: 0.958,
-			connectedCityKeys: ["jaka", "mani", "losa"],
-			quarantineBoundaries: [
-				...[
-					{ key: "sydn-losa", points: ["t"] },
-					{ key: "sydn", points: ["tr"] },
-					{ key: "mani", points: ["tr", "tl", "bl"] },
-					{ key: "sydn", points: ["tl"] },
-					{ key: "jaka", points: ["tr", "tl", "bl"] },
-					{ key: "sydn", points: ["bl", "br"] },
-					{ key: "sydn-losa", points: ["b"] }
-				],
-				...getPacificTraversalPoints({ direction: "west" }),
-				...[
-					{ key: "losa-sydn", points: ["b"] },
-					{ key: "losa", points: ["br", "tr", "t"] },
-					{ key: "losa-sydn", points: ["t"] }
-				],
-				...getPacificTraversalPoints({ direction: "east" })
-			]
-		},
-	];
-	
-	for (let city of cityInfo)
-	{
-		city.key = city.name.replace(/ /g,'').substring(0,4);
-		data.cities[city.key] = new City(city);
-	}
-})();
 
 // Instantiate event cards
 (function ()
@@ -6292,17 +4714,6 @@ class City
 	for (let card of eventCards)
 		data.eventCards[card[0]] = card[1];
 })();
-
-function updateResearchStationSupplyCount()
-{
-	$("#researchStationSupplyCount").html(getResearchStationSupplyCount());
-}
-
-function getResearchStationSupplyCount()
-{
-	const MAX_RESEARCH_STATION_COUNT = 6;
-	return MAX_RESEARCH_STATION_COUNT - data.researchStationKeys.size;
-}
 
 // given an array of city info, loads any research stations and disease cubes
 function loadCityStates(cityInfoArray)
@@ -6337,7 +4748,7 @@ function loadCityStates(cityInfoArray)
 			for (let n = 0; n < numCubes; n++)
 			{
 				appendNewCubeToBoard(color, city.key);
-				city.incrementCubeCount(color);
+				city.incrementCubeCount(data.diseaseCubeSupplies, color);
 				cubeSupplies[c]--;
 			}
 		}
@@ -6359,7 +4770,7 @@ function queueCluster(cityKey)
 function executePendingClusters(details)
 {
 	for (let cityKey of data.pendingClusters)
-		getCity(cityKey).cluster(details);
+		getCity(cityKey).cluster(data, details);
 	
 	data.pendingClusters.clear();
 }
@@ -6380,13 +4791,13 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 		return;
 	
 	const city = getCity(cityKey),
-		cityOffset = city.getOffset(),
+		cityOffset = city.getOffset(data),
 		cWidth = data.cityWidth,
 		adj = data.boardWidth * 0.003, // slight adjustment needed for $rectB coords
 		$rects = $(".pinpointRect").stop(),
 		$rectA = $rects.first(),
 		$rectB = $rects.last(),
-		duration = getDuration("pinpointCity"),
+		duration = getDuration(data, "pinpointCity"),
 		easing = data.easings.pinpointCity;
 
 	$rects.attr("class", "pinpointRect hidden");
@@ -6476,7 +4887,7 @@ async function resolveOutbreaks(events)
 			
 			updateCubeSupplyCount(color, { addend: -1 });
 			supplyCubeBounceEffect(color);
-			await originCity.clusterDiseaseCubes({ animate: true });
+			await originCity.clusterDiseaseCubes(data, { animate: true });
 		}
 		else
 			$triggerCube = $(`.diseaseCube.${color}.${originCity.key}`).last();
@@ -6537,7 +4948,7 @@ async function resolveOutbreaks(events)
 			else
 				cubesToDisperse.push(appendNewCubeToBoard(color, originCity.key, { outbreakDestinationKey: affectedCity.key, prepareAnimation: true }));
 			
-			affectedCity.incrementCubeCount(color);
+			affectedCity.incrementCubeCount(data.diseaseCubeSupplies, color);
 		}
 		// remove the handled events
 		events = events.filter(e => !(infections.includes(e) || Object.is(outbreakEvent, e)));
@@ -6558,8 +4969,8 @@ async function resolveOutbreaks(events)
 			updateCubeSupplyCount(color, { addend: -numInfected });
 			highlightOutbreakCubes(cubesToDisperse);
 			supplyCubeBounceEffect(color);
-			await originCity.cluster({ animateCubes: true });
-			await sleep(getDuration("longInterval"));
+			await originCity.cluster(data, { animateCubes: true });
+			await sleep(getDuration(data, "longInterval"));
 		}
 
 		if (preventionOccured)
@@ -6588,10 +4999,10 @@ async function resolveOutbreaks(events)
 		}
 
 		if (diseaseCubeLimitExceeded(color)) // defeat -- return early
-			return sleep(getDuration("shortInterval"));
+			return sleep(getDuration(data, "shortInterval"));
 	}
 
-	return sleep(getDuration("shortInterval"));
+	return sleep(getDuration(data, "shortInterval"));
 }
 
 function outbreakTriggerCubeFlash($triggerCube)
@@ -6653,15 +5064,15 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 				$elements: $marker,
 				desiredProperties: {
 					top: (data.boardHeight * topPercentages[outbreakCount]),
-					left: getDimension(leftDimension)
+					left: getDimension(data, leftDimension)
 				},
-				duration: animate ? getDuration("moveMarker") : 0,
+				duration: animate ? getDuration(data, "moveMarker") : 0,
 				easing: data.easings.moveMarker
 			});
 
 			if (animate)
 			{
-				await sleep(getDuration("mediumInterval"));
+				await sleep(getDuration(data, "mediumInterval"));
 
 				if (tooManyOutbreaksOccured()) // defeat -- return early
 				{
@@ -6687,9 +5098,9 @@ function disperseOutbreakCubes(originCityKey, cubesToDisperse)
 			.addClass(destinationKey)
 			.removeAttr("data-destinationKey");
 		
-		getCity(destinationKey).clusterDiseaseCubes({ animate: true });
+		getCity(destinationKey).clusterDiseaseCubes(data, { animate: true });
 	}
-	return sleep(getDuration("cubePlacement"));
+	return sleep(getDuration(data, "cubePlacement"));
 }
 
 function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestinationKey } = {})
@@ -6755,7 +5166,7 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } =
 	const $supplyCube = $(`#${color}SupplyCube`),
 		desiredProperties = $supplyCube.offset(),
 		supplyCubeWidth = $supplyCube.width(),
-		duration = getDuration("cubePlacement") * 0.5;
+		duration = getDuration(data, "cubePlacement") * 0.5;
 
 	desiredProperties.width = supplyCubeWidth;
 	desiredProperties.height = supplyCubeWidth;
@@ -6780,7 +5191,7 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } =
 		supplyCubeBounceEffect(color);
 	}
 
-	return city.clusterDiseaseCubes({ animate: true });
+	return city.clusterDiseaseCubes(data, { animate: true });
 }
 
 function supplyCubeBounceEffect(diseaseColor)
@@ -6815,7 +5226,7 @@ function supplyCubeBounceEffect(diseaseColor)
 				...supplyCubeOffset,
 				...{ width: supplyCubeWidth, height: supplyCubeWidth }
 			},
-			duration: getDuration(400),
+			duration: getDuration(data, 400),
 			easing: "easeOutBounce"
 		});
 
@@ -6958,7 +5369,7 @@ function specialEventAlert({ title, description, eventClass, visibleMs })
 	return new Promise(async resolve =>
 	{
 		const $banner = $("#specialEventBanner"),
-			duration = getDuration("specialEventBannerReveal"),
+			duration = getDuration(data, "specialEventBannerReveal"),
 			easing = data.easings.specialEventBannerReveal;
 		
 		$banner.removeAttr("class").addClass(eventClass)
@@ -7033,7 +5444,7 @@ async function epidemicInfect()
 	disableEventCards();
 
 	const { $epidemic, $btn } = await prepareEpidemicStep(),
-		interval = getDuration("longInterval");
+		interval = getDuration(data, "longInterval");
 
 	highlightEpidemicStep($epidemic, "infect");
 	await buttonClickPromise($btn.html("INFECT").removeClass("btnDisabled"));
@@ -7180,7 +5591,7 @@ async function highlightMarkerTrack(trackName, { off } = {})
 	if (off)
 		$highlighters.addClass("hidden");
 
-	return sleep(getDuration("shortInterval"));
+	return sleep(getDuration(data, "shortInterval"));
 }
 
 function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
@@ -7210,13 +5621,13 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 			desiredProperties: {
 				left: (data.boardWidth * spaceLocations[epidemicCount])
 			},
-			duration: animate ? getDuration("moveMarker") : 0,
+			duration: animate ? getDuration(data, "moveMarker") : 0,
 			easing: data.easings.moveMarker
 		});
 
 		if (animate)
 		{
-			await sleep(getDuration("mediumInterval"));
+			await sleep(getDuration(data, "mediumInterval"));
 			$marker.removeClass("smallGlow");
 			await highlightMarkerTrack(trackName, { off: true });
 		}
@@ -7246,9 +5657,9 @@ async function animateEpidemicIntensify()
 	
 	unbindInfectionDiscardHover();
 	
-	await sleep(getDuration("longInterval"));
+	await sleep(getDuration(data, "longInterval"));
 	await expandInfectionDiscardPile();
-	await sleep(getDuration("longInterval"));
+	await sleep(getDuration(data, "longInterval"));
 	
 	const $cards = $container.children(".infectionCard"),
 		$veil = $container.children("#infDiscardVeil"),
@@ -7293,7 +5704,7 @@ async function animateEpidemicIntensify()
 						left: $container.width()
 					},
 					desiredProperties: {
-						left: getDimension("discardDiseaseIcon")
+						left: getDimension(data, "discardDiseaseIcon")
 					},
 					duration: duration
 				})
@@ -7358,7 +5769,7 @@ async function animateEpidemicIntensify()
 	collapsenfectionDiscardPile();
 	bindInfectionDiscardHover();
 
-	return sleep(getDuration("longInterval"));
+	return sleep(getDuration(data, "longInterval"));
 }
 
 function shuffleAnimation($container, $elements, { numShuffles } = {})
@@ -7381,7 +5792,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 			{
 				$elements,
 				desiredProperties: centerOfContainer,
-				duration: getDuration(500),
+				duration: getDuration(data, 500),
 				easing: easing
 			});
 
@@ -7394,7 +5805,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 				{
 					minDistance,
 					maxDistance,
-					duration: getDuration(100),
+					duration: getDuration(data, 100),
 					easing
 				});
 			
@@ -7402,7 +5813,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 				{
 					$elements,
 					desiredProperties: centerOfContainer,
-					duration: getDuration(100),
+					duration: getDuration(data, 100),
 					easing
 				});
 		}
@@ -7513,10 +5924,10 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 		if (player)
 		{
 			await player.expandPanelIfCollapsed();
-			await sleep(getDuration("shortInterval"));
+			await sleep(getDuration(data, "shortInterval"));
 		}
 		
-		let completionInterval = getDuration("discardPlayerCard");
+		let completionInterval = getDuration(data, "discardPlayerCard");
 		if (player && Array.isArray(cardKeys))
 		{
 			for (let cardKey of cardKeys)
@@ -7561,14 +5972,14 @@ function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 				left: guideOffset.left,
 				width: $container.width() * 0.98
 			},
-			getDuration("discardPlayerCard"),
+			getDuration(data, "discardPlayerCard"),
 			function()
 			{
 				$card.insertAfter($guide)
 					.removeAttr("style");
 			});
 	
-	return sleep(getDuration("discardPlayerCard") * data.playerCardAnimationInterval);
+	return sleep(getDuration(data, "discardPlayerCard") * data.playerCardAnimationInterval);
 }
 
 function isEventCardKey(cardKey)
@@ -7581,13 +5992,13 @@ function isEpidemicKey(cardKey)
 }
 function isCityKey(cardKey)
 {
-	return data.cities.hasOwnProperty(cardKey);
+	return cities.hasOwnProperty(cardKey);
 }
 
 function newInfectionCardTemplate()
 {
-	const fontSize = getDimension("infCardFont"),
-		cityNameTop = getDimension("infCardNameTop");
+	const fontSize = getDimension(data, "infCardFont"),
+		cityNameTop = getDimension(data, "infCardNameTop");
 	
 	return $(`<div class='infectionCard'>
 				<div class='infectionCardContents'>
@@ -7695,7 +6106,7 @@ async function infectionStep()
 		{
 			if (card.preventionCode === data.infectionPreventionCodes.notPrevented)
 			{
-				const interval = getDuration("shortInterval");
+				const interval = getDuration(data, "shortInterval");
 
 				await sleep(interval);
 				await placeDiseaseCubes(card);
@@ -7761,9 +6172,9 @@ function positionAutoTreatCircleComponents($circle, $cureMarker)
 	if (!medic)
 		return false;
 	
-	const circleRadius = getDimension("cityWidth") * 3,
+	const circleRadius = getDimension(data, "cityWidth") * 3,
 		circleDiameter = circleRadius * 2,
-		cityOffset = medic.getLocation().getOffset();
+		cityOffset = medic.getLocation().getOffset(data);
 	
 	$circle = $circle || $(".autoTreatCircle");
 	$cureMarker = $cureMarker || $(".autoTreatCureMarker");
@@ -7807,7 +6218,7 @@ async function medicAutoTreatAnimation()
 		duration: duration
 	});
 
-	await sleep(getDuration("longInterval"));
+	await sleep(getDuration(data, "longInterval"));
 
 	await specialEventAlert(
 	{
@@ -7816,7 +6227,7 @@ async function medicAutoTreatAnimation()
 		eventClass: "medic"
 	});
 
-	await sleep(getDuration("shortInterval"));
+	await sleep(getDuration(data, "shortInterval"));
 
 	const $elements = $circle.add($cureMarker)
 	await animatePromise(
@@ -7877,7 +6288,7 @@ async function quarantineAnimation(cityKey)
 {
 	await showQuarantineArea(1000);
 
-	await sleep(getDuration("mediumInterval"));
+	await sleep(getDuration(data, "mediumInterval"));
 
 	await specialEventAlert(
 	{
@@ -7887,7 +6298,7 @@ async function quarantineAnimation(cityKey)
 		visibleMs: 1500
 	});
 
-	await sleep(getDuration("shortInterval"));
+	await sleep(getDuration(data, "shortInterval"));
 	
 	return hideQuarantineArea();
 }
@@ -8021,7 +6432,7 @@ async function finishInfectionStep()
 		disableEventCards();
 	}
 	else
-		await sleep(getDuration("longInterval"));
+		await sleep(getDuration(data, "longInterval"));
 
 	let $cards = $container.find(".infectionCard");
 	while ($cards.length)
@@ -8034,7 +6445,7 @@ async function finishInfectionStep()
 	{
 		$(".drawnInfectionCard").remove(); // sometimes skipping setup leaves these unremoved.
 		$container.removeAttr("style").addClass("hidden");
-		return sleep(getDuration(500));
+		return sleep(getDuration(data, 500));
 	}
 
 	$container.fadeOut(450);
@@ -8066,8 +6477,8 @@ function getInfectionContainer()
 function getInfectionCardTextStyle()
 {
 	return {
-		"top": getDimension("infDiscardNameTop") + "px",
-		"font-size": getDimension("infDiscardFont") + "px"
+		"top": getDimension(data, "infDiscardNameTop") + "px",
+		"font-size": getDimension(data, "infDiscardFont") + "px"
 	};
 }
 
@@ -8092,7 +6503,7 @@ function discardInfectionCard($card, duration)
 					left: $discardPile.offset().left,
 					top: $discardTitle.offset().top + $discardTitle.height()
 				},
-				getDuration(duration || 125),
+				getDuration(data, duration || 125),
 				function()
 				{
 					$card.insertAfter($discardTitle)
@@ -8102,7 +6513,7 @@ function discardInfectionCard($card, duration)
 						.children(".cityName")
 						.css(getInfectionCardTextStyle());
 						
-					$card.height(getDimension("infDiscardHeight"));
+					$card.height(getDimension(data, "infDiscardHeight"));
 
 					resolve();
 				});
@@ -8114,9 +6525,9 @@ function positionInfectionPanelComponents()
 	const $container = getInfectionContainer().removeAttr("style"),
 		$cards = $container.find(".infectionCard"),
 		$veils = $container.find(".veil"),
-		cardHeight = getDimension("infCardHeight"),
-		cardNameTop = getDimension("infCardNameTop"),
-		cardFontSize = getDimension("infCardFont");
+		cardHeight = getDimension(data, "infCardHeight"),
+		cardNameTop = getDimension(data, "infCardNameTop"),
+		cardFontSize = getDimension(data, "infCardFont");
 	
 	if (currentStepIs("setup"))
 	{
@@ -8134,7 +6545,7 @@ function positionInfectionPanelComponents()
 		const $infGroups = $(".infGroup"),
 			availableHeight = data.boardHeight - $("#setupProcedureContainer").height();
 			
-		$infGroups.height(availableHeight / $infGroups.length - getDimension("infGroupAdj"));
+		$infGroups.height(availableHeight / $infGroups.length - getDimension(data, "infGroupAdj"));
 	}
 	
 	$cards.height(cardHeight);
@@ -8145,7 +6556,7 @@ function positionInfectionPanelComponents()
 			"top": cardNameTop + "px"
 		});
 
-	const veilLeft = getDimension("diseaseIcon");
+	const veilLeft = getDimension(data, "diseaseIcon");
 	$veils.height(cardHeight)
 		.css("left", veilLeft);
 }
@@ -8201,7 +6612,7 @@ function dealInitialInfectionCards()
 			
 			for (let card of group)
 			{
-				await sleep(getDuration("shortInterval"));
+				await sleep(getDuration(data, "shortInterval"));
 				await revealInfectionCard(card);
 				await placeDiseaseCubes(card);
 			}
@@ -8215,7 +6626,7 @@ function dealInitialInfectionCards()
 
 function computeGroupInfRateMargin($groupInfRate)
 {
-	return (data.panelWidth - getDimension("groupInfRateCubeWidth") * $groupInfRate.children().length) / 2;
+	return (data.panelWidth - getDimension(data, "groupInfRateCubeWidth") * $groupInfRate.children().length) / 2;
 }
 
 function showNextGroupInfRate()
@@ -8233,7 +6644,7 @@ function showNextGroupInfRate()
 		{
 			marginLeft: computeGroupInfRateMargin($groupInfRate)
 		},
-		getDuration("shortInterval"),
+		getDuration(data, "shortInterval"),
 		data.easings.revealCard,
 		() => resolve());
 	});
@@ -8244,9 +6655,9 @@ async function dealFaceDownInfGroup(group)
 	for (let card of group)
 	{
 		dealFaceDownInfCard(card.index);
-		await sleep(getDuration("dealCard") * 0.65);
+		await sleep(getDuration(data, "dealCard") * 0.65);
 	}
-	return sleep(getDuration("dealCard") * 0.35);
+	return sleep(getDuration(data, "dealCard") * 0.35);
 }
 
 function dealFaceDownInfCard(elementIndex)
@@ -8274,11 +6685,11 @@ function dealFaceDownInfCard(elementIndex)
 			.attr("z-index", "1")
 			.animate(
 			{
-				width: getDimension("diseaseIcon"),
+				width: getDimension(data, "diseaseIcon"),
 				left: data.boardWidth + 1,
 				top: containerTop
 			},
-			getDuration("dealCard"),
+			getDuration(data, "dealCard"),
 			data.easings.dealCard,
 			function() { resolve() });
 	});
@@ -8295,7 +6706,7 @@ async function revealInfectionCard({ cityKey, index }, { forecasting } = {})
 			$cardback = forecasting ? $(".drawnInfectionCard").eq(index) : $(".drawnInfectionCard").first();
 		
 		// The first $cardback is removed if not forecasting because each one is removed after fading out.
-		$cardback.fadeOut(getDuration("revealInfCard"), function() { $(this).remove() });
+		$cardback.fadeOut(getDuration(data, "revealInfCard"), function() { $(this).remove() });
 		
 		$card.attr("data-key", cityKey)
 			.click(function() { pinpointCityFromCard($card) })
@@ -8306,8 +6717,8 @@ async function revealInfectionCard({ cityKey, index }, { forecasting } = {})
 		
 		setInfectionCardTitleAttribute($card, city);
 		
-		$veil.animate({ left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
-			getDuration("revealInfCard"),
+		$veil.animate({ left: "+=" + getDimension(data, "diseaseIcon", { compliment: true }) },
+			getDuration(data, "revealInfCard"),
 			data.easings.revealCard,
 			() =>
 			{
@@ -8339,11 +6750,11 @@ function placeDiseaseCubes({ cityKey, numCubes = 1 })
 			updateCubeSupplyCount(city.color, { addend: -1 });
 			
 			placeDiseaseCube(city, cubeSupplyOffset);
-			await sleep(getDuration("cubePlacement") * 0.45);
+			await sleep(getDuration(data, "cubePlacement") * 0.45);
 		}
 		
 		// let the last cube animation finish completely before clustering the city
-		await sleep(getDuration("cubePlacement") * 0.6);
+		await sleep(getDuration(data, "cubePlacement") * 0.6);
 		
 		if (data.fastForwarding)
 			queueCluster(cityKey);
@@ -8359,12 +6770,12 @@ function placeDiseaseCube(city, cubeSupplyOffset)
 		appendNewCubeToBoard(city.color, city.key, { prepareAnimation: true })
 			.offset(cubeSupplyOffset)
 		
-		city.incrementCubeCount();
+		city.incrementCubeCount(data.diseaseCubeSupplies);
 
 		if (!data.fastForwarding)
 		{
 			supplyCubeBounceEffect(city.color);
-			await city.clusterDiseaseCubes({ animate: true });
+			await city.clusterDiseaseCubes(data, { animate: true });
 		}
 		
 		resolve();
@@ -8597,7 +7008,7 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 		const $cureMarker = newCureMarker(diseaseColor, diseaseStatus, { isForReveal: true });
 
 		$cureMarker.css("opacity", 0.1)
-			.animate({ opacity: 1 }, getDuration("specialEventBannerReveal") * 8, "easeOutQuad");
+			.animate({ opacity: 1 }, getDuration(data, "specialEventBannerReveal") * 8, "easeOutQuad");
 
 		let description = "";
 		if (data.cures.remaining > 0)
@@ -8630,7 +7041,7 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 				...{ width: $cureMarker.width() }
 			},
 			desiredProperties: getCureMarkerDesiredProperties(diseaseColor),
-			duration: getDuration("cureMarkerAnimation"),
+			duration: getDuration(data, "cureMarkerAnimation"),
 			easing: data.easings.cureMarkerAnimation
 		});
 
@@ -8896,7 +7307,8 @@ async function setup()
 	loadInfectionDiscards(infectionDiscards);
 	loadPlayerCards(playerCards);
 
-	getActivePlayer().getLocation().setPawnIndices();
+	const activePlayer = getActivePlayer()
+	activePlayer.getLocation().setPawnIndices(activePlayer);
 	await resizeAll();
 
 	// Delay clustering to ensure cluster accuracy.
@@ -8956,10 +7368,10 @@ async function animateRoleDetermination()
 	for (let slotMachine of slotMachines)
 	{
 		slotMachine.pull();
-		await sleep(getDuration(400));
+		await sleep(getDuration(data, 400));
 	}
 
-	const DOUBLE_SLOT_MACHINE_DURATION = getDuration(slotMachines[0].duration * 2);
+	const DOUBLE_SLOT_MACHINE_DURATION = getDuration(data, slotMachines[0].duration * 2);
 	await Promise.race([
 		sleep(DOUBLE_SLOT_MACHINE_DURATION),
 		detectSkipping(DOUBLE_SLOT_MACHINE_DURATION)
@@ -9211,7 +7623,7 @@ class RoleSlotMachine
 		{
 			$elements: $role,
 			desiredProperties: { top: "-=" + (this.optionHeight * this.MIDDLE_OPTION_INDEX) },
-			duration: getDuration(600),
+			duration: getDuration(data, 600),
 			easing: "easeOutBounce"
 		});
 
@@ -9244,7 +7656,7 @@ async function animateNewGameSetup()
 			placePawnsInAtlanta,
 			placeResearchStationInAtlanta
 		],
-		interval = getDuration("shortInterval");
+		interval = getDuration(data, "shortInterval");
 	
 	$("#skipSetupButtons").removeClass("hidden");
 	bindBtnSkipSetupStepClick();
@@ -9253,9 +7665,9 @@ async function animateNewGameSetup()
 	for (let step of setupSteps)
 	{
 		highlightNextSetupStep();
-		await sleep(getDuration(interval));
+		await sleep(getDuration(data, interval));
 		await step();
-		await sleep(getDuration(interval))
+		await sleep(getDuration(data, interval))
 	}
 	
 	beginGame();
@@ -9323,26 +7735,26 @@ async function beginGame()
 
 	await Promise.all([
 		clusterAll(),
-		sleep(getDuration("longInterval"))
+		sleep(getDuration(data, "longInterval"))
 	]);
 
 	await animatePromise(
 	{
 		$elements: $setupProcedureContainer,
 		desiredProperties: { height: 0 },
-		duration: getDuration(400)
+		duration: getDuration(data, 400)
 	});
 
 	$setupProcedureContainer.add("#setupContainer").remove();
 
 	const $containersToShow = $("#turnProcedureContainer, #indicatorContainer");
-	$containersToShow.slideDown(getDuration(400), function()
+	$containersToShow.slideDown(getDuration(data, 400), function()
 	{
 		unhide($containersToShow);
 		bindRoleCardHoverEvents();
 		bindPawnEvents();
 		data.currentStep.next();
-		$("#actionsContainer").slideDown(getDuration(400), function()
+		$("#actionsContainer").slideDown(getDuration(data, 400), function()
 		{
 			unhide($(this));
 			if (data.skippingSetup) doneSkippingSetup();
@@ -9374,7 +7786,7 @@ function animatePreparePlayerDeck()
 		{
 			$elements: $container.children("h4"),
 			desiredProperties: { opacity: 0 },
-			duration: getDuration("longInterval")
+			duration: getDuration(data, "longInterval")
 		});
 	
 		const $divs = $container.children("div"),
@@ -9417,9 +7829,9 @@ async function showEpidemicsToShuffle($container)
 		$elements: $cardbacks,
 		initialProperties: { opacity: 0 },
 		desiredProperties: { opacity: 1 },
-		duration: getDuration("revealCard")
+		duration: getDuration(data, "revealCard")
 	});
-	await sleep(getDuration("mediumInterval"));
+	await sleep(getDuration(data, "mediumInterval"));
 	$cardbacks.remove();
 	
 	return animatePromise(
@@ -9427,7 +7839,7 @@ async function showEpidemicsToShuffle($container)
 		$elements: $epidemics.removeClass("hidden"),
 		initialProperties: { width: 0 },
 		desiredProperties: { width: epidemicWidth },
-		duration: getDuration("revealCard"),
+		duration: getDuration(data, "revealCard"),
 		easing
 	});
 }
@@ -9474,7 +7886,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 			$elements: $cardback.appendTo($divs.eq(divIdx)),
 			initialProperties,
 			desiredProperties: desiredProps[divIdx],
-			duration: getDuration("dealCard"),
+			duration: getDuration(data, "dealCard"),
 			easing
 		});
 
@@ -9484,7 +7896,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 			setPlayerDeckImgSize({ size: getMaxPlayerDeckImgSize() - data.numEpidemics });
 		}
 
-		await sleep(getDuration("dealCard") / 6);
+		await sleep(getDuration(data, "dealCard") / 6);
 
 		if (++divIdx === $divs.length)
 			divIdx = 0;
@@ -9493,7 +7905,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 
 function getInitialPlayerDeckSize({ includeEpidemics } = {})
 {
-	let deckSize = Object.keys(data.cities).length + Object.keys(data.eventCards).length;
+	let deckSize = Object.keys(cities).length + Object.keys(data.eventCards).length;
 
 	if (includeEpidemics)
 		deckSize += data.numEpidemics;
@@ -9525,7 +7937,7 @@ function shuffleEpidemicIntoPile($div)
 		{
 			$elements: $epidemic,
 			desiredProperties: { width: 0 },
-			duration: getDuration("dealCard"),
+			duration: getDuration(data, "dealCard"),
 			easing
 		});
 
@@ -9537,7 +7949,7 @@ function shuffleEpidemicIntoPile($div)
 			$elements: $epidemicCardback,
 			initialProperties: { ...{ position: "absolute"}, ...{ initialEpidemicOffset } },
 			desiredProperties: { top: $cardbacks.last().offset().top },
-			duration: getDuration("dealCard") / 2,
+			duration: getDuration(data, "dealCard") / 2,
 			easing
 		});
 
@@ -9561,7 +7973,7 @@ function placePileOntoPlayerDeck($div, deckPropertes)
 		{
 			$elements: $pile,
 			desiredProperties: deckPropertes,
-			duration: getDuration("dealCard"), 
+			duration: getDuration(data, "dealCard"), 
 			easing: data.easings.dealCard
 		});
 
@@ -9669,14 +8081,14 @@ async function placeResearchStationInAtlanta()
 			$cdcBlurb = $("#setupContainer").children("h4");
 
 		pinpointCity(ATLANTA_KEY);
-		await data.cities[ATLANTA_KEY].buildResearchStation({ animate: true });
-		await sleep(getDuration("longInterval"));
+		await cities[ATLANTA_KEY].buildResearchStation({ animate: true });
+		await sleep(getDuration(data, "longInterval"));
 		
 		await animatePromise(
 		{
 			$elements: $cdcBlurb,
 			desiredProperties: { opacity: 0 },
-			duration: getDuration(400)
+			duration: getDuration(data, 400)
 		});
 		$cdcBlurb.remove();
 
@@ -9704,7 +8116,7 @@ function placePawnsInAtlanta()
 			$elements: $cdcBlurb.prependTo("#setupContainer"),
 			initialProperties: { opacity: 0 },
 			desiredProperties: { opacity: 1 },
-			duration: getDuration(400)
+			duration: getDuration(data, 400)
 		});
 		pinpointCity(ATLANTA_KEY);
 	
@@ -9734,12 +8146,12 @@ function placePawnsInAtlanta()
 				$elements: $pawn,
 				initialProperties: initialOffset,
 				desiredProperties: pawnOffsetInAtlanta,
-				duration: getDuration(400),
+				duration: getDuration(data, 400),
 				easing: "easeInQuart"
 			});
 		}
 	
-		await sleep(getDuration(400));
+		await sleep(getDuration(data, 400));
 		finishedSetupStep();
 		resolve();
 	});
@@ -9749,12 +8161,12 @@ function animateDetermineTurnOrder()
 {
 	return new Promise(async resolve =>
 	{
-		const interval = getDuration("shortInterval");
+		const interval = getDuration(data, "shortInterval");
 	
 		await showStartingHandPopulations();
-		await sleep(getDuration(interval));
+		await sleep(getDuration(data, interval));
 		data.turnOrder = await showTurnOrder();
-		await sleep(getDuration(interval));
+		await sleep(getDuration(data, interval));
 		await arrangePlayerPanels();
 	
 		$("#roleSetupContainer").addClass("hidden");
@@ -9772,7 +8184,7 @@ async function arrangePlayerPanels()
 	for (let rID of data.turnOrder)
 		await transformIntoPlayerPanel($roleContainers.filter(`[data-role='${rID}']`));
 	
-	return sleep(getDuration(500));
+	return sleep(getDuration(data, 500));
 }
 
 async function transformIntoPlayerPanel($roleContainer)
@@ -9816,7 +8228,7 @@ async function transformIntoPlayerPanel($roleContainer)
 		$elements: $roleContainer.appendTo($("#rightPanel")),
 		initialProperties,
 		desiredProperties,
-		duration: getDuration(500),
+		duration: getDuration(data, 500),
 		easing: "easeInOutQuint"
 	});
 
@@ -9860,9 +8272,9 @@ function showTurnOrder()
 				$elements: $rank,
 				initialProperties: { opacity: 0.1 },
 				desiredProperties: { opacity: 1 },
-				duration: getDuration(500)
+				duration: getDuration(data, 500)
 			});
-			await sleep(getDuration(500));
+			await sleep(getDuration(data, 500));
 		}
 		resolve(turnOrder);
 	});
@@ -9908,7 +8320,7 @@ function showStartingHandPopulations()
 	{
 		$elements: $cards,
 		desiredProperties: { height: expandedCardHeight },
-		duration: getDuration(400),
+		duration: getDuration(data, 400),
 		easing: "easeInOutQuad"
 	});
 }
@@ -9949,10 +8361,10 @@ function animateInitialDeal()
 			$roleContainers = $("#roleSetupContainer").find(".roleContainer");
 			
 		await dealFaceDownStartingHands(startingHands, $roleContainers);
-		await sleep(getDuration("mediumInterval"));
+		await sleep(getDuration(data, "mediumInterval"));
 		await revealStartingHands(startingHands, $roleContainers);
 	
-		await sleep(getDuration("longInterval"));
+		await sleep(getDuration(data, "longInterval"));
 		finishedSetupStep();
 		resolve();
 	});
@@ -9965,7 +8377,7 @@ async function dealFaceDownStartingHands(startingHands, $roleContainers)
 		deckOffset = $("#imgPlayerDeck").offset(),
 		CARD_MARGIN_BOTTOM = 4,
 		finalCardbackWidth = data.STARTING_HAND_CARD_HEIGHT - CARD_MARGIN_BOTTOM,
-		interval = getDuration("dealCard") * 0.4;
+		interval = getDuration(data, "dealCard") * 0.4;
 
 	await makeRoomForStartingHands(startingHandSize, $roleContainers);
 
@@ -9975,7 +8387,7 @@ async function dealFaceDownStartingHands(startingHands, $roleContainers)
 	while (cardsDealt < numCardsToDeal)
 	{
 		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), deckOffset, { finalCardbackWidth, zIndex });
-		await sleep(getDuration(interval));
+		await sleep(getDuration(data, interval));
 		
 		cardsDealt++;
 		if (roleIndex === $roleContainers.length - 1)
@@ -10020,7 +8432,7 @@ function makeRoomForStartingHands(startingHandSize, $roleContainers)
 		$elements: $roleContainers,
 		initialProperties: { height: initialHeight },
 		desiredProperties: { height: requiredHeight },
-		duration: getDuration(400),
+		duration: getDuration(data, 400),
 		easing: "easeOutQuad"
 	});
 }
@@ -10092,7 +8504,7 @@ function expandInfectionDiscardPile()
 				$container
 					.css({ height: panelHeight })
 					.animate({ height: expandedHeight + 2 },
-						getDuration("discardPileExpand"),
+						getDuration(data, "discardPileExpand"),
 						function() { resolve(); });
 			}
 		});
@@ -10110,7 +8522,7 @@ function collapsenfectionDiscardPile()
 					scrollTop: 0,
 					height: $("#topPanel").height()
 				},
-				getDuration("discardPileCollapse"),
+				getDuration(data, "discardPileCollapse"),
 				function() { resolve(); });
 		});
 }
@@ -10199,7 +8611,7 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 					top: data.boardHeight - expandedPileHeight,
 					scrollTop: showRemovedCardsContainer ? document.getElementById("playerDiscard").scrollHeight : 0
 				},
-				getDuration("discardPileExpand"),
+				getDuration(data, "discardPileExpand"),
 				function() { resolve() });
 		}
 	});
@@ -10233,7 +8645,7 @@ function collapsePlayerDiscardPile()
 				height: data.topPanelHeight,
 				top: data.boardHeight - data.topPanelHeight,
 				zIndex: 7
-			}, getDuration("discardPileCollapse"),
+			}, getDuration(data, "discardPileCollapse"),
 			function()
 			{
 				$discardPile.children("#removedPlayerCards")

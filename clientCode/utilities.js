@@ -10,6 +10,22 @@ function sleep(ms)
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function getDuration({ skipping, durations }, durationNameOrMs)
+{
+	if (skipping)
+		return 0;
+	
+	if (isNaN(durationNameOrMs))
+		return durations[durationNameOrMs];
+	
+	return durationNameOrMs;
+}
+
+function setDuration({ durations }, durationName, ms)
+{
+	durations[durationName] = ms;
+}
+
 async function delayExecution(fn, delayMs)
 {
 	await sleep(delayMs);
@@ -159,6 +175,18 @@ function makeElementsSquare(cssSelector)
 	$elements.height($elements.first().width());
 }
 
+function getColorClass($element)
+{
+	const colors = ["y", "r", "u", "b"],
+		classes = $element.attr("class").split(" ");
+
+	for (let c of classes)
+		if (colors.includes(c))
+			return c;
+
+	return false;
+}
+
 function removeWhitespace(string)
 {
 	return string.replace(/ /g,"");
@@ -260,6 +288,28 @@ function getHorizontalOverflow($element)
 {
 	const element = document.getElementById($element.attr("id"));
 	return element.scrollWidth - element.clientWidth;
+}
+
+// Facilitates responsiveness where simple css rules fail
+// Returns a dimension value calculated using gameData.sizeRatios
+function getDimension(gameData, dimension,
+	{
+		compliment,
+		getFactor,
+		format
+	} = {})
+{
+	const ratio = gameData.sizeRatios[dimension],
+		base = gameData[ratio[0]]; // some value that is updated on resize events
+	let factor = compliment ? 1 - ratio[1] : ratio[1]; // the ratio to the base value, or optionally the compliment of that ratio
+	
+	if (format == "percent")
+		factor *= 100;
+	
+	if (getFactor)
+		return factor;
+	
+	return Math.round(base * factor);
 }
 
 function distanceBetweenPoints(pointA, pointB)
