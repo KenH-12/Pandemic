@@ -16,7 +16,8 @@ import Event, {
 	DirectFlight,
 	CharterFlight,
 	ShuttleFlight,
-	BuildResearchStation
+	BuildResearchStation,
+	TreatDisease
 } from "./event.js";
 
 $(function(){
@@ -140,6 +141,8 @@ function parseEvents(events)
 					parsedEvents.push(new ShuttleFlight(e, cities));
 				else if (e.code === eventTypes.buildResearchStation.code)
 					parsedEvents.push(new BuildResearchStation(e, cities));
+				else if (e.code === eventTypes.treatDisease.code)
+					parsedEvents.push(new TreatDisease(e, cities));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -882,7 +885,8 @@ function showEventIconDetails($icon, event)
 									|| event instanceof DirectFlight
 									|| event instanceof CharterFlight
 									|| event instanceof ShuttleFlight
-									|| event instanceof BuildResearchStation ? event.getDetails() : eventType.name}
+									|| event instanceof BuildResearchStation
+									|| event instanceof TreatDisease ? event.getDetails() : eventType.name}
 									<div class='eventDetailsArrow'></div>
 								</div>`).appendTo("#boardContainer"),
 		containerHeight = $detailsContainer.height(),
@@ -1312,7 +1316,7 @@ const actionInterfacePopulator = {
 				actionInterfacePopulator.appendSpecialAbilityRule(eventTypes.treatDisease);
 			
 			for (let color of diseaseColorOptions)
-				$actionInterface.append(newDiseaseCubeElement(color));
+				$actionInterface.append(newDiseaseCubeElement({ color }));
 
 			const $cubes = $(`.${city.key}.diseaseCube`);
 			$actionInterface.children(".diseaseCube")
@@ -5104,7 +5108,7 @@ function disperseOutbreakCubes(originCityKey, cubesToDisperse)
 
 function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestinationKey } = {})
 {
-	const $newCube = newDiseaseCubeElement(color, cityKey)
+	const $newCube = newDiseaseCubeElement({ color, cityKey })
 		.appendTo("#boardContainer");
 	
 	if (outbreakDestinationKey)
@@ -5123,24 +5127,6 @@ function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestin
 	}
 	
 	return $newCube;
-}
-
-function newDiseaseCubeElement(color, cityKey)
-{
-	const $diseaseCube =  $(`<div class='diseaseCube'>
-								<div class='cubeBackground'></div>
-								<div class='cubeTop'></div>
-								<div class='cubeLeft'></div>
-								<div class='cubeRight'></div>
-							</div>`);
-	
-	if (color)
-		$diseaseCube.addClass(color);
-	
-	if (cityKey)
-		$diseaseCube.addClass(cityKey);
-	
-	return $diseaseCube;
 }
 
 async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } = {})

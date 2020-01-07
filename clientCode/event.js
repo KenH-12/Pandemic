@@ -476,7 +476,6 @@ class BuildResearchStation extends Event
 
     getDetails()
     {
-		log(this.player.role.toUpperCase());
 		let discarded;
 		if (this.player.role === "Operations Expert")
 			discarded = `<p>[discard not required]</p>`;
@@ -487,6 +486,31 @@ class BuildResearchStation extends Event
 				<p>Role: ${this.player.newRoleTag()}</p>
 				<p>Location: ${this.city.name}</p>
 				${discarded}`;
+    }
+}
+
+class TreatDisease extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.city = cities[this.cityKey];
+		this.numCubesRemoved = this.prevCubeCount - this.newCubeCount;
+    }
+
+    getDetails()
+    {
+		let details = `<p class='title'>TREAT DISEASE</p>
+						<p>Role: ${this.player.newRoleTag()}</p>
+						<p>Location: ${this.city.name}</p>
+						<span class='cubesRemoved'><span>Removed: </span>`;
+		
+		for (let i = 0; i < this.numCubesRemoved; i++)
+			details += newDiseaseCubeElement({ color: this.diseaseColor, asJqueryObject: false });
+		
+		details += "</span>";
+		
+		return details;
     }
 }
 
@@ -511,5 +535,6 @@ export {
 	DirectFlight,
 	CharterFlight,
 	ShuttleFlight,
-	BuildResearchStation
+	BuildResearchStation,
+	TreatDisease
 }

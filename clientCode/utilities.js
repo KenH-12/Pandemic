@@ -439,3 +439,19 @@ function getClipPathPolygonFromPoints(containerWidth, containerHeight, points)
 
 	return clipPath;
 }
+
+function newDiseaseCubeElement({ color, cityKey, asJqueryObject = true } = {})
+{
+	let cssClasses = "diseaseCube";
+	if (color) cssClasses += ` ${color}`;
+	if (cityKey) cssClasses += ` ${cityKey}`;
+	
+	const diseaseCubeHtml = `<div class='${cssClasses}'>
+								<div class='cubeBackground'></div>
+								<div class='cubeTop'></div>
+								<div class='cubeLeft'></div>
+								<div class='cubeRight'></div>
+							</div>`;
+	
+	return asJqueryObject ? $(diseaseCubeHtml) : diseaseCubeHtml;
+}

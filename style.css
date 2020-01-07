@@ -328,6 +328,14 @@ span.r {color: #ef282a; background: none}
 	border-bottom: 1px solid #fff;
 	margin: 2px 0;
 }
+.eventDetails .diseaseCube
+{
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-right: 3px;
+}
+.eventDetails .cubesRemoved > * { vertical-align: middle }
 
 .eventDetailsArrow
 {
