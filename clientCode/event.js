@@ -391,10 +391,70 @@ class DriveFerry extends Event
 
     getDetails()
     {
-        return `<p class='title'>Drive/Ferry</p>
-                <p>${this.origin.name}</p>
-                to
-                <p>${this.destination.name}</p>`;
+        return `<p class='title'>DRIVE/FERRY</p>
+                <p>${this.origin.name} to ${this.destination.name}</p>`;
+    }
+}
+
+class DirectFlight extends Event
+{
+	constructor(event, cities)
+    {
+        super(event);
+        this.origin = cities[this.originKey];
+        this.destination = cities[this.destinationKey];
+    }
+
+    getDetails()
+    {
+		const {
+			name: destinationName,
+			color: destinationColor
+		} = this.destination;
+
+		return `<p class='title'>DIRECT FLIGHT</p>
+                <p>${this.origin.name} to ${destinationName}</p>
+				<p>Discarded:</p>
+				<div class='playerCard ${destinationColor}'>${destinationName.toUpperCase()}</div>`;
+    }
+}
+
+class CharterFlight extends Event
+{
+	constructor(event, cities)
+    {
+        super(event);
+        this.origin = cities[this.originKey];
+        this.destination = cities[this.destinationKey];
+    }
+
+    getDetails()
+    {
+		const {
+			name: originName,
+			color: originColor
+		} = this.origin;
+
+		return `<p class='title'>DIRECT FLIGHT</p>
+                <p>${originName} to ${this.destination.name}</p>
+				<p>Discarded:</p>
+				<div class='playerCard ${originColor}'>${originName.toUpperCase()}</div>`;
+    }
+}
+
+class ShuttleFlight extends Event
+{
+	constructor(event, cities)
+    {
+        super(event);
+        this.origin = cities[this.originKey];
+        this.destination = cities[this.destinationKey];
+    }
+
+    getDetails()
+    {
+		return `<p class='title'>SHUTTLE FLIGHT</p>
+                <p>${this.origin.name} to ${this.destination.name}</p>`;
     }
 }
 
@@ -404,7 +464,10 @@ function getEventType(eventCode)
 }
 
 export {
-    eventTypes,
-    DriveFerry,
-    getEventType
+	eventTypes,
+	getEventType,
+	DriveFerry,
+	DirectFlight,
+	CharterFlight,
+	ShuttleFlight
 }

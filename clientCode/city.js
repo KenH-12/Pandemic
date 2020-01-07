@@ -87,7 +87,7 @@ export default class City
 	}
 	
 	// Puts a research station on this city.
-	buildResearchStation({ animate, isGovernmentGrant } = {})
+	buildResearchStation(gameData, { animate, isGovernmentGrant } = {})
 	{
 		let $rs,
 			stationInitialOffset = false;

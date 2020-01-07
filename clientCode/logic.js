@@ -1,7 +1,21 @@
 "use strict";
 
-import { cities, getCity, getPacificPath } from "./city.js";
-import Event, { eventTypes, DriveFerry, getEventType } from "./event.js";
+import {
+	cities,
+	getCity,
+	researchStationKeys,
+	updateResearchStationSupplyCount,
+    getResearchStationSupplyCount,
+	getPacificPath
+} from "./city.js";
+import Event, {
+	eventTypes,
+	getEventType,
+	DriveFerry,
+	DirectFlight,
+	CharterFlight,
+	ShuttleFlight
+} from "./event.js";
 
 $(function(){
 const data =
@@ -116,6 +130,12 @@ function parseEvents(events)
 				
 				if (e.code === eventTypes.driveFerry.code)
 					parsedEvents.push(new DriveFerry(e, cities));
+				else if (e.code === eventTypes.directFlight.code)
+					parsedEvents.push(new DirectFlight(e, cities));
+				else if (e.code === eventTypes.charterFlight.code)
+					parsedEvents.push(new CharterFlight(e, cities));
+				else if (e.code === eventTypes.shuttleFlight.code)
+					parsedEvents.push(new ShuttleFlight(e, cities));
 				else
 					parsedEvents.push(new Event(e));
 			}
@@ -883,7 +903,10 @@ function showEventIconDetails($icon, event)
 	const eventType = getEventType(event.code),
 		$eventHistory = $("#eventHistory"),
 		$detailsContainer = $(`<div class='eventDetails'>
-									${event instanceof DriveFerry ? event.getDetails() : eventType.name}
+									${event instanceof DriveFerry
+									|| event instanceof DirectFlight
+									|| event instanceof CharterFlight
+									|| event instanceof ShuttleFlight ? event.getDetails() : eventType.name}
 									<div class='eventDetailsArrow'></div>
 								</div>`).appendTo("#boardContainer"),
 		containerHeight = $detailsContainer.height(),
@@ -2110,7 +2133,7 @@ async function airlift(playerToAirlift, destination)
 	
 	await discardOrRemoveEventCard(events.shift());
 
-	setDuration("pawnAnimation", 1000);
+	setDuration(data, "pawnAnimation", 1000);
 	await playerToAirlift.updateLocation(destination);
 
 	// If any events are left after shifting the airliftEvent, they are auto-treat disease events.
@@ -2310,7 +2333,7 @@ async function governmentGrant(targetCity, relocationKey)
 		hideTravelPathArrow();
 	}
 	else
-		await targetCity.buildResearchStation({ animate: true, isGovernmentGrant: true });
+		await targetCity.buildResearchStation(data, { animate: true, isGovernmentGrant: true });
 	
 	resumeCurrentStep();
 }
@@ -2861,7 +2884,7 @@ async function buildResearchStation(relocationKey)
 		hideTravelPathArrow();
 	}
 	else
-		await city.buildResearchStation({ animate: true });
+		await city.buildResearchStation(data, { animate: true });
 	
 	proceed();
 }
@@ -2954,7 +2977,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		log("events: ", events);
 		await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
-		setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
+		setDuration(data, "pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
 		await player.updateLocation(destination);
 
 		if (events.length > 1)
@@ -4737,7 +4760,7 @@ function loadCityStates(cityInfoArray)
 		
 		// place the research station if it has one
 		if (cityInfo.researchStation == "1")
-			city.buildResearchStation();
+			city.buildResearchStation(data);
 		
 		// place disease cubes on the city if it has any
 		for (let c = 0; c < colors.length; c++)
@@ -8081,7 +8104,7 @@ async function placeResearchStationInAtlanta()
 			$cdcBlurb = $("#setupContainer").children("h4");
 
 		pinpointCity(ATLANTA_KEY);
-		await cities[ATLANTA_KEY].buildResearchStation({ animate: true });
+		await cities[ATLANTA_KEY].buildResearchStation(data, { animate: true });
 		await sleep(getDuration(data, "longInterval"));
 		
 		await animatePromise(
