@@ -17,7 +17,8 @@ import Event, {
 	CharterFlight,
 	ShuttleFlight,
 	BuildResearchStation,
-	TreatDisease
+	TreatDisease,
+	ShareKnowledge
 } from "./event.js";
 
 $(function(){
@@ -143,6 +144,8 @@ function parseEvents(events)
 					parsedEvents.push(new BuildResearchStation(e, cities));
 				else if (e.code === eventTypes.treatDisease.code)
 					parsedEvents.push(new TreatDisease(e, cities));
+				else if (e.code === eventTypes.shareKnowledge.code)
+					parsedEvents.push(new ShareKnowledge(e, cities));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -886,7 +889,8 @@ function showEventIconDetails($icon, event)
 									|| event instanceof CharterFlight
 									|| event instanceof ShuttleFlight
 									|| event instanceof BuildResearchStation
-									|| event instanceof TreatDisease ? event.getDetails() : eventType.name}
+									|| event instanceof TreatDisease
+									|| event instanceof ShareKnowledge ? event.getDetails() : eventType.name}
 									<div class='eventDetailsArrow'></div>
 								</div>`).appendTo("#boardContainer"),
 		containerHeight = $detailsContainer.height(),

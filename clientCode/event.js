@@ -72,7 +72,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"The other player must also be in the city with you."
 		],
 		actionPathName: "shareKnowledge",
-		propertyNames: ["cardKey", "giverRoleID", "recipientRoleID"],
+		propertyNames: ["cardKey", "giverRoleID", "receiverRoleID"],
 		relatedRoleName: "Researcher",
 		relatedRoleRule: "The Researcher may <i>give</i> a City card without needing to be in the city that matches the card."
 	},
@@ -514,6 +514,24 @@ class TreatDisease extends Event
     }
 }
 
+class ShareKnowledge extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.card = cities[this.cardKey];
+    }
+
+    getDetails()
+    {
+		return `<p class='title'>SHARE KNOWLEDGE</p>
+				<p>Giver: ${this.giver.newRoleTag()}</p>
+				<p>Receiver: ${this.receiver.newRoleTag()}</p>
+				<p>Shared Card: </p>
+				<div class='playerCard ${this.card.color}'>${this.card.name.toUpperCase()}</div>`;
+    }
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
@@ -523,8 +541,18 @@ function getEventType(eventCode)
 function attachPlayersToEvents(players, events)
 {
 	for (let event of events)
+	{
 		if (players.hasOwnProperty(event.role))
+		{
 			event.player = players[event.role];
+
+			if (event instanceof ShareKnowledge)
+			{
+				event.giver = players[event.giverRoleID];
+				event.receiver = players[event.receiverRoleID];
+			}
+		}
+	}
 }
 
 export {
@@ -536,5 +564,6 @@ export {
 	CharterFlight,
 	ShuttleFlight,
 	BuildResearchStation,
-	TreatDisease
+	TreatDisease,
+	ShareKnowledge
 }
