@@ -57,7 +57,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "",
 		actionPathName: "buildResearchStation",
-		propertyNames: ["originKey", "destinationKey"],
+		propertyNames: ["cityKey", "relocationKey"],
 		relatedRoleName: "Operations Expert",
 		relatedRoleRule: "The Operations Expert can do this action without discarding."
 	},
@@ -391,8 +391,10 @@ class DriveFerry extends Event
 
     getDetails()
     {
-        return `<p class='title'>DRIVE/FERRY</p>
-                <p>${this.origin.name} to ${this.destination.name}</p>`;
+        return `<p class='title'>DRIVE / FERRY</p>
+				<p>Role: ${this.player.newRoleTag()}</p>
+				<p>Origin: ${this.origin.name}</p>
+				<p>Destination: ${this.destination.name}</p>`;
     }
 }
 
@@ -413,7 +415,9 @@ class DirectFlight extends Event
 		} = this.destination;
 
 		return `<p class='title'>DIRECT FLIGHT</p>
-                <p>${this.origin.name} to ${destinationName}</p>
+				<p>Role: ${this.player.newRoleTag()}</p>
+				<p>Origin: ${this.origin.name}</p>
+				<p>Destination: ${destinationName}</p>
 				<p>Discarded:</p>
 				<div class='playerCard ${destinationColor}'>${destinationName.toUpperCase()}</div>`;
     }
@@ -435,8 +439,10 @@ class CharterFlight extends Event
 			color: originColor
 		} = this.origin;
 
-		return `<p class='title'>DIRECT FLIGHT</p>
-                <p>${originName} to ${this.destination.name}</p>
+		return `<p class='title'>CHARTER FLIGHT</p>
+				<p>Role: ${this.player.newRoleTag()}</p>
+				<p>Origin: ${originName}</p>
+				<p>Destination: ${this.destination.name}</p>
 				<p>Discarded:</p>
 				<div class='playerCard ${originColor}'>${originName.toUpperCase()}</div>`;
     }
@@ -454,7 +460,33 @@ class ShuttleFlight extends Event
     getDetails()
     {
 		return `<p class='title'>SHUTTLE FLIGHT</p>
-                <p>${this.origin.name} to ${this.destination.name}</p>`;
+				<p>Role: ${this.player.newRoleTag()}</p>
+				<p>Origin: ${this.origin.name}</p>
+				<p>Destination: ${this.destination.name}</p>`;
+    }
+}
+
+class BuildResearchStation extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.city = cities[this.cityKey];
+    }
+
+    getDetails()
+    {
+		log(this.player.role.toUpperCase());
+		let discarded;
+		if (this.player.role === "Operations Expert")
+			discarded = `<p>[discard not required]</p>`;
+		else
+			discarded = `<p>Discarded:</p><div class='playerCard ${this.city.color}'>${this.city.name.toUpperCase()}</div>`;
+
+		return `<p class='title'>BUILD RESEARCH STATION</p>
+				<p>Role: ${this.player.newRoleTag()}</p>
+				<p>Location: ${this.city.name}</p>
+				${discarded}`;
     }
 }
 
@@ -463,11 +495,21 @@ function getEventType(eventCode)
 	return eventTypes[eventCodes[eventCode]];
 }
 
+// Because Events need to be instantiated before Players.
+function attachPlayersToEvents(players, events)
+{
+	for (let event of events)
+		if (players.hasOwnProperty(event.role))
+			event.player = players[event.role];
+}
+
 export {
 	eventTypes,
 	getEventType,
+	attachPlayersToEvents,
 	DriveFerry,
 	DirectFlight,
 	CharterFlight,
-	ShuttleFlight
+	ShuttleFlight,
+	BuildResearchStation
 }

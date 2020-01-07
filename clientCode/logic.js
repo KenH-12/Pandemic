@@ -11,10 +11,12 @@ import {
 import Event, {
 	eventTypes,
 	getEventType,
+	attachPlayersToEvents,
 	DriveFerry,
 	DirectFlight,
 	CharterFlight,
-	ShuttleFlight
+	ShuttleFlight,
+	BuildResearchStation
 } from "./event.js";
 
 $(function(){
@@ -136,14 +138,19 @@ function parseEvents(events)
 					parsedEvents.push(new CharterFlight(e, cities));
 				else if (e.code === eventTypes.shuttleFlight.code)
 					parsedEvents.push(new ShuttleFlight(e, cities));
+				else if (e.code === eventTypes.buildResearchStation.code)
+					parsedEvents.push(new BuildResearchStation(e, cities));
 				else
-					parsedEvents.push(new Event(e));
+					parsedEvents.push(new Event(e, cities));
 			}
 
 			data.events = [...data.events, ...parsedEvents];
 
 			if (Object.keys(data.players).length)
+			{
+				attachPlayersToEvents(data.players, parsedEvents);
 				appendEventHistoryIcons(parsedEvents);
+			}
 			
 			return resolve(parsedEvents);
 		});
@@ -176,38 +183,6 @@ function setEventHistoryScrollPosition($eventHistory)
 	
 	$eventHistory.animate({ scrollLeft: overflow });
 }
-
-/* class Event
-{
-	constructor({ code, id, turnNum, role, details })
-	{
-		this.code = code;
-		this.id = id;
-		this.turnNum = turnNum;
-		this.role = role;
-		
-		if (details.length)
-		{
-			const names = getEventType(code).propertyNames,
-				values = details.split(",");
-			
-			if (names.length === 1 && values.length > 1) // The single property is an array of values
-				this[names[0]] = values;
-			else
-			{
-				for (let i = 0; i < names.length; i++)
-					this[names[i]] = values[i];
-			}
-		}
-
-		return this;
-	}
-
-	isOfType(eventType)
-	{
-		return this.code === eventType.code;
-	}
-} */
 
 class Step
 {
@@ -906,7 +881,8 @@ function showEventIconDetails($icon, event)
 									${event instanceof DriveFerry
 									|| event instanceof DirectFlight
 									|| event instanceof CharterFlight
-									|| event instanceof ShuttleFlight ? event.getDetails() : eventType.name}
+									|| event instanceof ShuttleFlight
+									|| event instanceof BuildResearchStation ? event.getDetails() : eventType.name}
 									<div class='eventDetailsArrow'></div>
 								</div>`).appendTo("#boardContainer"),
 		containerHeight = $detailsContainer.height(),
@@ -7325,6 +7301,7 @@ async function setup()
 
 	data.startingHandPopulations = startingHandPopulations;
 	instantiatePlayers(players);
+	attachPlayersToEvents(data.players, data.events);
 	appendEventHistoryIcons();
 	loadDiseaseStatuses(diseaseStatuses);
 	loadInfectionDiscards(infectionDiscards);

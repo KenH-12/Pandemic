@@ -9,6 +9,7 @@ TO DO
 event history
 	slideshow buttons
 	detailed tooltips
+		make sure they don't appear partially outside the window
 	new icons should not appear prematurely
 	if the event history is not overflowing horizontally, animate new icons into view from right to left
 
