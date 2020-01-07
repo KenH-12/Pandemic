@@ -500,17 +500,16 @@ class TreatDisease extends Event
 
     getDetails()
     {
-		let details = `<p class='title'>TREAT DISEASE</p>
+		let cubesRemoved = "";
+		for (let i = 0; i < this.numCubesRemoved; i++)
+			cubesRemoved += newDiseaseCubeElement({ color: this.diseaseColor, asJqueryObject: false });
+		
+		return `<p class='title'>TREAT DISEASE</p>
 						<p>Role: ${this.player.newRoleTag()}</p>
 						<p>Location: ${this.city.name}</p>
-						<span class='cubesRemoved'><span>Removed: </span>`;
-		
-		for (let i = 0; i < this.numCubesRemoved; i++)
-			details += newDiseaseCubeElement({ color: this.diseaseColor, asJqueryObject: false });
-		
-		details += "</span>";
-		
-		return details;
+						<span class='cubesRemoved'>
+							<span>Removed: </span>${cubesRemoved}
+						</span>`;
     }
 }
 
@@ -529,6 +528,30 @@ class ShareKnowledge extends Event
 				<p>Receiver: ${this.receiver.newRoleTag()}</p>
 				<p>Shared Card: </p>
 				<div class='playerCard ${this.card.color}'>${this.card.name.toUpperCase()}</div>`;
+    }
+}
+
+class DiscoverACure extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.cards = [];
+		
+		for (let key of this.cardKeys)
+			this.cards.push(cities[key]);
+    }
+
+    getDetails()
+    {
+		let discarded = "";
+		for (let card of this.cards)
+			discarded += `<div class='playerCard ${card.color}'>${card.name.toUpperCase()}</div>`;
+		
+		return `<p class='title'>DISCOVER A CURE</p>
+				<p>Role: ${this.player.newRoleTag()}</p>
+				<p>Discarded: </p>
+				${discarded}`;
     }
 }
 
@@ -565,5 +588,6 @@ export {
 	ShuttleFlight,
 	BuildResearchStation,
 	TreatDisease,
-	ShareKnowledge
+	ShareKnowledge,
+	DiscoverACure
 }
