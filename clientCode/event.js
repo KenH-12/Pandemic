@@ -576,9 +576,50 @@ class OperationsFlight extends Event
     }
 }
 
+class PlanContingency extends Event
+{
+	constructor(event)
+    {
+		super(event);
+		this.cardName = getEventCardName(this.cardKey);
+    }
+
+    getDetails()
+    {
+		return `<p class='title'>PLAN CONTINGENCY</p>
+				<p>Role: ${this.player.newRoleTag()}</p>
+				<p>Stored Event Card:</p>
+				<div class='playerCard eventCard'>${this.cardName.toUpperCase()}</div>`;
+    }
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
+}
+
+function getEventCardName(cardKey)
+{
+	const {
+		airlift,
+		resilientPopulation,
+		forecast,
+		governmentGrant,
+		oneQuietNight
+	} = eventTypes,
+	eventCards = [
+		airlift,
+		resilientPopulation,
+		forecast,
+		governmentGrant,
+		oneQuietNight
+	];
+
+	for (let eventCard of eventCards)
+		if (eventCard.cardKey === cardKey)
+			return eventCard.name;
+	
+	return "";
 }
 
 // Because Events need to be instantiated before Players.
@@ -611,5 +652,6 @@ export {
 	TreatDisease,
 	ShareKnowledge,
 	DiscoverACure,
-	OperationsFlight
+	OperationsFlight,
+	PlanContingency
 }
