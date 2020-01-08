@@ -141,7 +141,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "To dispatch a pawn, drag and drop it onto a city.",
 		actionPathName: "movementAction",
-		propertyNames: ["roleToDispatch", "originKey", "destinationKey", "movementType"]
+		propertyNames: ["dispatchedRoleID", "originKey", "destinationKey", "movementTypeCode"]
 	},
 	rendezvous: {
 		name: "Rendezvous",
@@ -325,6 +325,7 @@ eventCodes = {
 	er: "eradication",
 	pc: "planContingency",
 	dp: "dispatchPawn",
+	rv: "rendezvous",
 	// da: "dispatchAccept",
 	of: "operationsFlight",
 	pa: "pass",
@@ -352,14 +353,17 @@ export default class Event
 {
 	constructor({ code, id, turnNum, role, details })
 	{
+		const eventType = getEventType(code);
+		
 		this.code = code;
+		this.name = eventType.name;
 		this.id = id;
 		this.turnNum = turnNum;
 		this.role = role;
 		
 		if (details.length)
 		{
-			const names = getEventType(code).propertyNames,
+			const names = eventType.propertyNames,
 				values = details.split(",");
 			
 			if (names.length === 1 && values.length > 1) // The single property is an array of values
@@ -378,6 +382,12 @@ export default class Event
 	{
 		return this.code === eventType.code;
 	}
+
+	getDetails()
+	{
+		return `<p class='title'>${this.name.toUpperCase()}</p>
+				<p>Role: ${this.player.newRoleTag()}</p>`;
+	}
 }
 
 class DriveFerry extends Event
@@ -391,8 +401,7 @@ class DriveFerry extends Event
 
     getDetails()
     {
-        return `<p class='title'>DRIVE / FERRY</p>
-				<p>Role: ${this.player.newRoleTag()}</p>
+		return `${super.getDetails()}
 				<p>Origin: ${this.origin.name}</p>
 				<p>Destination: ${this.destination.name}</p>`;
     }
@@ -414,8 +423,7 @@ class DirectFlight extends Event
 			color: destinationColor
 		} = this.destination;
 
-		return `<p class='title'>DIRECT FLIGHT</p>
-				<p>Role: ${this.player.newRoleTag()}</p>
+		return `${super.getDetails()}
 				<p>Origin: ${this.origin.name}</p>
 				<p>Destination: ${destinationName}</p>
 				<p>Discarded:</p>
@@ -439,8 +447,7 @@ class CharterFlight extends Event
 			color: originColor
 		} = this.origin;
 
-		return `<p class='title'>CHARTER FLIGHT</p>
-				<p>Role: ${this.player.newRoleTag()}</p>
+		return `${super.getDetails()}
 				<p>Origin: ${originName}</p>
 				<p>Destination: ${this.destination.name}</p>
 				<p>Discarded:</p>
@@ -459,8 +466,7 @@ class ShuttleFlight extends Event
 
     getDetails()
     {
-		return `<p class='title'>SHUTTLE FLIGHT</p>
-				<p>Role: ${this.player.newRoleTag()}</p>
+		return `${super.getDetails()}
 				<p>Origin: ${this.origin.name}</p>
 				<p>Destination: ${this.destination.name}</p>`;
     }
@@ -482,8 +488,7 @@ class BuildResearchStation extends Event
 		else
 			discarded = `<p>Discarded:</p><div class='playerCard ${this.city.color}'>${this.city.name.toUpperCase()}</div>`;
 
-		return `<p class='title'>BUILD RESEARCH STATION</p>
-				<p>Role: ${this.player.newRoleTag()}</p>
+		return `${super.getDetails()}
 				<p>Location: ${this.city.name}</p>
 				${discarded}`;
     }
@@ -504,13 +509,12 @@ class TreatDisease extends Event
 		for (let i = 0; i < this.numCubesRemoved; i++)
 			cubesRemoved += newDiseaseCubeElement({ color: this.diseaseColor, asJqueryObject: false });
 		
-		return `<p class='title'>TREAT DISEASE</p>
-						<p>Role: ${this.player.newRoleTag()}</p>
-						<p>Location: ${this.city.name}</p>
-						<span class='cubesRemoved'>
-							<span>Removed: </span>${cubesRemoved}
-						</span>`;
-    }
+		return `${super.getDetails()}
+				<p>Location: ${this.city.name}</p>
+				<span class='cubesRemoved'>
+					<span>Removed: </span>${cubesRemoved}
+				</span>`;
+}
 }
 
 class ShareKnowledge extends Event
@@ -523,7 +527,7 @@ class ShareKnowledge extends Event
 
     getDetails()
     {
-		return `<p class='title'>SHARE KNOWLEDGE</p>
+		return `${super.getDetails()}
 				<p>Giver: ${this.giver.newRoleTag()}</p>
 				<p>Receiver: ${this.receiver.newRoleTag()}</p>
 				<p>Shared Card: </p>
@@ -548,8 +552,7 @@ class DiscoverACure extends Event
 		for (let card of this.cards)
 			discarded += `<div class='playerCard ${card.color}'>${card.name.toUpperCase()}</div>`;
 		
-		return `<p class='title'>DISCOVER A CURE</p>
-				<p>Role: ${this.player.newRoleTag()}</p>
+		return `${super.getDetails()}
 				<p>Discarded: </p>
 				${discarded}`;
     }
@@ -567,8 +570,7 @@ class OperationsFlight extends Event
 
     getDetails()
     {
-		return `<p class='title'>OPERATIONS FLIGHT</p>
-				<p>Role: ${this.player.newRoleTag()}</p>
+		return `${super.getDetails()}
 				<p>Origin: ${this.origin.name}</p>
 				<p>Destination: ${this.destination.name}</p>
 				<p>Discarded: </p>
@@ -586,16 +588,61 @@ class PlanContingency extends Event
 
     getDetails()
     {
-		return `<p class='title'>PLAN CONTINGENCY</p>
-				<p>Role: ${this.player.newRoleTag()}</p>
+		return `${super.getDetails()}>
 				<p>Stored Event Card:</p>
 				<div class='playerCard eventCard'>${this.cardName.toUpperCase()}</div>`;
+    }
+}
+
+class DispatchPawn extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.origin = cities[this.originKey];
+		this.destination = cities[this.destinationKey];
+		this.movementType = getEventType(this.movementTypeCode);
+		log("MOVEMENT TYPE: ", this.movementType);
+		this.discard = false;
+		
+		if (movementTypeRequiresDiscard(this.movementType))
+		{
+			const { directFlight, charterFlight } = eventTypes;
+
+			if (this.movementTypeCode === directFlight.code)
+				this.discard = this.destination;
+			else if (this.movementTypeCode === charterFlight.code)
+				this.discard = this.origin;
+		}
+    }
+
+    getDetails()
+    {
+		let discarded = "";
+		if (this.discard)
+			discarded = `<p>Discarded:</p><div class='playerCard ${this.discard.color}'>${this.discard.name.toUpperCase()}</div>`;
+		
+		return `${super.getDetails()}
+				<p>Dispatched: ${this.dispatchedPlayer.newRoleTag()}</p>
+				<p>Dispatch Type: ${this.movementType.name}</p>
+				<p>Origin: ${this.origin.name}</p>
+				<p>Destination: ${this.destination.name}</p>
+				${discarded}`;
     }
 }
 
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
+}
+
+function movementTypeRequiresDiscard(eventType)
+{
+	const { directFlight, charterFlight, operationsFlight } = eventTypes;
+	
+	return eventType.code === directFlight.code
+		|| eventType.code === charterFlight.code
+		|| eventType.code === operationsFlight.code;
 }
 
 function getEventCardName(cardKey)
@@ -636,6 +683,10 @@ function attachPlayersToEvents(players, events)
 				event.giver = players[event.giverRoleID];
 				event.receiver = players[event.receiverRoleID];
 			}
+			else if (event instanceof DispatchPawn)
+			{
+				event.dispatchedPlayer = players[event.dispatchedRoleID];
+			}
 		}
 	}
 }
@@ -643,6 +694,7 @@ function attachPlayersToEvents(players, events)
 export {
 	eventTypes,
 	getEventType,
+	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
 	DriveFerry,
 	DirectFlight,
@@ -653,5 +705,6 @@ export {
 	ShareKnowledge,
 	DiscoverACure,
 	OperationsFlight,
-	PlanContingency
+	PlanContingency,
+	DispatchPawn
 }

@@ -11,6 +11,7 @@ import {
 import Event, {
 	eventTypes,
 	getEventType,
+	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
 	DriveFerry,
 	DirectFlight,
@@ -21,7 +22,8 @@ import Event, {
 	ShareKnowledge,
 	DiscoverACure,
 	OperationsFlight,
-	PlanContingency
+	PlanContingency,
+	DispatchPawn
 } from "./event.js";
 
 $(function(){
@@ -155,6 +157,8 @@ function parseEvents(events)
 					parsedEvents.push(new OperationsFlight(e, cities));
 				else if (e.code === eventTypes.planContingency.code)
 					parsedEvents.push(new PlanContingency(e));
+				else if (e.code === eventTypes.dispatchPawn.code)
+					parsedEvents.push(new DispatchPawn(e, cities));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -888,7 +892,8 @@ function showEventIconDetails($icon, event)
 									|| event instanceof ShareKnowledge
 									|| event instanceof DiscoverACure
 									|| event instanceof OperationsFlight
-									|| event instanceof PlanContingency ?
+									|| event instanceof PlanContingency
+									|| event instanceof DispatchPawn ?
 									event.getDetails()
 									: eventType.name}
 								</div>`).appendTo($boardContainer),
@@ -3186,15 +3191,6 @@ function getMovementDetails()
 	}
 	
 	return false;
-}
-
-function movementTypeRequiresDiscard(eventType)
-{
-	const { directFlight, charterFlight, operationsFlight } = eventTypes;
-	
-	return eventType.code === directFlight.code
-		|| eventType.code === charterFlight.code
-		|| eventType.code === operationsFlight.code;
 }
 
 // Checks if the active pawn has been dropped on a valid destination city.

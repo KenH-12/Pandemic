@@ -9,7 +9,14 @@ TO DO
 event history
 	slideshow buttons
 	detailed tooltips
-		make sure they don't appear partially outside the window
+		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
+			Title should show action description
+			role tags should show role card to right of tooltip
+			city cards should pinpoint location
+			event cards should show description
+			dotted underline for
+				city names (pinpoint city)
+				movement types (dispatch pawn)
 	new icons should not appear prematurely
 	if the event history is not overflowing horizontally, animate new icons into view from right to left
 
