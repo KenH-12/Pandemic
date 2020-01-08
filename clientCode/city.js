@@ -1159,6 +1159,21 @@ function getResearchStationSupplyCount()
 	return MAX_RESEARCH_STATION_COUNT - researchStationKeys.size;
 }
 
+function showPlaceholderStation($originalStation)
+{
+	$("#placeholderStation")
+		.removeAttr("style")
+		.offset($originalStation.offset())
+		.removeClass("hidden");
+	
+	$originalStation.css("opacity", 0.7);
+}
+function hidePlaceholderStation($originalStation)
+{
+	$originalStation.css("opacity", 1);
+	$("#placeholderStation").addClass("hidden");
+}
+
 const diseaseCubeSupplies = {
     y: 24,
     r: 24,
