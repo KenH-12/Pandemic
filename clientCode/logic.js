@@ -19,7 +19,8 @@ import Event, {
 	BuildResearchStation,
 	TreatDisease,
 	ShareKnowledge,
-	DiscoverACure
+	DiscoverACure,
+	OperationsFlight
 } from "./event.js";
 
 $(function(){
@@ -149,6 +150,8 @@ function parseEvents(events)
 					parsedEvents.push(new ShareKnowledge(e, cities));
 				else if (e.code === eventTypes.discoverACure.code)
 					parsedEvents.push(new DiscoverACure(e, cities));
+				else if (e.code === eventTypes.operationsFlight.code)
+					parsedEvents.push(new OperationsFlight(e, cities));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -880,7 +883,8 @@ function showEventIconDetails($icon, event)
 									|| event instanceof BuildResearchStation
 									|| event instanceof TreatDisease
 									|| event instanceof ShareKnowledge
-									|| event instanceof DiscoverACure ?
+									|| event instanceof DiscoverACure
+									|| event instanceof OperationsFlight ?
 									event.getDetails()
 									: eventType.name}
 								</div>`).appendTo($boardContainer),

@@ -555,6 +555,27 @@ class DiscoverACure extends Event
     }
 }
 
+class OperationsFlight extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.origin = cities[this.originKey];
+		this.destination = cities[this.destinationKey];
+		this.card = cities[this.cardKey];
+    }
+
+    getDetails()
+    {
+		return `<p class='title'>OPERATIONS FLIGHT</p>
+				<p>Role: ${this.player.newRoleTag()}</p>
+				<p>Origin: ${this.origin.name}</p>
+				<p>Destination: ${this.destination.name}</p>
+				<p>Discarded: </p>
+				<div class='playerCard ${this.card.color}'>${this.card.name.toUpperCase()}</div>`;
+    }
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
@@ -589,5 +610,6 @@ export {
 	BuildResearchStation,
 	TreatDisease,
 	ShareKnowledge,
-	DiscoverACure
+	DiscoverACure,
+	OperationsFlight
 }
