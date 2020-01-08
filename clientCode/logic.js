@@ -871,6 +871,7 @@ function showEventIconDetails($icon, event)
 {
 	const eventType = getEventType(event.code),
 		$eventHistory = $("#eventHistory"),
+		$boardContainer = $("#boardContainer"),
 		$detailsContainer = $(`<div class='eventDetails'>
 									${event instanceof DriveFerry
 									|| event instanceof DirectFlight
@@ -879,30 +880,38 @@ function showEventIconDetails($icon, event)
 									|| event instanceof BuildResearchStation
 									|| event instanceof TreatDisease
 									|| event instanceof ShareKnowledge
-									|| event instanceof DiscoverACure ? event.getDetails() : eventType.name}
-									<div class='eventDetailsArrow'></div>
-								</div>`).appendTo("#boardContainer"),
+									|| event instanceof DiscoverACure ?
+									event.getDetails()
+									: eventType.name}
+								</div>`).appendTo($boardContainer),
+		$arrow = $("<div class='eventDetailsArrow'></div>").appendTo($boardContainer),
 		containerHeight = $detailsContainer.height(),
 		halfContainerWidth = Math.ceil($detailsContainer.width() / 2),
-		iconWidth = $icon.width();
+		iconOffset = $icon.offset(),
+		iconWidth = $icon.outerWidth(),
+		topAdjustment = -iconWidth * 0.6;
+	
+	let containerOffsetLeft = iconOffset.left - halfContainerWidth + iconWidth / 2;
+	if (containerOffsetLeft < 0)
+		containerOffsetLeft = 0;
 
 	$detailsContainer
 		.offset(
 		{
-			top: $eventHistory.offset().top - containerHeight - iconWidth,
-			left: $icon.offset().left - halfContainerWidth + iconWidth / 2
-		})
-		.children(".eventDetailsArrow")
-		.css({
-			width: iconWidth,
-			height: iconWidth,
-			left: halfContainerWidth - iconWidth / 2
+			top: $eventHistory.offset().top - containerHeight + topAdjustment,
+			left: containerOffsetLeft
 		});
+	
+	iconOffset.top += topAdjustment;
+	$arrow.offset(iconOffset)
+		.width(iconWidth)
+		.height(iconWidth);
 }
 
 function hideEventIconDetails()
 {
 	$(".eventDetails").remove();
+	$(".eventDetailsArrow").remove();
 }
 
 function enableBtnCancelAction()

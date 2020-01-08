@@ -309,6 +309,7 @@ span.r {color: #ef282a; background: none}
 	margin-left: 0;
 	border-radius: 20%;
 }
+
 .eventDetails
 {
 	position: absolute;
@@ -326,6 +327,11 @@ span.r {color: #ef282a; background: none}
 	text-align: center;
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #fff;
+	padding-top: 2px;
+	margin-bottom: 3px;
+}
+.eventDetails > p
+{
 	margin: 2px 0;
 }
 .eventDetails .diseaseCube
@@ -340,7 +346,6 @@ span.r {color: #ef282a; background: none}
 .eventDetailsArrow
 {
 	position: absolute;
-	top: 99%;
 	background-color: #252525;
 	clip-path: polygon(50% 65%, 0 0, 100% 0);
 }
