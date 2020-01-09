@@ -23,7 +23,8 @@ import Event, {
 	DiscoverACure,
 	OperationsFlight,
 	PlanContingency,
-	DispatchPawn
+	DispatchPawn,
+	Airlift
 } from "./event.js";
 
 $(function(){
@@ -159,6 +160,8 @@ function parseEvents(events)
 					parsedEvents.push(new PlanContingency(e));
 				else if (e.code === eventTypes.dispatchPawn.code)
 					parsedEvents.push(new DispatchPawn(e, cities));
+				else if (e.code === eventTypes.airlift.code)
+					parsedEvents.push(new Airlift(e, cities));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -893,7 +896,8 @@ function showEventIconDetails($icon, event)
 									|| event instanceof DiscoverACure
 									|| event instanceof OperationsFlight
 									|| event instanceof PlanContingency
-									|| event instanceof DispatchPawn ?
+									|| event instanceof DispatchPawn
+									|| event instanceof Airlift ?
 									event.getDetails()
 									: eventType.name}
 								</div>`).appendTo($boardContainer),

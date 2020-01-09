@@ -291,7 +291,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		cardKey: "airl",
 		rules: ["Play at any time. Not an action.", "Move any 1 pawn to any city."],
 		instructions: "To airlift a pawn, drag and drop it onto the destination city.",
-		propertyNames: ["roleToAirlift", "originKey", "destinationKey"],
+		propertyNames: ["airliftedRoleID", "originKey", "destinationKey"],
 		actionPathName: "airlift"
 	},
 	governmentGrant: {
@@ -631,6 +631,26 @@ class DispatchPawn extends Event
     }
 }
 
+class Airlift extends Event
+{
+    constructor(event, cities)
+    {
+        super(event);
+        this.origin = cities[this.originKey];
+        this.destination = cities[this.destinationKey];
+    }
+
+    getDetails()
+    {
+		return `${super.getDetails()}
+				<p>Airlifted: ${this.airliftedPlayer.newRoleTag()}</p>
+				<p>Origin: ${this.origin.name}</p>
+				<p>Destination: ${this.destination.name}</p>
+				<p>Discarded:</p>
+				<div class='playerCard eventCard'>AIRLIFT</div>`;
+    }
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
@@ -684,9 +704,9 @@ function attachPlayersToEvents(players, events)
 				event.receiver = players[event.receiverRoleID];
 			}
 			else if (event instanceof DispatchPawn)
-			{
 				event.dispatchedPlayer = players[event.dispatchedRoleID];
-			}
+			else if (event instanceof Airlift)
+				event.airliftedPlayer = players[event.airliftedRoleID];
 		}
 	}
 }
@@ -706,5 +726,6 @@ export {
 	DiscoverACure,
 	OperationsFlight,
 	PlanContingency,
-	DispatchPawn
+	DispatchPawn,
+	Airlift
 }
