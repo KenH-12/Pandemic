@@ -1,5 +1,6 @@
 "use strict";
 
+import EventCard from "./eventCard.js";
 import {
 	cities,
 	getCity,
@@ -158,7 +159,7 @@ function parseEvents(events)
 				else if (e.code === eventTypes.operationsFlight.code)
 					parsedEvents.push(new OperationsFlight(e, cities));
 				else if (e.code === eventTypes.planContingency.code)
-					parsedEvents.push(new PlanContingency(e));
+					parsedEvents.push(new PlanContingency(e, data.eventCards));
 				else if (e.code === eventTypes.dispatchPawn.code)
 					parsedEvents.push(new DispatchPawn(e, cities));
 				else if (e.code === eventTypes.airlift.code)
@@ -523,15 +524,15 @@ function indicatePromptingEventCard()
 
 function getEventCardEventType(cardKey)
 {
-	const eventCardName = data.eventCards[cardKey];
+	const eventCard = data.eventCards[cardKey];
 
-	if (!eventCardName)
+	if (!eventCard)
 	{
 		console.error(`Event Card does not exist: "${cardKey}"`);
 		return false;
 	}
 
-	return eventTypes[toCamelCase(eventCardName)];
+	return eventTypes[toCamelCase(eventCard.name)];
 }
 
 function disableEventCards()
@@ -1129,11 +1130,11 @@ const actionInterfacePopulator = {
 		else if (buttonType === "playerCard")
 		{
 			buttonClass = "playerCard";
-			newElementFn = newPlayerCardElement;
+			newElementFn = newPlayerCard;
 		}
 
 		for (let key of cityKeys)
-			$interface.append(newElementFn(key, { noTooltip: true }));
+			$interface.append(newElementFn(getCityOrEventCardObject(key), { noTooltip: true }));
 		
 		if (typeof onClick === "function")
 			$interface.children(`.${buttonClass}`).click(function() { onClick($(this)) });
@@ -1158,7 +1159,7 @@ const actionInterfacePopulator = {
 			$discardPrompt.append(`<p>${promptMsg}</p>`);
 
 		for (let key of ensureIsArray(cardKeys))
-			$discardPrompt.append(newPlayerCardElement(key));
+			$discardPrompt.append(newPlayerCard(getCityOrEventCardObject(key)));
 		
 		$discardPrompt.children(".playerCard")
 			.click(function() { pinpointCityFromCard($(this)) });
@@ -1424,7 +1425,7 @@ const actionInterfacePopulator = {
 										</div>`);
 				
 				for (let cardKey of player.getShareableCardKeys())
-					$giveableContainer.append(newPlayerCardElement(cardKey, { noTooltip: true }));
+					$giveableContainer.append(newPlayerCard(getCity(cardKey), { noTooltip: true }));
 
 				$actionInterface.append($giveableContainer);
 			}
@@ -1439,7 +1440,7 @@ const actionInterfacePopulator = {
 										</div>`);
 				
 				for (let cardKey of participant.getShareableCardKeys())
-					$takeableContainer.append(newPlayerCardElement(cardKey, { noTooltip: true }));
+					$takeableContainer.append(newPlayerCard(getCity(cardKey), { noTooltip: true }));
 
 				$actionInterface.append($takeableContainer);
 			}
@@ -2514,7 +2515,7 @@ class DiscardPrompt
 		if (cardKeys.length === numDiscardsRequired)
 		{
 			for (let key of cardKeys)
-				this.$discardsContainer.append(newPlayerCardElement(key, { noTooltip: true }));
+				this.$discardsContainer.append(newPlayerCard(getCityOrEventCardObject(key), { noTooltip: true }));
 
 			this.keeperCount = 0;
 			this.discardSelectionCount = cardKeys.length;
@@ -2526,7 +2527,7 @@ class DiscardPrompt
 		else
 		{
 			for (let key of cardKeys)
-				this.$keepersContainer.append(newPlayerCardElement(key, { noTooltip: true }));
+				this.$keepersContainer.append(newPlayerCard(getCityOrEventCardObject(key), { noTooltip: true }));
 
 			this.discardSelectionCount = 0;
 			this.keeperCount = cardKeys.length;
@@ -3385,7 +3386,7 @@ function newFacedownPlayerCard()
 
 async function revealPlayerCard(cardKey, $container)
 {
-	const $card = newPlayerCardElement(cardKey),
+	const $card = $(newPlayerCard(getCityOrEventCardObject(cardKey))),
 		duration = getDuration(data, "revealPlayerCard"),
 		easing = data.easings.revealCard;
 
@@ -4729,8 +4730,13 @@ function getDiseaseColor(key)
 					];
 
 	for (let card of eventCards)
-		data.eventCards[card[0]] = card[1];
+		data.eventCards[card[0]] = new EventCard(card[0], card[1]);
 })();
+
+function getCityOrEventCardObject(key)
+{
+	return data.eventCards[key] || getCity(key);
+}
 
 // given an array of city info, loads any research stations and disease cubes
 function loadCityStates(cityInfoArray)
@@ -5551,7 +5557,7 @@ function finishIntensifyStep($epidemic, $btn)
 			}
 		);
 		// hide the .epidemicFull and show a new epidemic playercard element to discard
-		const $card = newPlayerCardElement("epid");
+		const $card = $(newPlayerCard("epidemic"));
 		$epidemic.addClass("hidden").before($card)
 			.children()
 			.removeAttr("style");
@@ -6781,10 +6787,9 @@ function placeDiseaseCube(city, cubeSupplyOffset)
 	});
 }
 
-function newCityButton(cityKey)
+function newCityButton(city)
 {
-	const city = getCity(cityKey),
-		$btn = $(`<div class='button actionPromptOption' data-key='${cityKey}'>
+	const $btn = $(`<div class='button actionPromptOption' data-key='${city.key}'>
 					${city.name}
 				</div>`);
 	
@@ -6793,37 +6798,6 @@ function newCityButton(cityKey)
 	.click(function() { $(this).off("mousenter mouseleave") }); // Prevents the travel path arrow from being hidden.
 
 	return $btn;
-}
-
-function newPlayerCardElement(cardKey, { noTooltip } = {})
-{
-	let city,
-		cardType,
-		tooltip,
-		cardName;
-	
-	if (isEventCardKey(cardKey))
-	{
-		cardType = "eventCard";
-		tooltip = "Event card";
-		cardName = data.eventCards[cardKey];
-	}
-	else if (isEpidemicKey(cardKey))
-	{
-		cardType = "epidemic";
-		tooltip = "Epidemic card";
-		cardName = "EPIDEMIC";
-	}
-	else
-	{
-		city = getCity(cardKey);
-		cardType = city.color;
-		cardName = city.name;
-		tooltip = `City card
-Click to locate ${city.name}`;
-	}
-
-	return $(`<div class='playerCard ${cardType}' title='${ noTooltip ? "" : tooltip }' data-key='${cardKey}'>${cardName.toUpperCase()}</div>`);
 }
 
 function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAutoTreat } = {})
@@ -7084,7 +7058,7 @@ function loadPlayerCards(playerCards)
 
 	for (let card of playerCards)
 	{
-		$card = newPlayerCardElement(card.key);
+		$card = $(newPlayerCard(getCityOrEventCardObject(card.key)));
 
 		if (card.pileID in data.players)
 		{
@@ -7814,7 +7788,7 @@ async function showEpidemicsToShuffle($container)
 	{
 		$div = $("<div></div>").appendTo($container);
 		newFacedownPlayerCard().appendTo($div);
-		newPlayerCardElement("epi").appendTo($div);
+		$(newPlayerCard("epidemic")).appendTo($div);
 	}
 	
 	const $cardbacks = $container.find("img"),

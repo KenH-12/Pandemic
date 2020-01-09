@@ -39,6 +39,17 @@ export default class City
 		this.cubes[color] -= numCubesRemoved;
 		diseaseCubeSupplies[color] += numCubesRemoved;
 	}
+
+	getDiseaseColorOptions()
+	{
+		const diseaseColorOptions = [];
+
+		for (let color in this.cubes)
+			if (this.cubes[color] > 0)
+				diseaseColorOptions.push(color);
+
+		return diseaseColorOptions;
+	}
 	
 	isConnectedTo(cityKey)
 	{
@@ -69,21 +80,9 @@ export default class City
 		return { left: x, top: y };
 	}
 
-	getDiseaseColorOptions()
+	getResearchStation()
 	{
-		const diseaseColorOptions = [];
-
-		for (let color in this.cubes)
-			if (this.cubes[color] > 0)
-				diseaseColorOptions.push(color);
-
-		return diseaseColorOptions;
-	}
-
-	getOccupants(players)
-	{
-		return getFilteredMemberArray(players,
-			player => player.cityKey === this.key);
+		return $(`.researchStation[data-key='${this.key}']`);
 	}
 	
 	// Puts a research station on this city.
@@ -119,11 +118,6 @@ export default class City
 					animateCubes: true
 				});
 		}
-	}
-
-	getResearchStation()
-	{
-		return $(`.researchStation[data-key='${this.key}']`);
 	}
 
 	relocateResearchStationTo(city)
@@ -164,6 +158,12 @@ export default class City
 		return $(`.pawn.${this.key}`).length
 			|| this.getResearchStation().length
 			|| $(`.diseaseCube.${this.key}`).length;
+	}
+
+	getOccupants(players)
+	{
+		return getFilteredMemberArray(players,
+			player => player.cityKey === this.key);
 	}
 
 	// Positions any pawns and disease cubes on this city into a cluster.
@@ -360,6 +360,15 @@ export default class City
 			}
 		}
 		return sleep(getDuration(gameData, duration));
+	}
+
+	getPlayerCard({ noTooltip })
+	{
+		const { name, color, key } = this, 
+			tooltip = noTooltip ? "" : ` title='City card
+Click to locate ${name}'`;
+
+		return `<div class='playerCard ${color}' data-key='${key}'${tooltip}>${name.toUpperCase()}</div>`;
 	}
 }
 

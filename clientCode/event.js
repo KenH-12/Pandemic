@@ -418,16 +418,11 @@ class DirectFlight extends Event
 
     getDetails()
     {
-		const {
-			name: destinationName,
-			color: destinationColor
-		} = this.destination;
-
 		return `${super.getDetails()}
 				<p>Origin: ${this.origin.name}</p>
-				<p>Destination: ${destinationName}</p>
+				<p>Destination: ${this.destination.name}</p>
 				<p>Discarded:</p>
-				<div class='playerCard ${destinationColor}'>${destinationName.toUpperCase()}</div>`;
+				${this.destination.getPlayerCard({ noTooltip: true })}`;
     }
 }
 
@@ -442,16 +437,11 @@ class CharterFlight extends Event
 
     getDetails()
     {
-		const {
-			name: originName,
-			color: originColor
-		} = this.origin;
-
 		return `${super.getDetails()}
-				<p>Origin: ${originName}</p>
+				<p>Origin: ${this.origin.name}</p>
 				<p>Destination: ${this.destination.name}</p>
 				<p>Discarded:</p>
-				<div class='playerCard ${originColor}'>${originName.toUpperCase()}</div>`;
+				${this.origin.getPlayerCard({ noTooltip: true })}`;
     }
 }
 
@@ -486,7 +476,7 @@ class BuildResearchStation extends Event
 		if (this.player.role === "Operations Expert")
 			discarded = `<p>[discard not required]</p>`;
 		else
-			discarded = `<p>Discarded:</p><div class='playerCard ${this.city.color}'>${this.city.name.toUpperCase()}</div>`;
+			discarded = `<p>Discarded:</p>${this.city.getPlayerCard({ noTooltip: true })}`;
 
 		return `${super.getDetails()}
 				<p>Location: ${this.city.name}</p>
@@ -514,7 +504,7 @@ class TreatDisease extends Event
 				<span class='cubesRemoved'>
 					<span>Removed: </span>${cubesRemoved}
 				</span>`;
-}
+	}
 }
 
 class ShareKnowledge extends Event
@@ -531,7 +521,7 @@ class ShareKnowledge extends Event
 				<p>Giver: ${this.giver.newRoleTag()}</p>
 				<p>Receiver: ${this.receiver.newRoleTag()}</p>
 				<p>Shared Card: </p>
-				<div class='playerCard ${this.card.color}'>${this.card.name.toUpperCase()}</div>`;
+				${this.card.getPlayerCard({ noTooltip: true })}`;
     }
 }
 
@@ -540,17 +530,17 @@ class DiscoverACure extends Event
 	constructor(event, cities)
     {
 		super(event);
-		this.cards = [];
+		this.discards = [];
 		
 		for (let key of this.cardKeys)
-			this.cards.push(cities[key]);
+			this.discards.push(cities[key]);
     }
 
     getDetails()
     {
 		let discarded = "";
-		for (let card of this.cards)
-			discarded += `<div class='playerCard ${card.color}'>${card.name.toUpperCase()}</div>`;
+		for (let card of this.discards)
+			discarded += card.getPlayerCard({ noTooltip: true });
 		
 		return `${super.getDetails()}
 				<p>Discarded: </p>
@@ -565,7 +555,7 @@ class OperationsFlight extends Event
 		super(event);
 		this.origin = cities[this.originKey];
 		this.destination = cities[this.destinationKey];
-		this.card = cities[this.cardKey];
+		this.discard = cities[this.cardKey];
     }
 
     getDetails()
@@ -574,23 +564,23 @@ class OperationsFlight extends Event
 				<p>Origin: ${this.origin.name}</p>
 				<p>Destination: ${this.destination.name}</p>
 				<p>Discarded: </p>
-				<div class='playerCard ${this.card.color}'>${this.card.name.toUpperCase()}</div>`;
+				${this.discard.getPlayerCard({ noTooltip: true })}`;
     }
 }
 
 class PlanContingency extends Event
 {
-	constructor(event)
+	constructor(event, eventCards)
     {
 		super(event);
-		this.cardName = getEventCardName(this.cardKey);
+		this.eventCard = eventCards[this.cardKey];
     }
 
     getDetails()
     {
 		return `${super.getDetails()}>
 				<p>Stored Event Card:</p>
-				<div class='playerCard eventCard'>${this.cardName.toUpperCase()}</div>`;
+				${this.eventCard.getPlayerCard({ noTooltip: true })}`;
     }
 }
 
@@ -602,7 +592,6 @@ class DispatchPawn extends Event
 		this.origin = cities[this.originKey];
 		this.destination = cities[this.destinationKey];
 		this.movementType = getEventType(this.movementTypeCode);
-		log("MOVEMENT TYPE: ", this.movementType);
 		this.discard = false;
 		
 		if (movementTypeRequiresDiscard(this.movementType))
@@ -620,7 +609,7 @@ class DispatchPawn extends Event
     {
 		let discarded = "";
 		if (this.discard)
-			discarded = `<p>Discarded:</p><div class='playerCard ${this.discard.color}'>${this.discard.name.toUpperCase()}</div>`;
+			discarded = `<p>Discarded:</p>${this.discard.getPlayerCard({ noTooltip: true })}`;
 		
 		return `${super.getDetails()}
 				<p>Dispatched: ${this.dispatchedPlayer.newRoleTag()}</p>
@@ -637,7 +626,7 @@ class Airlift extends Event
     {
         super(event);
         this.origin = cities[this.originKey];
-        this.destination = cities[this.destinationKey];
+		this.destination = cities[this.destinationKey];
     }
 
     getDetails()
@@ -673,30 +662,6 @@ function movementTypeRequiresDiscard(eventType)
 	return eventType.code === directFlight.code
 		|| eventType.code === charterFlight.code
 		|| eventType.code === operationsFlight.code;
-}
-
-function getEventCardName(cardKey)
-{
-	const {
-		airlift,
-		resilientPopulation,
-		forecast,
-		governmentGrant,
-		oneQuietNight
-	} = eventTypes,
-	eventCards = [
-		airlift,
-		resilientPopulation,
-		forecast,
-		governmentGrant,
-		oneQuietNight
-	];
-
-	for (let eventCard of eventCards)
-		if (eventCard.cardKey === cardKey)
-			return eventCard.name;
-	
-	return "";
 }
 
 // Because Events need to be instantiated before Players.

@@ -455,3 +455,11 @@ function newDiseaseCubeElement({ color, cityKey, asJqueryObject = true } = {})
 	
 	return asJqueryObject ? $(diseaseCubeHtml) : diseaseCubeHtml;
 }
+
+function newPlayerCard(relatedObject, { noTooltip } = {})
+{
+	if (typeof relatedObject.getPlayerCard === "function")
+		return relatedObject.getPlayerCard({ noTooltip });
+
+	return `<div class='playerCard epidemic' data-key='epid'${ noTooltip ? "" : " title='Epidemic card'" }>EPIDEMIC</div>`;
+}

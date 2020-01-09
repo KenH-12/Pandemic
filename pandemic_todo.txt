@@ -20,6 +20,10 @@ event history
 	new icons should not appear prematurely
 	if the event history is not overflowing horizontally, animate new icons into view from right to left
 
+move data.eventCards to eventCards.js ?
+
+create MovementEvent class as a bridge between Event and all movement action event types
+
 when a piece lands behind part of a playerPanel, the panel should become transparent
 
 undo actions
