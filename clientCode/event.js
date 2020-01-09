@@ -651,6 +651,16 @@ class Airlift extends Event
     }
 }
 
+class OneQuietNight extends Event
+{
+    getDetails()
+    {
+		return `${super.getDetails()}
+				<p>Discarded:</p>
+				<div class='playerCard eventCard'>ONE QUIET NIGHT</div>`;
+    }
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
@@ -727,5 +737,6 @@ export {
 	OperationsFlight,
 	PlanContingency,
 	DispatchPawn,
-	Airlift
+	Airlift,
+	OneQuietNight
 }
