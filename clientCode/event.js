@@ -468,10 +468,17 @@ class BuildResearchStation extends Event
     {
 		super(event);
 		this.city = cities[this.cityKey];
+
+		if (this.relocationKey)
+			this.relocatedFromCity = cities[this.relocationKey];
     }
 
     getDetails()
     {
+		let relocatedFrom = "";
+		if (this.relocationKey)
+			relocatedFrom = `<p>Relocated Station From: ${this.relocatedFromCity.name}</p>`;
+		
 		let discarded;
 		if (this.player.role === "Operations Expert")
 			discarded = `<p>[discard not required]</p>`;
@@ -480,6 +487,7 @@ class BuildResearchStation extends Event
 
 		return `${super.getDetails()}
 				<p>Location: ${this.city.name}</p>
+				${relocatedFrom}
 				${discarded}`;
     }
 }

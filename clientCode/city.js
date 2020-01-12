@@ -120,7 +120,7 @@ export default class City
 		}
 	}
 
-	relocateResearchStationTo(city)
+	relocateResearchStationTo(gameData, city)
 	{
 		const $rs = this.getResearchStation(),
 			stationInitialOffset = $rs.offset();

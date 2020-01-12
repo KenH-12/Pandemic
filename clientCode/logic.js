@@ -2332,7 +2332,7 @@ async function governmentGrant(targetCity, relocationKey)
 
 	if (relocationKey)
 	{
-		await getCity(relocationKey).relocateResearchStationTo(targetCity);
+		await getCity(relocationKey).relocateResearchStationTo(data, targetCity);
 		turnOffResearchStationHighlights();
 		hideTravelPathArrow();
 	}
@@ -2884,7 +2884,7 @@ async function buildResearchStation(relocationKey)
 	if (relocationKey)
 	{
 		$("#boardContainer").children(".researchStation").not("#placeholderStation").removeClass("mediumGlow");
-		await getCity(relocationKey).relocateResearchStationTo(city);
+		await getCity(relocationKey).relocateResearchStationTo(data, city);
 		hideTravelPathArrow();
 	}
 	else

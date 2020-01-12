@@ -17,6 +17,7 @@ event history
 			dotted underline for
 				city names (pinpoint city)
 				movement types (dispatch pawn)
+			travel paths for movement actions and research station relocations
 	new icons should not appear prematurely
 	if the event history is not overflowing horizontally, animate new icons into view from right to left
 
