@@ -658,6 +658,34 @@ class OneQuietNight extends Event
     }
 }
 
+class CardDraw extends Event
+{
+	constructor(event, cities, eventCards)
+    {
+		super(event);
+		this.cards = [];
+		
+		for (let key of this.cardKeys)
+			this.cards.push(eventCards[key] || cities[key] || key);
+    }
+
+    getDetails()
+    {
+		let draws = "";
+		for (let card of this.cards)
+		{
+			if (typeof card.getPlayerCard === "function")
+				draws += card.getPlayerCard({ noTooltip: true });
+			else
+				draws += "<div class='playerCard epidemic'>EPIDEMIC</div>";
+		}
+		
+		return `${super.getDetails()}
+				<p>Draws: </p>
+				${draws}`;
+    }
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
@@ -711,5 +739,6 @@ export {
 	PlanContingency,
 	DispatchPawn,
 	Airlift,
-	OneQuietNight
+	OneQuietNight,
+	CardDraw
 }

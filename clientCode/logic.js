@@ -26,7 +26,8 @@ import Event, {
 	PlanContingency,
 	DispatchPawn,
 	Airlift,
-	OneQuietNight
+	OneQuietNight,
+	CardDraw
 } from "./event.js";
 
 $(function(){
@@ -166,6 +167,8 @@ function parseEvents(events)
 					parsedEvents.push(new Airlift(e, cities));
 				else if (e.code === eventTypes.oneQuietNight.code)
 					parsedEvents.push(new OneQuietNight(e, cities));
+				else if (e.code === eventTypes.cardDraw.code)
+					parsedEvents.push(new CardDraw(e, cities, data.eventCards));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -902,7 +905,8 @@ function showEventIconDetails($icon, event)
 									|| event instanceof PlanContingency
 									|| event instanceof DispatchPawn
 									|| event instanceof Airlift
-									|| event instanceof OneQuietNight ?
+									|| event instanceof OneQuietNight
+									|| event instanceof CardDraw ?
 									event.getDetails()
 									: eventType.name}
 								</div>`).appendTo($boardContainer),

@@ -1105,13 +1105,7 @@ const cities = {};
 
 function getCity(key)
 {
-	if (key in cities)
-		return cities[key];
-	
-	if (!(key in pacificPaths))
-		console.error(`cityKey does not exist: '${key}'`);
-	
-	return false;
+	return cities[key] || false;
 }
 
 const researchStationKeys = new Set();
