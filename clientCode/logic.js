@@ -28,7 +28,8 @@ import Event, {
 	Airlift,
 	OneQuietNight,
 	CardDraw,
-	GovernmentGrant
+	GovernmentGrant,
+	ResilientPopulation
 } from "./event.js";
 
 $(function(){
@@ -170,6 +171,8 @@ function parseEvents(events)
 					parsedEvents.push(new OneQuietNight(e, cities));
 				else if (e.code === eventTypes.governmentGrant.code)
 					parsedEvents.push(new GovernmentGrant(e, cities));
+				else if (e.code === eventTypes.resilientPopulation.code)
+					parsedEvents.push(new ResilientPopulation(e, cities));
 				else if (e.code === eventTypes.cardDraw.code)
 					parsedEvents.push(new CardDraw(e, cities, data.eventCards));
 				else
@@ -910,6 +913,7 @@ function showEventIconDetails($icon, event)
 									|| event instanceof Airlift
 									|| event instanceof OneQuietNight
 									|| event instanceof GovernmentGrant
+									|| event instanceof ResilientPopulation
 									|| event instanceof CardDraw ?
 									event.getDetails()
 									: eventType.name}

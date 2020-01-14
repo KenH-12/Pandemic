@@ -362,13 +362,24 @@ export default class City
 		return sleep(getDuration(gameData, duration));
 	}
 
-	getPlayerCard({ noTooltip })
+	getPlayerCard({ noTooltip } = {})
 	{
 		const { name, color, key } = this, 
 			tooltip = noTooltip ? "" : ` title='City card
 Click to locate ${name}'`;
 
 		return `<div class='playerCard ${color}' data-key='${key}'${tooltip}>${name.toUpperCase()}</div>`;
+	}
+
+	getInfectionCard({ toReveal } = {})
+	{
+		return `<div class='infectionCard'>
+					<div class='infectionCardContents'>
+						${ toReveal ? "<div class='veil'></div>" : "" }
+						<img class='infectionCardImg' src='images/cards/infectionCard_${this.color}.png' />
+						<p class='cityName'>${this.name.toUpperCase()}</p>
+					</div>
+				</div>`;
 	}
 }
 

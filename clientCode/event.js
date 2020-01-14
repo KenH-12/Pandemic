@@ -241,7 +241,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"You may play this between the Infect and Intensify steps of an epidemic."
 		],
 		instructions: "Select a card from INFECTION DISCARDS to remove from the game.",
-		propertyNames: ["removedCardKey"],
+		propertyNames: ["cardKey"],
 		actionPathName: "resilientPopulation"
 	},
 	oneQuietNight: {
@@ -672,6 +672,24 @@ class GovernmentGrant extends ResearchStationPlacement
 	}
 }
 
+class ResilientPopulation extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.city = cities[this.cardKey];
+	}
+	
+	getDetails()
+    {
+		return `${super.getDetails()}
+				<p>Removed From Game:</p>
+				${this.city.getInfectionCard()}
+				<p>Discarded:</p>
+				<div class='playerCard eventCard'>RESILIENT POPULATION</div>`;
+    }
+}
+
 class CardDraw extends Event
 {
 	constructor(event, cities, eventCards)
@@ -755,5 +773,6 @@ export {
 	Airlift,
 	OneQuietNight,
 	GovernmentGrant,
+	ResilientPopulation,
 	CardDraw
 }

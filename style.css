@@ -351,6 +351,22 @@ span.r {color: #ef282a; background: none}
 	clip-path: polygon(50% 65%, 0 0, 100% 0);
 }
 
+.eventDetails .infectionCard
+{
+	height: 18px;
+}
+.eventDetails .infectionCardContents
+{
+	width: 96%;
+	font-size: 14px;
+}
+.eventDetails .infectionCard .cityName
+{
+	top: 3px;
+	white-space: nowrap;
+	margin-left: 18%
+}
+
 #cureMarkerContainer
 {
 	width: 20.3%;
@@ -669,7 +685,7 @@ span.r {color: #ef282a; background: none}
 	width: 100%;
 	margin-top: 2px;
 }
-#infectionDiscard .infectionCardContents { width: 100%;  }
+#infectionDiscard .infectionCardContents { width: 100% }
 #epidemicContainer .btnDisabled { cursor: progress }
 .epidemicFull
 {
