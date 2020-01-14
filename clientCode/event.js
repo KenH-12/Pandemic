@@ -462,7 +462,7 @@ class ShuttleFlight extends Event
     }
 }
 
-class BuildResearchStation extends Event
+class ResearchStationPlacement extends Event
 {
 	constructor(event, cities)
     {
@@ -471,25 +471,30 @@ class BuildResearchStation extends Event
 
 		if (this.relocationKey)
 			this.relocatedFromCity = cities[this.relocationKey];
-    }
-
-    getDetails()
-    {
+	}
+	
+	getDetails()
+	{
 		let relocatedFrom = "";
 		if (this.relocationKey)
 			relocatedFrom = `<p>Relocated Station From: ${this.relocatedFromCity.name}</p>`;
-		
-		let discarded;
-		if (this.player.role === "Operations Expert")
-			discarded = `<p>[discard not required]</p>`;
-		else
-			discarded = `<p>Discarded:</p>${this.city.getPlayerCard({ noTooltip: true })}`;
 
 		return `${super.getDetails()}
 				<p>Location: ${this.city.name}</p>
 				${relocatedFrom}
-				${discarded}`;
-    }
+				${this.getDiscardDetails()}`;
+	}
+}
+
+class BuildResearchStation extends ResearchStationPlacement
+{
+	getDiscardDetails()
+	{
+		if (this.player.role === "Operations Expert")
+			return `<p>[discard not required]</p>`;
+		
+		return `<p>Discarded:</p>${this.city.getPlayerCard({ noTooltip: true })}`;
+	}
 }
 
 class TreatDisease extends Event
@@ -658,6 +663,15 @@ class OneQuietNight extends Event
     }
 }
 
+class GovernmentGrant extends ResearchStationPlacement
+{
+	getDiscardDetails()
+	{
+		return `<p>Discarded:</p>
+				<div class='playerCard eventCard'>GOVERNMENT GRANT</div>`;
+	}
+}
+
 class CardDraw extends Event
 {
 	constructor(event, cities, eventCards)
@@ -740,5 +754,6 @@ export {
 	DispatchPawn,
 	Airlift,
 	OneQuietNight,
+	GovernmentGrant,
 	CardDraw
 }
