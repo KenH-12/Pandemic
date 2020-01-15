@@ -463,3 +463,16 @@ function newPlayerCard(relatedObject, { noTooltip } = {})
 
 	return `<div class='playerCard epidemic' data-key='epid'${ noTooltip ? "" : " title='Epidemic card'" }>EPIDEMIC</div>`;
 }
+
+// Returns the Infection Rate (as seen on the Infection Rate Track on the game board)
+// which corresponds to the number of Epidemic cards drawn thus far.
+function getInfectionRate(epidemicCount)
+{
+	if (epidemicCount < 3)
+		return 2;
+
+	if (epidemicCount > 4)
+		return 4;
+	
+	return 3;
+}

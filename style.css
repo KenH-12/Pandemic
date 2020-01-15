@@ -342,7 +342,7 @@ span.r {color: #ef282a; background: none}
 	height: 16px;
 	margin-right: 3px;
 }
-.eventDetails .cubes > * { vertical-align: middle }
+.eventDetails .cubesRemoved > * { vertical-align: middle }
 
 .eventDetailsArrow
 {

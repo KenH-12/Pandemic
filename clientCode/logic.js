@@ -33,7 +33,8 @@ import Event, {
 	Forecast,
 	ForecastPlacement,
 	InfectCity,
-	infectionPreventionCodes
+	infectionPreventionCodes,
+	EpidemicIncrease
 } from "./event.js";
 
 $(function(){
@@ -187,6 +188,8 @@ function parseEvents(events)
 					parsedEvents.push(new CardDraw(e, cities, data.eventCards));
 				else if (e.code === eventTypes.infectCity.code)
 					parsedEvents.push(new InfectCity(e, cities));
+				else if (e.code === eventTypes.epidemicIncrease.code)
+					parsedEvents.push(new EpidemicIncrease(e));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -930,7 +933,8 @@ function showEventIconDetails($icon, event)
 									|| event instanceof ResilientPopulation
 									|| event instanceof Forecast
 									|| event instanceof CardDraw
-									|| event instanceof InfectCity ?
+									|| event instanceof InfectCity
+									|| event instanceof EpidemicIncrease ?
 									event.getDetails()
 									: eventType.name}
 								</div>`).appendTo($boardContainer),
@@ -5650,12 +5654,7 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 
 function updateInfectionRate(epidemicCount)
 {
-	let infRate = 2;
-
-	if (epidemicCount > 4)
-		infRate = 4;
-	else if (epidemicCount > 2)
-		infRate = 3;
+	const infRate = getInfectionRate(epidemicCount);
 	
 	data.infectionRate = infRate;
 

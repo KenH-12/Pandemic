@@ -791,6 +791,22 @@ class InfectCity extends Event
     }
 }
 
+class EpidemicIncrease extends Event
+{
+	constructor(event)
+	{
+		super(event);
+		this.infectionRate = getInfectionRate(this.epidemicCount);
+		this.previousInfectionRate = getInfectionRate(this.epidemicCount - 1);
+	}
+	getDetails()
+    {
+		return `${super.getDetails()}
+				<p>Epidemic Count: ${this.epidemicCount}</p>
+				<p>Infection Rate: ${this.previousInfectionRate} -> ${this.infectionRate}</p>`;
+    }
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
@@ -863,5 +879,6 @@ export {
 	ForecastPlacement,
 	CardDraw,
 	infectionPreventionCodes,
-	InfectCity
+	InfectCity,
+	EpidemicIncrease
 }
