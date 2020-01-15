@@ -255,7 +255,6 @@ export default class City
 
 	clusterResearchStation(gameData, { animateResearchStation, stationInitialOffset } = {})
 	{
-		log(`clustering ${this.name}'s station`);
 		const $researchStation = this.getResearchStation(),
 			desiredOffset = this.getOffset(gameData),
 			duration = getDuration(gameData, "stationPlacement");

@@ -386,7 +386,7 @@ export default class Event
 	getDetails()
 	{
 		return `<p class='title'>${this.name.toUpperCase()}</p>
-				<p>Role: ${this.player.newRoleTag()}</p>`;
+				${ this.player ? `<p>Role: ${this.player.newRoleTag()}</p>` : "" }`;
 	}
 }
 
@@ -766,6 +766,31 @@ class CardDraw extends Event
     }
 }
 
+const infectionPreventionCodes = {
+	notPrevented: "0",
+	eradicated: "e",
+	quarantine: "q",
+	medicAutoTreat: "m"
+};
+
+class InfectCity extends Event
+{
+	constructor(event, cities, preventedBy)
+    {
+		super(event);
+		this.city = cities[this.cityKey];
+		this.preventedBy = preventedBy;
+    }
+
+    getDetails()
+    {
+		return `${super.getDetails()}
+				<p>Infection Card: </p>
+				${this.city.getInfectionCard()}
+				${ this.preventedBy ? `<p>Infection Prevented By:</p>${this.preventedBy}` : "" }`;
+    }
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
@@ -781,7 +806,7 @@ function movementTypeRequiresDiscard(eventType)
 }
 
 // Because Events need to be instantiated before Players.
-function attachPlayersToEvents(players, events)
+function attachPlayersToEvents(players, getPlayer, events)
 {
 	for (let event of events)
 	{
@@ -789,7 +814,7 @@ function attachPlayersToEvents(players, events)
 		{
 			event.player = players[event.role];
 
-			if (event instanceof ShareKnowledge)
+			 if (event instanceof ShareKnowledge)
 			{
 				event.giver = players[event.giverRoleID];
 				event.receiver = players[event.receiverRoleID];
@@ -798,6 +823,18 @@ function attachPlayersToEvents(players, events)
 				event.dispatchedPlayer = players[event.dispatchedRoleID];
 			else if (event instanceof Airlift)
 				event.airliftedPlayer = players[event.airliftedRoleID];
+		}
+		else if (event instanceof InfectCity)
+		{
+			if (event.preventionCode === infectionPreventionCodes.notPrevented)
+				continue;
+			
+			if (event.preventionCode === infectionPreventionCodes.eradicated)
+				event.preventedBy = "Eradication";
+			else if (event.preventionCode === infectionPreventionCodes.quarantine)
+				event.preventedBy = getPlayer("Quarantine Specialist").newRoleTag();
+			else if (event.preventionCode === infectionPreventionCodes.medicAutoTreat)
+				event.preventedBy = getPlayer("Medic").newRoleTag();
 		}
 	}
 }
@@ -824,5 +861,7 @@ export {
 	ResilientPopulation,
 	Forecast,
 	ForecastPlacement,
-	CardDraw
+	CardDraw,
+	infectionPreventionCodes,
+	InfectCity
 }

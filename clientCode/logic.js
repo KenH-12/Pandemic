@@ -31,7 +31,9 @@ import Event, {
 	GovernmentGrant,
 	ResilientPopulation,
 	Forecast,
-	ForecastPlacement
+	ForecastPlacement,
+	InfectCity,
+	infectionPreventionCodes
 } from "./event.js";
 
 $(function(){
@@ -117,12 +119,6 @@ const data =
 		b: 24
 	},
 	pendingClusters: new Set(),
-	infectionPreventionCodes: {
-		notPrevented: "0",
-		eradicated: "e",
-		quarantine: "q",
-		medicAutoTreat: "m"
-	},
 	turn: -1,
 	currentStep: -1,
 	steps: {},
@@ -189,6 +185,8 @@ function parseEvents(events)
 				}
 				else if (e.code === eventTypes.cardDraw.code)
 					parsedEvents.push(new CardDraw(e, cities, data.eventCards));
+				else if (e.code === eventTypes.infectCity.code)
+					parsedEvents.push(new InfectCity(e, cities));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -197,7 +195,7 @@ function parseEvents(events)
 
 			if (Object.keys(data.players).length)
 			{
-				attachPlayersToEvents(data.players, parsedEvents);
+				attachPlayersToEvents(data.players, getPlayer, parsedEvents);
 				appendEventHistoryIcons(parsedEvents);
 			}
 			
@@ -849,7 +847,7 @@ function getEventIconFileName(eventType, event)
 			fileName = toCamelCase(infectCity.name);
 		
 		fileName += `_${getCity(event.cityKey).color}`;
-		if (event.preventionCode !== data.infectionPreventionCodes.notPrevented)
+		if (event.preventionCode !== infectionPreventionCodes.notPrevented)
 			fileName += `_${event.preventionCode}`;
 	}
 	else if (event.code === discoverACure.code)
@@ -862,13 +860,15 @@ function getEventIconFileExtension(eventType, event)
 {
 	const { code, cardKey } = eventType,
 		{
+			infectCity,
 			discoverACure,
 			epidemicIntensify,
 			autoTreatDisease,
 			eradication
 		} = eventTypes;
 
-	if (code === discoverACure.code && event
+	if (code === infectCity.code && event.preventionCode === infectionPreventionCodes.quarantine
+		|| code === discoverACure.code && event
 		|| cardKey && isEventCardKey(cardKey)
 		|| code === epidemicIntensify.code
 		|| code === autoTreatDisease.code
@@ -929,7 +929,8 @@ function showEventIconDetails($icon, event)
 									|| event instanceof GovernmentGrant
 									|| event instanceof ResilientPopulation
 									|| event instanceof Forecast
-									|| event instanceof CardDraw ?
+									|| event instanceof CardDraw
+									|| event instanceof InfectCity ?
 									event.getDetails()
 									: eventType.name}
 								</div>`).appendTo($boardContainer),
@@ -4011,18 +4012,12 @@ class Player
 	// Excludes Epidemic cards because they go straight to the discard pile after being resolved.
 	addCardKeysToHand(cardKeys)
 	{
-		log("addCardKeysToHand()");
-		log("cardKeys: ", cardKeys);
-		this.logCardKeys();
-
 		this.cardKeys = [
 			...this.cardKeys,
 			...ensureIsArray(cardKeys).filter(key => !isEpidemicKey(key))
 		];
 
 		this.updateCollapsedPanelCardCount();
-
-		this.logCardKeys();
 	}
 
 	// Removes the card element from the player's panel,
@@ -4030,34 +4025,19 @@ class Player
 	// Accepts a single cardKey string, or an array of cardKey strings.
 	removeCardsFromHand(cardKeys)
 	{
-		log(`removeCardsFromHand()`);
-		this.logCardKeys();
-		
 		for (let key of ensureIsArray(cardKeys))
 		{
-			log("removing card: ", key);
 			this.$panel.find(`.playerCard[data-key='${key}']`).remove();
 			this.cardKeys.splice(this.cardKeys.indexOf(key), 1);
 		}
 
 		this.updateCollapsedPanelCardCount();
-
-		this.logCardKeys();
 	}
 
 	updateCollapsedPanelCardCount()
 	{
 		this.$panel.find(".numCardsInHand")
 			.html(`— ${this.cardKeys.length} card${this.cardKeys.length === 1 ? "" : "s"} in hand —`);
-	}
-
-	logCardKeys()
-	{
-		let keys = "";
-		for (let key of this.cardKeys)
-			keys += key + ",";
-
-		log(this.role + " cardKeys: " + keys);
 	}
 
 	canDirectFlight()
@@ -4971,12 +4951,12 @@ async function resolveOutbreaks(events)
 			affectedCity = getCity(inf.infectedKey || inf.originKey);
 			
 			if (inf.code === outbreakInfection.code
-				&& inf.preventionCode !== data.infectionPreventionCodes.notPrevented)
+				&& inf.preventionCode !== infectionPreventionCodes.notPrevented)
 			{
-				if (inf.preventionCode === data.infectionPreventionCodes.quarantine)
+				if (inf.preventionCode === infectionPreventionCodes.quarantine)
 					quarantinePrevention = true;
 				
-				if (inf.preventionCode === data.infectionPreventionCodes.medicAutoTreat)
+				if (inf.preventionCode === infectionPreventionCodes.medicAutoTreat)
 					medicAutoTreatPrevention = true;
 				
 				preventionOccured = true;
@@ -6136,7 +6116,7 @@ async function infectionStep()
 		}
 		else
 		{
-			if (card.preventionCode === data.infectionPreventionCodes.notPrevented)
+			if (card.preventionCode === infectionPreventionCodes.notPrevented)
 			{
 				const interval = getDuration(data, "shortInterval");
 
@@ -6159,7 +6139,7 @@ async function infectionStep()
 
 async function infectionPreventionAnimation({ preventionCode, cityKey })
 {
-	const { quarantine, medicAutoTreat, eradicated } = data.infectionPreventionCodes;
+	const { quarantine, medicAutoTreat, eradicated } = infectionPreventionCodes;
 
 	if (preventionCode === quarantine)
 		return quarantineAnimation(cityKey);
@@ -7302,7 +7282,7 @@ async function setup()
 
 	data.startingHandPopulations = startingHandPopulations;
 	instantiatePlayers(players);
-	attachPlayersToEvents(data.players, data.events);
+	attachPlayersToEvents(data.players, getPlayer, data.events);
 	appendEventHistoryIcons();
 	loadDiseaseStatuses(diseaseStatuses);
 	loadInfectionDiscards(infectionDiscards);

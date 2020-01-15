@@ -342,7 +342,7 @@ span.r {color: #ef282a; background: none}
 	height: 16px;
 	margin-right: 3px;
 }
-.eventDetails .cubesRemoved > * { vertical-align: middle }
+.eventDetails .cubes > * { vertical-align: middle }
 
 .eventDetailsArrow
 {
@@ -355,6 +355,7 @@ span.r {color: #ef282a; background: none}
 {
 	height: 18px;
 	margin-bottom: 8px;
+	min-width: 200px;
 }
 .eventDetails .infectionCardContents
 {
