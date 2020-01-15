@@ -273,7 +273,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "forecastDraw"
 	},
 	forecastPlacement: {
-		name: "Forecast Place",
+		name: "Forecast",
 		code: "fp",
 		rules: [
 			"Play at any time. Not an action.",
@@ -690,6 +690,54 @@ class ResilientPopulation extends Event
     }
 }
 
+class Forecast extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.cities = [];
+		
+		for (let key of this.cardKeys)
+			this.cities.push(cities[key]);
+	}
+	
+	getDetails()
+    {
+		let infectionCards = "";
+		for (let city of this.cities)
+			infectionCards += city.getInfectionCard();
+		
+		return `${super.getDetails()}
+				<p>Top 6 Infections Cards:</p>
+				${infectionCards}
+				${this.placementEvent ? this.placementEvent.getDetails() : ""}
+				<p>Discarded:</p>
+				<div class='playerCard eventCard'>FORECAST</div>`;
+    }
+}
+
+class ForecastPlacement extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.cities = [];
+		
+		for (let key of this.cardKeys)
+			this.cities.push(cities[key]);
+	}
+	
+	getDetails()
+    {
+		let infectionCards = "";
+		for (let city of this.cities)
+			infectionCards += city.getInfectionCard();
+		
+		return `<p>New Order:</p>
+				${infectionCards}`;
+    }
+}
+
 class CardDraw extends Event
 {
 	constructor(event, cities, eventCards)
@@ -774,5 +822,7 @@ export {
 	OneQuietNight,
 	GovernmentGrant,
 	ResilientPopulation,
+	Forecast,
+	ForecastPlacement,
 	CardDraw
 }

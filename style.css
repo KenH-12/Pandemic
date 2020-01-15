@@ -354,6 +354,7 @@ span.r {color: #ef282a; background: none}
 .eventDetails .infectionCard
 {
 	height: 18px;
+	margin-bottom: 8px;
 }
 .eventDetails .infectionCardContents
 {

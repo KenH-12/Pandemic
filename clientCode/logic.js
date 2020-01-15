@@ -29,7 +29,9 @@ import Event, {
 	OneQuietNight,
 	CardDraw,
 	GovernmentGrant,
-	ResilientPopulation
+	ResilientPopulation,
+	Forecast,
+	ForecastPlacement
 } from "./event.js";
 
 $(function(){
@@ -173,6 +175,18 @@ function parseEvents(events)
 					parsedEvents.push(new GovernmentGrant(e, cities));
 				else if (e.code === eventTypes.resilientPopulation.code)
 					parsedEvents.push(new ResilientPopulation(e, cities));
+				else if (e.code === eventTypes.forecast.code)
+					parsedEvents.push(new Forecast(e, cities));
+				else if (e.code === eventTypes.forecastPlacement.code)
+				{
+					// The previously parsed Event is always the corresponding Forecast event which drew the top 6 infection cards.
+					// It can either be found in parsedEvents or data.events, but always at the end of whichever array.
+					const forecastEvent = parsedEvents.length ? parsedEvents[parsedEvents.length - 1] : data.events[data.events.length - 1],
+						placementEvent = new ForecastPlacement(e, cities);
+					
+					forecastEvent.placementEvent = placementEvent;
+					parsedEvents.push(placementEvent);
+				}
 				else if (e.code === eventTypes.cardDraw.code)
 					parsedEvents.push(new CardDraw(e, cities, data.eventCards));
 				else
@@ -914,6 +928,7 @@ function showEventIconDetails($icon, event)
 									|| event instanceof OneQuietNight
 									|| event instanceof GovernmentGrant
 									|| event instanceof ResilientPopulation
+									|| event instanceof Forecast
 									|| event instanceof CardDraw ?
 									event.getDetails()
 									: eventType.name}
