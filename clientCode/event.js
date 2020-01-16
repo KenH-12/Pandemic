@@ -514,7 +514,7 @@ class TreatDisease extends Event
 		
 		return `${super.getDetails()}
 				<p>Location: ${this.city.name}</p>
-				<span class='cubesRemoved'>
+				<span class='cubes'>
 					<span>Removed: </span>${cubesRemoved}
 				</span>`;
 	}
@@ -775,11 +775,10 @@ const infectionPreventionCodes = {
 
 class InfectCity extends Event
 {
-	constructor(event, cities, preventedBy)
+	constructor(event, cities)
     {
 		super(event);
 		this.city = cities[this.cityKey];
-		this.preventedBy = preventedBy;
     }
 
     getDetails()
@@ -804,6 +803,46 @@ class EpidemicIncrease extends Event
 		return `${super.getDetails()}
 				<p>Epidemic Count: ${this.epidemicCount}</p>
 				<p>Infection Rate: ${this.previousInfectionRate} -> ${this.infectionRate}</p>`;
+    }
+}
+
+class EpidemicInfect extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.city = cities[this.cityKey];
+		
+		this.MAX_NUM_CUBES = 3;
+		this.numCubesAdded = this.MAX_NUM_CUBES - this.prevCubeCount;
+    }
+
+    getDetails()
+    {
+		let infectionResult;
+		if (this.preventedBy)
+			infectionResult = `<p>Infection Prevented By:</p>${this.preventedBy}`;
+		else
+		{
+			let cubes = "";
+			for (let i = 0; i < this.numCubesAdded; i++)
+				cubes += newDiseaseCubeElement({ color: this.city.color, asJqueryObject: false });
+
+			if (cubes)
+				infectionResult = `<span class='cubes'>
+										<span>Disease Cubes Added: </span>${ cubes }
+									</span>`;
+			else
+				infectionResult = "<p>Disease Cubes Added: 0</p>";
+			
+			if (this.numCubesAdded < this.MAX_NUM_CUBES)
+				infectionResult += "<p>(Triggered Outbreak)</p>";
+		}
+		
+		return `${super.getDetails()}
+				<p>Bottom Infection Card: </p>
+				${this.city.getInfectionCard()}
+				${infectionResult}`;
     }
 }
 
@@ -840,7 +879,7 @@ function attachPlayersToEvents(players, getPlayer, events)
 			else if (event instanceof Airlift)
 				event.airliftedPlayer = players[event.airliftedRoleID];
 		}
-		else if (event instanceof InfectCity)
+		else if (event instanceof InfectCity || event instanceof EpidemicInfect)
 		{
 			if (event.preventionCode === infectionPreventionCodes.notPrevented)
 				continue;
@@ -880,5 +919,6 @@ export {
 	CardDraw,
 	infectionPreventionCodes,
 	InfectCity,
-	EpidemicIncrease
+	EpidemicIncrease,
+	EpidemicInfect
 }

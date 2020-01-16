@@ -34,7 +34,8 @@ import Event, {
 	ForecastPlacement,
 	InfectCity,
 	infectionPreventionCodes,
-	EpidemicIncrease
+	EpidemicIncrease,
+	EpidemicInfect
 } from "./event.js";
 
 $(function(){
@@ -190,6 +191,8 @@ function parseEvents(events)
 					parsedEvents.push(new InfectCity(e, cities));
 				else if (e.code === eventTypes.epidemicIncrease.code)
 					parsedEvents.push(new EpidemicIncrease(e));
+				else if (e.code === eventTypes.epidemicInfect.code)
+					parsedEvents.push(new EpidemicInfect(e, cities));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -865,12 +868,13 @@ function getEventIconFileExtension(eventType, event)
 		{
 			infectCity,
 			discoverACure,
+			epidemicInfect,
 			epidemicIntensify,
 			autoTreatDisease,
 			eradication
 		} = eventTypes;
 
-	if (code === infectCity.code && event.preventionCode === infectionPreventionCodes.quarantine
+	if ( (code === infectCity.code || code === epidemicInfect.code) && event.preventionCode === infectionPreventionCodes.quarantine
 		|| code === discoverACure.code && event
 		|| cardKey && isEventCardKey(cardKey)
 		|| code === epidemicIntensify.code
@@ -896,7 +900,7 @@ function getEventIconCssClasses(event)
 	else if (event.code === infectCity.code)
 		return `${getCity(event.cityKey).color}Border darkBlueBackground`;
 	else if (event.code === epidemicInfect.code)
-		return `${getCity(event.cityKey).color}Border lightGreenBackground`;
+		return "darkGreenBorder lightGreenBackground";
 	else if (event.code === eradication.code)
 		return `${event.diseaseColor}Border`;
 	
@@ -934,7 +938,8 @@ function showEventIconDetails($icon, event)
 									|| event instanceof Forecast
 									|| event instanceof CardDraw
 									|| event instanceof InfectCity
-									|| event instanceof EpidemicIncrease ?
+									|| event instanceof EpidemicIncrease
+									|| event instanceof EpidemicInfect ?
 									event.getDetails()
 									: eventType.name}
 								</div>`).appendTo($boardContainer),
