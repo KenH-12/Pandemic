@@ -4,8 +4,11 @@
 	if (isset($_SESSION["game"]))
 	{
 		$game = $_SESSION["game"];
+		$response = array();
+		$EPIDEMIC_INTENSIFY_CODE = "et";
 		
 		require "../connect.php";
+		include "../utilities.php";
 		
 		$results = $mysqli->query("SELECT	id,
 											turnNum,
@@ -16,9 +19,11 @@
 									WHERE game = $game
 									ORDER BY id");
 		
-		$response = array();
 		while ($row = mysqli_fetch_assoc($results))
 		{
+			if ($row["code"] === $EPIDEMIC_INTENSIFY_CODE)
+				$row["cardKeys"] = getEpidemicIntensifyCardKeys($mysqli, $row["id"]);
+
 			$response[] = $row;
 		}
 		

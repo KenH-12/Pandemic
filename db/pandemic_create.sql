@@ -5,6 +5,7 @@ DROP VIEW IF EXISTS vw_infectionCard;
 DROP VIEW IF EXISTS vw_player;
 DROP VIEW IF EXISTS vw_gamestate;
 DROP VIEW IF EXISTS vw_disease;
+DROP TABLE IF EXISTS epidemicintensify;
 DROP TABLE IF EXISTS eventhistory;
 DROP TABLE IF EXISTS player;
 DROP TABLE IF EXISTS location;
@@ -249,6 +250,17 @@ SELECT	eventID AS id,
         roleID AS role,
         gameID AS game
 FROM eventhistory;
+
+CREATE TABLE EPIDEMICINTENSIFY
+(
+	eventID		INT NOT NULL,
+    cityKey		CHAR(4) NOT NULL,
+    cardIndex	TINYINT NOT NULL,
+    
+    CONSTRAINT pk_epidemicIntensify_eventID_cityKey PRIMARY KEY (eventID, cityKey),
+    CONSTRAINT fk_eventHistory_epidemicIntensify_eventID FOREIGN KEY(eventID) REFERENCES EVENTHISTORY(eventID),
+    CONSTRAINT fk_city_epidemicIntensify_cityKey FOREIGN KEY(cityKey) REFERENCES CITY(cityKey)
+);
 
 CREATE VIEW vw_gamestate
 AS

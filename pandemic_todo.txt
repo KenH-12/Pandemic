@@ -18,12 +18,17 @@ event history
 				city names (pinpoint city)
 				movement types (dispatch pawn)
 			travel paths for movement actions and research station relocations
+			epidemic intensify should have a max height, and should be scrollable
 	new icons should not appear prematurely
 	if the event history is not overflowing horizontally, animate new icons into view from right to left
+
+replace event.code with instanceof Event
 
 move data.eventCards to eventCards.js ?
 
 create MovementEvent class as a bridge between Event and all movement action event types
+
+hovering over an epidemic card should show the full card
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
 

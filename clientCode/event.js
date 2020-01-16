@@ -846,6 +846,29 @@ class EpidemicInfect extends Event
     }
 }
 
+class EpidemicIntensify extends Event
+{
+	constructor(event, cities)
+    {
+		super(event);
+		this.cities = [];
+
+		for (let key of event.cardKeys)
+			this.cities.push(cities[key]);
+    }
+
+    getDetails()
+    {
+		let infectionCards = "";
+		for (let city of this.cities)
+			infectionCards += city.getInfectionCard();
+		
+		return `${super.getDetails()}
+				<p>Pre-Intensify Discard Pile:</p>
+				${infectionCards}`;
+    }
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
@@ -920,5 +943,6 @@ export {
 	infectionPreventionCodes,
 	InfectCity,
 	EpidemicIncrease,
-	EpidemicInfect
+	EpidemicInfect,
+	EpidemicIntensify
 }

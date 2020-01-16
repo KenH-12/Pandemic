@@ -777,6 +777,20 @@ function countEpidemicsResolvedOnTurn($mysqli, $game, $turnNum)
     return $numResolvedThisTurn;
 }
 
+function getEpidemicIntensifyCardKeys($mysqli, $eventID)
+{
+    $intensifyKeys = $mysqli->query("SELECT cityKey
+                            FROM epidemicIntensify
+                            WHERE eventID = $eventID
+                            ORDER BY cardIndex DESC");
+
+    $cardKeys = array();
+    while ($row = mysqli_fetch_assoc($intensifyKeys))
+        array_push($cardKeys, $row["cityKey"]);
+    
+    return $cardKeys;
+}
+
 // Throws an Exception if playing the specified $eventCardKey is illegal in the current game state.
 // "Event cards can be played at any time, except in between drawing and resolving a card."
 // Therefore, event cards cannot be played during the "draw" step or while resolving an epidemic.
