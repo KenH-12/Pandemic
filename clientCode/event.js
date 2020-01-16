@@ -197,6 +197,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	discard: {
 		name: "Discard",
+		displayName: "Discard To 7 Cards",
 		hasIcon: true,
 		code: "ds",
 		actionPathName: "discardPlayerCards",
@@ -357,6 +358,7 @@ export default class Event
 		
 		this.code = code;
 		this.name = eventType.name;
+		this.displayName = eventType.displayName;
 		this.id = id;
 		this.turnNum = turnNum;
 		this.role = role;
@@ -385,7 +387,9 @@ export default class Event
 
 	getDetails()
 	{
-		return `<p class='title'>${this.name.toUpperCase()}</p>
+		const name = this.displayName || this.name;
+		
+		return `<p class='title'>${name.toUpperCase()}</p>
 				${ this.player ? `<p>Role: ${this.player.newRoleTag()}</p>` : "" }`;
 	}
 }
@@ -766,6 +770,32 @@ class CardDraw extends Event
     }
 }
 
+class Discard extends Event
+{
+	constructor(event, cities, eventCards)
+    {
+		super(event);
+		this.cards = [];
+		
+		for (let key of ensureIsArray(this.cardKeys))
+			this.cards.push(eventCards[key] || cities[key]);
+    }
+
+    getDetails()
+    {
+		const HAND_LIMIT = 7;
+		
+		let discards = "";
+		for (let card of this.cards)
+			discards += card.getPlayerCard({ noTooltip: true });
+		
+		return `${super.getDetails()}
+				<p>Cards In Hand: ${ HAND_LIMIT + this.cards.length }</p>
+				<p>Discarded: </p>
+				${discards}`;
+    }
+}
+
 const infectionPreventionCodes = {
 	notPrevented: "0",
 	eradicated: "e",
@@ -940,6 +970,7 @@ export {
 	Forecast,
 	ForecastPlacement,
 	CardDraw,
+	Discard,
 	infectionPreventionCodes,
 	InfectCity,
 	EpidemicIncrease,

@@ -36,7 +36,8 @@ import Event, {
 	infectionPreventionCodes,
 	EpidemicIncrease,
 	EpidemicInfect,
-	EpidemicIntensify
+	EpidemicIntensify,
+	Discard
 } from "./event.js";
 
 $(function(){
@@ -188,6 +189,8 @@ function parseEvents(events)
 				}
 				else if (e.code === eventTypes.cardDraw.code)
 					parsedEvents.push(new CardDraw(e, cities, data.eventCards));
+				else if (e.code === eventTypes.discard.code)
+					parsedEvents.push(new Discard(e, cities, data.eventCards));
 				else if (e.code === eventTypes.infectCity.code)
 					parsedEvents.push(new InfectCity(e, cities));
 				else if (e.code === eventTypes.epidemicIncrease.code)
@@ -940,6 +943,7 @@ function showEventIconDetails($icon, event)
 									|| event instanceof ResilientPopulation
 									|| event instanceof Forecast
 									|| event instanceof CardDraw
+									|| event instanceof Discard
 									|| event instanceof InfectCity
 									|| event instanceof EpidemicIncrease
 									|| event instanceof EpidemicInfect
