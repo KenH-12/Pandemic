@@ -111,6 +111,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	eradication: {
 		name: "eradication",
+		displayName: "Disease Eradicated",
 		hasIcon: true,
 		code: "er",
 		propertyNames: ["diseaseColor"]
@@ -573,6 +574,18 @@ class DiscoverACure extends Event
 				<p>Discarded: </p>
 				${discarded}`;
     }
+}
+
+class Eradication extends Event
+{
+	getDetails()
+	{
+		const color = getColorWord(this.diseaseColor);
+		
+		return `${super.getDetails()}
+				<p>The ${color} disease has been eradicated!</p>
+				<p>(no new ${color} disease cubes will be placed on the board)</p>`;
+	}
 }
 
 class OperationsFlight extends Event
@@ -1049,6 +1062,7 @@ export {
 	AutoTreatDisease,
 	ShareKnowledge,
 	DiscoverACure,
+	Eradication,
 	OperationsFlight,
 	PlanContingency,
 	DispatchPawn,

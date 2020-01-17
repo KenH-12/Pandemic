@@ -187,6 +187,22 @@ function getColorClass($element)
 	return false;
 }
 
+function getColorWord(colorCode)
+{
+	const colorWords = {
+		y: "yellow",
+		r: "red",
+		u: "blue",
+		b: "black"
+	};
+
+	if (colorCode in colorWords)
+		return colorWords[colorCode];
+	
+	console.error(`Color code does not exist: '${colorCode}'`);
+	return "";
+}
+
 function removeWhitespace(string)
 {
 	return string.replace(/ /g,"");

@@ -40,7 +40,8 @@ import Event, {
 	Discard,
 	Outbreak,
 	OutbreakInfection,
-	AutoTreatDisease
+	AutoTreatDisease,
+	Eradication
 } from "./event.js";
 
 $(function(){
@@ -166,6 +167,8 @@ function parseEvents(events)
 					parsedEvents.push(new ShareKnowledge(e, cities));
 				else if (e.code === eventTypes.discoverACure.code)
 					parsedEvents.push(new DiscoverACure(e, cities));
+				else if (e.code === eventTypes.eradication.code)
+					parsedEvents.push(new Eradication(e));
 				else if (e.code === eventTypes.operationsFlight.code)
 					parsedEvents.push(new OperationsFlight(e, cities));
 				else if (e.code === eventTypes.planContingency.code)
@@ -944,6 +947,7 @@ function showEventIconDetails($icon, event)
 									|| event instanceof AutoTreatDisease
 									|| event instanceof ShareKnowledge
 									|| event instanceof DiscoverACure
+									|| event instanceof Eradication
 									|| event instanceof OperationsFlight
 									|| event instanceof PlanContingency
 									|| event instanceof DispatchPawn
@@ -6174,22 +6178,6 @@ async function infectionPreventionAnimation({ preventionCode, cityKey })
 function diseaseIsEradicated(diseaseColor)
 {
 	return data.cures[diseaseColor] === "eradicated";
-}
-
-function getColorWord(colorCode)
-{
-	const colorWords = {
-		y: "yellow",
-		r: "red",
-		u: "blue",
-		b: "black"
-	};
-
-	if (colorCode in colorWords)
-		return colorWords[colorCode];
-	
-	console.error(`Color code does not exist: '${colorCode}'`);
-	return "";
 }
 
 function newMedicAutoTreatCircle()

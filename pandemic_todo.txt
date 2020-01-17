@@ -13,8 +13,6 @@ event history
 		starting hands?
 		turn order?
 		other setup stuff?
-		auto-treat disease
-		eradication
 		pass
 			"—" icon
 			number of actions forfeited
