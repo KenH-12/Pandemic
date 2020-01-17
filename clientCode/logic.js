@@ -37,7 +37,9 @@ import Event, {
 	EpidemicIncrease,
 	EpidemicInfect,
 	EpidemicIntensify,
-	Discard
+	Discard,
+	Outbreak,
+	OutbreakInfection
 } from "./event.js";
 
 $(function(){
@@ -199,6 +201,10 @@ function parseEvents(events)
 					parsedEvents.push(new EpidemicInfect(e, cities));
 				else if (e.code === eventTypes.epidemicIntensify.code)
 					parsedEvents.push(new EpidemicIntensify(e, cities));
+				else if (e.code === eventTypes.outbreak.code)
+					parsedEvents.push(new Outbreak(e, cities, parsedEvents));
+				else if (e.code === eventTypes.outbreakInfection.code)
+					parsedEvents.push(new OutbreakInfection(e, cities, parsedEvents));
 				else
 					parsedEvents.push(new Event(e, cities));
 			}
@@ -926,7 +932,7 @@ function showEventIconDetails($icon, event)
 		$eventHistory = $("#eventHistory"),
 		$boardContainer = $("#boardContainer"),
 		$detailsContainer = $(`<div class='eventDetails'>
-									${event instanceof DriveFerry
+									${ event instanceof DriveFerry
 									|| event instanceof DirectFlight
 									|| event instanceof CharterFlight
 									|| event instanceof ShuttleFlight
@@ -947,9 +953,10 @@ function showEventIconDetails($icon, event)
 									|| event instanceof InfectCity
 									|| event instanceof EpidemicIncrease
 									|| event instanceof EpidemicInfect
-									|| event instanceof EpidemicIntensify ?
+									|| event instanceof EpidemicIntensify
+									|| event instanceof Outbreak ?
 									event.getDetails()
-									: eventType.name}
+									: eventType.name }
 								</div>`).appendTo($boardContainer),
 		$arrow = $("<div class='eventDetailsArrow'></div>").appendTo($boardContainer),
 		containerHeight = $detailsContainer.height(),
@@ -5081,7 +5088,6 @@ function removeOutbreakCubeHighlights(cityKey)
 
 function tooManyOutbreaksOccured()
 {
-	log("tooManyOutbreaksOccured()");
 	const OUTBREAK_LIMIT = 8;
 
 	if (data.outbreakCount >= OUTBREAK_LIMIT)
@@ -6926,7 +6932,6 @@ async function outOfPlayerCardsDefeatAnimation($cardDrawContainer)
 
 function diseaseCubeLimitExceeded(color)
 {
-	log(color, "cubes left: ", data.diseaseCubeSupplies[color]);
 	return data.gameEndCause === "cubes" && data.diseaseCubeSupplies[color] < 0;
 }
 

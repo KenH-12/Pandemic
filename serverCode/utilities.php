@@ -181,10 +181,21 @@ function outbreak($mysqli, $game, $originCityKey, $diseaseColor)
     
     while (count($pendingOutbreakKeys) > 0)
     {
-        $outbreakKey = array_shift($pendingOutbreakKeys);
+        $outbreakDetails = array_shift($pendingOutbreakKeys);
+
+        if (is_array($outbreakDetails))
+        {
+            $outbreakKey= $outbreakDetails["outbreakKey"];
+            $triggeredByKey = $outbreakDetails["triggeredByKey"];
+        }
+        else
+        {
+            $outbreakKey = $outbreakDetails;
+            $triggeredByKey = 0;
+        } 
         
         $outbreakCount++;
-        $events[] = recordEvent($mysqli, $game, "ob", "$outbreakCount,$outbreakKey,$diseaseColor");
+        $events[] = recordEvent($mysqli, $game, "ob", "$outbreakCount,$outbreakKey,$diseaseColor,$triggeredByKey");
 
         // If the outbreak limit is reached, the game is over and the players lose.
         if ($outbreakCount == $OUTBREAK_LIMIT)
@@ -237,7 +248,8 @@ function outbreak($mysqli, $game, $originCityKey, $diseaseColor)
             }
             else // the affected city will have an outbreak
             {
-                array_push($pendingOutbreakKeys, $affectedKey);
+                $outbreakDetails = array("outbreakKey" => $affectedKey, "triggeredByKey" => $outbreakKey);
+                array_push($pendingOutbreakKeys, $outbreakDetails);
                 array_push($currentOutbreakKeys, $affectedKey);
             }
         }

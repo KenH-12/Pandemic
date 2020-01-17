@@ -9,6 +9,14 @@ TO DO
 event history
 	slideshow buttons
 	detailed tooltips
+		initial infections
+		starting hands?
+		auto-treat disease
+		eradication
+		pass
+			"—" icon
+			number of actions forfeited
+		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
 			Title should show action description
 			role tags should show role card to right of tooltip

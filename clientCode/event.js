@@ -224,7 +224,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Outbreak",
 		hasIcon: true,
 		code: "ob",
-		propertyNames: ["outbreakCount", "originKey", "diseaseColor"]
+		propertyNames: ["outbreakCount", "originKey", "diseaseColor", "triggeredByKey"]
 	},
 	outbreakInfection: {
 		name: "Outbreak Infection",
@@ -899,6 +899,84 @@ class EpidemicIntensify extends Event
     }
 }
 
+class Outbreak extends Event
+{
+	constructor(event, cities, arrayContainingTriggerEvent)
+    {
+		super(event);
+		this.origin = cities[this.originKey];
+		this.infections = [];
+		this.triggeredOutbreaks = [];
+
+		if (this.triggeredByKey)
+			this.attachToTriggerEvent(arrayContainingTriggerEvent);
+	}
+	
+	attachToTriggerEvent(arrayContainingTriggerEvent)
+	{
+		let event;
+		for (let i = arrayContainingTriggerEvent.length - 1; i >= 0; i--)
+		{
+			event = arrayContainingTriggerEvent[i];
+			if (event instanceof Outbreak && event.originKey === this.triggeredByKey)
+			{
+				event.triggeredOutbreaks.push(this);
+				break;
+			}
+		}
+	}
+
+    getDetails()
+    {
+		let infectionDetails = "";
+		for (let infection of this.infections)
+			infectionDetails += this.getInfectionDetails(infection)
+		
+		let triggeredOutbreakDetails = "";
+			for (let outbreak of this.triggeredOutbreaks)
+			triggeredOutbreakDetails += `${this.getInfectionDetails(outbreak)}`;
+		
+		return `${super.getDetails()}
+				<p>Origin: ${this.origin.name}</p>
+				${ infectionDetails ? `<p>Affected Cities:</p>${infectionDetails}` : "" }
+				${triggeredOutbreakDetails}
+				<p>Outbreak Count: ${this.outbreakCount}</p>`;
+	}
+
+	getInfectionDetails(infection)
+	{
+		const cube = newDiseaseCubeElement({ color: this.diseaseColor, asJqueryObject: false });
+		return `<span class='cubes'>
+					${cube}<span> -> ${ infection instanceof OutbreakInfection ? infection.infectedCity.name : infection.origin.name }</span>
+				</span>
+				<br />`;
+	}
+}
+
+class OutbreakInfection extends Event
+{
+	constructor(event, cities, arrayContainingOutbreakEvent)
+    {
+		super(event);
+		this.infectedCity = cities[this.infectedKey];
+		this.attachToOutbreakEvent(arrayContainingOutbreakEvent);
+    }
+
+	attachToOutbreakEvent(arrayContainingOutbreakEvent)
+	{
+		let event;
+		for (let i = arrayContainingOutbreakEvent.length - 1; i >= 0; i--)
+		{
+			event = arrayContainingOutbreakEvent[i];
+			if (event instanceof Outbreak && event.originKey === this.originKey)
+			{
+				event.infections.push(this);
+				break;
+			}
+		}
+	}
+}
+
 function getEventType(eventCode)
 {
 	return eventTypes[eventCodes[eventCode]];
@@ -975,5 +1053,7 @@ export {
 	InfectCity,
 	EpidemicIncrease,
 	EpidemicInfect,
-	EpidemicIntensify
+	EpidemicIntensify,
+	Outbreak,
+	OutbreakInfection
 }
