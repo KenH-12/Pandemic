@@ -39,7 +39,8 @@ import Event, {
 	EpidemicIntensify,
 	Discard,
 	Outbreak,
-	OutbreakInfection
+	OutbreakInfection,
+	AutoTreatDisease
 } from "./event.js";
 
 $(function(){
@@ -159,6 +160,8 @@ function parseEvents(events)
 					parsedEvents.push(new BuildResearchStation(e, cities));
 				else if (e.code === eventTypes.treatDisease.code)
 					parsedEvents.push(new TreatDisease(e, cities));
+				else if (e.code === eventTypes.autoTreatDisease.code)
+					parsedEvents.push(new AutoTreatDisease(e, cities));
 				else if (e.code === eventTypes.shareKnowledge.code)
 					parsedEvents.push(new ShareKnowledge(e, cities));
 				else if (e.code === eventTypes.discoverACure.code)
@@ -938,6 +941,7 @@ function showEventIconDetails($icon, event)
 									|| event instanceof ShuttleFlight
 									|| event instanceof BuildResearchStation
 									|| event instanceof TreatDisease
+									|| event instanceof AutoTreatDisease
 									|| event instanceof ShareKnowledge
 									|| event instanceof DiscoverACure
 									|| event instanceof OperationsFlight

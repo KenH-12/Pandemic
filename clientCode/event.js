@@ -94,7 +94,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Auto-Treat Disease",
 		hasIcon: true,
 		code: "at",
-		propertyNames: ["cityKey", "diseaseColor"]
+		propertyNames: ["cityKey", "diseaseColor", "numCubesRemoved"]
 	},
 	discoverACure: {
 		name: "Discover A Cure",
@@ -501,16 +501,15 @@ class BuildResearchStation extends ResearchStationPlacement
 	}
 }
 
-class TreatDisease extends Event
+class DiseaseCubeRemoval extends Event
 {
 	constructor(event, cities)
-    {
+	{
 		super(event);
 		this.city = cities[this.cityKey];
-		this.numCubesRemoved = this.prevCubeCount - this.newCubeCount;
-    }
+	}
 
-    getDetails()
+	getDetails()
     {
 		let cubesRemoved = "";
 		for (let i = 0; i < this.numCubesRemoved; i++)
@@ -523,6 +522,17 @@ class TreatDisease extends Event
 				</span>`;
 	}
 }
+
+class TreatDisease extends DiseaseCubeRemoval
+{
+	constructor(event, cities)
+    {
+		super(event, cities);
+		this.numCubesRemoved = this.prevCubeCount - this.newCubeCount;
+    }
+}
+
+class AutoTreatDisease extends DiseaseCubeRemoval { }
 
 class ShareKnowledge extends Event
 {
@@ -1036,6 +1046,7 @@ export {
 	ShuttleFlight,
 	BuildResearchStation,
 	TreatDisease,
+	AutoTreatDisease,
 	ShareKnowledge,
 	DiscoverACure,
 	OperationsFlight,

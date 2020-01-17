@@ -141,7 +141,7 @@ function removeCubesFromCity($mysqli, $game, $role, $cityKey, $cubeColor, $remov
     if ($eventType == "td")
         return recordEvent($mysqli, $game, $eventType, "$cityKey,$cubeColor,$cubeCount,$newCubeCount", $role);
     else if ($eventType == "at")
-        return recordEvent($mysqli, $game, $eventType, "$cityKey,$cubeColor", $role);
+        return recordEvent($mysqli, $game, $eventType, "$cityKey,$cubeColor,$cubeCount", $role);
 }
 
 function recordEvent($mysqli, $game, $type, $details, $role = "NULL")

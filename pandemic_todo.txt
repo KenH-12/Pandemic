@@ -11,6 +11,8 @@ event history
 	detailed tooltips
 		initial infections
 		starting hands?
+		turn order?
+		other setup stuff?
 		auto-treat disease
 		eradication
 		pass
