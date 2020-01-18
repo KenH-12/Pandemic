@@ -458,8 +458,7 @@ function getClipPathPolygonFromPoints(containerWidth, containerHeight, points)
 
 function newDiseaseCubeElement({ color, cityKey, asJqueryObject = true } = {})
 {
-	let cssClasses = "diseaseCube";
-	if (color) cssClasses += ` ${color}`;
+	let cssClasses = `diseaseCube ${color || "w"}`;
 	if (cityKey) cssClasses += ` ${cityKey}`;
 	
 	const diseaseCubeHtml = `<div class='${cssClasses}'>

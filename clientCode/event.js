@@ -213,6 +213,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	initialInfection: {
 		name: "Initial Infection",
+		displayName: "Infect 9 Cities",
+		hasIcon: true,
 		code: "ii",
 		propertyNames: ["cityKey", "numCubes"]
 	},
@@ -392,6 +394,57 @@ export default class Event
 		
 		return `<p class='title'>${name.toUpperCase()}</p>
 				${ this.player ? `<p>Role: ${this.player.newRoleTag()}</p>` : "" }`;
+	}
+}
+
+class InitialInfection extends Event
+{
+	constructor(event, cities)
+	{
+		super(event);
+		this.infections = [];
+
+		this.addInfection(event, cities);
+	}
+
+	addInfection(infectionEvent, cities)
+	{
+		const { 0: cityKey, 1: numCubes } = infectionEvent.details.split(",");
+
+		this.infections.push({ cityKey, city: cities[cityKey], numCubes });
+	}
+
+	getDetails()
+	{
+		let infectionDetails = "";
+		let numCubes = 0;
+
+		for (let infection of this.infections)
+		{
+			if (infection.numCubes !== numCubes)
+			{
+				numCubes = infection.numCubes;
+				infectionDetails += this.newCubeRow(numCubes);
+			}
+
+			infectionDetails += infection.city.getInfectionCard();
+		}
+		
+		return super.getDetails() + infectionDetails;
+	}
+
+	newCubeRow(numCubes)
+	{
+		const cube = newDiseaseCubeElement({ asJqueryObject: false });
+
+		let cubeRow = "<span class='cubes'>";
+
+		for (let i = 0; i < numCubes; i++)
+			cubeRow += cube;
+		
+		cubeRow += "</span>";
+
+		return cubeRow;
 	}
 }
 
@@ -1053,6 +1106,7 @@ export {
 	getEventType,
 	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
+	InitialInfection,
 	DriveFerry,
 	DirectFlight,
 	CharterFlight,

@@ -41,7 +41,8 @@ import Event, {
 	Outbreak,
 	OutbreakInfection,
 	AutoTreatDisease,
-	Eradication
+	Eradication,
+	InitialInfection
 } from "./event.js";
 
 $(function(){
@@ -149,7 +150,15 @@ function parseEvents(events)
 				log("parsing event: ", e);
 				if (!e) continue;
 				
-				if (e.code === eventTypes.driveFerry.code)
+				if (e.code === eventTypes.initialInfection.code)
+				{
+					const lastEventParsed = parsedEvents[parsedEvents.length - 1];
+					if (lastEventParsed instanceof InitialInfection)
+						lastEventParsed.addInfection(e, cities);
+					else
+						parsedEvents.push(new InitialInfection(e, cities));
+				}
+				else if (e.code === eventTypes.driveFerry.code)
 					parsedEvents.push(new DriveFerry(e, cities));
 				else if (e.code === eventTypes.directFlight.code)
 					parsedEvents.push(new DirectFlight(e, cities));
@@ -884,6 +893,7 @@ function getEventIconFileExtension(eventType, event)
 {
 	const { code, cardKey } = eventType,
 		{
+			initialInfection,
 			infectCity,
 			discoverACure,
 			epidemicInfect,
@@ -892,7 +902,8 @@ function getEventIconFileExtension(eventType, event)
 			eradication
 		} = eventTypes;
 
-	if ( (code === infectCity.code || code === epidemicInfect.code) && event.preventionCode === infectionPreventionCodes.quarantine
+	if ( code === initialInfection.code
+		|| (code === infectCity.code || code === epidemicInfect.code) && event.preventionCode === infectionPreventionCodes.quarantine
 		|| code === discoverACure.code && event
 		|| cardKey && isEventCardKey(cardKey)
 		|| code === epidemicIntensify.code
@@ -938,7 +949,8 @@ function showEventIconDetails($icon, event)
 		$eventHistory = $("#eventHistory"),
 		$boardContainer = $("#boardContainer"),
 		$detailsContainer = $(`<div class='eventDetails'>
-									${ event instanceof DriveFerry
+									${ event instanceof InitialInfection
+									|| event instanceof DriveFerry
 									|| event instanceof DirectFlight
 									|| event instanceof CharterFlight
 									|| event instanceof ShuttleFlight
@@ -6619,17 +6631,16 @@ function dealInitialInfectionCards()
 	return new Promise(async (resolve) =>
 	{
 		// Filter initial infections and assign them indices
-		const infections = data.events
-						.filter(e => e.code === eventTypes.initialInfection.code)
-						.map((e, i) => { return { ...e, index: i } }),
+		const initialInfections = data.events.filter(e => e instanceof InitialInfection)[0]
+			.infections.map((inf, i) => { return { ...inf, index: i } }),
 			GROUP_SIZE = 3; // 3 groups of 3 infection cards
 		let group;
-		
-		while (infections.length)
+
+		while (initialInfections.length)
 		{
 			await showNextGroupInfRate();
 			
-			group = infections.splice(0, GROUP_SIZE);
+			group = initialInfections.splice(0, GROUP_SIZE);
 			await dealFaceDownInfGroup(group);
 			
 			for (let card of group)
@@ -6717,12 +6728,11 @@ function dealFaceDownInfCard(elementIndex)
 	});
 }
 
-async function revealInfectionCard({ cityKey, index }, { forecasting } = {})
+async function revealInfectionCard({ city, cityKey, index }, { forecasting } = {})
 {
 	return new Promise(resolve =>
 	{
 		const $card = getInfectionContainer().find(".infectionCard").eq(index),
-			city = getCity(cityKey),
 			diseaseColorIsEradicated = diseaseIsEradicated(city.color),
 			$veil = $card.find(".veil"),
 			$cardback = forecasting ? $(".drawnInfectionCard").eq(index) : $(".drawnInfectionCard").first();

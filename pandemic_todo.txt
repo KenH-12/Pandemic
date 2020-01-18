@@ -4,6 +4,9 @@ quarantine event icons get the wrong file extension -- export them as pngs
 
 drive/ferry icon is huge in action prompt
 
+initial infections are broken because of the recent merging of events
+	use the single InitialInfection object to get the initial infections for the dealInitialInfectionCards fn
+
 TO DO
 -----
 event history
@@ -13,9 +16,6 @@ event history
 		starting hands?
 		turn order?
 		other setup stuff?
-		pass
-			"—" icon
-			number of actions forfeited
 		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
 			Title should show action description
