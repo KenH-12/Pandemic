@@ -8350,6 +8350,8 @@ function getDecidingTurnOrderCardPopulations()
 		highestPop = 0;
 		for (let card of startingHandPopulations)
 		{
+			getCity(card.key).population = card.population;
+			
 			if (Number(card.population) > highestPop)
 			{
 				highestPop = Number(card.population);

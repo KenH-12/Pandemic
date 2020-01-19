@@ -420,14 +420,16 @@ class StartingHands extends Event
 
 	getDetails()
 	{
-		let details = "";
+		let details = "",
+			$card;
 		for (let hand of this.hands)
 		{
 			details += `<div class='hand'>
 							<p>Role: ${hand.player.newRoleTag()}</p>
 							<p>Starting Hand:</p>`;
+			
 			for (let card of hand.cards)
-				details += card.getPlayerCard({ noTooltip: true });
+				details += card.getPlayerCard({ includePopulation: true, noTooltip: true });
 			
 			details += "</div>";
 		}
