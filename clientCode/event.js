@@ -218,8 +218,9 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "ii",
 		propertyNames: ["cityKey", "numCubes"]
 	},
-	startingHand: {
-		name: "Starting Hand",
+	startingHands: {
+		name: "Starting Hands",
+		hasIcon: true,
 		code: "sh",
 		propertyNames: ["cardKeys"]
 	},
@@ -340,7 +341,7 @@ eventCodes = {
 	ds: "discard",
 	ic: "infectCity",
 	ii: "initialInfection",
-	sh: "startingHand",
+	sh: "startingHands",
 	ob: "outbreak",
 	oi: "outbreakInfection",
 	rp: "resilientPopulation",
@@ -394,6 +395,44 @@ export default class Event
 		
 		return `<p class='title'>${name.toUpperCase()}</p>
 				${ this.player ? `<p>Role: ${this.player.newRoleTag()}</p>` : "" }`;
+	}
+}
+
+class StartingHands extends Event
+{
+	constructor(event, cities, eventCards)
+	{
+		super(event);
+		delete this.role;
+		this.hands = [];
+		this.addHand(event, cities, eventCards);
+	}
+
+	addHand(hand, cities, eventCards)
+	{
+		hand.cards = [];
+
+		for (let key of hand.details.split(","))
+			hand.cards.push(eventCards[key] || cities[key]);
+		
+		this.hands.push(hand);
+	}
+
+	getDetails()
+	{
+		let details = "";
+		for (let hand of this.hands)
+		{
+			details += `<div class='hand'>
+							<p>Role: ${hand.player.newRoleTag()}</p>
+							<p>Starting Hand:</p>`;
+			for (let card of hand.cards)
+				details += card.getPlayerCard({ noTooltip: true });
+			
+			details += "</div>";
+		}
+
+		return super.getDetails() + details;
 	}
 }
 
@@ -1098,6 +1137,11 @@ function attachPlayersToEvents(players, getPlayer, events)
 			else if (event.preventionCode === infectionPreventionCodes.medicAutoTreat)
 				event.preventedBy = getPlayer("Medic").newRoleTag();
 		}
+		else if (event instanceof StartingHands)
+		{
+			for (let hand of event.hands)
+				hand.player = players[hand.role];
+		}
 	}
 }
 
@@ -1106,6 +1150,7 @@ export {
 	getEventType,
 	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
+	StartingHands,
 	InitialInfection,
 	DriveFerry,
 	DirectFlight,

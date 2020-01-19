@@ -4,9 +4,6 @@ quarantine event icons get the wrong file extension -- export them as pngs
 
 drive/ferry icon is huge in action prompt
 
-initial infections are broken because of the recent merging of events
-	use the single InitialInfection object to get the initial infections for the dealInitialInfectionCards fn
-
 TO DO
 -----
 event history

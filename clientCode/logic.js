@@ -42,7 +42,8 @@ import Event, {
 	OutbreakInfection,
 	AutoTreatDisease,
 	Eradication,
-	InitialInfection
+	InitialInfection,
+	StartingHands
 } from "./event.js";
 
 $(function(){
@@ -150,7 +151,14 @@ function parseEvents(events)
 				log("parsing event: ", e);
 				if (!e) continue;
 				
-				if (e.code === eventTypes.initialInfection.code)
+				if (e.code === eventTypes.startingHands.code)
+				{
+					if (parsedEvents.length)
+						parsedEvents[0].addHand(e, cities, data.eventCards);
+					else
+						parsedEvents.push(new StartingHands(e, cities, data.eventCards));
+				}
+				else if (e.code === eventTypes.initialInfection.code)
 				{
 					const lastEventParsed = parsedEvents[parsedEvents.length - 1];
 					if (lastEventParsed instanceof InitialInfection)
@@ -866,7 +874,8 @@ function getEventIconFileName(eventType, event)
 		eradication,
 		infectCity,
 		epidemicInfect,
-		discoverACure
+		discoverACure,
+		startingHands
 	} = eventTypes;
 
 	if (event.code === treatDisease.code
@@ -885,6 +894,8 @@ function getEventIconFileName(eventType, event)
 	}
 	else if (event.code === discoverACure.code)
 		fileName += `_${getCity(event.cardKeys[0]).color}`;
+	else if (event.code === startingHands.code)
+		fileName += `_${Object.keys(data.players).length}`;
 	
 	return fileName;
 }
@@ -949,7 +960,8 @@ function showEventIconDetails($icon, event)
 		$eventHistory = $("#eventHistory"),
 		$boardContainer = $("#boardContainer"),
 		$detailsContainer = $(`<div class='eventDetails'>
-									${ event instanceof InitialInfection
+									${ event instanceof StartingHands
+									|| event instanceof InitialInfection
 									|| event instanceof DriveFerry
 									|| event instanceof DirectFlight
 									|| event instanceof CharterFlight
@@ -8357,12 +8369,12 @@ function animateInitialDeal()
 {
 	return new Promise(async resolve =>
 	{
-		const startingHands = getEventsOfTurn(eventTypes.startingHand),
+		const startingHandsEvent = getEventsOfTurn(eventTypes.startingHands)[0],
 			$roleContainers = $("#roleSetupContainer").find(".roleContainer");
 			
-		await dealFaceDownStartingHands(startingHands, $roleContainers);
+		await dealFaceDownStartingHands(startingHandsEvent, $roleContainers);
 		await sleep(getDuration(data, "mediumInterval"));
-		await revealStartingHands(startingHands, $roleContainers);
+		await revealStartingHands(startingHandsEvent, $roleContainers);
 	
 		await sleep(getDuration(data, "longInterval"));
 		finishedSetupStep();
@@ -8370,15 +8382,15 @@ function animateInitialDeal()
 	});
 }
 
-async function dealFaceDownStartingHands(startingHands, $roleContainers)
+async function dealFaceDownStartingHands(startingHandsEvent, $roleContainers)
 {
-	const startingHandSize = startingHands[0].cardKeys.length,
-		numCardsToDeal = startingHands.length * startingHandSize,
+	const startingHandSize = startingHandsEvent.hands[0].cards.length,
+		numCardsToDeal = startingHandsEvent.hands.length * startingHandSize,
 		deckOffset = $("#imgPlayerDeck").offset(),
 		CARD_MARGIN_BOTTOM = 4,
 		finalCardbackWidth = data.STARTING_HAND_CARD_HEIGHT - CARD_MARGIN_BOTTOM,
 		interval = getDuration(data, "dealCard") * 0.4;
-
+	
 	await makeRoomForStartingHands(startingHandSize, $roleContainers);
 
 	let cardsDealt = 0,
@@ -8399,18 +8411,18 @@ async function dealFaceDownStartingHands(startingHands, $roleContainers)
 	}
 }
 
-async function revealStartingHands(startingHands, $roleContainers)
+async function revealStartingHands(startingHandsEvent, $roleContainers)
 {
 	$roleContainers.children(".playerCard").remove();
 	$(".drawnPlayerCard").remove();
 	
 	let $container;
-	for (let hand of startingHands)
+	for (let hand of startingHandsEvent.hands)
 	{
 		$container = $roleContainers.filter(`[data-role='${hand.role}']`);
 
-		for (let cardKey of hand.cardKeys)
-			revealPlayerCard(cardKey, $container);
+		for (let card of hand.cards)
+			revealPlayerCard(card.key, $container);
 	}
 }
 
