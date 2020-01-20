@@ -418,23 +418,73 @@ class StartingHands extends Event
 		this.hands.push(hand);
 	}
 
+	setPopulationRanks(turnOrderCards)
+	{
+		this.populationRanks = {};
+		let i = 1;
+		for (let card of turnOrderCards)
+			this.populationRanks[card.key] = i++;
+		
+		this.sortHandsByPopulationRank();
+	}
+
+	sortHandsByPopulationRank()
+	{
+		const sortedHands = [];
+
+		for (let cardKey in this.populationRanks)
+			for (let hand of this.hands)
+				for (let card of hand.cards)
+					if (card.key === cardKey)
+						sortedHands.push(hand);
+
+		this.hands = sortedHands;
+	}
+
 	getDetails()
 	{
-		let details = "",
-			$card;
+		let handDetails = "<div class='column'>",
+			turnOrder = `<div class='column'>
+							<p>Turn Order</p>`;
+
 		for (let hand of this.hands)
 		{
-			details += `<div class='hand'>
-							<p>Role: ${hand.player.newRoleTag()}</p>
-							<p>Starting Hand:</p>`;
+			handDetails += `<div class='hand'>
+								<p>Role: ${hand.player.newRoleTag()}</p>
+								<p>Starting Hand:</p>`;
 			
 			for (let card of hand.cards)
-				details += card.getPlayerCard({ includePopulation: true, noTooltip: true });
+			{
+				if (this.populationRanks.hasOwnProperty(card.key))
+					turnOrder += `<p class='populationRank' data-key='${card.key}'>#${this.populationRanks[card.key]}</p>`;
+
+				handDetails += card.getPlayerCard({ includePopulation: true, noTooltip: true });
+			}
 			
-			details += "</div>";
+			handDetails += "</div>";
 		}
 
-		return super.getDetails() + details;
+		handDetails += "</div>";
+		turnOrder += "</div>";
+
+		return super.getDetails() + handDetails + turnOrder;
+	}
+
+	positionPopulationRanks($eventDetails)
+	{
+		const $playerCards = $eventDetails.find(".playerCard");
+		
+		let $this,
+			$card;
+		$eventDetails.find(".populationRank").each(function()
+		{
+			$this = $(this);
+			$card = $playerCards.filter(`[data-key='${$this.attr("data-key")}']`).css("border-right", "3px solid #fff");
+
+			$this.offset({
+				top: $card.offset().top
+			});
+		});
 	}
 }
 

@@ -1012,6 +1012,9 @@ function showEventIconDetails($icon, event)
 	$arrow.offset(iconOffset)
 		.width(iconWidth)
 		.height(iconWidth);
+	
+	if (event instanceof StartingHands)
+		event.positionPopulationRanks($detailsContainer);
 }
 
 function hideEventIconDetails()
@@ -4462,7 +4465,12 @@ function instantiatePlayers(playerInfoArray)
 
 function getTurnOrder()
 {
-	return getDecidingTurnOrderCardPopulations().map(card => card.role);
+	const turnOrderCards = getDecidingTurnOrderCardPopulations(),
+		startingHandsEvent = data.events[0];
+	
+	startingHandsEvent.setPopulationRanks(turnOrderCards);
+	
+	return turnOrderCards.map(card => card.role);
 }
 
 function appendPawnToBoard(player)
@@ -7220,10 +7228,10 @@ function getNumActionsRemaining()
 
 // Returns the recorded events of the desiredEventTypes from the current turn.
 // Accepts an array of desiredEventTypes, or a single event type.
-function getEventsOfTurn(desiredEventTypes)
+function getEventsOfTurn(desiredEventTypes, { turnNum } = {})
 {
 	const eventsOfTurn = [];
-
+	turnNum = turnNum || data.turnNum;
 	desiredEventTypes = ensureIsArray(desiredEventTypes);
 	
 	for (let i = data.events.length - 1; i >= 0; i--)
@@ -7231,10 +7239,10 @@ function getEventsOfTurn(desiredEventTypes)
 		event = data.events[i];
 		
 		// Skip events queued for next turn.
-		if (event.turnNum > data.turnNum)
+		if (event.turnNum > turnNum)
 			continue;
 
-		if (event.turnNum < data.turnNum)
+		if (event.turnNum < turnNum)
 			break;
 		
 		if (desiredEventTypes)
@@ -8343,15 +8351,18 @@ function getDecidingTurnOrderCardPopulations()
 
 	let startingHandPopulations = [...data.startingHandPopulations],
 		highestPop,
-		cardWithHighestPop;
+		cardWithHighestPop,
+		city;
 	
 	while (startingHandPopulations.length)
 	{
 		highestPop = 0;
 		for (let card of startingHandPopulations)
 		{
-			getCity(card.key).population = card.population;
-			
+			city = getCity(card.key);
+			if (city)
+				city.population = card.population;
+
 			if (Number(card.population) > highestPop)
 			{
 				highestPop = Number(card.population);

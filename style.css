@@ -370,7 +370,20 @@ span.r {color: #ef282a; background: none}
 	margin-left: 18%
 }
 
+.eventDetails .column
+{
+	display: inline-block;
+	vertical-align: top;
+}
+.eventDetails .column:first-of-type p:first-of-type { margin-top: 18px; }
+.eventDetails .column:last-of-type { padding-left: 2px }
+.eventDetails .column:last-of-type p:first-of-type { border-bottom: 1px solid #fff }
 .eventDetails .hand { padding: 5px 0 }
+.eventDetails .populationRank
+{
+	font-size: 22px;
+	position: absolute;
+}
 
 #cureMarkerContainer
 {
