@@ -689,11 +689,13 @@ class ShareKnowledge extends Event
 
     getDetails()
     {
+		const isGiver = this.giver.rID == this.role,
+			participant = isGiver ? this.receiver : this.giver;
+
 		return `${super.getDetails()}
-				<p>Giver: ${this.giver.newRoleTag()}</p>
-				<p>Receiver: ${this.receiver.newRoleTag()}</p>
-				<p>Shared Card: </p>
-				${this.card.getPlayerCard({ noTooltip: true })}`;
+				<p>${ isGiver ? "Gave" : "Received" } Card:</p>
+				${this.card.getPlayerCard({ noTooltip: true })}
+				<p>${ isGiver ? "To" : "From" }: ${participant.newRoleTag()}</p>`;
     }
 }
 

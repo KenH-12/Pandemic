@@ -16,11 +16,6 @@ event history
 	detailed tooltips
 		infect city
 			show disease cube added
-		share knowledge
-			change format to...
-				Role: 
-				[ Gave || Received ] Card:
-				[ To || From ]:
 		dispatch pawn (rendezvous)
 			rendezvoused with which roles?
 		game end
