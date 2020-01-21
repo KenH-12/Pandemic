@@ -147,6 +147,7 @@ function parseEvents(events)
 			if (!Array.isArray(events))
 				events = [events];
 			
+			let parsedEvent;
 			for (let e of events)
 			{
 				log("parsing event: ", e);
@@ -194,15 +195,35 @@ function parseEvents(events)
 				else if (e.code === eventTypes.dispatchPawn.code)
 					parsedEvents.push(new DispatchPawn(e, cities));
 				else if (e.code === eventTypes.airlift.code)
-					parsedEvents.push(new Airlift(e, cities));
+				{
+					parsedEvent = new Airlift(e, cities)
+					parsedEvents.push(parsedEvent);
+					data.eventCardEvents.push(parsedEvent);
+				}
 				else if (e.code === eventTypes.oneQuietNight.code)
-					parsedEvents.push(new OneQuietNight(e, cities));
+				{
+					parsedEvent = new OneQuietNight(e, cities)
+					parsedEvents.push(parsedEvent);
+					data.eventCardEvents.push(parsedEvent);
+				}
 				else if (e.code === eventTypes.governmentGrant.code)
-					parsedEvents.push(new GovernmentGrant(e, cities));
+				{
+					parsedEvent = new GovernmentGrant(e, cities)
+					parsedEvents.push(parsedEvent);
+					data.eventCardEvents.push(parsedEvent);
+				}
 				else if (e.code === eventTypes.resilientPopulation.code)
-					parsedEvents.push(new ResilientPopulation(e, cities));
+				{
+					parsedEvent = new ResilientPopulation(e, cities)
+					parsedEvents.push(parsedEvent);
+					data.eventCardEvents.push(parsedEvent);
+				}
 				else if (e.code === eventTypes.forecast.code)
-					parsedEvents.push(new Forecast(e, cities));
+				{
+					parsedEvent = new Forecast(e, cities);
+					parsedEvents.push(parsedEvent);
+					data.eventCardEvents.push(parsedEvent);
+				}
 				else if (e.code === eventTypes.forecastPlacement.code)
 				{
 					// The previously parsed Event is always the corresponding Forecast event which drew the top 6 infection cards.
@@ -1849,18 +1870,20 @@ async function planContingency(cardKey)
 	disableActions();
 	resetActionPrompt();
 	
-	const $eventCard = $("#playerDiscard").find(`.playerCard[data-key='${cardKey}']`),
+	const eventType = eventTypes.planContingency,
+		$eventCard = $("#playerDiscard").find(`.playerCard[data-key='${cardKey}']`),
 		isContingencyCard = true,
 		targetProperties = getDrawnPlayerCardTargetProperties({ isContingencyCard });
 
 	await Promise.all([
-		requestAction(eventTypes.planContingency, { cardKey }),
+		requestAction(eventType, { cardKey }),
 		animateCardToHand($eventCard, targetProperties, { isContingencyCard })
 	]);
 
 	getActivePlayer().contingencyKey = cardKey;
 	$eventCard.addClass("contingency");
 
+	appendEventHistoryIconOfType(eventType);
 	proceed();
 }
 
@@ -2511,6 +2534,7 @@ function discardOrRemoveEventCard(event)
 		{
 			await animateContingencyCardRemoval();
 			player.contingencyKey = false;
+			event.cardWasRemoved = true;
 		}
 		else
 		{
@@ -7158,7 +7182,10 @@ function loadPlayerCards(playerCards)
 		else if (card.pile === "discard")
 			$card.insertAfter($discardPileTitle);
 		else if (card.pile === "removed")
+		{
+			data.removedEventCardKeys.push(card.key);
 			$card.insertAfter($removedCardsTitle);
+		}
 		else if (card.pile === "contingency")
 		{
 			$card.appendTo($("#contingencyPlanner").find(".role"))
@@ -7170,6 +7197,45 @@ function loadPlayerCards(playerCards)
 	
 	bindPlayerCardEvents();
 	setPlayerDeckImgSize();
+	flagRemovedEventCardEvents();
+}
+
+// When an event card is played 'from contingency' (the Contingency Planner stored the event card and then played it),
+// it is removed from the game rather than simply discarded.
+// This function creates arrays which will exist briefly while the game is being resumed (page was refreshed while the game is in progress).
+// These arrays facilitate the efficient flagging of 'event card Events' which removed their associated event card from the game.
+function prepareToFlagRemovedEventCardEvents()
+{
+	data.eventCardEvents = [];
+	data.removedEventCardKeys = [];
+}
+function flagRemovedEventCardEvents()
+{
+	// Only the Contingency Planner can cause event cards to be removed from the game.
+	if (getPlayer("Contingency Planner"))
+	{
+		let event, cardKey;
+		for (let i = data.eventCardEvents.length - 1; i >= 0; i--)
+		{
+			event = data.eventCardEvents[i];
+			cardKey = getEventType(event.code).cardKey;
+	
+			// Was the event card removed from the game?
+			if (data.removedEventCardKeys.includes(cardKey))
+			{
+				event.cardWasRemoved = true;
+				data.removedEventCardKeys.splice(data.removedEventCardKeys.indexOf(cardKey), 1);
+	
+				// Finished flagging events?
+				if (data.removedEventCardKeys.length === 0)
+					break;
+			}
+		}
+	}
+
+	// These are no longer needed after this function call.
+	delete data.removedEventCardKeys;
+	delete data.eventCardEvents;
 }
 
 function loadInfectionDiscards(cards)
@@ -7357,6 +7423,9 @@ async function setup()
 			console.error(err);
 			$("#curtain").children("p").first().html("An error occured: " + err);
 		});
+	
+	if (gamestate.gameIsResuming)
+		prepareToFlagRemovedEventCardEvents();
 	
 	await parseEvents(eventHistory);
 	loadGamestate(gamestate);

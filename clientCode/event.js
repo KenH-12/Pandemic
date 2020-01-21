@@ -762,7 +762,7 @@ class PlanContingency extends Event
 
     getDetails()
     {
-		return `${super.getDetails()}>
+		return `${super.getDetails()}
 				<p>Stored Event Card:</p>
 				${this.eventCard.getPlayerCard({ noTooltip: true })}`;
     }
@@ -819,7 +819,7 @@ class Airlift extends Event
 				<p>Airlifted: ${this.airliftedPlayer.newRoleTag()}</p>
 				<p>Origin: ${this.origin.name}</p>
 				<p>Destination: ${this.destination.name}</p>
-				<p>Discarded:</p>
+				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
 				<div class='playerCard eventCard'>AIRLIFT</div>`;
     }
 }
@@ -829,7 +829,7 @@ class OneQuietNight extends Event
     getDetails()
     {
 		return `${super.getDetails()}
-				<p>Discarded:</p>
+				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
 				<div class='playerCard eventCard'>ONE QUIET NIGHT</div>`;
     }
 }
@@ -838,7 +838,7 @@ class GovernmentGrant extends ResearchStationPlacement
 {
 	getDiscardDetails()
 	{
-		return `<p>Discarded:</p>
+		return `<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
 				<div class='playerCard eventCard'>GOVERNMENT GRANT</div>`;
 	}
 }
@@ -856,7 +856,7 @@ class ResilientPopulation extends Event
 		return `${super.getDetails()}
 				<p>Removed From Game:</p>
 				${this.city.getInfectionCard()}
-				<p>Discarded:</p>
+				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
 				<div class='playerCard eventCard'>RESILIENT POPULATION</div>`;
     }
 }
@@ -882,7 +882,7 @@ class Forecast extends Event
 				<p>Top 6 Infections Cards:</p>
 				${infectionCards}
 				${this.placementEvent ? this.placementEvent.getDetails() : ""}
-				<p>Discarded:</p>
+				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
 				<div class='playerCard eventCard'>FORECAST</div>`;
     }
 }
