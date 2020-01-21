@@ -69,7 +69,7 @@
             $cardIndex++;
         }
         
-        $eventDetails = implode(",", $cardKeys);
+        $eventDetails = implode(",", array_reverse($cardKeys));
         $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails);
 
         $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $forecastingRole, $activeRole);

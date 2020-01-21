@@ -198,31 +198,31 @@ function parseEvents(events)
 				{
 					parsedEvent = new Airlift(e, cities)
 					parsedEvents.push(parsedEvent);
-					data.eventCardEvents.push(parsedEvent);
+					queueEventCardRemovalCheck(parsedEvent);
 				}
 				else if (e.code === eventTypes.oneQuietNight.code)
 				{
 					parsedEvent = new OneQuietNight(e, cities)
 					parsedEvents.push(parsedEvent);
-					data.eventCardEvents.push(parsedEvent);
+					queueEventCardRemovalCheck(parsedEvent);
 				}
 				else if (e.code === eventTypes.governmentGrant.code)
 				{
 					parsedEvent = new GovernmentGrant(e, cities)
 					parsedEvents.push(parsedEvent);
-					data.eventCardEvents.push(parsedEvent);
+					queueEventCardRemovalCheck(parsedEvent);
 				}
 				else if (e.code === eventTypes.resilientPopulation.code)
 				{
 					parsedEvent = new ResilientPopulation(e, cities)
 					parsedEvents.push(parsedEvent);
-					data.eventCardEvents.push(parsedEvent);
+					queueEventCardRemovalCheck(parsedEvent);
 				}
 				else if (e.code === eventTypes.forecast.code)
 				{
 					parsedEvent = new Forecast(e, cities);
 					parsedEvents.push(parsedEvent);
-					data.eventCardEvents.push(parsedEvent);
+					queueEventCardRemovalCheck(parsedEvent);
 				}
 				else if (e.code === eventTypes.forecastPlacement.code)
 				{
@@ -7208,6 +7208,11 @@ function prepareToFlagRemovedEventCardEvents()
 {
 	data.eventCardEvents = [];
 	data.removedEventCardKeys = [];
+}
+function queueEventCardRemovalCheck(event)
+{
+	if (Array.isArray(data.eventCardEvents))
+		data.eventCardEvents.push(event);
 }
 function flagRemovedEventCardEvents()
 {
