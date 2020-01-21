@@ -132,7 +132,8 @@ const data =
 	turn: -1,
 	currentStep: -1,
 	steps: {},
-	events: []
+	events: [],
+	eventHistoryQueue: []
 };
 
 function parseEvents(events)
@@ -237,29 +238,56 @@ function parseEvents(events)
 			if (Object.keys(data.players).length)
 			{
 				attachPlayersToEvents(data.players, getPlayer, parsedEvents);
-				appendEventHistoryIcons(parsedEvents);
+				addToEventHistoryQueue(parsedEvents);
 			}
 			
 			return resolve(parsedEvents);
 		});
 }
 
-function appendEventHistoryIcons(newEvents)
+function addToEventHistoryQueue(events)
+{
+	for (let event of events)
+		if (getEventType(event.code).hasIcon)
+			data.eventHistoryQueue.push(event);
+}
+
+function appendEventHistoryIcons()
 {
 	const $eventHistory = $("#eventHistory");
+	
+	for (let event of data.eventHistoryQueue)
+		appendEventHistoryIcon($eventHistory, event);
+	
+	data.eventHistoryQueue.length = 0;
+	setEventHistoryScrollPosition($eventHistory);
+}
 
-	let $icon;
+function appendEventHistoryIconOfType(targetEventType)
+{
+	const $eventHistory = $("#eventHistory");
 	
-	newEvents = newEvents || data.events;
-	
-	for (let event of newEvents)
+	let event;
+	for (let i = 0; i < data.eventHistoryQueue.length; i++)
 	{
-		$icon = $(getEventIconHtml(getEventType(event.code), { event }));
-		bindEventIconHoverEvents($icon, event);
-		$eventHistory.append($icon);
+		event = data.eventHistoryQueue[i];
+		
+		if (event.isOfType(targetEventType))
+		{
+			appendEventHistoryIcon($eventHistory, event);
+			data.eventHistoryQueue.splice(i, 1);
+			break;
+		}
 	}
 
 	setEventHistoryScrollPosition($eventHistory);
+}
+
+function appendEventHistoryIcon($eventHistory, event)
+{
+	const $icon = $(getEventIconHtml(getEventType(event.code), { event }));
+	bindEventIconHoverEvents($icon, event);
+	$eventHistory.append($icon);
 }
 
 function setEventHistoryScrollPosition($eventHistory)
@@ -1870,7 +1898,7 @@ function forecastInProgress()
 async function forecastDraw(forecastEventToLoad)
 {
 	data.promptingEventType = eventTypes.forecastPlacement;
-
+	
 	disableBtnCancelAction();
 	disableActions();
 	$(".discardSelections").remove();
@@ -1884,6 +1912,7 @@ async function forecastDraw(forecastEventToLoad)
 		await discardOrRemoveEventCard(forecastEvent);
 	
 	await animateForecastDraw(forecastEvent.cardKeys);
+	appendEventHistoryIconOfType(eventTypes.forecast);
 	
 	const $btnDone = $("<div class='button'>DONE</div>");
 
@@ -1940,10 +1969,12 @@ function dealForecastedCards($cardContainer, cardKeys)
 		const $container = $cardContainer.parent(),
 			cards = [];
 
+		let cityKey;
 		for (let i = 0; i < cardKeys.length; i++)
 		{
+			cityKey = cardKeys[i];
 			$cardContainer.append(newInfectionCardTemplate());
-			cards.push({ cityKey: cardKeys[i], index: i });
+			cards.push({ city: getCity(cityKey), cityKey, index: i });
 		}
 		positionInfectionPanelComponents();
 
@@ -2068,13 +2099,15 @@ async function oneQuietNight()
 	resetActionPrompt();
 	disableActions();
 
-	const events = await requestAction(eventTypes.oneQuietNight);
+	const eventType = eventTypes.oneQuietNight,
+		events = await requestAction(eventType);
 	
 	await discardOrRemoveEventCard(events.shift());
 
 	if (isOneQuietNight())
 		indicateOneQuietNightStep();
 
+	appendEventHistoryIconOfType(eventType);
 	resumeCurrentStep();
 }
 
@@ -2141,6 +2174,7 @@ async function resilientPopulation(cardKeyToRemove)
 
 	await discardOrRemoveEventCard(events.shift());
 	await resilientPopulationAnimation(cardKeyToRemove);
+	appendEventHistoryIconOfType(eventType);
 
 	resizeInfectionDiscardElements();
 	bindInfectionDiscardHover();
@@ -2226,6 +2260,7 @@ async function airlift(playerToAirlift, destination)
 
 	setDuration(data, "pawnAnimation", 1000);
 	await playerToAirlift.updateLocation(destination);
+	appendEventHistoryIconOfType(eventType);
 
 	// If any events are left after shifting the airliftEvent, they are auto-treat disease events.
 	if (events.length)
@@ -2426,6 +2461,7 @@ async function governmentGrant(targetCity, relocationKey)
 	else
 		await targetCity.buildResearchStation(data, { animate: true, isGovernmentGrant: true });
 	
+	appendEventHistoryIconOfType(eventType);
 	resumeCurrentStep();
 }
 
@@ -2810,7 +2846,9 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 	disableActions();
 	resetActionPrompt();
 	
+	const eventType = eventTypes.shareKnowledge;
 	let giver, receiver;
+
 	if (activePlayer.isHoldingCardKey(cardKey))
 	{
 		giver = activePlayer;
@@ -2834,7 +2872,7 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 		log(`${p.role} cardKeys: ${string}`);
 	}
 
-	await requestAction(eventTypes.shareKnowledge,
+	await requestAction(eventType,
 		{
 			giver: giver.rID,
 			receiver: receiver.rID,
@@ -2846,20 +2884,11 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 		receiver.expandPanelIfCollapsed()
 	]);
 	await animateShareKnowledge(giver, receiver, cardKey);
+	appendEventHistoryIconOfType(eventType);
 
 	giver.removeCardsFromHand(cardKey);
 	receiver.addCardKeysToHand(cardKey);
-
-	for (let p of players)
-	{
-		string = "";
-		for (let key of p.cardKeys)
-		{
-			string += key + ",";
-		}
-		log(`${p.role} cardKeys: ${string}`);
-	}
-
+	
 	proceed();
 }
 
@@ -2950,9 +2979,10 @@ async function buildResearchStation(relocationKey)
 	
 	const player = getActivePlayer(),
 		playerIsOperationsExpert = player.role === "Operations Expert",
-		city = player.getLocation();
+		city = player.getLocation(),
+		eventType = eventTypes.buildResearchStation;
 
-	await requestAction(eventTypes.buildResearchStation,
+	await requestAction(eventType,
 		{
 			locationKey: city.key,
 			relocationKey: relocationKey || 0
@@ -2977,6 +3007,7 @@ async function buildResearchStation(relocationKey)
 	else
 		await city.buildResearchStation(data, { animate: true });
 	
+	appendEventHistoryIconOfType(eventType);
 	proceed();
 }
 
@@ -3070,6 +3101,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 
 		setDuration(data, "pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
 		await player.updateLocation(destination);
+		appendEventHistoryIconOfType(playerToDispatch ? eventTypes.dispatchPawn : eventType);
 
 		if (events.length > 1)
 			await animateAutoTreatDiseaseEvents(events);
@@ -3121,6 +3153,7 @@ function animateAutoTreatDiseaseEvents(events)
 
 				await sleep(interval);
 				await hideMedicAutoTreatCircle();
+				appendEventHistoryIconOfType(autoTreatDisease);
 			}
 			else if (e.isOfType(eradication))
 				await eradicationEvent(e.diseaseColor);
@@ -3160,11 +3193,12 @@ async function treatDisease($cube, diseaseColor)
 {
 	disableActions();
 	
-	const city = getActivePlayer().getLocation();
+	const city = getActivePlayer().getLocation(),
+		eventType = eventTypes.treatDisease;
 
 	diseaseColor = diseaseColor || getColorClass($cube);
 
-	const events = await requestAction(eventTypes.treatDisease,
+	const events = await requestAction(eventType,
 		{
 			cityKey: city.key,
 			diseaseColor
@@ -3187,25 +3221,32 @@ async function treatDisease($cube, diseaseColor)
 		numToRemove
 	});
 	city.decrementCubeCount(data.diseaseCubeSupplies, diseaseColor, numToRemove);
-	
+	appendEventHistoryIconOfType(eventType);
+
 	if (eradicated)
 		await eradicationEvent(diseaseColor);
 	
 	proceed();
 }
 
-async function eradicationEvent(diseaseColor)
+function eradicationEvent(diseaseColor)
 {
-	$(`#cureMarker${diseaseColor.toUpperCase()}`)
-		.prop("src", `images/pieces/cureMarker_${diseaseColor}_eradicated.png`);
-
-	data.cures[diseaseColor] = "eradicated";
-	
-	await specialEventAlert(
+	return new Promise(async resolve =>
 	{
-		title: "DISEASE ERADICATED!",
-		description: `No new disease cubes of this color will be placed on the board`,
-		eventClass: diseaseColor
+		$(`#cureMarker${diseaseColor.toUpperCase()}`)
+			.prop("src", `images/pieces/cureMarker_${diseaseColor}_eradicated.png`);
+
+		data.cures[diseaseColor] = "eradicated";
+		
+		await specialEventAlert(
+		{
+			title: "DISEASE ERADICATED!",
+			description: `No new disease cubes of this color will be placed on the board`,
+			eventClass: diseaseColor
+		});
+
+		appendEventHistoryIconOfType(eventTypes.eradication);
+		resolve();
 	});
 }
 
@@ -6621,6 +6662,7 @@ function initialInfectionStep()
 	{
 		prepareInitialInfections();
 		await dealInitialInfectionCards();
+		appendEventHistoryIconOfType(eventTypes.initialInfection);
 		await finishInfectionStep();
 
 		finishedSetupStep();
@@ -6921,6 +6963,7 @@ async function discoverACure(cardKeys)
 	data.cures.remaining--;
 	
 	await animateDiscoverCure(diseaseColor, newDiseaseStatus);
+	appendEventHistoryIconOfType(discoverACure);
 
 	if (data.gameEndCause)
 		return endGame();
@@ -7322,7 +7365,11 @@ async function setup()
 	data.startingHandPopulations = startingHandPopulations;
 	instantiatePlayers(players);
 	attachPlayersToEvents(data.players, getPlayer, data.events);
-	appendEventHistoryIcons();
+	
+	addToEventHistoryQueue(data.events);
+	if (data.gameIsResuming)
+		appendEventHistoryIcons();
+	
 	loadDiseaseStatuses(diseaseStatuses);
 	loadInfectionDiscards(infectionDiscards);
 	loadPlayerCards(playerCards);
@@ -8186,6 +8233,7 @@ function animateDetermineTurnOrder()
 		await showStartingHandPopulations();
 		await sleep(getDuration(data, interval));
 		data.turnOrder = await showTurnOrder();
+		appendEventHistoryIconOfType(eventTypes.startingHands);
 		await sleep(getDuration(data, interval));
 		await arrangePlayerPanels();
 	
