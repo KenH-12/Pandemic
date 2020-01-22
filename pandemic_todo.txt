@@ -18,6 +18,9 @@ event history
 			show disease cube added
 		dispatch pawn (rendezvous)
 			rendezvoused with which roles?
+		outbreak
+			specify which affected cities were quarantined or auto-treated
+				currently the details wrongly indicate that such cities received a disease cube
 		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
 			Title should show action description

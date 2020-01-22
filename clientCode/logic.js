@@ -1929,7 +1929,7 @@ async function forecastDraw(forecastEventToLoad)
 	indicatePromptingEventCard();
 
 	const forecastEvent = forecastEventToLoad || (await requestAction(eventTypes.forecast)).shift();
-	
+
 	// If loading an unresolved forecast, the event card will already be in the discard pile.
 	if (!forecastEventToLoad)
 		await discardOrRemoveEventCard(forecastEvent);
@@ -3476,7 +3476,8 @@ async function finishDrawStep(cardKeys)
 	$container.addClass("hidden");
 
 	getActivePlayer().addCardKeysToHand(cardKeys);
-	
+	appendEventHistoryIconOfType(eventTypes.cardDraw);
+
 	proceed();
 }
 
@@ -5156,6 +5157,7 @@ async function resolveOutbreaks(events)
 
 			await sleep(500); // instead of awaiting both of the above
 		}
+		appendEventHistoryIconOfType(outbreak);
 
 		if (diseaseCubeLimitExceeded(color)) // defeat -- return early
 			return sleep(getDuration(data, "shortInterval"));
@@ -5560,7 +5562,8 @@ function waitingToResolveSecondEpidemicThisTurn()
 
 async function epidemicIncrease()
 {
-	const { $epidemic, $btn } = await prepareEpidemicStep();
+	const { $epidemic, $btn } = await prepareEpidemicStep(),
+		eventType = eventTypes.epidemicIncrease;
 	
 	if (waitingToResolveSecondEpidemicThisTurn())
 		enableEventCards();
@@ -5572,9 +5575,10 @@ async function epidemicIncrease()
 	$btn.addClass("btnDisabled");
 	disableEventCards();
 	
-	const { 0: event } = await requestAction(eventTypes.epidemicIncrease);
+	const { 0: event } = await requestAction(eventType);
 
 	await moveInfectionRateMarker({ newEpidemicCount: event.epidemicCount, animate: true });
+	appendEventHistoryIconOfType(eventType);
 
 	proceed();
 }
@@ -5584,6 +5588,7 @@ async function epidemicInfect()
 	disableEventCards();
 
 	const { $epidemic, $btn } = await prepareEpidemicStep(),
+		eventType = eventTypes.epidemicInfect,
 		interval = getDuration(data, "longInterval");
 
 	highlightEpidemicStep($epidemic, "infect");
@@ -5592,7 +5597,7 @@ async function epidemicInfect()
 
 	const { 0: events } = await Promise.all(
 		[
-			requestAction(eventTypes.epidemicInfect),
+			requestAction(eventType),
 			sleep(interval) // minumum wait time so things don't happen too quickly
 		]),
 		{ cityKey, prevCubeCount, preventionCode } = events.shift(), // epInfect event
@@ -5600,6 +5605,7 @@ async function epidemicInfect()
 		$MAX_NUM_CUBES = 3,	
 		card = {
 			cityKey,
+			city: getCity(cityKey),
 			numCubes: $MAX_NUM_CUBES - prevCubeCount,
 			preventionCode: preventionCode,
 			index: 0
@@ -5610,17 +5616,21 @@ async function epidemicInfect()
 	await dealFaceDownInfCard(card.index);
 	await revealInfectionCard(card);
 
-	const color = getCity(card.cityKey).color;
+	const { color } = card.city;
 
-	if (preventionCode == 0)
+	if (preventionCode === infectionPreventionCodes.notPrevented)
 	{
 		await placeDiseaseCubes(card);
+		appendEventHistoryIconOfType(eventType);
 
 		if (diseaseCubeLimitExceeded(color))
 			return diseaseCubeDefeatAnimation(color);
 	}
 	else
+	{
 		await infectionPreventionAnimation(card);
+		appendEventHistoryIconOfType(eventType);
+	}
 
 	if (triggeredOutbreakEvents.length)
 	{
@@ -5644,7 +5654,8 @@ async function epidemicIntensify()
 	const {
 		$epidemic,
 		$btn
-	} = await prepareEpidemicStep();
+	} = await prepareEpidemicStep(),
+		eventType = eventTypes.epidemicIntensify;
 	
 	highlightEpidemicStep($epidemic, "intensify");
 
@@ -5657,9 +5668,10 @@ async function epidemicIntensify()
 
 	await Promise.all(
 		[
-			requestAction(eventTypes.epidemicIntensify),
+			requestAction(eventType),
 			animateEpidemicIntensify()
 		]);
+	appendEventHistoryIconOfType(eventType);
 
 	// When 2 epidemics are drawn on the same turn,
 	// event cards may be played after resolving the first.
@@ -6030,7 +6042,8 @@ function getPlayerWithTooManyCards()
 async function confirmDiscards(discardKeys)
 {
 	const player = getPlayerWithTooManyCards(),
-		$discardStepContainer = $("#discardStepContainer");
+		$discardStepContainer = $("#discardStepContainer"),
+		eventType = eventTypes.discard;
 	
 	$discardStepContainer.slideUp(function()
 	{
@@ -6039,7 +6052,7 @@ async function confirmDiscards(discardKeys)
 
 	await Promise.all(
 		[
-			requestAction(eventTypes.discard,
+			requestAction(eventType,
 				{
 					discardingRole: player.rID,
 					cardKeys: discardKeys
@@ -6048,6 +6061,7 @@ async function confirmDiscards(discardKeys)
 		]);
 
 	player.removeCardsFromHand(discardKeys);
+	appendEventHistoryIconOfType(eventType);
 	
 	proceed();
 }
@@ -6184,7 +6198,8 @@ async function infectionStep()
 	
 	log("infectionStep()");
 	const $container = $("#infectCitiesContainer"),
-		$btnContinue = $container.find(".button").html("INFECT CITY");
+		$btnContinue = $container.find(".button").html("INFECT CITY"),
+		{ infectCity } = eventTypes;
 	
 	let events,
 		card,
@@ -6218,7 +6233,7 @@ async function infectionStep()
 		// Infection card is being drawn and resolved.
 		disableEventCards();
 
-		events = await requestAction(eventTypes.infectCity);
+		events = await requestAction(infectCity);
 		
 		card = events.shift();
 		card.index = infectionCount;
@@ -6226,10 +6241,12 @@ async function infectionStep()
 		await dealFaceDownInfCard(card.index);
 		await revealInfectionCard(card);
 		
-		const color = getCity(card.cityKey).color;
+		const { color } = card.city;
 		// if any events are left after shifting the first, an outbreak occured.
 		if (events.length)
 		{
+			appendEventHistoryIconOfType(infectCity);
+
 			await resolveOutbreaks(events);
 			if (tooManyOutbreaksOccured())
 				return outbreakDefeatAnimation();
@@ -6246,12 +6263,16 @@ async function infectionStep()
 				await sleep(interval);
 				await placeDiseaseCubes(card);
 				await sleep(interval);
+				appendEventHistoryIconOfType(infectCity);
 
 				if (diseaseCubeLimitExceeded(color))
 					return diseaseCubeDefeatAnimation(color);
 			}
 			else
+			{
 				await infectionPreventionAnimation(card);
+				appendEventHistoryIconOfType(infectCity);
+			}
 		}
 
 		infectionCount++;
