@@ -1107,28 +1107,67 @@ class Outbreak extends Event
 
     getDetails()
     {
-		let infectionDetails = "";
-		for (let infection of this.infections)
-			infectionDetails += this.getInfectionDetails(infection)
-		
-		let triggeredOutbreakDetails = "";
-			for (let outbreak of this.triggeredOutbreaks)
-			triggeredOutbreakDetails += `${this.getInfectionDetails(outbreak)}`;
-		
 		return `${super.getDetails()}
 				<p>Origin: ${this.origin.name}</p>
-				${ infectionDetails ? `<p>Affected Cities:</p>${infectionDetails}` : "" }
-				${triggeredOutbreakDetails}
+				${this.getInfectionDetails()}
+				${this.getPreventionDetails()}
 				<p>Outbreak Count: ${this.outbreakCount}</p>`;
 	}
 
-	getInfectionDetails(infection)
+	getInfectionDetails()
 	{
 		const cube = newDiseaseCubeElement({ color: this.diseaseColor, asJqueryObject: false });
-		return `<span class='cubes'>
-					${cube}<span> -> ${ infection instanceof OutbreakInfection ? infection.infectedCity.name : infection.origin.name }</span>
-				</span>
-				<br />`;
+		let infectionDetails = "",
+			cityName;
+
+		for (let infection of [...this.infections, ...this.triggeredOutbreaks])
+		{
+			if (infection.preventedBy)
+				continue;
+			
+			cityName = infection instanceof OutbreakInfection ? infection.city.name : infection.origin.name;
+	
+			infectionDetails += `<span class='cubes indent-1'>
+									${cube}<span> -> ${cityName}</span>
+								</span>
+								<br />`;
+		}
+
+		if (infectionDetails.length)
+			return `<p>Affected Cities:</p>${infectionDetails}`;
+		
+		return "";
+	}
+
+	getPreventionDetails()
+	{
+		const preventionStrings = {
+			quarantined: "",
+			autoTreated: ""
+		};
+		let preventionMethod;
+		
+		for (let infection of this.infections)
+		{
+			if (infection.preventedBy)
+			{
+				if (infection.preventionCode === infectionPreventionCodes.quarantine)
+					preventionMethod = "quarantined";
+				else if (infection.preventionCode === infectionPreventionCodes.medicAutoTreat)
+					preventionMethod = "autoTreated";
+				
+				if (!preventionStrings[preventionMethod].length)
+					preventionStrings[preventionMethod] += `<p class='indent-1'>By ${infection.preventedBy}:</p>`;
+				
+				preventionStrings[preventionMethod] += `<p class='indent-2'>${infection.city.name}</p>`;
+			}
+		}
+
+		const { quarantined, autoTreated } = preventionStrings;
+		if (quarantined.length || autoTreated.length)
+			return `<p>Infections Prevented:</p>${quarantined}${autoTreated}`;
+		
+		return "";
 	}
 }
 
@@ -1137,7 +1176,7 @@ class OutbreakInfection extends Event
 	constructor(event, cities, arrayContainingOutbreakEvent)
     {
 		super(event);
-		this.infectedCity = cities[this.infectedKey];
+		this.city = cities[this.infectedKey];
 		this.attachToOutbreakEvent(arrayContainingOutbreakEvent);
     }
 
@@ -1189,7 +1228,7 @@ function attachPlayersToEvents(players, getPlayer, events)
 			else if (event instanceof Airlift)
 				event.airliftedPlayer = players[event.airliftedRoleID];
 		}
-		else if (event instanceof InfectCity || event instanceof EpidemicInfect)
+		else if (event instanceof InfectCity || event instanceof EpidemicInfect || event instanceof OutbreakInfection)
 		{
 			if (event.preventionCode === infectionPreventionCodes.notPrevented)
 				continue;

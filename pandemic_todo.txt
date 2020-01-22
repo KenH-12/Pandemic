@@ -9,6 +9,12 @@ when the medic auto-treats more than one disease color in the same location, the
 the operations flight button was enabled after it was already used that turn
 	replicate:
 		operations flight, build research station
+	
+unneeded outbreak cube did not return to supply
+	replicate:
+		QS on hoch, medic on losa, drew sydn infection card
+	test with epidemic infect as well as infec city
+
 TO DO
 -----
 event history
@@ -16,9 +22,6 @@ event history
 	detailed tooltips
 		dispatch pawn (rendezvous)
 			rendezvoused with which roles?
-		outbreak
-			specify which affected cities were quarantined or auto-treated
-				currently the details wrongly indicate that such cities received a disease cube
 		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
 			Title should show action description
