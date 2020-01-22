@@ -3125,7 +3125,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 
 		setDuration(data, "pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
 		await player.updateLocation(destination);
-		appendEventHistoryIconOfType(playerToDispatch ? eventTypes.dispatchPawn : eventType);
+		appendEventHistoryIconOfType(playerToDispatch || eventType.code === eventTypes.rendezvous.code ? eventTypes.dispatchPawn : eventType);
 
 		if (events.length > 1)
 			await animateAutoTreatDiseaseEvents(events);
@@ -7238,7 +7238,7 @@ function queueEventCardRemovalCheck(event)
 function flagRemovedEventCardEvents()
 {
 	// Only the Contingency Planner can cause event cards to be removed from the game.
-	if (getPlayer("Contingency Planner"))
+	if (data.eventCardEvents && getPlayer("Contingency Planner"))
 	{
 		let event, cardKey;
 		for (let i = data.eventCardEvents.length - 1; i >= 0; i--)

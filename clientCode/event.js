@@ -142,7 +142,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "To dispatch a pawn, drag and drop it onto a city.",
 		actionPathName: "movementAction",
-		propertyNames: ["dispatchedRoleID", "originKey", "destinationKey", "movementTypeCode"]
+		propertyNames: ["dispatchedRoleID", "originKey", "destinationKey", "movementTypeCode", "rolesAtRendezvousDestination"]
 	},
 	rendezvous: {
 		name: "Rendezvous",
@@ -802,8 +802,23 @@ class DispatchPawn extends Event
 				<p>Dispatch Type: ${this.movementType.name}</p>
 				<p>Origin: ${this.origin.name}</p>
 				<p>Destination: ${this.destination.name}</p>
+				${ this.isRendezvous ? this.rendezvousedWith() : "" }
 				${discarded}`;
-    }
+	}
+	
+	isRendezvous()
+	{
+		return this.movementTypeCode === eventTypes.rendezvous.code;
+	}
+
+	rendezvousedWith()
+	{
+		let rendezvousRoles = "<p>Rendezvoused With:</p>";
+		for (let player of this.playersAtDestination)
+			rendezvousRoles += `<p class='indent-1'>${player.newRoleTag()}</p>`;
+		
+		return rendezvousRoles;
+	}
 }
 
 class Airlift extends Event
@@ -1218,13 +1233,22 @@ function attachPlayersToEvents(players, getPlayer, events)
 		{
 			event.player = players[event.role];
 
-			 if (event instanceof ShareKnowledge)
+			if (event instanceof ShareKnowledge)
 			{
 				event.giver = players[event.giverRoleID];
 				event.receiver = players[event.receiverRoleID];
 			}
 			else if (event instanceof DispatchPawn)
+			{
 				event.dispatchedPlayer = players[event.dispatchedRoleID];
+				
+				if (event.isRendezvous())
+				{
+					event.playersAtDestination = [];
+					for (let role of event.rolesAtRendezvousDestination)
+						event.playersAtDestination.push(players[role]);
+				}
+			}
 			else if (event instanceof Airlift)
 				event.airliftedPlayer = players[event.airliftedRoleID];
 		}
@@ -1236,9 +1260,15 @@ function attachPlayersToEvents(players, getPlayer, events)
 			if (event.preventionCode === infectionPreventionCodes.eradicated)
 				event.preventedBy = "Eradication";
 			else if (event.preventionCode === infectionPreventionCodes.quarantine)
-				event.preventedBy = getPlayer("Quarantine Specialist").newRoleTag();
+			{
+				const qs = getPlayer("Quarantine Specialist");
+				event.preventedBy = qs ? qs.newRoleTag() : false;
+			}
 			else if (event.preventionCode === infectionPreventionCodes.medicAutoTreat)
-				event.preventedBy = getPlayer("Medic").newRoleTag();
+			{
+				const medic = getPlayer("Medic");
+				event.preventedBy = medic ? medic.newRoleTag() : false;
+			}
 		}
 		else if (event instanceof StartingHands)
 		{

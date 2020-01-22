@@ -714,16 +714,25 @@ function validateOperationsFlight($mysqli, $game, $role, $discardKey)
         throw new Exception("Invalid Operations Flight: this action can be performed only once per turn.");
 }
 
-function validateDispatcherRendezvous($mysqli, $game, $role, $destinationKey)
+// Returns an array of roles whose pawns are currently at the specified destination.
+// Validates Rendezvous event requests by throwing an Exception if 0 pawns are at the specified destination.
+function getRolesAtRendezvousDestination($mysqli, $game, $role, $destinationKey)
 {
     // The Dispatcher can move any pawn to any city containing another pawn.
-    $destinationContainsPawn = $mysqli->query("SELECT COUNT(*) AS 'numPawns'
-                                                FROM vw_player
-                                                WHERE game = $game
-                                                AND location = '$destinationKey'
-                                                AND rID != $role")->fetch_assoc()["numPawns"] > 0;
+    $rolesAtDestination = array();
+    $result = $mysqli->query("SELECT rID
+                            FROM vw_player
+                            WHERE game = $game
+                            AND location = '$destinationKey'
+                            AND rID != $role");
     
-    return $destinationContainsPawn;
+    if ($result->num_rows == 0)
+        throw new Exception("Invalid Rendezvous: there must be at least one pawn at the specified destination.");
+    
+    while ($row = mysqli_fetch_assoc($result))
+        array_push($rolesAtDestination, $row["rID"]);
+    
+    return $rolesAtDestination;
 }
 
 function getContingencyCardKey($mysqli, $game)

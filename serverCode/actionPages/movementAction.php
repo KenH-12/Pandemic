@@ -79,7 +79,7 @@
 				// allows them to move any pawn to a city containing another pawn.
 				if ($actionCode === "rv")
 				{
-					validateDispatcherRendezvous($mysqli, $game, $role, $destinationKey);
+					$rolesAtDestination = getRolesAtRendezvousDestination($mysqli, $game, $role, $destinationKey);
 					$isDispatchEvent = true;
 				}
 
@@ -92,7 +92,11 @@
 				if ($isDispatchEvent) // Dispatch event details include the dispatched $role and the $actionCode as the movement type.
 				{
 					$eventDetails = "$role,$eventDetails,$actionCode";
-					$actionCode = "dp";
+
+					if ($actionCode === "rv")
+						$eventDetails .= "," . implode("", $rolesAtDestination);
+					
+					$actionCode = "dp";	
 				}
 				else if ($actionCode === "of") // Operatons Flight's discard is uninferable
 					$eventDetails .= ",$cardKey";
