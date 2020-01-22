@@ -982,10 +982,20 @@ class InfectCity extends Event
 
     getDetails()
     {
+		const cube = newDiseaseCubeElement({ color: this.city.color, asJqueryObject: false });
+		let infectionResult;
+
+		if (this.preventedBy)
+			infectionResult = `<p>Infection Prevented By:</p>${this.preventedBy}`;
+		else
+			infectionResult = `<span class='cubes'>
+									<span>Placed Disease Cube: </span>${cube}
+								</span>`;
+		
 		return `${super.getDetails()}
 				<p>Infection Card: </p>
 				${this.city.getInfectionCard()}
-				${ this.preventedBy ? `<p>Infection Prevented By:</p>${this.preventedBy}` : "" }`;
+				${infectionResult}`;
     }
 }
 
