@@ -2,10 +2,6 @@ BUGS
 ----
 drive/ferry icon is huge in action prompt
 
-when the medic auto-treats more than one disease color in the same location, the cure vial is not centered on the auto-treat circle
-	bug occured after drive/ferry from atlanta to chicago with cubes of 2 cured diseases in chicago
-	the cure vial remained misplaced for the next auto-treat event (single color)
-
 the operations flight button was enabled after it was already used that turn
 	replicate:
 		operations flight, build research station
