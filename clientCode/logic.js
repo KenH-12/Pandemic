@@ -254,7 +254,12 @@ function parseEvents(events)
 					parsedEvents.push(new Event(e, cities));
 			}
 
-			data.events = [...data.events, ...parsedEvents];
+			let eventIndex = data.events.length;
+			for (let newEvent of parsedEvents)
+			{
+				newEvent.index = eventIndex++;
+				data.events.push(newEvent);
+			}
 
 			if (Object.keys(data.players).length)
 			{
@@ -1000,45 +1005,18 @@ function bindEventIconHoverEvents($icon, event)
 {
 	$icon.off("mouseenter mouseleave")
 		.hover(function() { showEventIconDetails($icon, event) },
-			function() { hideEventIconDetails() });
+		function() { allowEventDetailsHovering($icon, event) });
 }
 
 function showEventIconDetails($icon, event)
 {
-	const eventType = getEventType(event.code),
-		$eventHistory = $("#eventHistory"),
+	if ($(".eventDetails").length // prevent duplication
+		|| typeof event.getDetails !== "function")
+		return false;
+	
+	const $eventHistory = $("#eventHistory"),
 		$boardContainer = $("#boardContainer"),
-		$detailsContainer = $(`<div class='eventDetails'>
-									${ event instanceof StartingHands
-									|| event instanceof InitialInfection
-									|| event instanceof DriveFerry
-									|| event instanceof DirectFlight
-									|| event instanceof CharterFlight
-									|| event instanceof ShuttleFlight
-									|| event instanceof BuildResearchStation
-									|| event instanceof TreatDisease
-									|| event instanceof AutoTreatDisease
-									|| event instanceof ShareKnowledge
-									|| event instanceof DiscoverACure
-									|| event instanceof Eradication
-									|| event instanceof OperationsFlight
-									|| event instanceof PlanContingency
-									|| event instanceof DispatchPawn
-									|| event instanceof Airlift
-									|| event instanceof OneQuietNight
-									|| event instanceof GovernmentGrant
-									|| event instanceof ResilientPopulation
-									|| event instanceof Forecast
-									|| event instanceof CardDraw
-									|| event instanceof Discard
-									|| event instanceof InfectCity
-									|| event instanceof EpidemicIncrease
-									|| event instanceof EpidemicInfect
-									|| event instanceof EpidemicIntensify
-									|| event instanceof Outbreak ?
-									event.getDetails()
-									: eventType.name }
-								</div>`).appendTo($boardContainer),
+		$detailsContainer = $(`<div class='eventDetails'>${event.getDetails()}</div>`).appendTo($boardContainer),
 		$arrow = $("<div class='eventDetailsArrow'></div>").appendTo($boardContainer),
 		containerHeight = $detailsContainer.height(),
 		halfContainerWidth = Math.ceil($detailsContainer.width() / 2),
@@ -1064,6 +1042,63 @@ function showEventIconDetails($icon, event)
 	
 	if (event instanceof StartingHands)
 		event.positionPopulationRanks($detailsContainer);
+}
+
+function allowEventDetailsHovering($icon, event)
+{
+	const $eventDetails = $(".eventDetails"),
+		detailsOffset = $eventDetails.offset(),
+		iconOffset = $icon.offset(),
+		hoverBox = {
+			top: detailsOffset.top,
+			left: detailsOffset.left,
+			right: detailsOffset.left + $eventDetails.width(),
+			bottom: iconOffset.top
+		},
+		$document = $(document);
+	
+	$document.off("mousemove")
+		.mousemove(function(e)
+		{
+			if (e.pageY < hoverBox.top
+				|| e.pageX < hoverBox.left
+				|| e.pageX > hoverBox.right
+				|| e.pageY > hoverBox.bottom
+				&& !$icon.is(":hover"))
+			{
+				$document.off("mousemove");
+				hideEventIconDetails();
+
+				const $next = $icon.next(),
+					$prev = $icon.prev();
+				
+				if ($next.length && $next.is(":hover"))
+					showEventIconDetails($next, getNextEventWithIcon(event));
+				else if ($prev.length && $prev.is(":hover"))
+					showEventIconDetails($prev, getPreviousEventWithIcon(event));
+			}
+		});
+}
+
+function getNextEventWithIcon(event)
+{
+	let e;
+	for (let i = event.index + 1; i <= data.events.length; i++)
+	{
+		e = data.events[i];
+		if (e.hasIcon())
+			return e;
+	}
+}
+function getPreviousEventWithIcon(event)
+{
+	let e;
+	for (let i = event.index - 1; i >= 0; i--)
+	{
+		e = data.events[i];
+		if (e.hasIcon())
+			return e;
+	}
 }
 
 function hideEventIconDetails()

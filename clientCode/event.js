@@ -389,6 +389,11 @@ export default class Event
 		return this.code === eventType.code;
 	}
 
+	hasIcon()
+	{
+		return getEventType(this.code).hasIcon;
+	}
+
 	getDetails()
 	{
 		const name = this.displayName || this.name;
