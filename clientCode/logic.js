@@ -5113,17 +5113,6 @@ async function resolveOutbreaks(events)
 		// remove the handled events
 		events = events.filter(e => !(infections.includes(e) || Object.is(outbreakEvent, e)));
 		
-		if (!cubesToDisperse.length)
-		{
-			// If there are no cubes to disperse, all connected cities have already
-			// had an outbreak as part of resolving the current infection card and are therefore unaffected
-			// by this outbreak, which means the outbreak trigger cube must be returned to the supply
-			// as it has no destination.
-			removeOutbreakCubeHighlights(originCity.key);
-			await removeCubesFromBoard(originCity, { color });
-			continue;
-		}
-
 		if (cubesToDisperse.length > 1)
 		{
 			updateCubeSupplyCount(color, { addend: -numInfected });
@@ -5142,8 +5131,20 @@ async function resolveOutbreaks(events)
 				showMedicAutoTreatCircle({ fadeInMs: preventionVisualFadeInMs });
 		}
 
-		removeOutbreakCubeHighlights(originCity.key);
-		await disperseOutbreakCubes(originCity.key, cubesToDisperse);
+		if (cubesToDisperse.length)
+		{
+			removeOutbreakCubeHighlights(originCity.key);
+			await disperseOutbreakCubes(originCity.key, cubesToDisperse);
+		}
+		else
+		{
+			// If there are no cubes to disperse, it means that all potential infections caused by the current outbreak were prevented
+			// (either by the Quarantine Specialist, the Medic, or by the city having already
+			// had an outbreak as part of resolving the current infection card),
+			// which means the outbreak trigger cube must be returned to the supply as it has no destination.
+			removeOutbreakCubeHighlights(originCity.key);
+			await removeCubesFromBoard(originCity, { color, slow: true });
+		}
 
 		if (preventionOccured)
 		{
@@ -5286,7 +5287,7 @@ function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestin
 	return $newCube;
 }
 
-async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } = {})
+async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove, slow } = {})
 {
 	let $cubesToRemove;
 
@@ -5308,7 +5309,7 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove } =
 	const $supplyCube = $(`#${color}SupplyCube`),
 		desiredProperties = $supplyCube.offset(),
 		supplyCubeWidth = $supplyCube.width(),
-		duration = getDuration(data, "cubePlacement") * 0.5;
+		duration = getDuration(data, "cubePlacement") * (slow ? 1.5 : 0.5);
 
 	desiredProperties.width = supplyCubeWidth;
 	desiredProperties.height = supplyCubeWidth;
