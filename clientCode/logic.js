@@ -5128,7 +5128,7 @@ async function resolveOutbreaks(events)
 				showQuarantineArea(preventionVisualFadeInMs);
 	
 			if (medicAutoTreatPrevention)
-				showMedicAutoTreatCircle({ fadeInMs: preventionVisualFadeInMs });
+				showMedicAutoTreatCircle({ color, fadeInMs: preventionVisualFadeInMs });
 		}
 
 		if (cubesToDisperse.length)
