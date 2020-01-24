@@ -1042,6 +1042,8 @@ function showEventIconDetails($icon, event)
 	
 	if (event instanceof StartingHands)
 		event.positionPopulationRanks($detailsContainer);
+	
+	bindEventDetailsHoverEvents($detailsContainer);
 }
 
 function allowEventDetailsHovering($icon, event)
@@ -1078,6 +1080,11 @@ function allowEventDetailsHovering($icon, event)
 					showEventIconDetails($prev, getPreviousEventWithIcon(event));
 			}
 		});
+}
+
+function bindEventDetailsHoverEvents($eventDetails)
+{
+	bindRoleCardHoverEvents();
 }
 
 function getNextEventWithIcon(event)
@@ -3992,7 +3999,13 @@ class Player
 			if (hoveredElementOffset.top + roleCardHeight > data.boardHeight)
 				roleCardOffset.top = data.boardHeight - roleCardHeight - CARD_MARGIN;
 			
-			roleCardOffset.left = data.boardWidth - ($roleCard.width() + CARD_MARGIN);
+			if ($hoveredElement.closest(".eventDetails").length)
+			{
+				const $eventDetails = $(".eventDetails");
+				roleCardOffset.left = $eventDetails.offset().left + $eventDetails.outerWidth() + CARD_MARGIN;
+			}
+			else
+				roleCardOffset.left = data.boardWidth - ($roleCard.width() + CARD_MARGIN);
 		}
 		else
 		{

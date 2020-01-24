@@ -14,7 +14,6 @@ event history
 		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
 			Title should show action description
-			role tags should show role card to right of tooltip
 			city cards should pinpoint location
 			event cards should show description
 			dotted underline for
