@@ -1044,6 +1044,8 @@ function showEventIconDetails($icon, event)
 		event.positionPopulationRanks($detailsContainer);
 	
 	bindEventDetailsHoverEvents($detailsContainer);
+	locateCityOnPlayerCardClick($detailsContainer);
+	locateCityOnInfectionCardClick($detailsContainer);
 }
 
 function allowEventDetailsHovering($icon, event)
@@ -1339,8 +1341,7 @@ const actionInterfacePopulator = {
 		for (let key of ensureIsArray(cardKeys))
 			$discardPrompt.append(newPlayerCard(getCityOrEventCardObject(key)));
 		
-		$discardPrompt.children(".playerCard")
-			.click(function() { pinpointCityFromCard($(this)) });
+		locateCityOnInfectionCardClick({ $containingElement: $discardPrompt });
 
 		$discardPrompt.append(`<div class='button ${buttonClass}'>${buttonText || "DISCARD"}</div>`);
 
@@ -3503,7 +3504,7 @@ async function performDrawStep()
 			return outOfPlayerCardsDefeatAnimation($container);
 		}
 
-		bindPlayerCardEvents();
+		locateCityOnPlayerCardClick();
 		
 		await sleep(getDuration(data, "mediumInterval"));
 		resolve(cardDrawEvent.cardKeys);
@@ -5050,15 +5051,21 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 	});
 }
 
-// binds click events of .playerCard elements
-function bindPlayerCardEvents()
+function locateCityOnPlayerCardClick({ $containingElement } = {})
 {
-	$(".playerCard:not(.eventCard, .epidemic)")
-		.off("click")
-		.click(function()
-		{
-			pinpointCityFromCard($(this));
-		});
+	const cityCardSelector = ".playerCard:not(.eventCard, .epidemic)",
+		$playerCards = $containingElement ? $containingElement.find(cityCardSelector) : $(cityCardSelector);
+	
+	$playerCards.off("click")
+		.click(function() { pinpointCityFromCard($(this)) });
+}
+function locateCityOnInfectionCardClick({ $containingElement } = {})
+{
+	const infectionCardSelector = ".infectionCard",
+		$infectionCards = $containingElement ? $containingElement.find(infectionCardSelector) : $(infectionCardSelector);
+	
+	$infectionCards.off("click")
+		.click(function() { pinpointCityFromCard($(this)) });
 }
 
 async function resolveOutbreaks(events)
@@ -7265,7 +7272,7 @@ function loadPlayerCards(playerCards)
 		}
 	}
 	
-	bindPlayerCardEvents();
+	locateCityOnPlayerCardClick();
 	setPlayerDeckImgSize();
 	flagRemovedEventCardEvents();
 }
@@ -7351,8 +7358,7 @@ function loadInfectionDiscards(cards)
 	if ($removedCardsContainer.children(".infectionCard").length)
 		$removedCardsContainer.removeClass("hidden");
 	
-	$discardPile.find(".infectionCard")
-		.click(function() { pinpointCityFromCard($(this)) });
+	locateCityOnInfectionCardClick({ $containingElement: $discardPile });
 }
 
 // Returns the number of unresolved epidemics that were drawn this turn.

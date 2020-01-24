@@ -377,7 +377,7 @@ Click to locate ${name}'`,
 
 	getInfectionCard({ toReveal } = {})
 	{
-		return `<div class='infectionCard'>
+		return `<div class='infectionCard' data-key='${this.key}'>
 					<div class='infectionCardContents'>
 						${ toReveal ? "<div class='veil'></div>" : "" }
 						<img class='infectionCardImg' src='images/cards/infectionCard_${this.color}.png' />
