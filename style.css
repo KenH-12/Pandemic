@@ -844,6 +844,8 @@ span.r {color: #ef282a; background: none}
 	font-size: 14px;
 	overflow: hidden;
 }
+.playerCard, .infectionCard { cursor: url("images/target_black.png"), auto }
+.playerCard.b { cursor: url("images/target_white.png"), auto }
 .playerCard * { pointer-events: none }
 .playerPanel > .playerCard:first-of-type { margin-top: 4px }
 .playerPanel .playerCard.eventCard:not(.unavailable) { cursor: pointer }
