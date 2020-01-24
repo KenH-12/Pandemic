@@ -13,6 +13,7 @@ event history
 	detailed tooltips
 		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
+			clicking a role tag should locate the pawn
 			Title should show action description
 			event cards should show description
 			dotted underline for

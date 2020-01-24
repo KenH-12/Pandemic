@@ -1044,8 +1044,9 @@ function showEventIconDetails($icon, event)
 		event.positionPopulationRanks($detailsContainer);
 	
 	bindEventDetailsHoverEvents($detailsContainer);
-	locateCityOnPlayerCardClick($detailsContainer);
-	locateCityOnInfectionCardClick($detailsContainer);
+	locateCityOnPlayerCardClick({ $containingElement: $detailsContainer });
+	locateCityOnInfectionCardClick({ $containingElement: $detailsContainer });
+	locatePawnOnRoleTagClick($detailsContainer);
 }
 
 function allowEventDetailsHovering($icon, event)
@@ -5066,6 +5067,12 @@ function locateCityOnInfectionCardClick({ $containingElement } = {})
 	
 	$infectionCards.off("click")
 		.click(function() { pinpointCityFromCard($(this)) });
+}
+function locatePawnOnRoleTagClick($containingElement)
+{
+	$containingElement.find(".roleTag")
+		.off("click")
+		.click(function() { data.players[$(this).data("role")].pinpointLocation() });
 }
 
 async function resolveOutbreaks(events)
