@@ -21,7 +21,6 @@ event history
 				movement types (dispatch pawn)
 			travel paths for movement actions and research station relocations?
 			epidemic intensify should have a max height, and should be scrollable
-	if the event history is not overflowing horizontally, animate new icons into view from right to left
 
 replace event.code with instanceof Event
 

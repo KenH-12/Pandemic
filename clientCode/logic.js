@@ -321,9 +321,28 @@ function setEventHistoryScrollPosition($eventHistory)
 	const overflow = getHorizontalOverflow($eventHistory);
 	
 	if (overflow <= 0)
-		return false;
+		return slideInNewEventIcon($eventHistory);
 	
 	$eventHistory.animate({ scrollLeft: overflow });
+}
+
+async function slideInNewEventIcon($eventHistory)
+{
+	const $icons = $eventHistory.children("img"),
+		$newIcon = $icons.last().addClass("hidden"),
+		freeSpace = $eventHistory.width() - ($icons.length - 1) * $newIcon.width();
+	
+	$newIcon.css("margin-left", freeSpace)
+		.on("load", async function()
+		{
+			await animatePromise({
+				$elements: $newIcon.removeClass("hidden"),
+				desiredProperties: { marginLeft: 0 },
+				easing: "easeOutQuad"
+			});
+		
+			$newIcon.removeAttr("style");
+		});
 }
 
 class Step
