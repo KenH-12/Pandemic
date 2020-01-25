@@ -1,6 +1,6 @@
 "use strict";
 
-import EventCard from "./eventCard.js";
+import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 import {
 	cities,
 	getCity,
@@ -156,9 +156,9 @@ function parseEvents(events)
 				if (e.code === eventTypes.startingHands.code)
 				{
 					if (parsedEvents.length)
-						parsedEvents[0].addHand(e, cities, data.eventCards);
+						parsedEvents[0].addHand(e, cities, eventCards);
 					else
-						parsedEvents.push(new StartingHands(e, cities, data.eventCards));
+						parsedEvents.push(new StartingHands(e, cities, eventCards));
 				}
 				else if (e.code === eventTypes.initialInfection.code)
 				{
@@ -191,7 +191,7 @@ function parseEvents(events)
 				else if (e.code === eventTypes.operationsFlight.code)
 					parsedEvents.push(new OperationsFlight(e, cities));
 				else if (e.code === eventTypes.planContingency.code)
-					parsedEvents.push(new PlanContingency(e, data.eventCards));
+					parsedEvents.push(new PlanContingency(e, eventCards));
 				else if (e.code === eventTypes.dispatchPawn.code)
 					parsedEvents.push(new DispatchPawn(e, cities));
 				else if (e.code === eventTypes.airlift.code)
@@ -235,9 +235,9 @@ function parseEvents(events)
 					parsedEvents.push(placementEvent);
 				}
 				else if (e.code === eventTypes.cardDraw.code)
-					parsedEvents.push(new CardDraw(e, cities, data.eventCards));
+					parsedEvents.push(new CardDraw(e, cities, eventCards));
 				else if (e.code === eventTypes.discard.code)
-					parsedEvents.push(new Discard(e, cities, data.eventCards));
+					parsedEvents.push(new Discard(e, cities, eventCards));
 				else if (e.code === eventTypes.infectCity.code)
 					parsedEvents.push(new InfectCity(e, cities));
 				else if (e.code === eventTypes.epidemicIncrease.code)
@@ -660,7 +660,7 @@ function indicatePromptingEventCard()
 
 function getEventCardEventType(cardKey)
 {
-	const eventCard = data.eventCards[cardKey];
+	const eventCard = eventCards[cardKey];
 
 	if (!eventCard)
 	{
@@ -4937,24 +4937,9 @@ function getDiseaseColor(key)
 	return getCity(key).color;
 }
 
-// Instantiate event cards
-(function ()
-{
-	const eventCards = [
-						["resi", "Resilient Population"],
-						["oneq", "One Quiet Night"],
-						["fore", "Forecast"],
-						["airl", "Airlift"],
-						["gove", "Government Grant"]
-					];
-
-	for (let card of eventCards)
-		data.eventCards[card[0]] = new EventCard(card[0], card[1]);
-})();
-
 function getCityOrEventCardObject(key)
 {
-	return data.eventCards[key] || getCity(key);
+	return eventCards[key] || getCity(key);
 }
 
 // given an array of city info, loads any research stations and disease cubes
@@ -6221,7 +6206,7 @@ function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 
 function isEventCardKey(cardKey)
 {
-	return data.eventCards.hasOwnProperty(cardKey);
+	return eventCards.hasOwnProperty(cardKey);
 }
 function isEpidemicKey(cardKey)
 {
@@ -7305,6 +7290,7 @@ function loadPlayerCards(playerCards)
 	}
 	
 	bindCityLocatorClickEvents();
+	bindEventCardHoverEvents();
 	setPlayerDeckImgSize();
 	flagRemovedEventCardEvents();
 }
@@ -8154,7 +8140,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 
 function getInitialPlayerDeckSize({ includeEpidemics } = {})
 {
-	let deckSize = Object.keys(cities).length + Object.keys(data.eventCards).length;
+	let deckSize = Object.keys(cities).length + Object.keys(eventCards).length;
 
 	if (includeEpidemics)
 		deckSize += data.numEpidemics;

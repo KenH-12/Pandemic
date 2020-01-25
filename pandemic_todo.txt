@@ -21,6 +21,8 @@ event history
 			outbreak spread paths?
 			epidemic intensify should have a max height, and should be scrollable
 
+show the actual event card in the action prompt?
+
 replace event.code with instanceof Event
 
 move data.eventCards to eventCards.js ?

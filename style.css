@@ -250,7 +250,8 @@ body,
 .darkGreenBorder { border: 2px solid #01863f }
 .researchStationBackground { background-color: #e9cf94 }
 span.r {color: #ef282a; background: none}
-.eventCard
+.eventCard,
+.eventCardFull
 {
 	background: linear-gradient(30deg, 
 		gray,
@@ -265,6 +266,39 @@ span.r {color: #ef282a; background: none}
 	color: #000;
 }
 .eventCard.unavailable:active { background-color: #8a181a }
+
+.eventCardFull
+{
+	width: 17%;
+	padding-bottom: 3px;
+	border-top-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+	overflow: hidden;
+}
+.eventCardFull h5
+{
+	display: inline;
+	font-size: 12px;
+	font-weight: 400;
+	padding: 5px 2px 2px 2px;
+	background-color: #000;
+	color: #fff;
+	border-bottom-right-radius: 5px;
+}
+.eventCardFull h3 { margin-top: -2px; padding-bottom: 5px }
+.eventCardFull img { border-top: 2px solid #000 }
+.eventCardFull img,
+.eventCardFull > p:first-of-type
+{ border-bottom: 2px solid #000 }
+.eventCardFull > p { padding: 2px 5px }
+.eventCardFull > p:first-of-type
+{
+	background-color: #000;
+	color: #fff;
+	text-align: center;
+	padding: 0;
+	margin-bottom: 3px;
+}
 .pawnArrow.airlift > div,
 .airlift:not(.pawnArrow)
 {
@@ -827,7 +861,8 @@ span.r {color: #ef282a; background: none}
 	cursor: pointer;
 }
 .playerCard,
-.epidemicFull > h2
+.epidemicFull > h2,
+.eventCardFull > h3
 { font-family: 'Audiowide', 'Electrolize', sans-serif; }
 .playerCard
 {
@@ -836,10 +871,13 @@ span.r {color: #ef282a; background: none}
 	white-space: nowrap;
 	margin: 2px 1%;
 	border: none;
-	border-top-left-radius: 5px;
-	border-bottom-right-radius: 5px;
 	font-size: 14px;
 	overflow: hidden;
+}
+.playerCard
+{
+	border-top-left-radius: 5px;
+	border-bottom-right-radius: 5px;
 }
 .playerCard:not(.eventCard),
 .infectionCard,
@@ -973,11 +1011,15 @@ span.r {color: #ef282a; background: none}
 
 .roleCard
 {
+	width: 17%;
+	border: 2px solid #fff;
+	border-radius: 8px;
+}
+.roleCard,
+.eventCardFull
+{
 	position: absolute;
 	z-index: 12;
-	border: 2px solid #fff;
-	width: 17%;
-	border-radius: 8px;
 	font-size: 14px;
 	filter: drop-shadow(-4px 4px 6px #000);
 }
@@ -987,21 +1029,28 @@ span.r {color: #ef282a; background: none}
 	padding: 2px 0;
 	background-color: #fff;
 	color: #000;
+}
+.roleCard h3,
+.eventCardFull h3
+{
 	font-size: 18px;
 	text-align: center;
 }
-.rolePortrait
+.rolePortrait { border-bottom: 2px solid #fff }
+.rolePortrait,
+.eventCardFull img
 {
 	display: block;
 	width: 100%;
-	border-bottom: 2px solid #fff;
 }
+.roleCard ul,
+.eventCardFull h5,
+.eventCardFull p { font-family: 'Ropa Sans', sans-serif }
 .roleCard ul
 {
 	list-style: inside;
 	padding: 4%;
 	padding-left: 14%;
-	font-family: 'Ropa Sans', sans-serif;
 }
 .roleCard li
 {
