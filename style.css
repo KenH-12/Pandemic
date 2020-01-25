@@ -841,7 +841,7 @@ span.r {color: #ef282a; background: none}
 	font-size: 14px;
 	overflow: hidden;
 }
-.playerCard,
+.playerCard:not(.eventCard),
 .infectionCard,
 .playerPanel .role *:not(.eventCard),
 #roleIndicator,
