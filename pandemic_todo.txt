@@ -5,6 +5,8 @@ drive/ferry icon is huge in action prompt
 the operations flight button was enabled after it was already used that turn
 	replicate:
 		operations flight, build research station
+	
+the playerCard in the Direct Flight discard prompt is not locatable
 
 TO DO
 -----
@@ -13,13 +15,11 @@ event history
 	detailed tooltips
 		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
-			clicking a role tag should locate the pawn
 			Title should show action description
 			event cards should show description
 			dotted underline for
-				city names (pinpoint city)
 				movement types (dispatch pawn)
-			travel paths for movement actions and research station relocations
+			travel paths for movement actions and research station relocations?
 			epidemic intensify should have a max height, and should be scrollable
 	if the event history is not overflowing horizontally, animate new icons into view from right to left
 

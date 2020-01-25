@@ -556,8 +556,8 @@ class DriveFerry extends Event
     getDetails()
     {
 		return `${super.getDetails()}
-				<p>Origin: ${this.origin.name}</p>
-				<p>Destination: ${this.destination.name}</p>`;
+				<p>Origin: ${getLocatableCityName(this.origin)}</p>
+				<p>Destination: ${getLocatableCityName(this.destination)}</p>`;
     }
 }
 
@@ -573,8 +573,8 @@ class DirectFlight extends Event
     getDetails()
     {
 		return `${super.getDetails()}
-				<p>Origin: ${this.origin.name}</p>
-				<p>Destination: ${this.destination.name}</p>
+				<p>Origin: ${getLocatableCityName(this.origin)}</p>
+				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				<p>Discarded:</p>
 				${this.destination.getPlayerCard({ noTooltip: true })}`;
     }
@@ -592,8 +592,8 @@ class CharterFlight extends Event
     getDetails()
     {
 		return `${super.getDetails()}
-				<p>Origin: ${this.origin.name}</p>
-				<p>Destination: ${this.destination.name}</p>
+				<p>Origin: ${getLocatableCityName(this.origin)}</p>
+				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				<p>Discarded:</p>
 				${this.origin.getPlayerCard({ noTooltip: true })}`;
     }
@@ -611,8 +611,8 @@ class ShuttleFlight extends Event
     getDetails()
     {
 		return `${super.getDetails()}
-				<p>Origin: ${this.origin.name}</p>
-				<p>Destination: ${this.destination.name}</p>`;
+				<p>Origin: ${getLocatableCityName(this.origin)}</p>
+				<p>Destination: ${getLocatableCityName(this.destination)}</p>`;
     }
 }
 
@@ -631,10 +631,10 @@ class ResearchStationPlacement extends Event
 	{
 		let relocatedFrom = "";
 		if (this.relocationKey)
-			relocatedFrom = `<p>Relocated Station From: ${this.relocatedFromCity.name}</p>`;
+			relocatedFrom = `<p>Relocated Station From: ${getLocatableCityName(this.relocatedFromCity)}</p>`;
 
 		return `${super.getDetails()}
-				<p>Location: ${this.city.name}</p>
+				<p>Location: ${getLocatableCityName(this.city)}</p>
 				${relocatedFrom}
 				${this.getDiscardDetails()}`;
 	}
@@ -666,7 +666,7 @@ class DiseaseCubeRemoval extends Event
 			cubesRemoved += newDiseaseCubeElement({ color: this.diseaseColor, asJqueryObject: false });
 		
 		return `${super.getDetails()}
-				<p>Location: ${this.city.name}</p>
+				<p>Location: ${getLocatableCityName(this.city)}</p>
 				<span class='cubes'>
 					<span>Removed: </span>${cubesRemoved}
 				</span>`;
@@ -752,8 +752,8 @@ class OperationsFlight extends Event
     getDetails()
     {
 		return `${super.getDetails()}
-				<p>Origin: ${this.origin.name}</p>
-				<p>Destination: ${this.destination.name}</p>
+				<p>Origin: ${getLocatableCityName(this.origin)}</p>
+				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				<p>Discarded: </p>
 				${this.discard.getPlayerCard({ noTooltip: true })}`;
     }
@@ -805,8 +805,8 @@ class DispatchPawn extends Event
 		return `${super.getDetails()}
 				<p>Dispatched: ${this.dispatchedPlayer.newRoleTag()}</p>
 				<p>Dispatch Type: ${this.movementType.name}</p>
-				<p>Origin: ${this.origin.name}</p>
-				<p>Destination: ${this.destination.name}</p>
+				<p>Origin: ${getLocatableCityName(this.origin)}</p>
+				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				${ this.isRendezvous ? this.rendezvousedWith() : "" }
 				${discarded}`;
 	}
@@ -839,8 +839,8 @@ class Airlift extends Event
     {
 		return `${super.getDetails()}
 				<p>Airlifted: ${this.airliftedPlayer.newRoleTag()}</p>
-				<p>Origin: ${this.origin.name}</p>
-				<p>Destination: ${this.destination.name}</p>
+				<p>Origin: ${getLocatableCityName(this.origin)}</p>
+				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
 				<div class='playerCard eventCard'>AIRLIFT</div>`;
     }
@@ -1128,7 +1128,7 @@ class Outbreak extends Event
     getDetails()
     {
 		return `${super.getDetails()}
-				<p>Origin: ${this.origin.name}</p>
+				<p>Origin: ${getLocatableCityName(this.origin)}</p>
 				${this.getInfectionDetails()}
 				${this.getPreventionDetails()}
 				<p>Outbreak Count: ${this.outbreakCount}</p>`;
@@ -1137,18 +1137,15 @@ class Outbreak extends Event
 	getInfectionDetails()
 	{
 		const cube = newDiseaseCubeElement({ color: this.diseaseColor, asJqueryObject: false });
-		let infectionDetails = "",
-			cityName;
+		let infectionDetails = "";
 
 		for (let infection of [...this.infections, ...this.triggeredOutbreaks])
 		{
 			if (infection.preventedBy)
 				continue;
 			
-			cityName = infection instanceof OutbreakInfection ? infection.city.name : infection.origin.name;
-	
 			infectionDetails += `<span class='cubes indent-1'>
-									${cube}<span> -> ${cityName}</span>
+									${cube}<span> -> ${getLocatableCityName(infection.city || infection.origin)}</span>
 								</span>
 								<br />`;
 		}
@@ -1179,7 +1176,7 @@ class Outbreak extends Event
 				if (!preventionStrings[preventionMethod].length)
 					preventionStrings[preventionMethod] += `<p class='indent-1'>By ${infection.preventedBy}:</p>`;
 				
-				preventionStrings[preventionMethod] += `<p class='indent-2'>${infection.city.name}</p>`;
+				preventionStrings[preventionMethod] += `<p class='indent-2'>${getLocatableCityName(infection.city)}</p>`;
 			}
 		}
 
@@ -1281,6 +1278,11 @@ function attachPlayersToEvents(players, getPlayer, events)
 				hand.player = players[hand.role];
 		}
 	}
+}
+
+function getLocatableCityName(city)
+{
+	return `<span class='locatable' data-key='${city.key}'>${city.name}</span>`;
 }
 
 export {
