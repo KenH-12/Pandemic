@@ -312,6 +312,7 @@ function appendEventHistoryIconOfType(targetEventType)
 function appendEventHistoryIcon($eventHistory, event)
 {
 	const $icon = $(getEventIconHtml(getEventType(event.code), { event }));
+	log("$icon.length",$icon.length);
 	bindEventIconHoverEvents($icon, event);
 	$eventHistory.append($icon);
 }
@@ -913,9 +914,7 @@ function getActionButtonContents(eventType)
 	if (!eventType.hasIcon)
 		return name.toUpperCase();
 
-	return `<div class='actionIcon'>
-				${getEventIconHtml(eventType)}
-			</div>
+	return `${getEventIconHtml(eventType)}
 			<div class='actionName'>${name.toUpperCase()}</div>`;
 }
 
@@ -1000,7 +999,7 @@ function getEventIconFileExtension(eventType, event)
 
 function getEventIconCssClasses(event)
 {
-	if (!event) return false;
+	if (!event) return "actionIcon";
 
 	const {
 		infectCity,
@@ -1255,7 +1254,7 @@ const actionInterfacePopulator = {
 		// because the opening h2 tag has to be on the same line as the img tag
 		// to avoid unwanted spacing when the document is rendered.
 		if (eventType.hasIcon)
-			actionTitleContents = $(getEventIconHtml(eventType, { cssClasses: "actionIcon" }) + actionTitleContents);
+			actionTitleContents = $(getEventIconHtml(eventType) + actionTitleContents);
 		
 		$actionTitleContainer.append(actionTitleContents);
 		

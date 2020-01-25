@@ -1,7 +1,5 @@
 BUGS
 ----
-drive/ferry icon is huge in action prompt
-
 the operations flight button was enabled after it was already used that turn
 	replicate:
 		operations flight, build research station
