@@ -20,6 +20,7 @@ event history
 			dotted underline for
 				movement types (dispatch pawn)
 			travel paths for movement actions and research station relocations?
+			outbreak spread paths?
 			epidemic intensify should have a max height, and should be scrollable
 
 replace event.code with instanceof Event

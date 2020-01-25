@@ -254,10 +254,10 @@ function parseEvents(events)
 					parsedEvents.push(new Event(e, cities));
 			}
 
-			let eventIndex = data.events.length;
+			let idx = data.events.length;
 			for (let newEvent of parsedEvents)
 			{
-				newEvent.index = eventIndex++;
+				newEvent.eventHistoryIndex = idx++;
 				data.events.push(newEvent);
 			}
 
@@ -1062,7 +1062,7 @@ function showEventIconDetails($icon, event)
 	if (event instanceof StartingHands)
 		event.positionPopulationRanks($detailsContainer);
 	
-	bindEventDetailsHoverEvents($detailsContainer);
+	bindRoleCardHoverEvents();
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
 }
@@ -1103,15 +1103,10 @@ function allowEventDetailsHovering($icon, event)
 		});
 }
 
-function bindEventDetailsHoverEvents($eventDetails)
-{
-	bindRoleCardHoverEvents();
-}
-
 function getNextEventWithIcon(event)
 {
 	let e;
-	for (let i = event.index + 1; i <= data.events.length; i++)
+	for (let i = event.eventHistoryIndex + 1; i <= data.events.length; i++)
 	{
 		e = data.events[i];
 		if (e.hasIcon())
@@ -1121,7 +1116,7 @@ function getNextEventWithIcon(event)
 function getPreviousEventWithIcon(event)
 {
 	let e;
-	for (let i = event.index - 1; i >= 0; i--)
+	for (let i = event.eventHistoryIndex - 1; i >= 0; i--)
 	{
 		e = data.events[i];
 		if (e.hasIcon())

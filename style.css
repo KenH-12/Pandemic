@@ -349,7 +349,7 @@ span.r {color: #ef282a; background: none}
 	background-color: #252525;
 	clip-path: polygon(50% 65%, 0 0, 100% 0);
 }
-
+.eventDetails .locatable:hover { border-bottom: 1px solid #fff }
 .eventDetails .infectionCard
 {
 	height: 18px;
