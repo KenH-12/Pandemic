@@ -3573,7 +3573,7 @@ async function dealFaceDownPlayerCards($container, numCardsToDeal)
 			numCardsInDeck--;
 		}
 
-		await dealFaceDownPlayerCard($container, deckOffset);
+		dealFaceDownPlayerCard($container, deckOffset);
 		await sleep(getDuration(data, "dealCard") * 0.5);
 	}
 	return sleep(getDuration(data, "longInterval"));
@@ -3581,34 +3581,31 @@ async function dealFaceDownPlayerCards($container, numCardsToDeal)
 
 function dealFaceDownPlayerCard($container, deckOffset, { finalCardbackWidth, zIndex } = {})
 {
-	return new Promise(resolve =>
-	{
-		const $deck = $("#imgPlayerDeck"),
-			$playerCard = $("<div class='playerCard'></div>").appendTo($container),
-			containerOffset = $playerCard.offset(),
-			$cardback = newFacedownPlayerCard().addClass("drawnPlayerCard");
-		
-		if (zIndex)
-			$cardback.css({ zIndex });
+	const $deck = $("#imgPlayerDeck"),
+		$playerCard = $("<div class='playerCard template'></div>").appendTo($container),
+		containerOffset = $playerCard.offset(),
+		$cardback = newFacedownPlayerCard().addClass("drawnPlayerCard");
+	
+	if (zIndex)
+		$cardback.css({ zIndex });
 
-		$cardback
-			.appendTo("body")
-			.width($deck.width())
-			.offset(
-				{
-					top: deckOffset.top,
-					left: deckOffset.left
-				})
-			.animate(
-				{
-					width: finalCardbackWidth || $container.width() * 0.152,
-					top: containerOffset.top,
-					left: containerOffset.left
-				},
-				getDuration(data, "dealCard"),
-				data.easings.dealCard,
-				resolve());
-	});
+	$cardback
+		.appendTo("body")
+		.width($deck.width())
+		.offset(
+			{
+				top: deckOffset.top,
+				left: deckOffset.left
+			})
+		.animate(
+			{
+				width: finalCardbackWidth || $container.width() * 0.152,
+				top: containerOffset.top,
+				left: containerOffset.left
+			},
+			getDuration(data, "dealCard"),
+			data.easings.dealCard,
+			function() { $cardback.removeClass("template") });
 }
 
 function newFacedownPlayerCard()

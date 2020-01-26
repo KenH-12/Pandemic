@@ -879,7 +879,7 @@ span.r {color: #ef282a; background: none}
 	border-top-left-radius: 5px;
 	border-bottom-right-radius: 5px;
 }
-.playerCard:not(.eventCard):not(.epidemic),
+.playerCard:not(.eventCard):not(.epidemic):not(.template),
 .infectionCard:not(.template),
 .playerPanel .role *:not(.eventCard),
 #roleIndicator,
@@ -929,7 +929,7 @@ span.r {color: #ef282a; background: none}
 .discardPrompt .playerCard
 {
 	margin-bottom: 3px;
-	cursor: pointer;
+	cursor: pointer !important;
 }
 .discardSelections > p
 {
@@ -1296,7 +1296,7 @@ span.r {color: #ef282a; background: none}
 	padding-bottom: 5px;
 	margin-bottom: 10px;
 }
-.shareableCards .playerCard { cursor: pointer }
+.shareableCards .playerCard { cursor: pointer !important }
 .btnRelocateStation
 {
 	width: 98%;
