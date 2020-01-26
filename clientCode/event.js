@@ -1,5 +1,7 @@
 "use strict";
 
+import { eventCards } from "./eventCard.js";
+
 const eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
@@ -831,6 +833,7 @@ class Airlift extends Event
     constructor(event, cities)
     {
         super(event);
+		this.eventCard = eventCards[eventTypes.airlift.cardKey];
         this.origin = cities[this.originKey];
 		this.destination = cities[this.destinationKey];
     }
@@ -842,26 +845,38 @@ class Airlift extends Event
 				<p>Origin: ${getLocatableCityName(this.origin)}</p>
 				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
-				<div class='playerCard eventCard'>AIRLIFT</div>`;
+				${this.eventCard.getPlayerCard()}`;
     }
 }
 
 class OneQuietNight extends Event
 {
-    getDetails()
+	constructor(event)
+    {
+        super(event);
+		this.eventCard = eventCards[eventTypes.oneQuietNight.cardKey];
+    }
+	
+	getDetails()
     {
 		return `${super.getDetails()}
 				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
-				<div class='playerCard eventCard'>ONE QUIET NIGHT</div>`;
+				${this.eventCard.getPlayerCard()}`;
     }
 }
 
 class GovernmentGrant extends ResearchStationPlacement
 {
+	constructor(event)
+    {
+        super(event);
+		this.eventCard = eventCards[eventTypes.governmentGrant.cardKey];
+    }
+	
 	getDiscardDetails()
 	{
 		return `<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
-				<div class='playerCard eventCard'>GOVERNMENT GRANT</div>`;
+				${this.eventCard.getPlayerCard()}`;
 	}
 }
 
@@ -870,6 +885,7 @@ class ResilientPopulation extends Event
 	constructor(event, cities)
     {
 		super(event);
+		this.eventCard = eventCards[eventTypes.resilientPopulation.cardKey];
 		this.city = cities[this.cardKey];
 	}
 	
@@ -879,7 +895,7 @@ class ResilientPopulation extends Event
 				<p>Removed From Game:</p>
 				${this.city.getInfectionCard()}
 				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
-				<div class='playerCard eventCard'>RESILIENT POPULATION</div>`;
+				${this.eventCard.getPlayerCard()}`;
     }
 }
 
@@ -888,6 +904,7 @@ class Forecast extends Event
 	constructor(event, cities)
     {
 		super(event);
+		this.eventCard = eventCards[eventTypes.forecast.cardKey];
 		this.cities = [];
 		
 		for (let key of this.cardKeys)
@@ -905,7 +922,7 @@ class Forecast extends Event
 				${infectionCards}
 				${this.placementEvent ? this.placementEvent.getDetails() : ""}
 				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
-				<div class='playerCard eventCard'>FORECAST</div>`;
+				${this.eventCard.getPlayerCard()}`;
     }
 }
 

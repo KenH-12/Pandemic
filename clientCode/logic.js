@@ -1062,6 +1062,7 @@ function showEventIconDetails($icon, event)
 		event.positionPopulationRanks($detailsContainer);
 	
 	bindRoleCardHoverEvents();
+	bindEventCardHoverEvents(data, { $containingElement: $detailsContainer });
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
 }
@@ -2760,6 +2761,7 @@ class DiscardPrompt
 		}
 
 		this.updateCountIndicators();
+		bindEventCardHoverEvents(data, { $containingElement: this.$container });
 
 		log("DiscardPrompt cardKeys: ", this.cardKeys);
 
@@ -3538,6 +3540,7 @@ async function performDrawStep()
 		}
 
 		bindCityLocatorClickEvents();
+		bindEventCardHoverEvents(data, { $containingElement: $container });
 		
 		await sleep(getDuration(data, "mediumInterval"));
 		resolve(cardDrawEvent.cardKeys);
@@ -7290,7 +7293,6 @@ function loadPlayerCards(playerCards)
 	}
 	
 	bindCityLocatorClickEvents();
-	bindEventCardHoverEvents();
 	setPlayerDeckImgSize();
 	flagRemovedEventCardEvents();
 }
@@ -7557,6 +7559,7 @@ async function setup()
 
 	bindPlayerDeckHover();
 	bindInfectionDeckHover();
+	bindEventCardHoverEvents(data);
 	
 	if (forecastInProgress())
 	{

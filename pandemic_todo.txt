@@ -6,6 +6,13 @@ the operations flight button was enabled after it was already used that turn
 	
 the playerCard in the Direct Flight discard prompt is not locatable
 
+the dark red disabled event card click thing isn't working
+	instead of the dark red thing...
+		use a tooltip to the right of the full event card which explains why it can't be played at the moment
+	
+the target cursor is visible before the newly drawn city card is revealed
+	it's also visible before infection cards are even drawn (the card templates already exist)
+
 TO DO
 -----
 event history
@@ -14,7 +21,6 @@ event history
 		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
 			Title should show action description
-			event cards should show description
 			dotted underline for
 				movement types (dispatch pawn)
 			travel paths for movement actions and research station relocations?

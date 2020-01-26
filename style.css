@@ -929,6 +929,7 @@ span.r {color: #ef282a; background: none}
 .discardPrompt .playerCard
 {
 	margin-bottom: 3px;
+	cursor: pointer;
 }
 .discardSelections > p
 {

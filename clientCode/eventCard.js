@@ -13,7 +13,7 @@ export default class EventCard
 		return `<div class='playerCard eventCard' data-key='${this.key}'>${this.name.toUpperCase()}</div>`;
     }
     
-    showFullCard($eventCard)
+    async showFullCard($eventCard, { boardWidth, boardHeight })
     {
         const $fullCard = $(`<div class='eventCardFull'>
                                 <h5>EVENT</h5>
@@ -21,14 +21,12 @@ export default class EventCard
                                 <img src='images/cards/event/${toCamelCase(this.name)}.jpg' alt='${this.name}' />
                                 ${this.getRules()}
                             </div>`),
-            eventCardOffset = $eventCard.offset(),
-            CARD_MARGIN = 5;
+            $cardImg = $fullCard.children("img");
         
         $fullCard.appendTo("#boardContainer")
-            .offset({
-                top: eventCardOffset.top,
-                left: eventCardOffset.left + $eventCard.width() + CARD_MARGIN
-            });
+            .offset(getFullCardOffset($eventCard, $fullCard, boardWidth));
+
+        $cardImg.on("load", function() { ensureFullCardIsOnScreen($fullCard, boardHeight) });
     }
 
     getRules()
@@ -57,22 +55,48 @@ const eventCards = {};
 		eventCards[card[0]] = new EventCard(card[0], card[1]);
 })();
 
-function bindEventCardHoverEvents($container = [])
+function bindEventCardHoverEvents(boardDimensions, { $containingElement } = {})
 {
     const eventCardSelector = ".playerCard.eventCard",
-        $eventCards = $container.length ? $container.find(eventCardSelector) : $(eventCardSelector);
+        $eventCards = $containingElement ? $containingElement.find(eventCardSelector) : $(eventCardSelector);
     
     let $this;
-    $eventCards
+    $eventCards.off("mouseenter mouseleave")
         .hover(function()
         {
             $this = $(this);
-            eventCards[$this.data("key")].showFullCard($this);
+            eventCards[$this.data("key")].showFullCard($this, boardDimensions);
         },
         function()
         {
             $(".eventCardFull").remove();
         });
+}
+
+function getFullCardOffset($eventCard, $fullCard, boardWidth)
+{
+    const fullCardOffset = $eventCard.offset(),
+        eventCardWidth = $eventCard.outerWidth(),
+        fullCardWidth = $fullCard.outerWidth(),
+        MARGIN = 5;
+    
+    if ($eventCard.closest(".playerPanel").length
+        || $eventCard.closest(".eventDetails").length)
+        fullCardOffset.left += eventCardWidth + MARGIN;
+    else if ($eventCard.closest("#playerDiscard").length)
+        fullCardOffset.left -= fullCardWidth + MARGIN;
+    else if ($eventCard.closest("#rightPanel").length)
+        fullCardOffset.left = boardWidth - fullCardWidth - MARGIN;
+    
+    return fullCardOffset;
+}
+
+function ensureFullCardIsOnScreen($fullCard, boardHeight)
+{
+    const fullCardHeight = $fullCard.outerHeight();
+
+    if ($fullCard.offset().top + fullCardHeight > boardHeight)
+        $fullCard.offset({ top: boardHeight - fullCardHeight });
 }
 
 export {
