@@ -879,8 +879,8 @@ span.r {color: #ef282a; background: none}
 	border-top-left-radius: 5px;
 	border-bottom-right-radius: 5px;
 }
-.playerCard:not(.eventCard),
-.infectionCard,
+.playerCard:not(.eventCard):not(.epidemic),
+.infectionCard:not(.template),
 .playerPanel .role *:not(.eventCard),
 #roleIndicator,
 .roleTag { cursor: url("images/target_black.png"), auto }

@@ -6225,7 +6225,7 @@ function newInfectionCardTemplate()
 	const fontSize = getDimension(data, "infCardFont"),
 		cityNameTop = getDimension(data, "infCardNameTop");
 	
-	return $(`<div class='infectionCard'>
+	return $(`<div class='infectionCard template'>
 				<div class='infectionCardContents'>
 					<div class='veil'></div>
 					<img class='infectionCardImg' />
@@ -6616,6 +6616,7 @@ function loadInfCardsDrawnThisTurn()
 			
 			$card.attr("data-key", city.key)
 				.click(function() { pinpointCityFromCard($card) })
+				.removeClass("template")
 				.find(".infectionCardImg")
 				.attr("src", `images/cards/infectionCard_${city.color}.png`)
 				.siblings(".cityName")
@@ -6938,6 +6939,7 @@ async function revealInfectionCard({ city, cityKey, index }, { forecasting } = {
 			() =>
 			{
 				$veil.remove();
+				$card.removeClass("template");
 
 				if (!data.fastForwarding && !diseaseColorIsEradicated && !forecasting)
 					pinpointCity(cityKey, { pinpointClass: `${city.color}Border` });
