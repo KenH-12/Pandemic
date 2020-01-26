@@ -6,10 +6,6 @@ the operations flight button was enabled after it was already used that turn
 	
 the playerCard in the Direct Flight discard prompt is not locatable
 
-the dark red disabled event card click thing isn't working
-	instead of the dark red thing...
-		use a tooltip to the right of the full event card which explains why it can't be played at the moment
-
 perhaps the role tag in the airlift prompt should not get the target cursor
 	check other movement types
 	check other role tag appearances
@@ -27,8 +23,6 @@ event history
 			travel paths for movement actions and research station relocations?
 			outbreak spread paths?
 			epidemic intensify should have a max height, and should be scrollable
-
-when an event card from an event's details is hovered, try aligning the full event cards with the event details container
 
 show the actual event card in the action prompt?
 

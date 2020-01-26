@@ -251,7 +251,7 @@ body,
 .researchStationBackground { background-color: #e9cf94 }
 span.r {color: #ef282a; background: none}
 .eventCard,
-.eventCardFull
+#eventCardFull
 {
 	background: linear-gradient(30deg, 
 		gray,
@@ -265,9 +265,9 @@ span.r {color: #ef282a; background: none}
 		gray);
 	color: #000;
 }
-.eventCard.unavailable:active { background-color: #8a181a }
+.eventCard.unavailable:active { background: #8a181a }
 
-.eventCardFull
+#eventCardFull
 {
 	width: 17%;
 	padding-bottom: 3px;
@@ -275,7 +275,7 @@ span.r {color: #ef282a; background: none}
 	border-bottom-right-radius: 8px;
 	overflow: hidden;
 }
-.eventCardFull h5
+#eventCardFull h5
 {
 	display: inline;
 	font-size: 12px;
@@ -285,13 +285,13 @@ span.r {color: #ef282a; background: none}
 	color: #fff;
 	border-bottom-right-radius: 5px;
 }
-.eventCardFull h3 { margin-top: -2px; padding-bottom: 5px }
-.eventCardFull img { border-top: 2px solid #000 }
-.eventCardFull img,
-.eventCardFull > p:first-of-type
+#eventCardFull h3 { margin-top: -2px; padding-bottom: 5px }
+#eventCardFull img { border-top: 2px solid #000 }
+#eventCardFull img,
+#eventCardFull > p:first-of-type
 { border-bottom: 2px solid #000 }
-.eventCardFull > p { padding: 2px 5px }
-.eventCardFull > p:first-of-type
+#eventCardFull > p { padding: 2px 5px }
+#eventCardFull > p:first-of-type
 {
 	background-color: #000;
 	color: #fff;
@@ -299,6 +299,8 @@ span.r {color: #ef282a; background: none}
 	padding: 0;
 	margin-bottom: 3px;
 }
+#disabledEventCard.tooltip { width: 300px }
+
 .pawnArrow.airlift > div,
 .airlift:not(.pawnArrow)
 {
@@ -344,19 +346,21 @@ span.r {color: #ef282a; background: none}
 	border-radius: 20%;
 }
 
-.eventDetails
+.tooltip
 {
 	position: absolute;
 	background-color: #252525;
-	min-height: 50px;
-	min-width: 50px;
 	z-index: 10;
-	font-size: 16px;
+	font-size: 14px;
 	color: #fff;
-	padding: 5px;
+	padding: 4px;
+	border-radius: 5px;
 	filter: drop-shadow(-4px -4px 6px #000);
 }
-.eventDetails .title
+.tooltip > p { margin: 3px 0 }
+
+#eventDetails { font-size: 16px }
+#eventDetails .title
 {
 	font-size: 17px;
 	text-align: center;
@@ -365,9 +369,8 @@ span.r {color: #ef282a; background: none}
 	padding-top: 2px;
 	margin-bottom: 3px;
 }
-.eventDetails > p { margin: 2px 0 }
-.eventDetails .playerCard { margin: 2px 0 }
-.eventDetails .diseaseCube
+#eventDetails .playerCard { margin: 2px 0 }
+#eventDetails .diseaseCube
 {
 	display: inline-block;
 	width: 16px;
@@ -375,50 +378,50 @@ span.r {color: #ef282a; background: none}
 	margin-right: 3px;
 	margin-bottom: 3px;
 }
-.eventDetails .cubes > * { vertical-align: middle }
+#eventDetails .cubes > * { vertical-align: middle }
 
-.eventDetailsArrow
+#eventDetailsArrow
 {
 	position: absolute;
 	background-color: #252525;
 	clip-path: polygon(50% 65%, 0 0, 100% 0);
 }
-.eventDetails .locatable:hover { border-bottom: 1px solid #fff }
-.eventDetails .infectionCard
+#eventDetails .locatable:hover { border-bottom: 1px solid #fff }
+#eventDetails .infectionCard
 {
 	height: 18px;
 	margin-bottom: 8px;
 	min-width: 200px;
 }
-.eventDetails .infectionCardContents
+#eventDetails .infectionCardContents
 {
 	width: 96%;
 	font-size: 14px;
 }
-.eventDetails .infectionCard .cityName
+#eventDetails .infectionCard .cityName
 {
 	top: 3px;
 	white-space: nowrap;
 	margin-left: 18%
 }
 
-.eventDetails .column
+#eventDetails .column
 {
 	display: inline-block;
 	vertical-align: top;
 }
-.eventDetails .column:first-of-type p:first-of-type { margin-top: 18px; }
-.eventDetails .column:last-of-type { padding-left: 2px }
-.eventDetails .column:last-of-type p:first-of-type { border-bottom: 1px solid #fff }
-.eventDetails .hand { padding: 5px 0 }
-.eventDetails .populationRank
+#eventDetails .column:first-of-type p:first-of-type { margin-top: 18px; }
+#eventDetails .column:last-of-type { padding-left: 2px }
+#eventDetails .column:last-of-type p:first-of-type { border-bottom: 1px solid #fff }
+#eventDetails .hand { padding: 5px 0 }
+#eventDetails .populationRank
 {
 	font-size: 22px;
 	position: absolute;
 }
 
-.eventDetails .indent-1 { margin-left: 12px }
-.eventDetails .indent-2 { margin-left: 30px }
+#eventDetails .indent-1 { margin-left: 12px }
+#eventDetails .indent-2 { margin-left: 30px }
 
 #cureMarkerContainer
 {
@@ -862,7 +865,7 @@ span.r {color: #ef282a; background: none}
 }
 .playerCard,
 .epidemicFull > h2,
-.eventCardFull > h3
+#eventCardFull > h3
 { font-family: 'Audiowide', 'Electrolize', sans-serif; }
 .playerCard
 {
@@ -883,9 +886,10 @@ span.r {color: #ef282a; background: none}
 .infectionCard:not(.template),
 .playerPanel .role *:not(.eventCard),
 #roleIndicator,
-.roleTag { cursor: url("images/target_black.png"), auto }
+.roleTag
+{ cursor: url("images/target_black.png"), auto }
 .playerCard.b,
-.eventDetails .locatable { cursor: url("images/target_white.png"), auto }
+#eventDetails .locatable { cursor: url("images/target_white.png"), auto }
 .playerCard * { pointer-events: none }
 .playerPanel > .playerCard:first-of-type { margin-top: 4px }
 .playerPanel .playerCard.eventCard:not(.unavailable) { cursor: pointer }
@@ -1017,7 +1021,7 @@ span.r {color: #ef282a; background: none}
 	border-radius: 8px;
 }
 .roleCard,
-.eventCardFull
+#eventCardFull
 {
 	position: absolute;
 	z-index: 12;
@@ -1032,21 +1036,21 @@ span.r {color: #ef282a; background: none}
 	color: #000;
 }
 .roleCard h3,
-.eventCardFull h3
+#eventCardFull h3
 {
 	font-size: 18px;
 	text-align: center;
 }
 .rolePortrait { border-bottom: 2px solid #fff }
 .rolePortrait,
-.eventCardFull img
+#eventCardFull img
 {
 	display: block;
 	width: 100%;
 }
 .roleCard ul,
-.eventCardFull h5,
-.eventCardFull p { font-family: 'Ropa Sans', sans-serif }
+#eventCardFull h5,
+#eventCardFull p { font-family: 'Ropa Sans', sans-serif }
 .roleCard ul
 {
 	list-style: inside;

@@ -1028,14 +1028,14 @@ function bindEventIconHoverEvents($icon, event)
 
 function showEventIconDetails($icon, event)
 {
-	if ($(".eventDetails").length // prevent duplication
+	if ($("#eventDetails").length // prevent duplication
 		|| typeof event.getDetails !== "function")
 		return false;
 	
 	const $eventHistory = $("#eventHistory"),
 		$boardContainer = $("#boardContainer"),
-		$detailsContainer = $(`<div class='eventDetails'>${event.getDetails()}</div>`).appendTo($boardContainer),
-		$arrow = $("<div class='eventDetailsArrow'></div>").appendTo($boardContainer),
+		$detailsContainer = $(`<div id='eventDetails' class='tooltip'>${event.getDetails()}</div>`).appendTo($boardContainer),
+		$arrow = $("<div id='eventDetailsArrow'></div>").appendTo($boardContainer),
 		containerHeight = $detailsContainer.height(),
 		halfContainerWidth = Math.ceil($detailsContainer.width() / 2),
 		iconOffset = $icon.offset(),
@@ -1069,7 +1069,7 @@ function showEventIconDetails($icon, event)
 
 function allowEventDetailsHovering($icon, event)
 {
-	const $eventDetails = $(".eventDetails"),
+	const $eventDetails = $("#eventDetails"),
 		detailsOffset = $eventDetails.offset(),
 		iconOffset = $icon.offset(),
 		hoverBox = {
@@ -1126,8 +1126,7 @@ function getPreviousEventWithIcon(event)
 
 function hideEventIconDetails()
 {
-	$(".eventDetails").remove();
-	$(".eventDetailsArrow").remove();
+	$("#eventDetails, #eventDetailsArrow").remove();
 }
 
 function enableBtnCancelAction()
@@ -4033,9 +4032,9 @@ class Player
 			if (hoveredElementOffset.top + roleCardHeight > data.boardHeight)
 				roleCardOffset.top = data.boardHeight - roleCardHeight - CARD_MARGIN;
 			
-			if ($hoveredElement.closest(".eventDetails").length)
+			if ($hoveredElement.closest("#eventDetails").length)
 			{
-				const $eventDetails = $(".eventDetails");
+				const $eventDetails = $("#eventDetails");
 				roleCardOffset.left = $eventDetails.offset().left + $eventDetails.outerWidth() + CARD_MARGIN;
 			}
 			else
