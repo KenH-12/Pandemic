@@ -3,12 +3,6 @@ BUGS
 the operations flight button was enabled after it was already used that turn
 	replicate:
 		operations flight, build research station
-	
-the playerCard in the Direct Flight discard prompt is not locatable
-
-perhaps the role tag in the airlift prompt should not get the target cursor
-	check other movement types
-	check other role tag appearances
 
 TO DO
 -----

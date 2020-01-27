@@ -306,7 +306,7 @@ function appendEventHistoryIconOfType(targetEventType)
 		}
 	}
 
-	setEventHistoryScrollPosition($eventHistory);
+	setEventHistoryScrollPosition($eventHistory, { addingNewIcon: true });
 }
 
 function appendEventHistoryIcon($eventHistory, event)
@@ -317,11 +317,11 @@ function appendEventHistoryIcon($eventHistory, event)
 	$eventHistory.append($icon);
 }
 
-function setEventHistoryScrollPosition($eventHistory)
+function setEventHistoryScrollPosition($eventHistory, { addingNewIcon } = {})
 {
 	const overflow = getHorizontalOverflow($eventHistory);
 	
-	if (overflow <= 0)
+	if (addingNewIcon && overflow <= 0)
 		return slideInNewEventIcon($eventHistory);
 	
 	$eventHistory.animate({ scrollLeft: overflow });
@@ -333,17 +333,20 @@ async function slideInNewEventIcon($eventHistory)
 		$newIcon = $icons.last().addClass("hidden"),
 		freeSpace = $eventHistory.width() - ($icons.length - 1) * $newIcon.width();
 	
-	$newIcon.css("margin-left", freeSpace)
-		.on("load", async function()
-		{
-			await animatePromise({
-				$elements: $newIcon.removeClass("hidden"),
-				desiredProperties: { marginLeft: 0 },
-				easing: "easeOutQuad"
-			});
-		
-			$newIcon.removeAttr("style");
-		});
+	$newIcon.css("margin-left", freeSpace);
+
+	await Promise.race([
+		resolvePromiseOnLoad($newIcon),
+		sleep(250)
+	]);
+
+	await animatePromise({
+		$elements: $newIcon.removeClass("hidden"),
+		desiredProperties: { marginLeft: 0 },
+		easing: "easeOutQuad"
+	});
+
+	$newIcon.removeAttr("style");
 }
 
 class Step
@@ -1367,6 +1370,7 @@ const actionInterfacePopulator = {
 
 		actionInterfacePopulator.$actionInterface.append($discardPrompt);
 
+		bindEventCardHoverEvents(data, { $containingElement: $discardPrompt });
 		if (isContingencyCard)
 			bindRoleCardHoverEvents();
 
@@ -1810,6 +1814,7 @@ const actionInterfacePopulator = {
 			});
 
 			bindRoleCardHoverEvents();
+			locatePawnOnRoleTagClick(actionInterfacePopulator.$actionInterface);
 		}
 
 		return true;

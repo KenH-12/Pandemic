@@ -882,7 +882,7 @@ span.r {color: #ef282a; background: none}
 	border-top-left-radius: 5px;
 	border-bottom-right-radius: 5px;
 }
-.playerCard:not(.eventCard):not(.epidemic):not(.template),
+.playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template),
 .infectionCard:not(.template),
 .playerPanel .role *:not(.eventCard),
 #roleIndicator,

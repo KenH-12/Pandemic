@@ -121,6 +121,17 @@ function animatePromise({ $elements, initialProperties, desiredProperties, durat
 		});
 }
 
+function resolvePromiseOnLoad($img)
+{
+	return new Promise(resolve =>
+	{
+		$img.on("load", function()
+		{
+			resolve();
+		});
+	});
+}
+
 function propertyStrobe($elements,
 	{
 		initialState,
