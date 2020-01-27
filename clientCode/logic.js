@@ -274,7 +274,7 @@ function parseEvents(events)
 function addToEventHistoryQueue(events)
 {
 	for (let event of events)
-		if (getEventType(event.code).hasIcon)
+		if (event.hasIcon())
 			data.eventHistoryQueue.push(event);
 }
 
@@ -943,33 +943,23 @@ function getEventIconFileName(eventType, event)
 	if (!event)
 	return fileName;
 
-	const {
-		treatDisease,
-		autoTreatDisease,
-		eradication,
-		infectCity,
-		epidemicInfect,
-		discoverACure,
-		startingHands
-	} = eventTypes;
-
-	if (event.code === treatDisease.code
-		|| event.code === autoTreatDisease.code
-		|| event.code === eradication.code)
+	if (event instanceof TreatDisease
+		|| event instanceof AutoTreatDisease
+		|| event instanceof Eradication)
 		fileName += `_${event.diseaseColor}`;
-	else if (event.code === infectCity.code
-			|| event.code === epidemicInfect.code)
+	else if (event instanceof InfectCity
+			|| event instanceof EpidemicInfect)
 	{
-		if (event.code === epidemicInfect.code)
-			fileName = toCamelCase(infectCity.name);
+		if (event instanceof EpidemicInfect)
+			fileName = toCamelCase(eventTypes.infectCity.name);
 		
 		fileName += `_${getCity(event.cityKey).color}`;
 		if (event.preventionCode !== infectionPreventionCodes.notPrevented)
 			fileName += `_${event.preventionCode}`;
 	}
-	else if (event.code === discoverACure.code)
+	else if (event instanceof DiscoverACure)
 		fileName += `_${getCity(event.cardKeys[0]).color}`;
-	else if (event.code === startingHands.code)
+	else if (event instanceof StartingHands)
 		fileName += `_${Object.keys(data.players).length}`;
 	
 	return fileName;
@@ -977,24 +967,13 @@ function getEventIconFileName(eventType, event)
 
 function getEventIconFileExtension(eventType, event)
 {
-	const { code, cardKey } = eventType,
-		{
-			initialInfection,
-			infectCity,
-			discoverACure,
-			epidemicInfect,
-			epidemicIntensify,
-			autoTreatDisease,
-			eradication
-		} = eventTypes;
-
-	if ( code === initialInfection.code
-		|| (code === infectCity.code || code === epidemicInfect.code) && event.preventionCode === infectionPreventionCodes.quarantine
-		|| code === discoverACure.code && event
-		|| cardKey && isEventCardKey(cardKey)
-		|| code === epidemicIntensify.code
-		|| code === autoTreatDisease.code
-		|| code === eradication.code)
+	if ( event instanceof InitialInfection
+		|| (event instanceof InfectCity || event instanceof EpidemicInfect) && event.preventionCode === infectionPreventionCodes.quarantine
+		|| event instanceof DiscoverACure && event
+		|| eventType.cardKey && isEventCardKey(eventType.cardKey)
+		|| event instanceof EpidemicIntensify
+		|| event instanceof AutoTreatDisease
+		|| event instanceof Eradication)
 		return "jpg";
 	
 	return "png";
@@ -1004,19 +983,13 @@ function getEventIconCssClasses(event)
 {
 	if (!event) return "actionIcon";
 
-	const {
-		infectCity,
-		epidemicInfect,
-		eradication
-	} = eventTypes;
-
 	if (event.role && data.players[event.role])
 		return `${data.players[event.role].camelCaseRole}Border`;
-	else if (event.code === infectCity.code)
+	else if (event instanceof InfectCity)
 		return `${getCity(event.cityKey).color}Border darkBlueBackground`;
-	else if (event.code === epidemicInfect.code)
+	else if (event instanceof EpidemicInfect)
 		return "darkGreenBorder lightGreenBackground";
-	else if (event.code === eradication.code)
+	else if (event instanceof Eradication)
 		return `${event.diseaseColor}Border`;
 	
 	return "darkGreenBorder";
@@ -2605,7 +2578,7 @@ function discardOrRemoveEventCard(event)
 {
 	return new Promise(async resolve =>
 	{
-		const cardKey = getEventType(event.code).cardKey,
+		const cardKey = event.eventCard.cardKey,
 			$card = $("#playerPanelContainer").find(`.playerCard[data-key='${cardKey}']`),
 			player = data.players[event.role];
 		
@@ -3202,7 +3175,6 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			dataToPost.discardKey = operationsFlightDiscardKey;
 
 		const events = await requestAction(eventType, dataToPost);
-		log("events: ", events);
 		await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
 		setDuration(data, "pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
@@ -3238,8 +3210,8 @@ function animateAutoTreatDiseaseEvents(events)
 	{
 		disableActions();
 		const { autoTreatDisease, eradication } = eventTypes,
-			autoTreatEvents = events.filter(e => e.code === autoTreatDisease.code
-												|| e.code === eradication.code),
+			autoTreatEvents = events.filter(e => e instanceof AutoTreatDisease
+												|| e instanceof Eradication),
 			city = getPlayer("Medic").getLocation(),
 			interval = getDuration(data, "shortInterval");
 
@@ -3314,9 +3286,9 @@ async function treatDisease($cube, diseaseColor)
 		eradicated = false;
 	for (let event of events)
 	{
-		if (event.code === eventTypes.treatDisease.code)
+		if (event instanceof TreatDisease)
 			numToRemove = event.prevCubeCount - event.newCubeCount;
-		else if (event.code === eventTypes.eradication.code)
+		else if (event instanceof Eradication)
 			eradicated = true;
 	}
 	
@@ -5092,7 +5064,7 @@ function locatePawnOnRoleTagClick($containingElement)
 async function resolveOutbreaks(events)
 {
 	const { outbreak, outbreakInfection } = eventTypes,
-		pendingOutbreaks = events.filter(e => e.code === outbreak.code),
+		pendingOutbreaks = events.filter(e => e instanceof Outbreak),
 		color = pendingOutbreaks[0].diseaseColor;
 	
 	let outbreakEvent,
@@ -5110,8 +5082,8 @@ async function resolveOutbreaks(events)
 		// and outbreak events whose origin is connected to the currently outbreaking city.
 		// However, if a city has been triggered to outbreak but there are pending outbreakInfection events
 		// where the infectedKey is the outbreak originKey, don't include that outbreak event.
-		infections = events.filter(e => (e.code === outbreakInfection.code && e.originKey === outbreakEvent.originKey)
-										|| (e.code === outbreak.code
+		infections = events.filter(e => (e instanceof OutbreakInfection && e.originKey === outbreakEvent.originKey)
+										|| (e instanceof Outbreak
 											&& originCity.isConnectedTo(e.originKey)
 											&& !events.some(f => f.infectedKey == e.originKey)));
 		
@@ -5156,7 +5128,7 @@ async function resolveOutbreaks(events)
 		{			
 			affectedCity = getCity(inf.infectedKey || inf.originKey);
 			
-			if (inf.code === outbreakInfection.code
+			if (inf instanceof OutbreakInfection
 				&& inf.preventionCode !== infectionPreventionCodes.notPrevented)
 			{
 				if (inf.preventionCode === infectionPreventionCodes.quarantine)
@@ -7323,7 +7295,7 @@ function flagRemovedEventCardEvents()
 		for (let i = data.eventCardEvents.length - 1; i >= 0; i--)
 		{
 			event = data.eventCardEvents[i];
-			cardKey = getEventType(event.code).cardKey;
+			cardKey = event.eventCard.cardKey;
 	
 			// Was the event card removed from the game?
 			if (data.removedEventCardKeys.includes(cardKey))
