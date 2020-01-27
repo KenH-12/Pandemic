@@ -3,8 +3,11 @@ BUGS
 
 TO DO
 -----
+allow actions to be undone
+
 event history
 	slideshow buttons
+	remove icons which are not visible?
 	detailed tooltips
 		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file

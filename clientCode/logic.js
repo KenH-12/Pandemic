@@ -254,12 +254,7 @@ function parseEvents(events)
 					parsedEvents.push(new Event(e, cities));
 			}
 
-			let idx = data.events.length;
-			for (let newEvent of parsedEvents)
-			{
-				newEvent.eventHistoryIndex = idx++;
-				data.events.push(newEvent);
-			}
+			data.events = [...data.events, ...parsedEvents];
 
 			if (Object.keys(data.players).length)
 			{
@@ -999,7 +994,7 @@ function bindEventIconHoverEvents($icon, event)
 {
 	$icon.off("mouseenter mouseleave")
 		.hover(function() { showEventIconDetails($icon, event) },
-		function() { allowEventDetailsHovering($icon, event) });
+		function() { allowEventDetailsHovering($icon) });
 }
 
 function showEventIconDetails($icon, event)
@@ -1043,7 +1038,7 @@ function showEventIconDetails($icon, event)
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
 }
 
-function allowEventDetailsHovering($icon, event)
+function allowEventDetailsHovering($icon)
 {
 	const $eventDetails = $("#eventDetails"),
 		detailsOffset = $eventDetails.offset(),
@@ -1068,36 +1063,20 @@ function allowEventDetailsHovering($icon, event)
 				$document.off("mousemove");
 				hideEventIconDetails();
 
-				const $next = $icon.next(),
-					$prev = $icon.prev();
-				
-				if ($next.length && $next.is(":hover"))
-					showEventIconDetails($next, getNextEventWithIcon(event));
-				else if ($prev.length && $prev.is(":hover"))
-					showEventIconDetails($prev, getPreviousEventWithIcon(event));
+				checkEventIconHovering();
 			}
 		});
 }
 
-function getNextEventWithIcon(event)
+// Due to the additional functionality provided by allowEventDetailsHovering,
+// moving the mouse from one event history icon to another will not cause the second icon's mouseenter event to fire.
+// This check will manually fire the hovered element's mouseenter event if the element is contained within #eventHistory.
+function checkEventIconHovering()
 {
-	let e;
-	for (let i = event.eventHistoryIndex + 1; i <= data.events.length; i++)
-	{
-		e = data.events[i];
-		if (e.hasIcon())
-			return e;
-	}
-}
-function getPreviousEventWithIcon(event)
-{
-	let e;
-	for (let i = event.eventHistoryIndex - 1; i >= 0; i--)
-	{
-		e = data.events[i];
-		if (e.hasIcon())
-			return e;
-	}
+	const $hovered = $(":hover");
+
+	if ($hovered.closest("#eventHistory").length)
+		$hovered.trigger("mouseenter");
 }
 
 function hideEventIconDetails()
