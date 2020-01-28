@@ -1,5 +1,9 @@
 BUGS
 ----
+event cards aren't animated to the discard pile when they are played
+	happened with:
+		one quiet night
+		resilient population
 
 TO DO
 -----
@@ -20,7 +24,10 @@ event history
 
 show the actual event card in the action prompt?
 
-move data.eventCards to eventCards.js ?
+ensure that role cards appear on screen as is done with event cards
+
+remove quarantine special event alert
+	and auto-treat
 
 create MovementEvent class as a bridge between Event and all movement action event types
 

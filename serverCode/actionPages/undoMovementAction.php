@@ -32,7 +32,6 @@
         $DISPATCH = "dp";
         
         require "../connect.php";
-        include "../undoActionsUtilities.php";
         include "../utilities.php";
 
         $event = getEventById($mysqli, $game, $eventID);
@@ -85,8 +84,7 @@
         if (getRoleName($mysqli, $roleToMove) === "Medic")
             undoEventsTriggeredByEvent($mysqli, $game, $eventID);
 
-        // Go back one step
-
+        previousStep($mysqli, $game, $activeRole, $currentStep, $movementType);
         deleteEvent($mysqli, $game, $eventID);
     }
     catch(Exception $e)
