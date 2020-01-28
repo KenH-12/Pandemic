@@ -1884,13 +1884,11 @@ async function planContingency(cardKey)
 	resetActionPrompt();
 	
 	const eventType = eventTypes.planContingency,
-		$eventCard = $("#playerDiscard").find(`.playerCard[data-key='${cardKey}']`),
-		isContingencyCard = true,
-		targetProperties = getDrawnPlayerCardTargetProperties({ isContingencyCard });
+		$eventCard = $("#playerDiscard").find(`.playerCard[data-key='${cardKey}']`);
 
 	await Promise.all([
 		requestAction(eventType, { cardKey }),
-		animateCardToHand($eventCard, targetProperties, { isContingencyCard })
+		animateCardToHand($eventCard, { isContingencyCard: true })
 	]);
 
 	getActivePlayer().contingencyKey = cardKey;
@@ -3641,8 +3639,10 @@ function getDrawnPlayerCardTargetProperties({ isContingencyCard } = {})
 	return targetProperties;
 }
 
-function animateCardToHand($card, targetProperties, { isContingencyCard } = {})
+function animateCardToHand($card, { targetProperties, isContingencyCard } = {})
 {
+	targetProperties = targetProperties || getDrawnPlayerCardTargetProperties({ isContingencyCard });
+	
 	// Some initial values should be calculated before the Promise is made.
 	const initialOffset = $card.offset(),
 		initialWidth = $card.width();
@@ -8852,6 +8852,54 @@ function collapsePlayerDiscardPile()
 				
 				resolve();
 			});
+	});
+}
+
+async function undoAction()
+{
+	const event = getLatestUndoableEvent();
+
+	if (!event)
+		return false;
+
+	const { undoneEventIds, prevStepName } = await event.requestUndo(getActivePlayer(), data.currentStep.name);
+
+	await animateUndoEvents(undoneEventIds);
+	setCurrentStep(prevStepName);
+	proceed();
+}
+
+function getLatestUndoableEvent()
+{
+	let event;
+	for (let i = data.events.length - 1; i >= 0; i--)
+	{
+		event = data.events[i];
+		
+		if (event.isUndoable)
+			return event;
+	}
+
+	return false;
+}
+
+async function animateUndoEvents(undoneEventIds)
+{
+	return new Promise(resolve =>
+	{
+		let event;
+		for (let id of undoneEventIds.reverse())
+		{
+			for (let i = data.events.lengh - 1; i >= 0; i--)
+			{
+				event = data.events[i];
+				if (event.id == id)
+					break;
+			}
+	
+			await event.animateUndo(animateCardToHand);
+		}
+		resolve();
 	});
 }
 

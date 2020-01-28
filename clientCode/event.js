@@ -550,7 +550,8 @@ class MovementAction extends Event
 {
 	constructor(event, cities)
     {
-        super(event);
+		super(event);
+		this.isUndoable = true;
         this.origin = cities[this.originKey];
         this.destination = cities[this.destinationKey];
 	}
@@ -566,26 +567,36 @@ class MovementAction extends Event
 		return details;
 	}
 	
-	undo(activePlayer, currentStep)
+	async animateUndo(animateCardToHand)
+	{
+		const playerToMove = this instanceof DispatchPawn ? this.dispatchedPlayer : this.player;
+
+		if (this.discardKey)
+			await animateCardToHand($("#playerDiscard").children(`data-key='${this.discardKey}'`));
+		
+		return playerToMove.updateLocation(this.origin);
+	}
+	
+	requestUndo(activePlayer, currentStepName)
 	{
 		return new Promise((resolve, reject) =>
 		{
 			$.post(`serverCode/actionPages/undoMovementAction.php`,
 			{
 				activeRole: activePlayer.rID,
-				currentStep,
+				currentStep: currentStepName,
 				actionCode: this.code,
 				eventID: this.id
 			},
 			function(response)
 			{
 				log(response);
-				const { failure, prevStep } = JSON.parse(response);
+				const result = JSON.parse(response);
 				
-				if (failure)
-					reject(failure);
+				if (result.failure)
+					reject(result.failure);
 				else
-					resolve(prevStep);
+					resolve(result);
 			});
 		});
 	}
@@ -620,6 +631,7 @@ class ResearchStationPlacement extends Event
 	constructor(event, cities)
     {
 		super(event);
+		this.isUndoable = true;
 		this.city = cities[this.cityKey];
 
 		if (this.relocationKey)
@@ -677,6 +689,7 @@ class TreatDisease extends DiseaseCubeRemoval
 	constructor(event, cities)
     {
 		super(event, cities);
+		this.isUndoable = true;
 		this.numCubesRemoved = this.prevCubeCount - this.newCubeCount;
     }
 }
@@ -688,6 +701,7 @@ class ShareKnowledge extends Event
 	constructor(event, cities)
     {
 		super(event);
+		this.isUndoable = true;
 		this.card = cities[this.cardKey];
     }
 
@@ -708,6 +722,7 @@ class DiscoverACure extends Event
 	constructor(event, cities)
     {
 		super(event);
+		this.isUndoable = true;
 		this.discards = [];
 		
 		for (let key of this.cardKeys)
@@ -743,6 +758,7 @@ class OperationsFlight extends Event
 	constructor(event, cities)
     {
 		super(event);
+		this.isUndoable = true;
 		this.origin = cities[this.originKey];
 		this.destination = cities[this.destinationKey];
 		this.discard = cities[this.cardKey];
@@ -763,6 +779,7 @@ class PlanContingency extends Event
 	constructor(event, eventCards)
     {
 		super(event);
+		this.isUndoable = true;
 		this.eventCard = eventCards[this.cardKey];
     }
 
@@ -827,7 +844,8 @@ class Airlift extends Event
 {
     constructor(event, cities)
     {
-        super(event);
+		super(event);
+		this.isUndoable = true;
 		this.eventCard = eventCards[eventTypes.airlift.cardKey];
         this.origin = cities[this.originKey];
 		this.destination = cities[this.destinationKey];
@@ -848,7 +866,8 @@ class OneQuietNight extends Event
 {
 	constructor(event)
     {
-        super(event);
+		super(event);
+		this.isUndoable = true;
 		this.eventCard = eventCards[eventTypes.oneQuietNight.cardKey];
     }
 	
@@ -880,6 +899,7 @@ class ResilientPopulation extends Event
 	constructor(event, cities)
     {
 		super(event);
+		this.isUndoable = true;
 		this.eventCard = eventCards[eventTypes.resilientPopulation.cardKey];
 		this.city = cities[this.cardKey];
 	}
@@ -926,6 +946,7 @@ class ForecastPlacement extends Event
 	constructor(event, cities)
     {
 		super(event);
+		this.isUndoable = true;
 		this.cities = [];
 		
 		for (let key of this.cardKeys)
@@ -976,6 +997,7 @@ class Discard extends Event
 	constructor(event, cities, eventCards)
     {
 		super(event);
+		this.isUndoable = true;
 		this.cards = [];
 		
 		for (let key of ensureIsArray(this.cardKeys))
