@@ -546,77 +546,50 @@ class InitialInfection extends Event
 	}
 }
 
-class DriveFerry extends Event
-{
-    constructor(event, cities)
-    {
-        super(event);
-        this.origin = cities[this.originKey];
-        this.destination = cities[this.destinationKey];
-    }
-
-    getDetails()
-    {
-		return `${super.getDetails()}
-				<p>Origin: ${getLocatableCityName(this.origin)}</p>
-				<p>Destination: ${getLocatableCityName(this.destination)}</p>`;
-    }
-}
-
-class DirectFlight extends Event
+class MovementAction extends Event
 {
 	constructor(event, cities)
     {
         super(event);
         this.origin = cities[this.originKey];
         this.destination = cities[this.destinationKey];
+	}
+	
+	getDetails()
+    {
+		let details = super.getDetails();
+		
+		if (!(this instanceof DispatchPawn))
+			details += `<p>Origin: ${getLocatableCityName(this.origin)}</p>
+						<p>Destination: ${getLocatableCityName(this.destination)}</p>`;
+		
+		return details;
     }
+}
 
-    getDetails()
+class DriveFerry extends MovementAction {}
+
+class DirectFlight extends MovementAction
+{
+	getDetails()
     {
 		return `${super.getDetails()}
-				<p>Origin: ${getLocatableCityName(this.origin)}</p>
-				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				<p>Discarded:</p>
 				${this.destination.getPlayerCard({ noTooltip: true })}`;
     }
 }
 
-class CharterFlight extends Event
+class CharterFlight extends MovementAction
 {
-	constructor(event, cities)
-    {
-        super(event);
-        this.origin = cities[this.originKey];
-        this.destination = cities[this.destinationKey];
-    }
-
-    getDetails()
+	getDetails()
     {
 		return `${super.getDetails()}
-				<p>Origin: ${getLocatableCityName(this.origin)}</p>
-				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				<p>Discarded:</p>
 				${this.origin.getPlayerCard({ noTooltip: true })}`;
     }
 }
 
-class ShuttleFlight extends Event
-{
-	constructor(event, cities)
-    {
-        super(event);
-        this.origin = cities[this.originKey];
-        this.destination = cities[this.destinationKey];
-    }
-
-    getDetails()
-    {
-		return `${super.getDetails()}
-				<p>Origin: ${getLocatableCityName(this.origin)}</p>
-				<p>Destination: ${getLocatableCityName(this.destination)}</p>`;
-    }
-}
+class ShuttleFlight extends MovementAction {}
 
 class ResearchStationPlacement extends Event
 {
@@ -777,13 +750,11 @@ class PlanContingency extends Event
     }
 }
 
-class DispatchPawn extends Event
+class DispatchPawn extends MovementAction
 {
 	constructor(event, cities)
     {
-		super(event);
-		this.origin = cities[this.originKey];
-		this.destination = cities[this.destinationKey];
+		super(event, cities);
 		this.movementType = getEventType(this.movementTypeCode);
 		this.discard = false;
 		
@@ -809,7 +780,7 @@ class DispatchPawn extends Event
 				<p>Dispatch Type: ${this.movementType.name}</p>
 				<p>Origin: ${getLocatableCityName(this.origin)}</p>
 				<p>Destination: ${getLocatableCityName(this.destination)}</p>
-				${ this.isRendezvous ? this.rendezvousedWith() : "" }
+				${ this.isRendezvous() ? this.rendezvousedWith() : "" }
 				${discarded}`;
 	}
 	
