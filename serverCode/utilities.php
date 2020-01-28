@@ -1072,7 +1072,7 @@ function previousStep($mysqli, $game, $currentTurnRoleID, $currentStep, $eventTy
     else
         throw new Exception("failed to go back one step from '$currentStep' step.");
     
-    updateStep($mysqli, $game, $currentStep, $prevStep, $currentTurnRoleID);
+    return updateStep($mysqli, $game, $currentStep, $prevStep, $currentTurnRoleID);
 }
 
 function getPreviousDiscardStepName($mysqli, $game)

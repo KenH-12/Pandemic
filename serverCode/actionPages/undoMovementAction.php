@@ -9,7 +9,7 @@
         if (!isset($_POST["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["role"]))
+        if (!isset($_POST["activeRole"]))
             throw new Exception("Role not set.");
 
         if (!isset($_POST["actionCode"]))
@@ -20,7 +20,7 @@
         
         $game = $_SESSION["game"];
         $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["role"];
+        $activeRole = $_POST["activeRole"];
         $actionCode = $_POST["actionCode"];
         $eventID = $_POST["eventID"];
 
@@ -84,8 +84,8 @@
         if (getRoleName($mysqli, $roleToMove) === "Medic")
             undoEventsTriggeredByEvent($mysqli, $game, $eventID);
 
-        previousStep($mysqli, $game, $activeRole, $currentStep, $movementType);
         deleteEvent($mysqli, $game, $eventID);
+        $response["prevStep"] = previousStep($mysqli, $game, $activeRole, $currentStep, $movementType);
     }
     catch(Exception $e)
     {

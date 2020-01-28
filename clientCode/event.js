@@ -558,13 +558,37 @@ class MovementAction extends Event
 	getDetails()
     {
 		let details = super.getDetails();
-		
+
 		if (!(this instanceof DispatchPawn))
 			details += `<p>Origin: ${getLocatableCityName(this.origin)}</p>
 						<p>Destination: ${getLocatableCityName(this.destination)}</p>`;
 		
 		return details;
-    }
+	}
+	
+	undo(activePlayer, currentStep)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			$.post(`serverCode/actionPages/undoMovementAction.php`,
+			{
+				activeRole: activePlayer.rID,
+				currentStep,
+				actionCode: this.code,
+				eventID: this.id
+			},
+			function(response)
+			{
+				log(response);
+				const { failure, prevStep } = JSON.parse(response);
+				
+				if (failure)
+					reject(failure);
+				else
+					resolve(prevStep);
+			});
+		});
+	}
 }
 
 class DriveFerry extends MovementAction {}
