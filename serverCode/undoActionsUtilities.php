@@ -47,4 +47,60 @@ function validateEventCanBeUndone($mysqli, $game, $event)
         throw new Exception("one or more undoable events occured after the event in question.");
 }
 
+function undoEventsTriggeredByEvent($mysqli, $game, $triggerEventID)
+{
+    $AUTO_TREAT_DISEASE = "at";
+    $ERADICATION = "er";
+    
+    $eventsAfterEvent = $mysqli->query("SELECT * FROM vw_event
+                                        WHERE game = $game
+                                        AND id > $triggerEventID");
+    
+    while ($event = mysqli_fetch_assoc($eventsAfterEvent))
+    {
+        $eventType = $event["eventType"];
+
+        if ($eventType === $AUTO_TREAT_DISEASE)
+            undoAutoTreatDiseaseEvent($mysqli, $game, $event);
+        else if ($eventType === $ERADICATION)
+            undoEradicationEvent($mysqli, $game, $event);
+        else
+            throw new Exception("Failed to undo events triggered by event -- unexpected event type found: '$eventType'");
+    }
+}
+
+function undoAutoTreatDiseaseEvent($mysqli, $game, $event)
+{
+    $eventDetails = explode(",", $event["details"]);
+    
+    include "../utilities.php";
+    addCubesToCity($mysqli, $game, $eventDetails["cityKey"], $eventDetails["diseaseColor"], $eventDetails["numCubesRemoved"]);
+
+    deleteEvent($mysqli, $game, $event["id"]);
+}
+
+function undoEradicationEvent($mysqli, $game, $event)
+{
+    $column = $event["details"] . "StatusID";
+
+    $mysqli->query("UPDATE pandemic
+                    SET $column = getDiseaseStatusID('cured')
+                    WHERE gameID = $game");
+
+    if ($mysqli->affected_rows != 1)
+        throw new Exception("Failed to undo Eradication event: " . $mysqli->error);
+    
+    deleteEvent($mysqli, $game, $event["id"]);
+}
+
+function deleteEvent($mysqli, $game, $eventID)
+{
+    $mysqli->query("DELETE FROM vw_event
+                    WHERE game = $game
+                    AND id = $eventID");
+
+    if ($mysqli->affected_rows != 1)
+        throw new Exception("Failed to delete event: " . $mysqli->error);
+}
+
 ?>

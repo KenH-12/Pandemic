@@ -78,12 +78,16 @@
             throw new Exception("pawn could not be placed back on origin city: $mysqli->error");
         
         // If a card was discarded to perform the action, put it back in the role's hand.
+        if ($discardKey)
+            moveCardsToPile($mysqli, $game, "player", "discard", $role, $discardKey);
 
         // If the medic moved as a result of the action, undo any resulting auto-treat disease and eradication events.
+        if (getRoleName($mysqli, $roleToMove) === "Medic")
+            undoEventsTriggeredByEvent($mysqli, $game, $eventID);
 
         // Go back one step
 
-        // Delete the event
+        deleteEvent($mysqli, $game, $eventID);
     }
     catch(Exception $e)
     {
