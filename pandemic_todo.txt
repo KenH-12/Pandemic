@@ -5,9 +5,25 @@ event cards aren't animated to the discard pile when they are played
 		one quiet night
 		resilient population
 
+dispatching a pawn via drive/ferry to a city containing another pawn is counted as a rendezvous event
+	drive/ferry and shuttle flight should take priority over rendezvous
+
 TO DO
 -----
 allow actions to be undone
+	movement actions
+		dispatch pawn
+		triggered auto-treat / eradication events
+	build research station
+	treat disease
+		triggered eradication events
+	share knowledge
+	discover a cure
+		triggered auto-treat / eradication events
+	pass
+	event cards
+	discard
+
 
 event history
 	slideshow buttons

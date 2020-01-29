@@ -44,19 +44,19 @@
         if ($movementType === $DISPATCH)
         {
             $roleToMove = $eventDetails[0];
-            $originKey = $eventDetails[1]
-            $destinatinKey = $eventDetails[2]
+            $originKey = $eventDetails[1];
+            $destinationKey = $eventDetails[2];
             $movementType = $eventDetails[3];
         }
         else
         {
             $roleToMove = $role;
             $originKey = $eventDetails[0];
-            $destinatinKey = $eventDetails[1];
+            $destinationKey = $eventDetails[1];
         }
 
         if ($movementType === $DIRECT_FLIGHT)
-            $discardKey = $destinatinKey;
+            $discardKey = $destinationKey;
         else if ($movementType === $CHARTER_FLIGHT)
             $discardKey = $originKey;
         else if ($movementType === $OPERATIONS_FLIGHT)
@@ -67,14 +67,14 @@
         $mysqli->autocommit(FALSE);
         
         // Put the pawn back on the origin city.
-        $mysqi->query("UPDATE vw_player
+        $mysqli->query("UPDATE vw_player
                         SET location = '$originKey'
                         WHERE game = $game
-                        AND role = $roleToMove
-                        AND location = '$destinatinKey'");
+                        AND rID = $roleToMove
+                        AND location = '$destinationKey'");
         
         if ($mysqli->affected_rows != 1)
-            throw new Exception("pawn could not be placed back on origin city: $mysqli->error");
+            throw new Exception("pawn ($roleToMove) could not be placed back on origin ('$originKey') from destination ('$destinationKey') : $mysqli->error");
         
         // If a card was discarded to perform the action, put it back in the role's hand.
         if ($discardKey)
@@ -82,8 +82,9 @@
 
         $response["undoneEventIds"] = array($eventID);
         // If the medic moved as a result of the action, undo any resulting auto-treat disease and eradication events.
-        if (getRoleName($mysqli, $roleToMove) === "Medic")
-            array_merge($response["undoneEventIds"], undoEventsTriggeredByEvent($mysqli, $game, $eventID));
+        if (getRoleName($mysqli, $roleToMove) === "Medic"
+            && $triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
+            array_merge($response["undoneEventIds"], $triggeredEventIds);
 
         deleteEvent($mysqli, $game, $eventID);
         $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep, $movementType);

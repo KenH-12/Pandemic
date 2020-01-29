@@ -307,7 +307,6 @@ function appendEventHistoryIconOfType(targetEventType)
 function appendEventHistoryIcon($eventHistory, event)
 {
 	const $icon = $(getEventIconHtml(getEventType(event.code), { event }));
-	log("$icon.length",$icon.length);
 	bindEventIconHoverEvents($icon, event);
 	$eventHistory.append($icon);
 }
@@ -3639,8 +3638,9 @@ function getDrawnPlayerCardTargetProperties({ isContingencyCard } = {})
 	return targetProperties;
 }
 
-function animateCardToHand($card, { targetProperties, isContingencyCard } = {})
+function animateCardToHand($card, { player, targetProperties, isContingencyCard } = {})
 {
+	player = player || getActivePlayer();
 	targetProperties = targetProperties || getDrawnPlayerCardTargetProperties({ isContingencyCard });
 	
 	// Some initial values should be calculated before the Promise is made.
@@ -3652,7 +3652,7 @@ function animateCardToHand($card, { targetProperties, isContingencyCard } = {})
 		if ($card.hasClass("epidemic"))
 			return resolve();
 
-		const $rolePanel = getActivePlayer().$panel;
+		const $rolePanel = player.$panel;
 		
 		let $insertAfterElement;
 		if (isContingencyCard) // Contingency cards are placed within the .role div
@@ -3791,9 +3791,12 @@ function resizeBottomPanelElements()
 		.height(data.topPanelHeight + titleHeight)
 		.offset({ top: panelOffsetTop - titleHeight });
 	
-	const $eventHistory = $("#eventHistory");
-	$eventHistory.height(data.topPanelHeight * 0.42)
+	const $eventHistory = $("#eventHistory"),
+		$btnUndoAction = $("#btnUndoAction"),
+		eventHistoryHeight = data.topPanelHeight * 0.42;
+	$eventHistory.add($btnUndoAction).height(eventHistoryHeight)
 		.offset({ top: panelOffsetTop + data.topPanelHeight*0.58 });
+	$btnUndoAction.css("line-height", eventHistoryHeight * 1.1 +"px");
 	setEventHistoryScrollPosition($eventHistory);
 }
 
@@ -4170,7 +4173,7 @@ class Player
 		return this.$panel.find(`.playerCard[data-key='${cardKey}']`);
 	}
 
-	// Appends either a single cardKey or an array or cardKeys to this Player's cardKeys array.
+	// Appends either a single cardKey or an array of cardKeys to this Player's cardKeys array.
 	// Excludes Epidemic cards because they go straight to the discard pile after being resolved.
 	addCardKeysToHand(cardKeys)
 	{
@@ -8855,52 +8858,86 @@ function collapsePlayerDiscardPile()
 	});
 }
 
+$("#btnUndoAction").click(function()
+{
+	undoAction();
+});
+
 async function undoAction()
 {
-	const event = getLatestUndoableEvent();
+	const { event, eventIndex } = getLatestUndoableEvent();
 
 	if (!event)
 		return false;
 
+	if (currentStepIs("draw"))
+		$("#cardDrawContainer").addClass("hidden").find(".button").off("click");
+	else
+	{
+		resetActionPrompt({ actionCancelled: true });
+		disableActions();
+	}
+
 	const { undoneEventIds, prevStepName } = await event.requestUndo(getActivePlayer(), data.currentStep.name);
 
 	await animateUndoEvents(undoneEventIds);
+	data.events.length = eventIndex;
+	
 	setCurrentStep(prevStepName);
 	proceed();
 }
 
 function getLatestUndoableEvent()
 {
-	let event;
-	for (let i = data.events.length - 1; i >= 0; i--)
+	let event, i;
+	for (i = data.events.length - 1; i >= 0; i--)
 	{
 		event = data.events[i];
 		
 		if (event.isUndoable)
-			return event;
+			return { event, eventIndex: i };
 	}
 
-	return false;
+	return { event: false };
 }
 
-async function animateUndoEvents(undoneEventIds)
+function animateUndoEvents(undoneEventIds)
 {
-	return new Promise(resolve =>
+	return new Promise(async resolve =>
 	{
+		log("all events: ", data.events);
 		let event;
 		for (let id of undoneEventIds.reverse())
 		{
-			for (let i = data.events.lengh - 1; i >= 0; i--)
+			log("searching events for ", id);
+			for (let i = data.events.length - 1; i >= 0; i--)
 			{
 				event = data.events[i];
+				log("checking event: ", event);
 				if (event.id == id)
 					break;
 			}
 	
-			await event.animateUndo(animateCardToHand);
+			log("event: ", event);
+			removeEventIcon(event);
+			await event.animateUndo(data, animateCardToHand);
 		}
 		resolve();
 	});
+}
+
+function removeEventIcon(event)
+{
+	const $icon = $("#eventHistory").children("img").last(),
+		alt = $icon.attr("alt");
+
+	if (alt !== event.name)
+	{
+		console.error(`Encountered unexpected icon ('${alt}') when attempting to remove event icon: '${event.name}'`);
+		return false;
+	}
+
+	$icon.fadeOut(function() { $icon.remove() });
 }
 
 setup();

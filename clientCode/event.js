@@ -567,14 +567,24 @@ class MovementAction extends Event
 		return details;
 	}
 	
-	async animateUndo(animateCardToHand)
+	animateUndo(gameData, animateCardToHand)
 	{
-		const playerToMove = this instanceof DispatchPawn ? this.dispatchedPlayer : this.player;
+		return new Promise(async resolve =>
+		{
+			const playerToMove = this instanceof DispatchPawn ? this.dispatchedPlayer : this.player;
 
-		if (this.discardKey)
-			await animateCardToHand($("#playerDiscard").children(`data-key='${this.discardKey}'`));
-		
-		return playerToMove.updateLocation(this.origin);
+			if (this.discardKey)
+			{
+				await animateCardToHand($("#playerDiscard").children(`[data-key='${this.discardKey}']`, { player: this.player }));
+				this.player.addCardKeysToHand(this.discardKey);
+			}
+			
+			setDuration(gameData, "pawnAnimation", this instanceof DriveFerry ? 500 : 1000);
+			await playerToMove.updateLocation(this.origin);
+			setDuration(gameData, "pawnAnimation", 250);
+
+			resolve();
+		});
 	}
 	
 	requestUndo(activePlayer, currentStepName)
@@ -606,6 +616,12 @@ class DriveFerry extends MovementAction {}
 
 class DirectFlight extends MovementAction
 {
+	constructor(event, cities)
+	{
+		super(event, cities);
+		this.discardKey = this.destination.key;
+	}
+
 	getDetails()
     {
 		return `${super.getDetails()}
@@ -616,6 +632,12 @@ class DirectFlight extends MovementAction
 
 class CharterFlight extends MovementAction
 {
+	constructor(event, cities)
+	{
+		super(event, cities);
+		this.discardKey = this.origin.key;
+	}
+	
 	getDetails()
     {
 		return `${super.getDetails()}

@@ -1010,31 +1010,37 @@ function undoEventsTriggeredByEvent($mysqli, $game, $triggerEventID)
                                         WHERE game = $game
                                         AND id > $triggerEventID");
     
+    $undoneEventIds = array();
     while ($event = mysqli_fetch_assoc($eventsAfterEvent))
     {
         $eventType = $event["eventType"];
 
         if ($eventType === $AUTO_TREAT_DISEASE)
-            undoAutoTreatDiseaseEvent($mysqli, $game, $event);
+            array_push($undoneEventIds, undoAutoTreatDiseaseEvent($mysqli, $game, $event));
         else if ($eventType === $ERADICATION)
-            undoEradicationEvent($mysqli, $game, $event);
+            array_push($undoneEventIds, undoEradicationEvent($mysqli, $game, $event));
         else
             throw new Exception("Failed to undo events triggered by event -- unexpected event type found: '$eventType'");
     }
+
+    return $undoneEventIds;
 }
 
 function undoAutoTreatDiseaseEvent($mysqli, $game, $event)
 {
     $eventDetails = explode(",", $event["details"]);
+    $eventID = $event["id"];
     
     addCubesToCity($mysqli, $game, $eventDetails["cityKey"], $eventDetails["diseaseColor"], $eventDetails["numCubesRemoved"]);
+    deleteEvent($mysqli, $game, $eventID);
 
-    deleteEvent($mysqli, $game, $event["id"]);
+    return $eventID;
 }
 
 function undoEradicationEvent($mysqli, $game, $event)
 {
     $column = $event["details"] . "StatusID";
+    $eventID = $event["id"];
 
     $mysqli->query("UPDATE pandemic
                     SET $column = getDiseaseStatusID('cured')
@@ -1043,7 +1049,9 @@ function undoEradicationEvent($mysqli, $game, $event)
     if ($mysqli->affected_rows != 1)
         throw new Exception("Failed to undo Eradication event: " . $mysqli->error);
     
-    deleteEvent($mysqli, $game, $event["id"]);
+    deleteEvent($mysqli, $game, $eventID);
+
+    return $eventID;
 }
 
 function deleteEvent($mysqli, $game, $eventID)
@@ -1056,23 +1064,32 @@ function deleteEvent($mysqli, $game, $eventID)
         throw new Exception("Failed to delete event: " . $mysqli->error);
 }
 
-function previousStep($mysqli, $game, $currentTurnRoleID, $currentStep, $eventTypeToUndo)
+function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eventTypeToUndo)
 {
     $DISCARD = "ds";
     if ($eventTypeToUndo === $DISCARD)
-        $prevStep = getPreviousDiscardStepName($mysqli, $game);
-    else if ($currentStep === "draw")
-        $prevStep = "action 4";
-    else if ($currentStep === "action 1")
-        $prevStep = "infect cities";
-    else if (substr($currentStep, 0, 6) === "action")
-        $prevStep = "action " . $currentStep[7] - 1;
-    else if ($currentStep === "hand limit")
-        $prevStep = countActionsTakenThisTurn($mysqli, $game) + 1;
+        $prevStepName = getPreviousDiscardStepName($mysqli, $game);
+    else if ($currentStepName === "draw")
+        $prevStepName = "action 4";
+    else if ($currentStepName === "action 1")
+        $prevStepName = "infect cities";
+    else if (substr($currentStepName, 0, 6) === "action")
+        $prevStepName = "action " . ($currentStepName[7] - 1);
+    else if ($currentStepName === "hand limit")
+        $prevStepName = countActionsTakenThisTurn($mysqli, $game) + 1;
     else
-        throw new Exception("failed to go back one step from '$currentStep' step.");
+        throw new Exception("Cannot revert to previous step from '$currentStepName' step.");
     
-    return updateStep($mysqli, $game, $currentStep, $prevStep, $currentTurnRoleID);
+    $mysqli->query("UPDATE vw_gamestate
+                    SET step = getStepID('$prevStepName')
+                    WHERE game = $game
+                    AND stepName = '$currentStepName'
+                    AND turn = $currentTurnRoleID");
+    
+    if ($mysqli->affected_rows != 1)
+        throw new Exception("Failed to revert to previous '$prevStepName' step from '$currentStepName' step: " . $mysqli->error);
+    
+    return $prevStepName;
 }
 
 function getPreviousDiscardStepName($mysqli, $game)
