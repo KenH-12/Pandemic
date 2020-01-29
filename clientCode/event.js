@@ -826,9 +826,15 @@ class DispatchPawn extends MovementAction
 			const { directFlight, charterFlight } = eventTypes;
 
 			if (this.movementTypeCode === directFlight.code)
+			{
 				this.discard = this.destination;
+				this.discardKey = this.destination.key;
+			}
 			else if (this.movementTypeCode === charterFlight.code)
+			{
 				this.discard = this.origin;
+				this.discardKey = this.origin.key;
+			}
 		}
     }
 

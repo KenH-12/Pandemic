@@ -12,7 +12,6 @@ TO DO
 -----
 allow actions to be undone
 	movement actions
-		dispatch pawn
 		triggered auto-treat / eradication events
 	build research station
 	treat disease
@@ -23,6 +22,7 @@ allow actions to be undone
 	pass
 	event cards
 	discard
+restrict undoability to legal scenarios
 
 
 event history

@@ -514,6 +514,7 @@ function proceed()
 function setCurrentStep(stepName)
 {
 	data.currentStep = data.steps[stepName];
+	data.currentStep.procedureIdx = -1;
 	return data.currentStep;
 }
 
