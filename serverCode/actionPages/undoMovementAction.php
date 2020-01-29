@@ -84,7 +84,7 @@
         // If the medic moved as a result of the action, undo any resulting auto-treat disease and eradication events.
         if (getRoleName($mysqli, $roleToMove) === "Medic"
             && $triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
-            array_merge($response["undoneEventIds"], $triggeredEventIds);
+            $response["undoneEventIds"] = array_merge($response["undoneEventIds"], $triggeredEventIds);
 
         deleteEvent($mysqli, $game, $eventID);
         $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep, $movementType);

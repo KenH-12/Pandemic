@@ -704,6 +704,15 @@ class DiseaseCubeRemoval extends Event
 					<span>Removed: </span>${cubesRemoved}
 				</span>`;
 	}
+
+	animateUndo(placeDiseaseCubes)
+	{
+		return new Promise(async resolve =>
+		{
+			await placeDiseaseCubes({ cityKey: this.cityKey, numCubes: this.numCubesRemoved, diseaseColor: this.diseaseColor });
+			resolve();
+		});
+	}
 }
 
 class TreatDisease extends DiseaseCubeRemoval
@@ -772,6 +781,15 @@ class Eradication extends Event
 		return `${super.getDetails()}
 				<p>The ${color} disease has been eradicated!</p>
 				<p>(no new ${color} disease cubes will be placed on the board)</p>`;
+	}
+
+	animateUndo()
+	{
+		return new Promise(resolve =>
+		{
+			$(`#cureMarker${this.diseaseColor.toUpperCase()}`).attr("src", `images/pieces/cureMarker_${this.diseaseColor}.png`);
+			resolve();
+		});
 	}
 }
 
@@ -1354,11 +1372,13 @@ export {
 	attachPlayersToEvents,
 	StartingHands,
 	InitialInfection,
+	MovementAction,
 	DriveFerry,
 	DirectFlight,
 	CharterFlight,
 	ShuttleFlight,
 	BuildResearchStation,
+	DiseaseCubeRemoval,
 	TreatDisease,
 	AutoTreatDisease,
 	ShareKnowledge,

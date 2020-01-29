@@ -14,11 +14,13 @@ import Event, {
 	getEventType,
 	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
+	MovementAction,
 	DriveFerry,
 	DirectFlight,
 	CharterFlight,
 	ShuttleFlight,
 	BuildResearchStation,
+	DiseaseCubeRemoval,
 	TreatDisease,
 	ShareKnowledge,
 	DiscoverACure,
@@ -6911,18 +6913,19 @@ function setInfectionCardTitleAttribute($card, city)
 Click to locate ${city.name}`);
 }
 
-function placeDiseaseCubes({ cityKey, numCubes = 1 })
+function placeDiseaseCubes({ cityKey, numCubes = 1, diseaseColor })
 {
 	return new Promise(async resolve =>
 	{
 		const city = getCity(cityKey),
-			cubeSupplyOffset = $(`#${city.color}SupplyCube`).offset();
+			color = diseaseColor || city.color,
+			cubeSupplyOffset = $(`#${color}SupplyCube`).offset();
 		
 		for (let i = numCubes; i > 0; i--)
 		{
-			updateCubeSupplyCount(city.color, { addend: -1 });
+			updateCubeSupplyCount(color, { addend: -1 });
 			
-			placeDiseaseCube(city, cubeSupplyOffset);
+			placeDiseaseCube(city, color, cubeSupplyOffset);
 			await sleep(getDuration(data, "cubePlacement") * 0.45);
 		}
 		
@@ -6936,18 +6939,18 @@ function placeDiseaseCubes({ cityKey, numCubes = 1 })
 	});
 }
 
-function placeDiseaseCube(city, cubeSupplyOffset)
+function placeDiseaseCube(city, diseaseColor, cubeSupplyOffset)
 {
 	return new Promise(async resolve =>
 	{
-		appendNewCubeToBoard(city.color, city.key, { prepareAnimation: true })
+		appendNewCubeToBoard(diseaseColor, city.key, { prepareAnimation: true })
 			.offset(cubeSupplyOffset)
 		
 		city.incrementCubeCount(data.diseaseCubeSupplies);
 
 		if (!data.fastForwarding)
 		{
-			supplyCubeBounceEffect(city.color);
+			supplyCubeBounceEffect(diseaseColor);
 			await city.clusterDiseaseCubes(data, { animate: true });
 		}
 		
@@ -8920,8 +8923,15 @@ function animateUndoEvents(undoneEventIds)
 			}
 	
 			log("event: ", event);
-			removeEventIcon(event);
-			await event.animateUndo(data, animateCardToHand);
+
+			if (event instanceof MovementAction)
+				await event.animateUndo(data, animateCardToHand);
+			else if (event instanceof DiseaseCubeRemoval)
+				await event.animateUndo(placeDiseaseCubes);
+			else
+				await event.animateUndo();
+			
+			await removeEventIcon(event);
 		}
 		resolve();
 	});
@@ -8929,16 +8939,23 @@ function animateUndoEvents(undoneEventIds)
 
 function removeEventIcon(event)
 {
-	const $icon = $("#eventHistory").children("img").last(),
-		alt = $icon.attr("alt");
-
-	if (alt !== event.name)
+	return new Promise(async resolve =>
 	{
-		console.error(`Encountered unexpected icon ('${alt}') when attempting to remove event icon: '${event.name}'`);
-		return false;
-	}
+		const $icon = $("#eventHistory").children("img").last(),
+			alt = $icon.attr("alt");
 
-	$icon.fadeOut(function() { $icon.remove() });
+		if (alt !== event.name)
+		{
+			console.error(`Encountered unexpected icon ('${alt}') when attempting to remove event icon: '${event.name}'`);
+			return false;
+		}
+
+		$icon.fadeOut(function()
+		{
+			$icon.remove();
+			resolve();
+		});
+	});
 }
 
 setup();

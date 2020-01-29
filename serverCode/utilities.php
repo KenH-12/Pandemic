@@ -1028,10 +1028,13 @@ function undoEventsTriggeredByEvent($mysqli, $game, $triggerEventID)
 
 function undoAutoTreatDiseaseEvent($mysqli, $game, $event)
 {
-    $eventDetails = explode(",", $event["details"]);
     $eventID = $event["id"];
+    $eventDetails = explode(",", $event["details"]);
+    $cityKey = $eventDetails[0];
+    $diseaseColor = $eventDetails[1];
+    $numCubesRemoved = $eventDetails[2];
     
-    addCubesToCity($mysqli, $game, $eventDetails["cityKey"], $eventDetails["diseaseColor"], $eventDetails["numCubesRemoved"]);
+    addCubesToCity($mysqli, $game, $cityKey, $diseaseColor, $numCubesRemoved);
     deleteEvent($mysqli, $game, $eventID);
 
     return $eventID;

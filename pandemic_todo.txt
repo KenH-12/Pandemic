@@ -24,6 +24,7 @@ allow actions to be undone
 	discard
 restrict undoability to legal scenarios
 
+position auto-treat vial on img load event
 
 event history
 	slideshow buttons
