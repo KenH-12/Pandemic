@@ -539,6 +539,31 @@ function cityHasResearchStation($mysqli, $game, $cityKey)
     return $hasResearchStation;
 }
 
+function placeResearchStation($mysqli, $game, $cityKey, $relocationKey = 0)
+{
+    if ($relocationKey != 0)
+        removeResearchStation($mysqli, $game, $relocationKey);
+    
+    $mysqli->query("UPDATE vw_location
+                    SET researchStation = 1
+                    WHERE game = $game
+                    AND locationKey = '$cityKey'");
+
+    if ($mysqli->affected_rows != 1)
+        throw new Exception("Failed to place research station on '$cityKey': " . $mysqli->error);
+}
+
+function removeResearchStation($mysqli, $game, $cityKey)
+{
+    $mysqli->query("UPDATE vw_location
+                    SET researchStation = 0
+                    WHERE game = $game
+                    AND locationKey = '$cityKey'");
+             
+    if ($mysqli->affected_rows != 1)
+        throw new Exception("Invalid research station relocation (from '$cityKey'): " . $mysqli->error);
+}
+
 function getCityColor($mysqli, $cityKey)
 {
     $color = $mysqli->query("SELECT diseaseColor FROM city WHERE cityKey = '$cityKey'")

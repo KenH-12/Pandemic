@@ -29,24 +29,23 @@
         $role = $event["role"];
         $eventDetails = explode(",", $event["details"]);
         $cityKey = $eventDetails[0];
-        $diseaseColor = $eventDetails[1];
-        $numCubesRemoved = $eventDetails[2] - $eventDetails[3];
 
         $mysqli->autocommit(FALSE);
-        
-        addCubesToCity($mysqli, $game, $cityKey, $diseaseColor, $numCubesRemoved);
-        
-        $response["undoneEventIds"] = array($eventID);
-        // Undo any eradication events that were triggered by the Treat Disease event.
-        if ($triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
-            $response["undoneEventIds"] = array_merge($response["undoneEventIds"], $triggeredEventIds);
+
+        if (isset($eventDetails[1]))
+        {
+            $relocationKey = $eventDetails[1];
+            placeResearchStation($mysqli, $game, $relocationKey, $cityKey);
+        }
+        else
+            removeResearchStation($mysqli, $game, $cityKey);
 
         deleteEvent($mysqli, $game, $eventID);
         $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
     }
     catch(Exception $e)
     {
-        $response["failure"] = "Failed to undo Treat Disease: " . $e->getMessage();
+        $response["failure"] = "Failed to undo research station placement: " . $e->getMessage();
     }
     finally
     {

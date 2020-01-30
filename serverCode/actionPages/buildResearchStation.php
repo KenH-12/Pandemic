@@ -79,24 +79,10 @@
                 if ($relocationKey == "0")
                     throw new Exception("No research station pieces remain and no relocation was specified.");
                 
-                $mysqli->query("UPDATE vw_location
-                                SET researchStation = 0
-                                WHERE game = $game
-                                AND locationKey = '$relocationKey'");
-                
-                if ($mysqli->affected_rows != 1)
-                    throw new Exception("Invalid research station relocation (from '$relocationKey'): " . $mysqli->error);
-                
                 $actionDetails .= ",$relocationKey";
             }
-
-            $mysqli->query("UPDATE vw_location
-                            SET researchStation = 1
-                            WHERE game = $game
-                            AND locationKey = '$locationKey'");
-
-            if ($mysqli->affected_rows != 1)
-                throw new Exception("Failed to place research station on '$locationKey': " . $mysqli->error);
+            
+            placeResearchStation($mysqli, $game, $locationKey, $relocationKey);
             
             $response["events"] = recordEvent($mysqli, $game, $actionCode, $actionDetails, $eventRole);
         }

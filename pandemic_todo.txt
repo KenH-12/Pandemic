@@ -11,11 +11,7 @@ dispatching a pawn via drive/ferry to a city containing another pawn is counted 
 TO DO
 -----
 allow actions to be undone
-	movement actions
-		triggered auto-treat / eradication events
 	build research station
-	treat disease
-		triggered eradication events
 	share knowledge
 	discover a cure
 		triggered auto-treat / eradication events

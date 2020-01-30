@@ -2358,7 +2358,7 @@ function newGrantStation()
 	highlightResearchStationSupply($grantStation);
 }
 
-function resetGrantStation({ $researchStation, cancelled } = {})
+async function resetGrantStation({ $researchStation, cancelled } = {})
 {
 	log("resetGrantStation()");
 	$researchStation = $researchStation || $("#boardContainer > .researchStation.grantStation");
@@ -2369,18 +2369,31 @@ function resetGrantStation({ $researchStation, cancelled } = {})
 	if (cancelled)
 		turnOffResearchStationSupplyHighlight();
 
-	$researchStation
-		.draggable({ disabled: true })
-		.animate($("#researchStationSupply img").offset(), getDuration(data, "stationPlacement"),
-		function()
-		{
-			researchStationKeys.delete("grantStation");
-			updateResearchStationSupplyCount();
-			$(this).remove();
-			
-			if (!cancelled)
-				promptAction({ eventType: eventTypes.governmentGrant });
-		});
+	await animateResearchStationBackToSupply($researchStation);
+	
+	if (!cancelled)
+		promptAction({ eventType: eventTypes.governmentGrant });
+}
+
+function animateResearchStationBackToSupply($researchStation)
+{
+	return new Promise(resolve =>
+	{
+		const key = $researchStation.hasClass("grantStation") ? "grantStation" : $researchStation.attr("data-key");
+		
+		$researchStation
+			.draggable({ disabled: true })
+			.animate($("#researchStationSupply img").offset(),
+				getDuration(data, "stationPlacement"),
+				function()
+				{
+					researchStationKeys.delete(key);
+					updateResearchStationSupplyCount();
+					$researchStation.remove();
+
+					resolve();
+				});
+	});
 }
 
 async function highlightResearchStationSupply($grantStation)
