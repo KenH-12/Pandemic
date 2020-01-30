@@ -8950,7 +8950,7 @@ function animateUndoEvents(undoneEventIds)
 			else if (event instanceof DiseaseCubeRemoval)
 				await event.animateUndo(placeDiseaseCubes);
 			else if (event instanceof ResearchStationPlacement)
-				await event.animateUndo(animateCardToHand, animateResearchStationBackToSupply);
+				await event.animateUndo(data, animateCardToHand, animateResearchStationBackToSupply);
 			else
 				await event.animateUndo();
 			

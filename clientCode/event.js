@@ -672,7 +672,7 @@ class ResearchStationPlacement extends Event
 				${this.getDiscardDetails()}`;
 	}
 
-	async animateUndo(animateCardToHand, animateResearchStationBackToSupply)
+	async animateUndo(gameData, animateCardToHand, animateResearchStationBackToSupply)
 	{
 		if (this.player.role !== "Operations Expert")
 		{
@@ -680,6 +680,12 @@ class ResearchStationPlacement extends Event
 			this.player.addCardKeysToHand(this.cityKey);
 		}
 
+		if (this.relocationKey)
+		{
+			await this.city.relocateResearchStationTo(gameData, this.relocatedFromCity);
+			return this.city.cluster(gameData, { animatePawns: true, animateCubes: true });
+		}
+		
 		return animateResearchStationBackToSupply($(`.researchStation[data-key='${this.cityKey}']`));
 	}
 	

@@ -539,9 +539,9 @@ function cityHasResearchStation($mysqli, $game, $cityKey)
     return $hasResearchStation;
 }
 
-function placeResearchStation($mysqli, $game, $cityKey, $relocationKey = 0)
+function placeResearchStation($mysqli, $game, $cityKey, $relocationKey = "0")
 {
-    if ($relocationKey != 0)
+    if ($relocationKey != "0")
         removeResearchStation($mysqli, $game, $relocationKey);
     
     $mysqli->query("UPDATE vw_location
