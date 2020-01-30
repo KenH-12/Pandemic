@@ -19,6 +19,7 @@ import Event, {
 	DirectFlight,
 	CharterFlight,
 	ShuttleFlight,
+	ResearchStationPlacement,
 	BuildResearchStation,
 	DiseaseCubeRemoval,
 	TreatDisease,
@@ -2379,7 +2380,8 @@ function animateResearchStationBackToSupply($researchStation)
 {
 	return new Promise(resolve =>
 	{
-		const key = $researchStation.hasClass("grantStation") ? "grantStation" : $researchStation.attr("data-key");
+		const key = $researchStation.hasClass("grantStation") ? "grantStation" : $researchStation.attr("data-key"),
+			city = isCityKey(key) ? getCity(key) : false;
 		
 		$researchStation
 			.draggable({ disabled: true })
@@ -2390,6 +2392,12 @@ function animateResearchStationBackToSupply($researchStation)
 					researchStationKeys.delete(key);
 					updateResearchStationSupplyCount();
 					$researchStation.remove();
+
+					if (city)
+					{
+						city.hasResearchStation = false;
+						city.cluster(data, { animatePawns: true, animateCubes: true });
+					}
 
 					resolve();
 				});
@@ -8941,6 +8949,8 @@ function animateUndoEvents(undoneEventIds)
 				await event.animateUndo(data, animateCardToHand);
 			else if (event instanceof DiseaseCubeRemoval)
 				await event.animateUndo(placeDiseaseCubes);
+			else if (event instanceof ResearchStationPlacement)
+				await event.animateUndo(animateCardToHand, animateResearchStationBackToSupply);
 			else
 				await event.animateUndo();
 			

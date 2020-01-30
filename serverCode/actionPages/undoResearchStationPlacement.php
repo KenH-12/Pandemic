@@ -19,6 +19,9 @@
         $currentStep = $_POST["currentStep"];
         $activeRole = $_POST["activeRole"];
         $eventID = $_POST["eventID"];
+
+        $BUILD_RESEARCH_STATION = "rs";
+        $GOVERNMENT_GRANT = "gg";
         
         require "../connect.php";
         include "../utilities.php";
@@ -27,11 +30,19 @@
         validateEventCanBeUndone($mysqli, $game, $event);
 
         $role = $event["role"];
+        $eventType = $event["eventType"];
         $eventDetails = explode(",", $event["details"]);
         $cityKey = $eventDetails[0];
 
         $mysqli->autocommit(FALSE);
 
+        // If a card was discarded to perform the action, return it to the role's hand
+        // (the Operations Expert can perform Build Research Station for free).
+        if ($eventType === $BUILD_RESEARCH_STATION
+            && getRoleName($mysqli, $role) !== "Operations Expert")
+            moveCardsToPile($mysqli, $game, "player", "discard", $role, $cityKey);
+
+        // If the action relocated a research station, place it back on the original city.
         if (isset($eventDetails[1]))
         {
             $relocationKey = $eventDetails[1];
@@ -40,6 +51,7 @@
         else
             removeResearchStation($mysqli, $game, $cityKey);
 
+        $response["undoneEventIds"] = array($eventID);
         deleteEvent($mysqli, $game, $eventID);
         $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
     }

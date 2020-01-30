@@ -671,6 +671,41 @@ class ResearchStationPlacement extends Event
 				${relocatedFrom}
 				${this.getDiscardDetails()}`;
 	}
+
+	async animateUndo(animateCardToHand, animateResearchStationBackToSupply)
+	{
+		if (this.player.role !== "Operations Expert")
+		{
+			await animateCardToHand($("#playerDiscard").children(`[data-key='${this.cityKey}']`, { player: this.player }));
+			this.player.addCardKeysToHand(this.cityKey);
+		}
+
+		return animateResearchStationBackToSupply($(`.researchStation[data-key='${this.cityKey}']`));
+	}
+	
+	requestUndo(activePlayer, currentStepName)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			$.post(`serverCode/actionPages/undoResearchStationPlacement.php`,
+			{
+				activeRole: activePlayer.rID,
+				currentStep: currentStepName,
+				actionCode: this.code,
+				eventID: this.id
+			},
+			function(response)
+			{
+				log(response);
+				const result = JSON.parse(response);
+				
+				if (result.failure)
+					reject(result.failure);
+				else
+					resolve(result);
+			});
+		});
+	}
 }
 
 class BuildResearchStation extends ResearchStationPlacement
@@ -1400,6 +1435,7 @@ export {
 	DirectFlight,
 	CharterFlight,
 	ShuttleFlight,
+	ResearchStationPlacement,
 	BuildResearchStation,
 	DiseaseCubeRemoval,
 	TreatDisease,
