@@ -87,7 +87,7 @@
             $response["undoneEventIds"] = array_merge($response["undoneEventIds"], $triggeredEventIds);
 
         deleteEvent($mysqli, $game, $eventID);
-        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep, $movementType);
+        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
     }
     catch(Exception $e)
     {

@@ -23,6 +23,7 @@ allow actions to be undone
 	event cards
 	discard
 restrict undoability to legal scenarios
+animate eventHistory more smoothly to the new position
 
 position auto-treat vial on img load event
 

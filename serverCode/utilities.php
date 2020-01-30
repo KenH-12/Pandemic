@@ -1067,7 +1067,7 @@ function deleteEvent($mysqli, $game, $eventID)
         throw new Exception("Failed to delete event: " . $mysqli->error);
 }
 
-function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eventTypeToUndo)
+function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eventTypeToUndo = false)
 {
     $DISCARD = "ds";
     if ($eventTypeToUndo === $DISCARD)

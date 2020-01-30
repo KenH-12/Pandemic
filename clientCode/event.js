@@ -722,7 +722,30 @@ class TreatDisease extends DiseaseCubeRemoval
 		super(event, cities);
 		this.isUndoable = true;
 		this.numCubesRemoved = this.prevCubeCount - this.newCubeCount;
-    }
+	}
+	
+	requestUndo(activePlayer, currentStepName)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			$.post(`serverCode/actionPages/undoTreatDisease.php`,
+			{
+				activeRole: activePlayer.rID,
+				currentStep: currentStepName,
+				eventID: this.id
+			},
+			function(response)
+			{
+				log(response);
+				const result = JSON.parse(response);
+				
+				if (result.failure)
+					reject(result.failure);
+				else
+					resolve(result);
+			});
+		});
+	}
 }
 
 class AutoTreatDisease extends DiseaseCubeRemoval { }
