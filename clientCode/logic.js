@@ -2578,7 +2578,7 @@ function discardOrRemoveEventCard(event)
 {
 	return new Promise(async resolve =>
 	{
-		const cardKey = event.eventCard.cardKey,
+		const cardKey = event.eventCard.key,
 			$card = $("#playerPanelContainer").find(`.playerCard[data-key='${cardKey}']`),
 			player = data.players[event.role];
 		
@@ -7302,7 +7302,7 @@ function flagRemovedEventCardEvents()
 		for (let i = data.eventCardEvents.length - 1; i >= 0; i--)
 		{
 			event = data.eventCardEvents[i];
-			cardKey = event.eventCard.cardKey;
+			cardKey = event.eventCard.key;
 	
 			// Was the event card removed from the game?
 			if (data.removedEventCardKeys.includes(cardKey))
