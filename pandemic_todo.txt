@@ -16,7 +16,6 @@ allow actions to be undone
 		triggered auto-treat / eradication events
 	pass
 	event cards
-		government grant
 		resilient population
 		one quiet night
 		airlift

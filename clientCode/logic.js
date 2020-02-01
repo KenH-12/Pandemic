@@ -8935,20 +8935,21 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 {
 	return new Promise(async resolve =>
 	{
-		log("all events: ", data.events);
 		let event;
 		for (let id of undoneEventIds.reverse())
 		{
-			log("searching events for ", id);
 			for (let i = data.events.length - 1; i >= 0; i--)
 			{
 				event = data.events[i];
-				log("checking event: ", event);
 				if (event.id == id)
 					break;
 			}
 	
-			log("event: ", event);
+			if (wasContingencyCard)
+			{
+				await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
+				await sleep(getDuration(data, "shortInterval"));
+			}
 
 			if (event instanceof MovementAction)
 				await event.animateUndo(data, animateCardToHand);
@@ -8959,6 +8960,8 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 			else
 				await event.animateUndo();
 			
+			if (wasContingencyCard) await collapsePlayerDiscardPile();
+
 			await removeEventIcon(event);
 		}
 		resolve();
