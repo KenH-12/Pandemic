@@ -10,6 +10,10 @@ dispatching a pawn via drive/ferry to a city containing another pawn is counted 
 
 TO DO
 -----
+in php files, require connect before checking required post values
+
+fix the status of AutoTreatDisease as an UndoableEvent, and its requestUndo method.
+
 allow actions to be undone
 	share knowledge
 	discover a cure

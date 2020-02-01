@@ -546,12 +546,42 @@ class InitialInfection extends Event
 	}
 }
 
-class MovementAction extends Event
+class UndoableEvent extends Event
+{
+	requestUndo(activePlayer, currentStepName, additionalDataToPost = {})
+	{
+		return new Promise((resolve, reject) =>
+		{
+			$.post(`serverCode/actionPages/${this.undoerFileName || `undo${toPascalCase(this.name)}`}.php`,
+			{
+				...{
+					activeRole: activePlayer.rID,
+					currentStep: currentStepName,
+					eventID: this.id
+				},
+				...additionalDataToPost
+			},
+			function(response)
+			{
+				log(response);
+				const result = JSON.parse(response);
+				
+				if (result.failure)
+					reject(result.failure);
+				else
+					resolve(result);
+			});
+		});
+	}
+}
+
+class MovementAction extends UndoableEvent
 {
 	constructor(event, cities)
     {
 		super(event);
 		this.isUndoable = true;
+		this.undoerFileName = "undoMovementAction";
         this.origin = cities[this.originKey];
         this.destination = cities[this.destinationKey];
 	}
@@ -565,6 +595,11 @@ class MovementAction extends Event
 						<p>Destination: ${getLocatableCityName(this.destination)}</p>`;
 		
 		return details;
+	}
+
+	requestUndo(activePlayer, currentStepName)
+	{
+		return super.requestUndo(activePlayer, currentStepName, { actionCode: this.code });
 	}
 	
 	animateUndo(gameData, animateCardToHand)
@@ -584,30 +619,6 @@ class MovementAction extends Event
 			setDuration(gameData, "pawnAnimation", 250);
 
 			resolve();
-		});
-	}
-	
-	requestUndo(activePlayer, currentStepName)
-	{
-		return new Promise((resolve, reject) =>
-		{
-			$.post(`serverCode/actionPages/undoMovementAction.php`,
-			{
-				activeRole: activePlayer.rID,
-				currentStep: currentStepName,
-				actionCode: this.code,
-				eventID: this.id
-			},
-			function(response)
-			{
-				log(response);
-				const result = JSON.parse(response);
-				
-				if (result.failure)
-					reject(result.failure);
-				else
-					resolve(result);
-			});
 		});
 	}
 }
@@ -648,12 +659,13 @@ class CharterFlight extends MovementAction
 
 class ShuttleFlight extends MovementAction {}
 
-class ResearchStationPlacement extends Event
+class ResearchStationPlacement extends UndoableEvent
 {
 	constructor(event, cities)
     {
 		super(event);
 		this.isUndoable = true;
+		this.undoerFileName = "undoResearchStationPlacement";
 		this.city = cities[this.cityKey];
 
 		if (this.relocationKey)
@@ -699,29 +711,6 @@ class ResearchStationPlacement extends Event
 		
 		return animateResearchStationBackToSupply($(`.researchStation[data-key='${this.cityKey}']`));
 	}
-	
-	requestUndo(activePlayer, currentStepName)
-	{
-		return new Promise((resolve, reject) =>
-		{
-			$.post(`serverCode/actionPages/undoResearchStationPlacement.php`,
-			{
-				activeRole: activePlayer.rID,
-				currentStep: currentStepName,
-				eventID: this.id
-			},
-			function(response)
-			{
-				log(response);
-				const result = JSON.parse(response);
-				
-				if (result.failure)
-					reject(result.failure);
-				else
-					resolve(result);
-			});
-		});
-	}
 }
 
 class BuildResearchStation extends ResearchStationPlacement
@@ -735,7 +724,7 @@ class BuildResearchStation extends ResearchStationPlacement
 	}
 }
 
-class DiseaseCubeRemoval extends Event
+class DiseaseCubeRemoval extends UndoableEvent
 {
 	constructor(event, cities)
 	{
@@ -774,34 +763,18 @@ class TreatDisease extends DiseaseCubeRemoval
 		this.isUndoable = true;
 		this.numCubesRemoved = this.prevCubeCount - this.newCubeCount;
 	}
-	
-	requestUndo(activePlayer, currentStepName)
+}
+
+class AutoTreatDisease extends DiseaseCubeRemoval
+{
+	constructor(event, cities)
 	{
-		return new Promise((resolve, reject) =>
-		{
-			$.post(`serverCode/actionPages/undoTreatDisease.php`,
-			{
-				activeRole: activePlayer.rID,
-				currentStep: currentStepName,
-				eventID: this.id
-			},
-			function(response)
-			{
-				log(response);
-				const result = JSON.parse(response);
-				
-				if (result.failure)
-					reject(result.failure);
-				else
-					resolve(result);
-			});
-		});
+		super(event, cities);
+		this.requestUndo = undefined;
 	}
 }
 
-class AutoTreatDisease extends DiseaseCubeRemoval { }
-
-class ShareKnowledge extends Event
+class ShareKnowledge extends UndoableEvent
 {
 	constructor(event, cities)
     {
@@ -819,7 +792,7 @@ class ShareKnowledge extends Event
 				<p>${ isGiver ? "Gave" : "Received" } Card:</p>
 				${this.card.getPlayerCard({ noTooltip: true })}
 				<p>${ isGiver ? "To" : "From" }: ${participant.newRoleTag()}</p>`;
-    }
+	}
 }
 
 class DiscoverACure extends Event

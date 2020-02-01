@@ -2,7 +2,9 @@
     try
     {
         session_start();
-        
+        require "../connect.php";
+        include "../utilities.php";
+
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
@@ -30,9 +32,6 @@
         $SHUTTLE_FLIGHT = "sf";
         $OPERATIONS_FLIGHT = "of";
         $DISPATCH = "dp";
-        
-        require "../connect.php";
-        include "../utilities.php";
 
         $event = getEventById($mysqli, $game, $eventID);
         validateEventCanBeUndone($mysqli, $game, $event);
