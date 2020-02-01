@@ -16,9 +16,16 @@ allow actions to be undone
 		triggered auto-treat / eradication events
 	pass
 	event cards
+		resilient population
+		one quiet night
+		airlift
+		forecast
 	discard
 restrict undoability to legal scenarios
 animate eventHistory more smoothly to the new position
+
+what happens when a card is animated back to a player's hand from the discard pile when it's not visible?
+	what about from the removed cards container?
 
 position auto-treat vial on img load event
 

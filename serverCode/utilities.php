@@ -786,6 +786,25 @@ function discardOrRemoveEventCard($mysqli, $game, $discardingRole, $cardKey)
         discardPlayerCards($mysqli, $game, $discardingRole, $cardKey);
 }
 
+// Moves the specified event card ($cardKey) to the pile which contained it before the $eventToUndo occured.
+// Event cards can be played from a role's hand,
+// or via the Contingency Planners's special ability which removes the card from the game instead of discarding it.
+// Returns true if the card was placed back in the 'contingency' pile, otherwise returns false.
+function moveEventCardToPrevPile($mysqli, $game, $cardKey, $eventToUndo)
+{
+    $currentPile = $mysqli->query("SELECT pile
+                                    FROM vw_playerCard
+                                    WHERE game = $game
+                                    AND cardKey = '$cardKey'")->fetch_assoc()["pile"];
+    
+    // The event card may have been removed by the Contingency Planner's special ability.
+    $prevPile = $currentPile === "removed" ? "contingency" : $eventToUndo["role"];
+    
+    moveCardsToPile($mysqli, $game, "player", $currentPile, $prevPile, $cardKey);
+
+   return $prevPile === "contingency";
+}
+
 function countEpidemicsDrawnOnTurn($mysqli, $game, $turnNum)
 {
     $CARD_DRAW_EVENT_CODE = "cd";

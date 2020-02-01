@@ -36,11 +36,21 @@
 
         $mysqli->autocommit(FALSE);
 
-        // If a card was discarded to perform the action, return it to the role's hand
-        // (the Operations Expert can perform Build Research Station for free).
-        if ($eventType === $BUILD_RESEARCH_STATION
-            && getRoleName($mysqli, $role) !== "Operations Expert")
-            moveCardsToPile($mysqli, $game, "player", "discard", $role, $cityKey);
+        if ($eventType === $BUILD_RESEARCH_STATION)
+        {
+            // (the Operations Expert can perform Build Research Station for free).
+            if (getRoleName($mysqli, $role) !== "Operations Expert")
+                moveCardsToPile($mysqli, $game, "player", "discard", $role, $cityKey);
+
+            $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
+        }
+        else if ($eventType === $GOVERNMENT_GRANT)
+        {
+            $GOVERNMENT_GRANT_CARDKEY = "gove";
+            $response["wasContingencyCard"] = moveEventCardToPrevPile($mysqli, $game, $GOVERNMENT_GRANT_CARDKEY, $event);
+        }
+        else
+            throw new Exception("Invalid event type: '$eventType'");
 
         // If the action relocated a research station, place it back on the original city.
         if (isset($eventDetails[1]))
@@ -53,7 +63,6 @@
 
         $response["undoneEventIds"] = array($eventID);
         deleteEvent($mysqli, $game, $eventID);
-        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
     }
     catch(Exception $e)
     {

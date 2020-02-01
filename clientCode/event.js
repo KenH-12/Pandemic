@@ -672,12 +672,23 @@ class ResearchStationPlacement extends Event
 				${this.getDiscardDetails()}`;
 	}
 
-	async animateUndo(gameData, animateCardToHand, animateResearchStationBackToSupply)
+	async animateUndo(gameData, animateCardToHand, animateResearchStationBackToSupply, wasConingencyCard)
 	{
-		if (this.player.role !== "Operations Expert")
+		let cardKey = false;
+		if (this instanceof BuildResearchStation && this.player.role !== "Operations Expert")
+			cardKey = this.cityKey;
+		else if (this instanceof GovernmentGrant)
+			cardKey = this.eventCard.key;
+
+		if (cardKey)
 		{
-			await animateCardToHand($("#playerDiscard").children(`[data-key='${this.cityKey}']`, { player: this.player }));
-			this.player.addCardKeysToHand(this.cityKey);
+			const $card = $("#playerDiscard").find(`[data-key='${cardKey}']`);
+			await animateCardToHand($card, { player: this.player, isContingencyCard: wasConingencyCard });
+
+			if (wasConingencyCard)
+				this.player.contingencyKey = cardKey;
+			else
+				this.player.addCardKeysToHand(cardKey);
 		}
 
 		if (this.relocationKey)
@@ -697,7 +708,6 @@ class ResearchStationPlacement extends Event
 			{
 				activeRole: activePlayer.rID,
 				currentStep: currentStepName,
-				actionCode: this.code,
 				eventID: this.id
 			},
 			function(response)
@@ -991,9 +1001,9 @@ class OneQuietNight extends Event
 
 class GovernmentGrant extends ResearchStationPlacement
 {
-	constructor(event)
+	constructor(event, cities)
     {
-        super(event);
+        super(event, cities);
 		this.eventCard = eventCards[eventTypes.governmentGrant.cardKey];
     }
 	

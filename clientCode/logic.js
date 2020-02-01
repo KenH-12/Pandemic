@@ -8903,13 +8903,18 @@ async function undoAction()
 		disableActions();
 	}
 
-	const { undoneEventIds, prevStepName } = await event.requestUndo(getActivePlayer(), data.currentStep.name);
+	const { undoneEventIds, wasContingencyCard, prevStepName } = await event.requestUndo(getActivePlayer(), data.currentStep.name);
 
-	await animateUndoEvents(undoneEventIds);
+	await animateUndoEvents(undoneEventIds, wasContingencyCard);
 	data.events.length = eventIndex;
 	
-	setCurrentStep(prevStepName);
-	proceed();
+	if (prevStepName)
+	{
+		setCurrentStep(prevStepName);
+		proceed();
+	}
+	else
+		resumeCurrentStep();
 }
 
 function getLatestUndoableEvent()
@@ -8926,7 +8931,7 @@ function getLatestUndoableEvent()
 	return { event: false };
 }
 
-function animateUndoEvents(undoneEventIds)
+function animateUndoEvents(undoneEventIds, wasContingencyCard)
 {
 	return new Promise(async resolve =>
 	{
@@ -8950,7 +8955,7 @@ function animateUndoEvents(undoneEventIds)
 			else if (event instanceof DiseaseCubeRemoval)
 				await event.animateUndo(placeDiseaseCubes);
 			else if (event instanceof ResearchStationPlacement)
-				await event.animateUndo(data, animateCardToHand, animateResearchStationBackToSupply);
+				await event.animateUndo(data, animateCardToHand, animateResearchStationBackToSupply, wasContingencyCard);
 			else
 				await event.animateUndo();
 			
