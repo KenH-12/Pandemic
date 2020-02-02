@@ -11,8 +11,6 @@ dispatching a pawn via drive/ferry to a city containing another pawn is counted 
 TO DO
 -----
 allow actions to be undone
-	discover a cure
-		triggered auto-treat / eradication events
 	pass
 	event cards
 		resilient population
@@ -20,8 +18,11 @@ allow actions to be undone
 		airlift
 		forecast
 	discard
+formalize the animation of revoking a cures or eradications
 restrict undoability to legal scenarios
 animate eventHistory more smoothly to the new position
+
+when the contingency card is hovered, indicate that it's 'in contingency'
 
 what happens when a card is animated back to a player's hand from the discard pile when it's not visible?
 	what about from the removed cards container?

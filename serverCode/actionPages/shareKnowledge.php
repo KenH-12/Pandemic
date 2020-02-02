@@ -8,7 +8,7 @@
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["actionCode"])
+        if (!isset($_POST["actionCode"]))
             throw new Exception("Action code not set.");
             
         if (!isset($_POST["currentStep"]))

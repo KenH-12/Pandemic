@@ -8954,7 +8954,8 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				await sleep(getDuration(data, "shortInterval"));
 			}
 
-			if (event instanceof MovementAction)
+			if (event instanceof MovementAction
+				|| event instanceof DiscoverACure)
 				await event.animateUndo(data, animateCardToHand);
 			else if (event instanceof DiseaseCubeRemoval)
 				await event.animateUndo(placeDiseaseCubes);

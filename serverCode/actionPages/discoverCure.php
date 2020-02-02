@@ -8,7 +8,7 @@
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["role"])
+        if (!isset($_POST["role"]))
             throw new Exception("Role not set.");
         
         if (!isset($_POST["currentStep"]))
@@ -20,7 +20,7 @@
         if (!isset($_POST["diseaseColor"]))
             throw new Exception("Disease color not set.");
         
-        if (!isset($_POST["cardKeys"])))
+        if (!isset($_POST["cardKeys"]))
             throw new Exception("Card keys not set.");
         
         $game = $_SESSION["game"];

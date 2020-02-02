@@ -816,7 +816,7 @@ class ShareKnowledge extends UndoableEvent
 	}
 }
 
-class DiscoverACure extends Event
+class DiscoverACure extends UndoableEvent
 {
 	constructor(event, cities)
     {
@@ -837,7 +837,31 @@ class DiscoverACure extends Event
 		return `${super.getDetails()}
 				<p>Discarded: </p>
 				${discarded}`;
-    }
+	}
+	
+	animateUndo(gameData, animateCardToHand)
+	{
+		return new Promise(async resolve =>
+		{
+			for (let key of this.cardKeys)
+				await animateCardToHand($("#playerDiscard").children(`.playerCard[data-key='${key}']`), { player: this.player });
+			
+			this.player.addCardKeysToHand(this.cardKeys);
+
+			const diseaseColor = this.discards[0].color,
+				$cureMarker = $(`#cureMarker${diseaseColor.toUpperCase()}`);
+			await animatePromise({
+				$elements: $cureMarker,
+				targetProperties: { opacity: 0 }
+			});
+			$cureMarker.remove();
+
+			gameData.cures[diseaseColor] = false;
+			gameData.cures.remaining++;
+
+			resolve();
+		});
+	}
 }
 
 class Eradication extends Event
