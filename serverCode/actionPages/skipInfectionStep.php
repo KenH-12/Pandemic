@@ -2,6 +2,8 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -18,9 +20,6 @@
 
         if ($currentStep !== "infect cities")
             throw new Exception("wrong step.");
-        
-        require "../connect.php";
-        include "../utilities.php";
 
         $mysqli->autocommit(FALSE);
 

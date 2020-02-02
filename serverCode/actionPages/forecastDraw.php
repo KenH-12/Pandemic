@@ -2,6 +2,8 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -15,9 +17,6 @@
         $game = $_SESSION["game"];
         $currentStep = $_POST["currentStep"];
         $activeRole = $_POST["role"];
-        
-        require "../connect.php";
-        include "../utilities.php";
         
         $EVENT_CODE = "fd";
         $CARD_KEY = "fore";

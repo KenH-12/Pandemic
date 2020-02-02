@@ -2,6 +2,8 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -27,9 +29,6 @@
         $roleToAirlift = $_POST["roleToAirlift"];
         $originKey = $_POST["originKey"];
         $destinationKey = $_POST["destinationKey"];
-        
-        require "../connect.php";
-        include "../utilities.php";
         
         $EVENT_CODE = "ar";
         $CARD_KEY = "airl";

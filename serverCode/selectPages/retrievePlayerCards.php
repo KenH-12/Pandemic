@@ -1,11 +1,13 @@
 <?php
-	session_start();
-	
-	if (isset($_SESSION["game"]))
+	try
 	{
-		$game = $_SESSION["game"];
-		
+		session_start();
 		require "../connect.php";
+		
+		if (!isset($_SESSION["game"]))
+			throw new Exception("Game not found");
+		
+		$game = $_SESSION["game"];
 		
 		// get all player cards which are in a player's hand or the discard pile
 		$cards = $mysqli->query("SELECT pileID, pile, cardKey as `key`
@@ -19,9 +21,15 @@
 		{
 			$response[] = $row;
 		}
-		
-		$mysqli->close();
 	}
-	
-	echo json_encode($response);
+	catch(Exception $e)
+	{
+		$response["failure"] = $e->getMessage();
+	}
+	finally
+	{
+		$mysqli->close();
+
+		echo json_encode($response);
+	}
 ?>

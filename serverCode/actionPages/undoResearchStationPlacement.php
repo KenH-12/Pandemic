@@ -2,6 +2,8 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -22,9 +24,6 @@
 
         $BUILD_RESEARCH_STATION = "rs";
         $GOVERNMENT_GRANT = "gg";
-        
-        require "../connect.php";
-        include "../utilities.php";
 
         $event = getEventById($mysqli, $game, $eventID);
         validateEventCanBeUndone($mysqli, $game, $event);

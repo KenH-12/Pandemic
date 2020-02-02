@@ -2,16 +2,26 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
         if (!isset($_POST["role"])
-            || !isset($_POST["currentStep"])
-            || !isset($_POST["cityKey"])
-            || !isset($_POST["diseaseColor"])
-            || !isset($_POST["cardKeys"]))
-            throw new Exception("Required values not set.");
+            throw new Exception("Role not set.");
+        
+        if (!isset($_POST["currentStep"]))
+            throw new Exception("Current step not set.");
+        
+        if (!isset($_POST["cityKey"]))
+            throw new Exception("City key not set.");
+        
+        if (!isset($_POST["diseaseColor"]))
+            throw new Exception("Disease color not set.");
+        
+        if (!isset($_POST["cardKeys"])))
+            throw new Exception("Card keys not set.");
         
         $game = $_SESSION["game"];
         $role = $_POST["role"];
@@ -19,9 +29,6 @@
         $cityKey = $_POST["cityKey"];
         $diseaseColor = $_POST["diseaseColor"];
         $cardKeys = $_POST["cardKeys"];
-
-        require "../connect.php";
-        include "../utilities.php";
 
         // Make sure the disease has not already been cured.
         if (getDiseaseStatus($mysqli, $game, $diseaseColor) != "rampant")

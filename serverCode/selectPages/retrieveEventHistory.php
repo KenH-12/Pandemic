@@ -1,14 +1,16 @@
 <?php
-	session_start();
-	
-	if (isset($_SESSION["game"]))
+	try
 	{
+		session_start();
+		require "../connect.php";
+		include "../utilities.php";
+		
+		if (!isset($_SESSION["game"]))
+			throw new Exception("Game not found");
+		
 		$game = $_SESSION["game"];
 		$response = array();
 		$EPIDEMIC_INTENSIFY_CODE = "et";
-		
-		require "../connect.php";
-		include "../utilities.php";
 		
 		$results = $mysqli->query("SELECT	id,
 											turnNum,
@@ -26,9 +28,15 @@
 
 			$response[] = $row;
 		}
-		
-		$mysqli->close();
 	}
-	
-	echo json_encode($response);
+	catch(Exception $e)
+	{
+		$response["failure"] = $e->getMessage();
+	}
+	finally
+	{
+		$mysqli->close();
+
+		echo json_encode($response);
+	}
 ?>

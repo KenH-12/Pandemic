@@ -2,6 +2,8 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -17,9 +19,6 @@
         $currentStep = $_POST["currentStep"];
 
         $NEXT_STEP = "epInfect";
-        
-        require "../connect.php";
-        include "../utilities.php";
 
         // Epidemic Step 1: INCREASE
         // "MOVE THE INFECTION RATE MARKER FORWARD 1 SPACE."

@@ -2,15 +2,23 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("game not found");
 
-        if (!isset($_POST["currentStep"])
-            || !isset($_POST["role"])
-            || !isset($_POST["discardingRole"])
-            || !isset($_POST["cardKeys"]))
-            throw new Exception("required value(s) not set");
+        if (!isset($_POST["currentStep"]))
+            throw new Exception("current step not set");
+        
+        if (!isset($_POST["role"]))
+            throw new Exception("role not set");
+        
+        if (!isset($_POST["discardingRole"]))
+            throw new Exception("discarding role not set");
+        
+        if (!isset($_POST["cardKeys"]))
+            throw new Exception("card keys not set");
         
         $game = $_SESSION["game"];
         $currentStep = $_POST["currentStep"];
@@ -24,9 +32,6 @@
             $nextStep = false; // next step will be determined by the updateStep function.
         else
             throw new Exception("Discard player card attempt unexpected during current step: '$currentStep'");
-        
-        require "../connect.php";
-        include "../utilities.php";
 
         $mysqli->autocommit(FALSE);
 

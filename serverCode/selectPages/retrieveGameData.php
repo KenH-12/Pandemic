@@ -1,14 +1,14 @@
 <?php
-	session_start();
 	try
 	{
+		session_start();
+		require "../connect.php";
+		include "../utilities.php";
+		
 		if (!isset($_SESSION["game"]))
 			throw new Exception("Game does not exist.");
 		
 		$game = $_SESSION["game"];
-		
-		require "../connect.php";
-		include "../utilities.php";
 		
 		$gameIsResuming = false;
 		$gamestate = $mysqli->query("SELECT turn,
@@ -137,7 +137,7 @@
 	finally
 	{
 		$mysqli->close();
+
+		echo json_encode($response);
 	}
-	
-	echo json_encode($response);
 ?>

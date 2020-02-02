@@ -10,8 +10,6 @@ dispatching a pawn via drive/ferry to a city containing another pawn is counted 
 
 TO DO
 -----
-in php files, require connect before checking required post values
-
 allow actions to be undone
 	discover a cure
 		triggered auto-treat / eradication events

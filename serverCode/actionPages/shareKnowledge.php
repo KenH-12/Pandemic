@@ -2,17 +2,29 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
         if (!isset($_POST["actionCode"])
-            || !isset($_POST["currentStep"])
-            || !isset($_POST["role"])
-            || !isset($_POST["giver"])
-            || !isset($_POST["receiver"])
-            || !isset($_POST["cardKey"]))
-            throw new Exception("Required values not set.");
+            throw new Exception("Action code not set.");
+            
+        if (!isset($_POST["currentStep"]))
+            throw new Exception("Current step not set.");
+        
+        if (!isset($_POST["role"]))
+            throw new Exception("Role not set.");
+           
+        if (!isset($_POST["giver"]))
+            throw new Exception("Giver not set.");
+         
+        if (!isset($_POST["receiver"]))
+            throw new Exception("Receiver not set.");
+        
+        if (!isset($_POST["cardKey"]))
+            throw new Exception("Card key not set.");
         
         $game = $_SESSION["game"];
         $eventType = $_POST["actionCode"];
@@ -21,9 +33,6 @@
         $giver = $_POST["giver"];
         $receiver = $_POST["receiver"];
         $cardKey = $_POST["cardKey"];
-
-        require "../connect.php";
-        include "../utilities.php";
 
         $mysqli->autocommit(FALSE);
 

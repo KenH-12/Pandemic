@@ -2,6 +2,8 @@
 	try
 	{
 		session_start();
+		require "../connect.php";
+		include "../utilities.php";
 		
 		if (!isset($_SESSION["game"]))
 			throw new Exception("game not found");
@@ -16,9 +18,6 @@
 		$EVENT_TYPE = "cd";
 		$NUM_CARDS_TO_DRAW = 2;
 		$HAND_LIMIT = 7;
-
-		require "../connect.php";
-		include "../utilities.php";
 		
 		$cards = $mysqli->query("SELECT cardKey AS `key`, cardIndex
 								FROM vw_playerCard
@@ -90,7 +89,7 @@
 			$mysqli->commit();
 		
 		$mysqli->close();
+
+		echo json_encode($response);
 	}
-	
-	echo json_encode($response);
 ?>

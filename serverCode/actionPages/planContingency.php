@@ -2,13 +2,19 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["role"])
-            || !isset($_POST["currentStep"])
-            || !isset($_POST["cardKey"]))
+        if (!isset($_POST["role"]))
+            throw new Exception("Required values not set.");
+        
+        if (!isset($_POST["currentStep"]))
+            throw new Exception("Required values not set.");
+        
+        if (!isset($_POST["cardKey"]))
             throw new Exception("Required values not set.");
         
         $game = $_SESSION["game"];
@@ -18,9 +24,6 @@
 
         $EVENT_CARD_COLOR = "e";
         $EVENT_CODE = "pc";
-
-        require "../connect.php";
-        include "../utilities.php";
 
         if (getRoleName($mysqli, $role) !== "Contingency Planner")
             throw new Exception("Only the Contingency Planner may perform this action.");

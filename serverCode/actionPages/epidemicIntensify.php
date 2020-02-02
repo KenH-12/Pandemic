@@ -2,6 +2,8 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -15,9 +17,6 @@
         $game = $_SESSION["game"];
         $role = $_POST["role"];
         $currentStep = $_POST["currentStep"];
-        
-        require "../connect.php";
-        include "../utilities.php";
 
         // Epidemic Step 3: INTENSIFY
         // "SHUFFLE THE CARDS IN THE INFECTION DISCARD PILE AND PUT THEM ON TOP OF THE INFECTION DECK."

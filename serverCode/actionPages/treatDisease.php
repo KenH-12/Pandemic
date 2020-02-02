@@ -2,24 +2,26 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["role"])
-            || !isset($_POST["currentStep"])
-            || !isset($_POST["cityKey"])
-            || !isset($_POST["diseaseColor"]))
-            throw new Exception("Required values not set.");
+        if (!isset($_POST["role"]))
+            throw new Exception("Role not set.");
+
+        if (!isset($_POST["currentStep"]))
+            throw new Exception("Current step not set.");
+        
+        if (!isset($_POST["diseaseColor"]))
+            throw new Exception("Disease color not set.");
         
         $game = $_SESSION["game"];
         $role = $_POST["role"];
         $currentStep = $_POST["currentStep"];
         $diseaseColor = $_POST["diseaseColor"];
         $cityKey = $_POST["cityKey"];
-
-        require "../connect.php";
-        include "../utilities.php";
 
         // Medic special ability is to remove all cubes of the same color when performing treat disease.
 		$playerIsMedic = getRoleName($mysqli, $role) == "Medic";
