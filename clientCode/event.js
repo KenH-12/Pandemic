@@ -799,6 +799,21 @@ class ShareKnowledge extends UndoableEvent
 				${this.card.getPlayerCard({ noTooltip: true })}
 				<p>${ isGiver ? "To" : "From" }: ${participant.newRoleTag()}</p>`;
 	}
+
+	animateUndo(animateShareKnowledge)
+	{
+		return new Promise(async resolve =>
+		{
+			const { receiver, giver, cardKey } = this;
+
+			await animateShareKnowledge(receiver, giver, cardKey);
+
+			receiver.removeCardsFromHand(cardKey);
+			giver.addCardKeysToHand(cardKey);
+
+			resolve();
+		});
+	}
 }
 
 class DiscoverACure extends Event

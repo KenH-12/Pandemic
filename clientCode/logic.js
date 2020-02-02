@@ -8960,6 +8960,8 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				await event.animateUndo(placeDiseaseCubes);
 			else if (event instanceof ResearchStationPlacement)
 				await event.animateUndo(data, animateCardToHand, animateResearchStationBackToSupply, wasContingencyCard);
+			else if (event instanceof ShareKnowledge)
+				await event.animateUndo(animateShareKnowledge);
 			else
 				await event.animateUndo();
 			

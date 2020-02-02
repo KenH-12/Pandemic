@@ -2,6 +2,8 @@
     try
     {
         session_start();
+        require "../connect.php";
+        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -19,9 +21,6 @@
         $currentStep = $_POST["currentStep"];
         $activeRole = $_POST["activeRole"];
         $eventID = $_POST["eventID"];
-        
-        require "../connect.php";
-        include "../utilities.php";
 
         $event = getEventById($mysqli, $game, $eventID);
         validateEventCanBeUndone($mysqli, $game, $event);
