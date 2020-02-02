@@ -767,10 +767,16 @@ class TreatDisease extends DiseaseCubeRemoval
 
 class AutoTreatDisease extends DiseaseCubeRemoval
 {
-	constructor(event, cities)
+	// While AutoTreatDisease is undoable and inherits from UndoableEvent,
+	// its instances are triggered by other UndoableEvents -- the undoing of which triggers
+	// any AutoTreatDisease events that they triggered to be undone in turn.
+	// Therefore, this requestUndo method does nothing and exists only because
+	// AutoTreatDisease inherits from DiseaseCubeRemoval which inherits from UndoableEvent
+	// (because TreatDisease is an UndoableEvent which also inherits from DiseaseCubeRemoval).
+	// Anyway, it's not as complicated as it sounds -- to summarize, this method is essentially a benign placeholder.
+	requestUndo()
 	{
-		super(event, cities);
-		this.requestUndo = undefined;
+		return new Promise(resolve => { resolve() });
 	}
 }
 

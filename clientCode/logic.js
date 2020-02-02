@@ -8935,6 +8935,9 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 {
 	return new Promise(async resolve =>
 	{
+		if (!undoneEventIds)
+			return resolve();
+		
 		let event;
 		for (let id of undoneEventIds.reverse())
 		{
