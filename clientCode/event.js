@@ -684,7 +684,7 @@ class ResearchStationPlacement extends UndoableEvent
 				${this.getDiscardDetails()}`;
 	}
 
-	async animateUndo(gameData, animateCardToHand, animateResearchStationBackToSupply, wasConingencyCard)
+	async animateUndo(gameData, animateCardToHand, animateResearchStationBackToSupply, wasContingencyCard)
 	{
 		let cardKey = false;
 		if (this instanceof BuildResearchStation && this.player.role !== "Operations Expert")
@@ -695,9 +695,9 @@ class ResearchStationPlacement extends UndoableEvent
 		if (cardKey)
 		{
 			const $card = $("#playerDiscard").find(`[data-key='${cardKey}']`);
-			await animateCardToHand($card, { player: this.player, isContingencyCard: wasConingencyCard });
+			await animateCardToHand($card, { player: this.player, isContingencyCard: wasContingencyCard });
 
-			if (wasConingencyCard)
+			if (wasContingencyCard)
 				this.player.contingencyKey = cardKey;
 			else
 				this.player.addCardKeysToHand(cardKey);
@@ -1000,7 +1000,7 @@ class Airlift extends Event
     }
 }
 
-class OneQuietNight extends Event
+class OneQuietNight extends UndoableEvent
 {
 	constructor(event)
     {
@@ -1015,6 +1015,25 @@ class OneQuietNight extends Event
 				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
 				${this.eventCard.getPlayerCard()}`;
     }
+
+	animateUndo(animateCardToHand, wasContingencyCard, indicateOneQuietNightStep)
+	{
+		return new Promise(async resolve =>
+		{
+			const cardKey = this.eventCard.key,
+				$card = $("#playerDiscard").find(`[data-key='${cardKey}']`);
+			await animateCardToHand($card, { player: this.player, isContingencyCard: wasContingencyCard });
+
+			if (wasContingencyCard)
+				this.player.contingencyKey = cardKey;
+			else
+				this.player.addCardKeysToHand(cardKey);
+			
+			indicateOneQuietNightStep({ off: true });
+			
+			resolve();
+		});
+	}
 }
 
 class GovernmentGrant extends ResearchStationPlacement

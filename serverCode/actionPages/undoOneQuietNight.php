@@ -49,10 +49,11 @@
             // Decrement the turn number,
             // set the turn to the prevTurnRoleID,
             // and set the step to 'infect cities' because that step was skipped by the One Quiet Night event which is being undone.
+            $prevStepName = "infect cities";
             $mysqli->query("UPDATE vw_gamestate
                             SET turnNum = $eventTurnNum,
                                 turn = $prevTurnRoleID,
-                                step = getStepID('infect cities')
+                                step = getStepID('$prevStepName')
                             WHERE game = $game
                             AND turnNum = $turnNum
                             AND turn = $activeRole
@@ -60,6 +61,10 @@
             
             if ($mysqli->affected_rows != 1)
                 throw new Exception("could not revert to the skipped 'infect cities' step of the previous turn." . $mysqli->error);
+            
+            $response["prevTurnNum"] = $eventTurnNum;
+            $response["prevTurnRoleID"] = $prevTurnRoleID;
+            $response["prevStepName"] = $prevStepName;
         }
 
         $response["wasContingencyCard"] = moveEventCardToPrevPile($mysqli, $game, $ONE_QUIET_NIGHT_CARDKEY, $event);

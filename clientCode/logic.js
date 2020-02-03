@@ -8903,13 +8903,29 @@ async function undoAction()
 		disableActions();
 	}
 
-	const { undoneEventIds, wasContingencyCard, prevStepName } = await event.requestUndo(getActivePlayer(), data.currentStep.name);
+	const {
+		undoneEventIds,
+		wasContingencyCard,
+		prevStepName,
+		prevTurnNum,
+		prevTurnRoleID
+	} = await event.requestUndo(getActivePlayer(), data.currentStep.name);
 
 	await animateUndoEvents(undoneEventIds, wasContingencyCard);
 	data.events.length = eventIndex;
 	
 	if (prevStepName)
 	{
+		// If a One Quiet Night event skipped the 'infect cities' step,
+		// revert to the 'infect cities' step of the previous turn.
+		if (prevTurnNum && prevTurnRoleID)
+		{
+			data.turnNum = prevTurnNum;
+			data.turn = prevTurnRoleID;
+
+			$("#actionsContainer").slideUp();
+		}
+		
 		setCurrentStep(prevStepName);
 		proceed();
 	}
@@ -8963,6 +8979,8 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				await event.animateUndo(data, animateCardToHand, animateResearchStationBackToSupply, wasContingencyCard);
 			else if (event instanceof ShareKnowledge)
 				await event.animateUndo(animateShareKnowledge);
+			else if (event instanceof OneQuietNight)
+				await event.animateUndo(animateCardToHand, wasContingencyCard, indicateOneQuietNightStep);
 			else
 				await event.animateUndo();
 			
