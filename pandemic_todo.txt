@@ -1,10 +1,5 @@
 BUGS
 ----
-event cards aren't animated to the discard pile when they are played
-	happened with:
-		one quiet night
-		resilient population
-
 dispatching a pawn via drive/ferry to a city containing another pawn is counted as a rendezvous event
 	drive/ferry and shuttle flight should take priority over rendezvous
 
