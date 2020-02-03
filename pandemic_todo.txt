@@ -12,6 +12,8 @@ allow actions to be undone
 		airlift
 		forecast
 	discard
+		what if one quiet night is played, then cards are drawn, then cards are discarded, then the 'infect cities' step is skipped?
+			allow the discard to be undone
 formalize the animation of revoking a cures or eradications
 restrict undoability to legal scenarios
 animate eventHistory more smoothly to the new position

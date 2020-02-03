@@ -698,9 +698,6 @@ function getAutoTreatDiseaseEvents($mysqli, $game, $cityKey, $diseaseColor = fal
     return false;
 }
 
-// Update's a role's location.
-// If the role is "Medic" and auto-treat disease events occur, returns said events.
-// Otherwise returns false.
 function updateRoleLocation($mysqli, $game, $role, $originKey, $destinationKey)
 {
     $mysqli->query("UPDATE vw_player
@@ -710,7 +707,7 @@ function updateRoleLocation($mysqli, $game, $role, $originKey, $destinationKey)
                     AND location = '$originKey'");
     
     if ($mysqli->affected_rows != 1)
-        throw new Exception("Failed to update location from $originKey to $destinationKey: " . $mysqli->error);
+        throw new Exception("Failed to update pawn location from '$originKey' to '$destinationKey': " . $mysqli->error);
 }
 
 function validateOperationsFlight($mysqli, $game, $role, $discardKey)

@@ -65,15 +65,7 @@
         
         $mysqli->autocommit(FALSE);
         
-        // Put the pawn back on the origin city.
-        $mysqli->query("UPDATE vw_player
-                        SET location = '$originKey'
-                        WHERE game = $game
-                        AND rID = $roleToMove
-                        AND location = '$destinationKey'");
-        
-        if ($mysqli->affected_rows != 1)
-            throw new Exception("pawn ($roleToMove) could not be placed back on origin ('$originKey') from destination ('$destinationKey') : $mysqli->error");
+        updateRoleLocation($mysqli, $game, $roleToMove, $destinationKey, $originKey);
         
         // If a card was discarded to perform the action, put it back in the role's hand.
         if ($discardKey)
