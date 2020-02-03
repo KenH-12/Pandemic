@@ -24,7 +24,7 @@
         validateEventCanBeUndone($mysqli, $game, $event);
 
         $role = $event["role"];
-        $eventDetails = $event["details"];
+        $eventDetails = explode(",", $event["details"]);
         $airliftedRole = $eventDetails[0];
         $originKey = $eventDetails[1];
 		$destinationKey = $eventDetails[2];

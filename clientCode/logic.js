@@ -3641,12 +3641,13 @@ async function animateCardsToHand($cards)
 	return animateCardToHand($cards.first(), targetProperties);
 }
 
-function getDrawnPlayerCardTargetProperties({ isContingencyCard } = {})
+function getDrawnPlayerCardTargetProperties({ player, isContingencyCard } = {})
 {
-	const $rolePanel = getActivePlayer().$panel,
-		$guide = $rolePanel.children().last(),
+	player = player || getActivePlayer();
+
+	const $guide = player.$panel.children().last(),
 		guideHeight = $guide.height(),
-		guideOffset = isContingencyCard ? $rolePanel.children(".role").offset() : $guide.offset(),
+		guideOffset = isContingencyCard ? player.$panel.children(".role").offset() : $guide.offset(),
 		$exampleCard = $("#playerPanelContainer").find(".playerCard").first(),
 		exampleCardHeight = $exampleCard ? $exampleCard.height() : false,
 		top = exampleCardHeight ? guideOffset.top + exampleCardHeight : guideOffset.top + guideHeight;
@@ -3665,7 +3666,7 @@ function getDrawnPlayerCardTargetProperties({ isContingencyCard } = {})
 function animateCardToHand($card, { player, targetProperties, isContingencyCard } = {})
 {
 	player = player || getActivePlayer();
-	targetProperties = targetProperties || getDrawnPlayerCardTargetProperties({ isContingencyCard });
+	targetProperties = targetProperties || getDrawnPlayerCardTargetProperties({ player, isContingencyCard });
 	
 	// Some initial values should be calculated before the Promise is made.
 	const initialOffset = $card.offset(),
@@ -8971,8 +8972,9 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 			}
 
 			if (event instanceof MovementAction
-				|| event instanceof DiscoverACure)
-				await event.animateUndo(data, animateCardToHand);
+				|| event instanceof DiscoverACure
+				|| event instanceof Airlift)
+				await event.animateUndo(data, animateCardToHand, wasContingencyCard);
 			else if (event instanceof DiseaseCubeRemoval)
 				await event.animateUndo(placeDiseaseCubes);
 			else if (event instanceof ResearchStationPlacement)

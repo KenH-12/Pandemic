@@ -978,7 +978,7 @@ class DispatchPawn extends MovementAction
 	}
 }
 
-class Airlift extends Event
+class Airlift extends UndoableEvent
 {
     constructor(event, cities)
     {
@@ -997,7 +997,30 @@ class Airlift extends Event
 				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
 				${this.eventCard.getPlayerCard()}`;
-    }
+	}
+	
+	animateUndo(gameData, animateCardToHand, wasContingencyCard)
+	{
+		return new Promise(async resolve =>
+		{
+			log("this.player: ", this.player);
+			
+			const cardKey = this.eventCard.key,
+				$card = $("#playerDiscard").find(`[data-key='${cardKey}']`);
+			await animateCardToHand($card, { player: this.player, isContingencyCard: wasContingencyCard });
+
+			if (wasContingencyCard)
+				this.player.contingencyKey = cardKey;
+			else
+				this.player.addCardKeysToHand(cardKey);
+			
+			setDuration(gameData, "pawnAnimation", 1000);
+			await this.airliftedPlayer.updateLocation(this.origin);
+			setDuration(gameData, "pawnAnimation", 250);
+
+			resolve();
+		});
+	}
 }
 
 class OneQuietNight extends UndoableEvent
