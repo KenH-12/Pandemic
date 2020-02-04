@@ -248,7 +248,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"You may play this between the Infect and Intensify steps of an epidemic."
 		],
 		instructions: "Select a card from INFECTION DISCARDS to remove from the game.",
-		propertyNames: ["cardKey"],
+		propertyNames: ["cardKey", "infectionDiscardIndex"],
 		actionPathName: "resilientPopulation"
 	},
 	oneQuietNight: {

@@ -33,12 +33,19 @@
         discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
         $discardingRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
 
+        // The cardIndex within the infection discard pile is recorded in case the Resilient Population event gets undone later.
+        $infectionDiscardIndex = $mysqli->query("SELECT cardIndex
+                                                FROM vw_infectionCard
+                                                WHERE game = $game
+                                                AND cardKey = '$cardKeyToRemove'")->fetch_assoc()["cardIndex"];
+
         $cardType = "infection";
         $currentPile = "discard";
         $newPile = "removed";
         moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKeyToRemove);
 
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $cardKeyToRemove, $discardingRole);
+        $eventDetails = "$cardKeyToRemove,$infectionDiscardIndex";
+        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails, $discardingRole);
 
         $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $discardingRole, $activeRole);
 
