@@ -6,6 +6,9 @@ dispatching a pawn via drive/ferry to a city containing another pawn is counted 
 play airlift from contingency to move medic to city where auto-treat will occur, then undo the airlift
 	the player discards expands twice for some reason
 
+sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
+	find a way to make sure it happens
+
 TO DO
 -----
 allow actions to be undone
@@ -52,11 +55,6 @@ create MovementEvent class as a bridge between Event and all movement action eve
 hovering over an epidemic card should show the full card
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
-
-undo actions
-
-the resilient population animation should scroll the infection discards container to the bottom
-before placing the card in the "removed from game" container
 
 find some other way to convey that the cost of some actions is to discard whichever card(s)
 	e.g. "Cost:"

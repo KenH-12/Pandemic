@@ -2242,24 +2242,7 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 		$cardToRemove = $discardPile.children(`[data-key='${cardKeyToRemove}']`),
 		easing = "easeInOutQuad";
 	
-	await expandInfectionDiscardPile();
-	
-	const pileScrollHeight = document.getElementById(discardPileID).scrollHeight,
-		pileIsOverflowing = pileScrollHeight > $discardPile.height();
-	
-	if (pileIsOverflowing)
-	{
-		const cardHeight = $cardToRemove.height();
-		$removedCardsContainer.height($removedCardsContainer.height() + cardHeight);
-
-		await animatePromise(
-		{
-			$elements: $discardPile,
-			desiredProperties: { scrollTop: pileScrollHeight + cardHeight },
-			duration: 500,
-			easing
-		});
-	}
+	await expandInfectionDiscardPile({ showRemovedCardsContainer: true });
 
 	const initialOffset = $cardToRemove.offset();
 	$cardToRemove.appendTo("#boardContainer")
@@ -3769,7 +3752,7 @@ function resizeInfectionDiscardElements()
 		cardHeight = getDimension(data, "infDiscardHeight"),
 		panelHeight = $("#topPanel").height();
 
-	positionRemovedInfectionCards("collapse");
+	positionRemovedInfectionCardsContainer("collapse");
 		
 	$infDiscard.css("height", panelHeight)
 		.find(".infectionCard")
@@ -3780,7 +3763,7 @@ function resizeInfectionDiscardElements()
 	$infDiscard.children("#infDiscardVeil").offset({ top: $infDiscard.children(".title").first().outerHeight() });
 }
 
-function positionRemovedInfectionCards()
+function positionRemovedInfectionCardsContainer()
 {
 	const $removedCardsContainer = $("#removedInfectionCards");
 	
@@ -8704,10 +8687,19 @@ function expandInfectionDiscardPile({ showRemovedCardsContainer } = {})
 		{
 			const $container = $("#infectionDiscard"),
 				panelHeight = $("#topPanel").height(),
-				maxHeight = data.boardHeight;
+				maxHeight = data.boardHeight - panelHeight - 5;
 
 			$container.stop().css("height", "auto");
-			positionRemovedInfectionCards();
+			positionRemovedInfectionCardsContainer();
+
+			if (showRemovedCardsContainer)
+			{
+				const $removedCardsContainer = $("#removedInfectionCards");
+				$removedCardsContainer.removeClass("hidden");
+
+				if (!$removedCardsContainer.children(".infectionCard").length)
+					$removedCardsContainer.height($removedCardsContainer.height() * 2.5);
+			}
 
 			let expandedHeight = $container.height();
 		
@@ -8728,13 +8720,13 @@ function expandInfectionDiscardPile({ showRemovedCardsContainer } = {})
 					$container.css("overflow-y", "scroll");
 				}
 				
+				const desiredProperties = { height: expandedHeight + 2 };
+				if (showRemovedCardsContainer)
+					desiredProperties.scrollHeight = document.getElementById($container.attr("id")).scrollHeight;
+
 				$container
 					.css({ height: panelHeight })
-					.animate(
-					{
-						height: expandedHeight + 2,
-						scrollTop: showRemovedCardsContainer ? $container.scrollHeight : 0
-					},
+					.animate(desiredProperties,
 					getDuration(data, "discardPileExpand"),
 					function() { resolve() });
 			}
@@ -8744,7 +8736,7 @@ function collapseInfectionDiscardPile()
 {
 	return new Promise(resolve =>
 		{
-			positionRemovedInfectionCards();
+			positionRemovedInfectionCardsContainer();
 			
 			$("#infectionDiscard")
 				.stop()

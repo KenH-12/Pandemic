@@ -1125,8 +1125,12 @@ class ResilientPopulation extends UndoableEvent
 				this.player.addCardKeysToHand(eventCardKey);
 			
 			await expandInfectionDiscardPile({ showRemovedCardsContainer: true });
+			await sleep(500);
 			const infectionCardOffset = $infectionCard.offset();
 
+			if ($removedCardsContainer.children(".infectionCard").length === 1)
+				$removedCardsContainer.height($removedCardsContainer.height());
+			
 			$infectionCard.appendTo("#boardContainer")
 				.offset(infectionCardOffset)
 				.css("z-index", 10);
@@ -1150,7 +1154,7 @@ class ResilientPopulation extends UndoableEvent
 					$elements: $discardPile,
 					desiredProperties: { scrollTop: scrollTarget },
 					duration: 600,
-					easing: "easeInOutQuad"
+					easing: "easeInSine"
 				});
 			}
 			
@@ -1161,7 +1165,7 @@ class ResilientPopulation extends UndoableEvent
 			await animatePromise({
 				$elements: $infectionCard,
 				desiredProperties: { top: desiredOffsetTop },
-				easing: "easeInOutQuad"
+				easing: "easeOutQuad"
 			});
 			$infectionCard.css("z-index", "auto");
 			
@@ -1172,8 +1176,9 @@ class ResilientPopulation extends UndoableEvent
 				$infectionCard.insertAfter($neighborCard);
 
 			if (!$removedCardsContainer.children(".infectionCard").length)
-				$removedCardsContainer.addClass("hidden");
+				$removedCardsContainer.addClass("hidden").removeAttr("style");
 			
+			await sleep(1000);
 			await collapseInfectionDiscardPile();
 
 			resolve();
