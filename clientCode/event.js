@@ -1074,7 +1074,7 @@ class GovernmentGrant extends ResearchStationPlacement
 	}
 }
 
-class ResilientPopulation extends Event
+class ResilientPopulation extends UndoableEvent
 {
 	constructor(event, cities)
     {
@@ -1091,7 +1091,94 @@ class ResilientPopulation extends Event
 				${this.city.getInfectionCard()}
 				<p>${ this.cardWasRemoved ? "Removed From Game" : "Discarded" }:</p>
 				${this.eventCard.getPlayerCard()}`;
-    }
+	}
+
+	requestUndo(activePlayer, currentStepName)
+	{
+		return new Promise(async resolve =>
+		{
+			const result = await super.requestUndo(activePlayer, currentStepName);
+	
+			this.neighborCardKey = result.neighborCardKey;
+			this.neighborWasDrawnBefore = result.neighborWasDrawnBefore;
+	
+			resolve(result);
+		});
+	}
+	
+	animateUndo(animateCardToHand, wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile)
+	{
+		return new Promise(async resolve =>
+		{
+			const eventCardKey = this.eventCard.key,
+				$eventCard = $("#playerDiscard").find(`[data-key='${eventCardKey}']`),
+				$discardPile = $("#infectionDiscard"),
+				$removedCardsContainer = $discardPile.children("#removedInfectionCards"),
+				$infectionCard = $removedCardsContainer.children(`[data-key='${this.cardKey}']`),
+				$neighborCard = $discardPile.children(`[data-key='${this.neighborCardKey}']`);
+
+			await animateCardToHand($eventCard, { player: this.player, isContingencyCard: wasContingencyCard });
+
+			if (wasContingencyCard)
+				this.player.contingencyKey = eventCardKey;
+			else
+				this.player.addCardKeysToHand(eventCardKey);
+			
+			await expandInfectionDiscardPile({ showRemovedCardsContainer: true });
+			const infectionCardOffset = $infectionCard.offset();
+
+			$infectionCard.appendTo("#boardContainer")
+				.offset(infectionCardOffset)
+				.css("z-index", 10);
+			
+			if (isOverflowingVertically($discardPile))
+			{
+				// Determine an appropriate scroll position before placing the card where it was in the pile.
+				let scrollTarget;
+				if (this.neighborWasDrawnBefore)
+				{
+					if ($neighborCard.prev().hasClass("infectionCard"))
+						scrollTarget = $neighborCard.prev().position().top;
+					else
+						scrollTarget = 0;
+				}
+				else
+					scrollTarget = $neighborCard.position().top;
+	
+				// Scroll so that the placement position is clearly visible.
+				await animatePromise({
+					$elements: $discardPile,
+					desiredProperties: { scrollTop: scrollTarget },
+					duration: 600,
+					easing: "easeInOutQuad"
+				});
+			}
+			
+			// Animate the card to its proper position in the pile.
+			let desiredOffsetTop = $neighborCard.offset().top;
+			if (!this.neighborWasDrawnBefore)
+				desiredOffsetTop += $neighborCard.height();
+			await animatePromise({
+				$elements: $infectionCard,
+				desiredProperties: { top: desiredOffsetTop },
+				easing: "easeInOutQuad"
+			});
+			$infectionCard.css("z-index", "auto");
+			
+			// New infection discards are placed at the top of the pile.
+			if (this.neighborWasDrawnBefore)
+				$infectionCard.insertBefore($neighborCard);
+			else
+				$infectionCard.insertAfter($neighborCard);
+
+			if (!$removedCardsContainer.children(".infectionCard").length)
+				$removedCardsContainer.addClass("hidden");
+			
+			await collapseInfectionDiscardPile();
+
+			resolve();
+		});
+	}
 }
 
 class Forecast extends Event

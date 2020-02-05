@@ -317,6 +317,12 @@ function getHorizontalOverflow($element)
 	return element.scrollWidth - element.clientWidth;
 }
 
+function isOverflowingVertically($element)
+{
+	const element = document.getElementById($element.attr("id"));
+	return element.scrollHeight > element.clientHeight;
+}
+
 // Facilitates responsiveness where simple css rules fail
 // Returns a dimension value calculated using gameData.sizeRatios
 function getDimension(gameData, dimension,

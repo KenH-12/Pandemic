@@ -2283,7 +2283,7 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 		.removeAttr("style");
 
 	await sleep(getDuration(data, "longInterval"));
-	return collapsenfectionDiscardPile();
+	return collapseInfectionDiscardPile();
 }
 
 async function tryAirlift(playerToAirlift)
@@ -5969,7 +5969,7 @@ async function animateEpidemicIntensify()
 	$container.children(".infectionCard").remove();
 
 	$title.html("INFECTION DISCARDS");
-	collapsenfectionDiscardPile();
+	collapseInfectionDiscardPile();
 	bindInfectionDiscardHover();
 
 	return sleep(getDuration(data, "longInterval"));
@@ -8698,7 +8698,7 @@ function removeCurtain()
 	});
 }
 
-function expandInfectionDiscardPile()
+function expandInfectionDiscardPile({ showRemovedCardsContainer } = {})
 {
 	return new Promise(resolve =>
 		{
@@ -8730,13 +8730,17 @@ function expandInfectionDiscardPile()
 				
 				$container
 					.css({ height: panelHeight })
-					.animate({ height: expandedHeight + 2 },
-						getDuration(data, "discardPileExpand"),
-						function() { resolve(); });
+					.animate(
+					{
+						height: expandedHeight + 2,
+						scrollTop: showRemovedCardsContainer ? $container.scrollHeight : 0
+					},
+					getDuration(data, "discardPileExpand"),
+					function() { resolve() });
 			}
 		});
 }
-function collapsenfectionDiscardPile()
+function collapseInfectionDiscardPile()
 {
 	return new Promise(resolve =>
 		{
@@ -8750,7 +8754,7 @@ function collapsenfectionDiscardPile()
 					height: $("#topPanel").height()
 				},
 				getDuration(data, "discardPileCollapse"),
-				function() { resolve(); });
+				function() { resolve() });
 		});
 }
 
@@ -8779,7 +8783,7 @@ function bindInfectionDiscardHover()
 	$("#infectionDiscard")
 		.unbind("mouseenter mouseleave")
 		.hover(function() { expandInfectionDiscardPile() },
-		function() { collapsenfectionDiscardPile() });
+		function() { collapseInfectionDiscardPile() });
 }
 bindInfectionDiscardHover();
 function unbindInfectionDiscardHover() { $("#infectionDiscard").unbind("mouseenter mouseleave") }
@@ -8983,6 +8987,8 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				await event.animateUndo(animateShareKnowledge);
 			else if (event instanceof OneQuietNight)
 				await event.animateUndo(animateCardToHand, wasContingencyCard, indicateOneQuietNightStep);
+			else if (event instanceof ResilientPopulation)
+				await event.animateUndo(animateCardToHand, wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
 			else
 				await event.animateUndo();
 			

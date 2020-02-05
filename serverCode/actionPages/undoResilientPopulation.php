@@ -28,6 +28,32 @@
         $cardKey = $eventDetails[0];
         $infectionDiscardIndex = $eventDetails[1];
 
+        $discardPile = $mysqli->query("SELECT cardKey, cardIndex
+                                        FROM vw_infectionCard
+                                        WHERE game = $game
+                                        AND pile = 'discard'");
+        
+        // From the infection discard pile, find a card which neighbored the removed card before it was removed.
+        // This will allow us to place the removed card back in the discard pile exactly where it was before.
+        while ($row = mysqli_fetch_assoc($discardPile))
+        {
+            $idx = $row["cardIndex"];
+
+            if ($idx == $infectionDiscardIndex - 1)
+            {
+                $response["neighborCardKey"] = $row["cardKey"];
+                $response["neighborWasDrawnBefore"] = 1;
+                break;
+            }
+            
+            if ($idx == $infectionDiscardIndex + 1)
+            {
+                $response["neighborCardKey"] = $row["cardKey"];
+                $response["neighborWasDrawnBefore"] = 0;
+                break;
+            }
+        }
+        
         $mysqli->autocommit(FALSE);
 
         // Put the infection card which was removed from the game by Resilient Population
