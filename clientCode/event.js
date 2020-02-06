@@ -1213,16 +1213,20 @@ class Forecast extends Event
     }
 }
 
-class ForecastPlacement extends Event
+class ForecastPlacement extends UndoableEvent
 {
-	constructor(event, cities)
+	constructor(event, cities, forecastEvent)
     {
 		super(event);
 		this.isUndoable = true;
+		this.undoerFileName = "undoForecastPlacement";
 		this.cities = [];
 		
 		for (let key of this.cardKeys)
 			this.cities.push(cities[key]);
+		
+		forecastEvent.placementEvent = this;
+		this.forecastEvent = forecastEvent;
 	}
 	
 	getDetails()
@@ -1233,7 +1237,13 @@ class ForecastPlacement extends Event
 		
 		return `<p>New Order:</p>
 				${infectionCards}`;
-    }
+	}
+	
+	detachFromDrawEvent()
+	{
+		this.forecastEvent.placementEvent = false;
+		this.forecastEvent = false;
+	}
 }
 
 class CardDraw extends Event

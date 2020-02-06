@@ -232,9 +232,8 @@ function parseEvents(events)
 					// The previously parsed Event is always the corresponding Forecast event which drew the top 6 infection cards.
 					// It can either be found in parsedEvents or data.events, but always at the end of whichever array.
 					const forecastEvent = parsedEvents.length ? parsedEvents[parsedEvents.length - 1] : data.events[data.events.length - 1],
-						placementEvent = new ForecastPlacement(e, cities);
+						placementEvent = new ForecastPlacement(e, cities, forecastEvent);
 					
-					forecastEvent.placementEvent = placementEvent;
 					parsedEvents.push(placementEvent);
 				}
 				else if (e.code === eventTypes.cardDraw.code)
@@ -291,7 +290,8 @@ function appendEventHistoryIconOfType(targetEventType)
 {
 	const $eventHistory = $("#eventHistory");
 	
-	let event;
+	let event,
+		oneOrMoreIconsWereAppended = false;
 	for (let i = 0; i < data.eventHistoryQueue.length; i++)
 	{
 		event = data.eventHistoryQueue[i];
@@ -300,11 +300,13 @@ function appendEventHistoryIconOfType(targetEventType)
 		{
 			appendEventHistoryIcon($eventHistory, event);
 			data.eventHistoryQueue.splice(i, 1);
+			oneOrMoreIconsWereAppended = true;
 			break;
 		}
 	}
 
-	setEventHistoryScrollPosition($eventHistory, { addingNewIcon: true });
+	if (oneOrMoreIconsWereAppended)
+		setEventHistoryScrollPosition($eventHistory, { addingNewIcon: true });
 }
 
 function appendEventHistoryIcon($eventHistory, event)
@@ -8926,6 +8928,11 @@ async function undoAction()
 		setCurrentStep(prevStepName);
 		proceed();
 	}
+	else if (forecastInProgress())
+	{
+		data.currentStep.indicate();
+		indicatePromptingEventCard();
+	}
 	else
 		resumeCurrentStep();
 }
@@ -8981,7 +8988,7 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				await event.animateUndo(animateCardToHand, wasContingencyCard, indicateOneQuietNightStep);
 			else if (event instanceof ResilientPopulation)
 				await event.animateUndo(animateCardToHand, wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
-			else
+			else if (typeof event.animateUndo === "function")
 				await event.animateUndo();
 			
 			if (wasContingencyCard) await collapsePlayerDiscardPile();
@@ -8996,6 +9003,12 @@ function removeEventIcon(event)
 {
 	return new Promise(async resolve =>
 	{
+		if (event instanceof ForecastPlacement)
+		{
+			event.detachFromDrawEvent();
+			return resolve();
+		}
+		
 		const $icon = $("#eventHistory").children("img").last(),
 			alt = $icon.attr("alt");
 
