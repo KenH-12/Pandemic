@@ -18,10 +18,14 @@
         $role = $_POST["role"];
         $currentStep = $_POST["currentStep"];
 
+        // Record the number of actions forfeited as this information will be displayed in the event history.
+        $MAX_NUM_ACTIONS = 4;
+        $eventDetails = $MAX_NUM_ACTIONS - countActionsTakenThisTurn($mysqli, $game);
+
         $mysqli->autocommit(FALSE);
         
         $EVENT_TYPE = "pa";
-        $response["events"] = recordEvent($mysqli, $game, $EVENT_TYPE, "", $role);
+        $response["events"] = recordEvent($mysqli, $game, $EVENT_TYPE, "$eventDetails", $role);
 
         $NEXT_STEP = "draw";
         $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $NEXT_STEP, $role);

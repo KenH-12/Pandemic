@@ -25,17 +25,19 @@ function getActiveRole($mysqli, $game)
 
 function getActionEventTypes()
 {
-    return "'dr','df','cf','sf','rs','sk','td','dc','pc','dp','of','pa'";
+    return array('dr','df','cf','sf','rs','sk','td','dc','pc','dp','of');
 }
 
 function countActionsTakenThisTurn($mysqli, $game)
 {
     $turnNum = getTurnNumber($mysqli, $game);
+    $actionEventTypes = "'" . implode("','", getActionEventTypes()) . "'";
+
     $actionsTakenThisTurn = $mysqli->query("SELECT COUNT(*) AS 'numActions'
                                             FROM vw_event
                                             WHERE game = $game
                                             AND turnNum = $turnNum
-                                            AND eventType IN (" . getActionEventTypes() . ")")
+                                            AND eventType IN ($actionEventTypes)")
                                                 ->fetch_assoc()["numActions"];
 
     return $actionsTakenThisTurn;

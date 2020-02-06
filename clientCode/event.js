@@ -163,12 +163,13 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	pass: {
 		name: "Pass Actions",
+		hasIcon: true,
 		code: "pa",
 		propertyNames: [],
 		rules: [`Forfeit your remaining actions and proceed to the "Draw 2 cards" step.`],
 		instructions: "Pass on your remaining actions for this turn?",
 		actionPathName: "passActions",
-		propertyNames: []
+		propertyNames: ["numActionsForfeited"]
 	},
 	cardDraw: {
 		name: "Draw 2 Cards",
@@ -373,6 +374,9 @@ export default class Event
 		{
 			const names = eventType.propertyNames,
 				values = details.split(",");
+			
+			log("names: ", names);
+			log("values: ", values);
 			
 			if (names.length === 1 && values.length > 1) // The single property is an array of values
 				this[names[0]] = values;
@@ -1246,6 +1250,15 @@ class ForecastPlacement extends UndoableEvent
 	}
 }
 
+class PassActions extends UndoableEvent
+{
+	getDetails()
+	{
+		return `${super.getDetails()}
+				<p>Actions Forfeited: ${this.numActionsForfeited}</p>`;
+	}
+}
+
 class CardDraw extends Event
 {
 	constructor(event, cities, eventCards)
@@ -1630,6 +1643,7 @@ export {
 	ResilientPopulation,
 	Forecast,
 	ForecastPlacement,
+	PassActions,
 	CardDraw,
 	Discard,
 	infectionPreventionCodes,

@@ -46,7 +46,8 @@ import Event, {
 	AutoTreatDisease,
 	Eradication,
 	InitialInfection,
-	StartingHands
+	StartingHands,
+	PassActions
 } from "./event.js";
 
 $(function(){
@@ -236,6 +237,8 @@ function parseEvents(events)
 					
 					parsedEvents.push(placementEvent);
 				}
+				else if (e.code === eventTypes.pass.code)
+					parsedEvents.push(new PassActions(e));
 				else if (e.code === eventTypes.cardDraw.code)
 					parsedEvents.push(new CardDraw(e, cities, eventCards));
 				else if (e.code === eventTypes.discard.code)
@@ -2888,7 +2891,11 @@ function requestAction(eventType, dataToPost)
 async function passActions()
 {
 	disableActions();
-	await requestAction(eventTypes.pass);
+	
+	const { pass } = eventTypes;
+
+	await requestAction(pass);
+	appendEventHistoryIconOfType(pass);
 	proceed();
 }
 
