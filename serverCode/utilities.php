@@ -1110,11 +1110,21 @@ function deleteEvent($mysqli, $game, $eventID)
         throw new Exception("Failed to delete event: " . $mysqli->error);
 }
 
-function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eventTypeToUndo = false)
+function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eventToUndo = false)
 {
-    $DISCARD = "ds";
-    if ($eventTypeToUndo === $DISCARD)
-        $prevStepName = getPreviousDiscardStepName($mysqli, $game);
+    if ($eventToUndo)
+    {
+        $DISCARD = "ds";
+        $PASS_ACTIONS = "pa";
+
+        if ($eventToUndo["eventType"] === $DISCARD)
+            $prevStepName = getPreviousDiscardStepName($mysqli, $game);
+        else if ($eventToUndo["eventType"] === $PASS_ACTIONS)
+        {
+            $MAX_ACTIONS_PER_TURN = 4;
+            $prevStepName = "action " . $MAX_ACTIONS_PER_TURN - $eventToUndo["details"];
+        }
+    }
     else if ($currentStepName === "draw")
         $prevStepName = "action 4";
     else if ($currentStepName === "action 1")
