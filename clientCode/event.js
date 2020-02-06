@@ -1252,6 +1252,12 @@ class ForecastPlacement extends UndoableEvent
 
 class PassActions extends UndoableEvent
 {
+	constructor(event)
+	{
+		super(event);
+		this.isUndoable = true;
+	}
+	
 	getDetails()
 	{
 		return `${super.getDetails()}

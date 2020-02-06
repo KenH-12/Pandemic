@@ -12,7 +12,6 @@ sometimes the city card populations aren't shown when animating the 'determine t
 TO DO
 -----
 allow actions to be undone
-	pass
 	discard
 		what if event cards are played during the discard step
 		what if one quiet night is played, then cards are drawn, then cards are discarded, then the 'infect cities' step is skipped?

@@ -1122,7 +1122,8 @@ function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eve
         else if ($eventToUndo["eventType"] === $PASS_ACTIONS)
         {
             $MAX_ACTIONS_PER_TURN = 4;
-            $prevStepName = "action " . $MAX_ACTIONS_PER_TURN - $eventToUndo["details"];
+            $numActionsForfeited = $eventToUndo["details"];
+            $prevStepName = "action " . (($MAX_ACTIONS_PER_TURN - $numActionsForfeited) + 1);
         }
     }
     else if ($currentStepName === "draw")
