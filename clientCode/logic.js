@@ -6090,13 +6090,9 @@ function getPlayerWithTooManyCards()
 async function confirmDiscards(discardKeys)
 {
 	const player = getPlayerWithTooManyCards(),
-		$discardStepContainer = $("#discardStepContainer"),
 		eventType = eventTypes.discard;
 	
-	$discardStepContainer.slideUp(function()
-	{
-		$discardStepContainer.children(".discardPrompt").remove();
-	});
+	removeDiscardPrompt();
 
 	await Promise.all(
 		[
@@ -6112,6 +6108,18 @@ async function confirmDiscards(discardKeys)
 	appendEventHistoryIconOfType(eventType);
 	
 	proceed();
+}
+
+function removeDiscardPrompt()
+{
+	const $discardStepContainer = $("#discardStepContainer");
+
+	$discardStepContainer.find("btnConfirm").off("click");
+
+	$discardStepContainer.slideUp(function()
+	{
+		$discardStepContainer.children(".discardPrompt").remove();
+	});
 }
 
 function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
@@ -8903,6 +8911,8 @@ async function undoAction()
 
 	if (currentStepIs("draw"))
 		$("#cardDrawContainer").addClass("hidden").find(".button").off("click");
+	else if (currentStepIs("hand limit"))
+		removeDiscardPrompt();
 	else
 	{
 		resetActionPrompt({ actionCancelled: true });

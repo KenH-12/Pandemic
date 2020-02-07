@@ -1112,28 +1112,20 @@ function deleteEvent($mysqli, $game, $eventID)
 
 function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eventToUndo = false)
 {
-    if ($eventToUndo)
-    {
-        $DISCARD = "ds";
-        $PASS_ACTIONS = "pa";
-
-        if ($eventToUndo["eventType"] === $DISCARD)
-            $prevStepName = getPreviousDiscardStepName($mysqli, $game);
-        else if ($eventToUndo["eventType"] === $PASS_ACTIONS)
-        {
-            $MAX_ACTIONS_PER_TURN = 4;
-            $numActionsForfeited = $eventToUndo["details"];
-            $prevStepName = "action " . (($MAX_ACTIONS_PER_TURN - $numActionsForfeited) + 1);
-        }
-    }
+    $DISCARD = "ds";
+    $PASS_ACTIONS = "pa";
+    
+    if ($eventToUndo && $eventToUndo["eventType"] === $DISCARD)
+        $prevStepName = getPreviousDiscardStepName($mysqli, $game);
+    else if ($currentStepName === "hand limit"
+        || $eventToUndo && $eventToUndo["eventType"] === $PASS_ACTIONS)
+        $prevStepName = "action " . (countActionsTakenThisTurn($mysqli, $game) + 1);
     else if ($currentStepName === "draw")
         $prevStepName = "action 4";
     else if ($currentStepName === "action 1")
         $prevStepName = "infect cities";
     else if (substr($currentStepName, 0, 6) === "action")
         $prevStepName = "action " . ($currentStepName[7] - 1);
-    else if ($currentStepName === "hand limit")
-        $prevStepName = countActionsTakenThisTurn($mysqli, $game) + 1;
     else
         throw new Exception("Cannot revert to previous step from '$currentStepName' step.");
     
