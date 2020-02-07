@@ -93,10 +93,7 @@
             $nextStep = "epIncrease";
         else
         {
-            $MAX_HAND_SIZE = 7;
-            $handSize = getHandSize($mysqli, $game, $role);
-
-            if ($handSize > $MAX_HAND_SIZE)
+            if (roleHasTooManyCards($mysqli, $game, $role))
                 $nextStep = "discard";
             else
                 $nextStep = "infect cities";

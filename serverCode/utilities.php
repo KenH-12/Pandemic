@@ -43,19 +43,6 @@ function countActionsTakenThisTurn($mysqli, $game)
     return $actionsTakenThisTurn;
 }
 
-function getHandSize($mysqli, $game, $role)
-{
-    $handSize = $mysqli->query("SELECT COUNT(*) AS 'handSize'
-                                FROM vw_playercard
-                                WHERE game = $game
-                                AND pileID = $role")->fetch_assoc()["handSize"];
-        
-    if (!is_numeric($handSize))
-        throw new Exception("Failed to retrieve hand size: " . $mysqli->error);
-    
-    return $handSize;
-}
-
 function getCubeColumnName($color)
 {
     $validColors = array("y", "r", "u", "b");

@@ -17,7 +17,6 @@
 		$CURRENT_STEP = "draw";
 		$EVENT_TYPE = "cd";
 		$NUM_CARDS_TO_DRAW = 2;
-		$HAND_LIMIT = 7;
 		
 		$cards = $mysqli->query("SELECT cardKey AS `key`, cardIndex
 								FROM vw_playerCard
@@ -67,7 +66,7 @@
 			
 			if ($numEpidemics > 0)
 				$nextStep = "epIncrease";
-			else if (getHandSize($mysqli, $game, $role) > $HAND_LIMIT)
+			else if (roleHasTooManyCards($mysqli, $game, $role))
 				$nextStep = "discard";
 			else
 				$nextStep = "infect cities";

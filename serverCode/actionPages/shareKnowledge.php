@@ -62,11 +62,7 @@
         $eventDetails = "$cardKey,$giver,$receiver";
         $response["events"] = recordEvent($mysqli, $game, $eventType, $eventDetails, $role);
 
-        // Check receiver's hand size and prompt discard if needed
-        $HAND_LIMIT = 7;
-        $receiverHandSize = getHandSize($mysqli, $game, $receiver);
-        
-        if ($receiverHandSize > $HAND_LIMIT)
+        if (roleHasTooManyCards($mysqli, $game, $receiver))
         {
             $nextStep = "hand limit";
             $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $nextStep, $role);
