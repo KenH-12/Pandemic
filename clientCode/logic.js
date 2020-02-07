@@ -8995,6 +8995,8 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				await event.animateUndo(animateCardToHand, wasContingencyCard, indicateOneQuietNightStep);
 			else if (event instanceof ResilientPopulation)
 				await event.animateUndo(animateCardToHand, wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
+			else if (event instanceof Discard)
+				await event.animateUndo(animateCardToHand);
 			else if (typeof event.animateUndo === "function")
 				await event.animateUndo();
 			

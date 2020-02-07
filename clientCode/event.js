@@ -1293,15 +1293,16 @@ class CardDraw extends Event
     }
 }
 
-class Discard extends Event
+class Discard extends UndoableEvent
 {
 	constructor(event, cities, eventCards)
     {
 		super(event);
 		this.isUndoable = true;
+		this.cardKeys = ensureIsArray(this.cardKeys);
 		this.cards = [];
 		
-		for (let key of ensureIsArray(this.cardKeys))
+		for (let key of this.cardKeys)
 			this.cards.push(eventCards[key] || cities[key]);
     }
 
@@ -1317,7 +1318,20 @@ class Discard extends Event
 				<p>Cards In Hand: ${ HAND_LIMIT + this.cards.length }</p>
 				<p>Discarded: </p>
 				${discards}`;
-    }
+	}
+	
+	animateUndo(animateCardToHand)
+	{
+		return new Promise(async resolve =>
+		{
+			for (let key of this.cardKeys)
+				await animateCardToHand($("#playerDiscard").children(`.playerCard[data-key='${key}']`), { player: this.player });
+			
+			this.player.addCardKeysToHand(this.cardKeys);
+
+			resolve();
+		});
+	}
 }
 
 const infectionPreventionCodes = {

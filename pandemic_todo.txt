@@ -9,11 +9,16 @@ play airlift from contingency to move medic to city where auto-treat will occur,
 sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
 	find a way to make sure it happens
 
+refreshing the page during the 'hand limit' step causes the 'PLAY' steps to remain hidden
+additionally, when [0 actions remaining] is shown in gray during the 'hand limit' step, the 'draw 2 cards' play step is highlighted
+	(or at least it is after refreshing the 'hand limit' step)
+
 TO DO
 -----
 allow actions to be undone
 	discard
-		what if event cards are played during the discard step
+		what if Share Knowledge is undone during the hand limit step?
+		what if event cards are played during the discard step?
 		what if one quiet night is played, then cards are drawn, then cards are discarded, then the 'infect cities' step is skipped?
 			allow the discard to be undone
 formalize the animation of revoking cures or eradications

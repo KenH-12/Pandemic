@@ -33,7 +33,7 @@
 
         moveCardsToPile($mysqli, $game, "player", "discard", $role, $cardKeys);
 
-        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
+        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep, $event);
         $response["undoneEventIds"] = array($eventID);
         deleteEvent($mysqli, $game, $eventID);
     }
