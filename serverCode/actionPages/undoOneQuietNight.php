@@ -34,40 +34,24 @@
 
         $mysqli->autocommit(FALSE);
 
+        $response["wasContingencyCard"] = moveEventCardToPrevPile($mysqli, $game, $ONE_QUIET_NIGHT_CARDKEY, $event);
+        $roleHasTooManyCards = roleHasTooManyCards($mysqli, $game, $role);
+
         // It's possible to undo One Quiet Night after the 'infect cities' step has been skipped and the next turn has begun,
         // but only if nothing has been done in said next turn.
         if ($turnNum != $eventTurnNum)
         {
-            // The card draw event of the previous turn is a good place to ensure that we retrieve the correct prevTurnRoleID.
-            $CARD_DRAW = "cd";
-            $prevTurnRoleID = $mysqli->query("SELECT role AS 'prevTurnRoleID'
-                                            FROM vw_event
-                                            WHERE game = $game
-                                            AND turnNum = $eventTurnNum
-                                            AND eventType = '$CARD_DRAW'")->fetch_assoc()["prevTurnRoleID"];
-            
-            // Decrement the turn number,
-            // set the turn to the prevTurnRoleID,
-            // and set the step to 'infect cities' because that step was skipped by the One Quiet Night event which is being undone.
-            $prevStepName = "infect cities";
-            $mysqli->query("UPDATE vw_gamestate
-                            SET turnNum = $eventTurnNum,
-                                turn = $prevTurnRoleID,
-                                step = getStepID('$prevStepName')
-                            WHERE game = $game
-                            AND turnNum = $turnNum
-                            AND turn = $activeRole
-                            AND stepName = '$currentStep'");
-            
-            if ($mysqli->affected_rows != 1)
-                throw new Exception("could not revert to the skipped 'infect cities' step of the previous turn." . $mysqli->error);
+            $prevStepName = $roleHasTooManyCards ? "discard" : "infect cities";
+            $response["prevTurnRoleID"] = goToStepBeforeOneQuietNight($mysqli, $game, $prevStepName);
             
             $response["prevTurnNum"] = $eventTurnNum;
-            $response["prevTurnRoleID"] = $prevTurnRoleID;
             $response["prevStepName"] = $prevStepName;
         }
-
-        $response["wasContingencyCard"] = moveEventCardToPrevPile($mysqli, $game, $ONE_QUIET_NIGHT_CARDKEY, $event);
+        else if ($roleHasTooManyCards)
+        {
+            $prevStep = getPreviousDiscardStepName($mysqli, $game);
+            $response["prevStepName"] = updateStep($mysqli, $game, $currentStep, $prevStep, $activeRole);
+        }
 
         $response["undoneEventIds"] = array($eventID);
         deleteEvent($mysqli, $game, $eventID);

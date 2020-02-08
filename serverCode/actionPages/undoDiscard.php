@@ -33,7 +33,18 @@
 
         moveCardsToPile($mysqli, $game, "player", "discard", $role, $cardKeys);
 
-        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep, $event);
+        $infectCitiesStepWasSkipped = $currentStep === 'action 1';
+
+        if ($infectCitiesStepWasSkipped)
+        {
+            $prevStep = "discard";
+            $response["prevTurnRoleID"] = goToStepBeforeOneQuietNight($mysqli, $game, $prevStep);
+            $response["prevStepName"] = $prevStep;
+            $response["prevTurnNum"] = $event["turnNum"];
+        }
+        else
+            $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep, $event);
+        
         $response["undoneEventIds"] = array($eventID);
         deleteEvent($mysqli, $game, $eventID);
     }

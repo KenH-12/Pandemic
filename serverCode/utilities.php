@@ -320,9 +320,9 @@ function countCardsInPlayerDeck($mysqli, $game)
 // Returns the nextStep.
 function updateStep($mysqli, $game, $currentStep, $nextStep, $currentTurnRoleID)
 {
-    if ($currentStep == "infect cities" && $nextStep == "action 1")
+    if ($currentStep === "infect cities" && $nextStep === "action 1")
         $currentTurnRoleID = nextTurn($mysqli, $game, $currentTurnRoleID);
-    else if ($currentStep == "hand limit" && !$nextStep)
+    else if ($currentStep === "hand limit" && !$nextStep)
     {
         // If the current turn was interrupted by the hand-limit-reached condition,
         // determine which step comes next.
@@ -335,6 +335,9 @@ function updateStep($mysqli, $game, $currentStep, $nextStep, $currentTurnRoleID)
             $nextStep = "draw";
     }
     
+    if ($currentStep === $nextStep)
+        return $nextStep;
+
     $mysqli->query("UPDATE vw_gamestate
                     SET step = getStepID('$nextStep')
                     WHERE game = $game
@@ -342,7 +345,7 @@ function updateStep($mysqli, $game, $currentStep, $nextStep, $currentTurnRoleID)
                     AND turn = $currentTurnRoleID");
     
     if ($mysqli->affected_rows != 1)
-        throw new Exception("Failed to update step: " . $mysqli->error);
+        throw new Exception("Failed to update step from '$currentStep' to '$nextStep': " . $mysqli->error);
     
     return $nextStep;
 }
@@ -1144,5 +1147,33 @@ function getPreviousDiscardStepName($mysqli, $game)
     
     // The "hand limit" step is used when a role's hand limit is exceeded following the Share Knowledge action.
     return "hand limit";
+}
+
+function goToStepBeforeOneQuietNight($mysqli, $game, $prevStepName)
+{
+    // The card draw event of the previous turn is a good place to ensure that we retrieve the correct prevTurnRoleID.
+    $prevTurnNum = getTurnNumber($mysqli, $game) - 1;
+    $CARD_DRAW = "cd";
+    $prevTurnRoleID = $mysqli->query("SELECT role AS 'prevTurnRoleID'
+                                    FROM vw_event
+                                    WHERE game = $game
+                                    AND turnNum = $prevTurnNum
+                                    AND eventType = '$CARD_DRAW'")->fetch_assoc()["prevTurnRoleID"];
+    
+    // Decrement the turn number,
+    // set the turn to the prevTurnRoleID,
+    // and set the step to that which preceded the skipping of the 'infect cities' step by One Quiet Night
+    // (could be 'infect cities' or 'discard').
+    $mysqli->query("UPDATE vw_gamestate
+                    SET turnNum = $prevTurnNum,
+                        turn = $prevTurnRoleID,
+                        step = getStepID('$prevStepName')
+                    WHERE game = $game
+                    AND stepName = 'action 1'");
+    
+    if ($mysqli->affected_rows != 1)
+        throw new Exception("could not revert to the step which preceded the skipped 'infect cities' step of the previous turn." . $mysqli->error);
+    
+    return $prevTurnRoleID;
 }
 ?>

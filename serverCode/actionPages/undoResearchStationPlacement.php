@@ -47,6 +47,12 @@
         {
             $GOVERNMENT_GRANT_CARDKEY = "gove";
             $response["wasContingencyCard"] = moveEventCardToPrevPile($mysqli, $game, $GOVERNMENT_GRANT_CARDKEY, $event);
+
+            if (roleHasTooManyCards($mysqli, $game, $role))
+            {
+                $prevStep = getPreviousDiscardStepName($mysqli, $game);
+                $response["prevStepName"] = updateStep($mysqli, $game, $currentStep, $prevStep, $activeRole);
+            }
         }
         else
             throw new Exception("Invalid event type: '$eventType'");
