@@ -315,7 +315,8 @@ span.r {color: #ef282a; background: none}
 		gray) !important
 }
 
-#topPanel, .bottomPanelDiv:not(#cureMarkerContainer)
+#topPanel,
+.bottomPanelDiv:not(#btnUndoAction):not(#cureMarkerContainer)
 {
 	position: absolute;
 	background-color: #252525;
@@ -333,19 +334,27 @@ span.r {color: #ef282a; background: none}
 	text-align: center;
 	font-size: 26px;
 	font-weight: 700;
-	border-right: 1px solid #fff;
+	border: 1px solid #fff;
+	border-left: none;
 	border-top-right-radius: 4px;
+	background-color: #0c658b;
 }
-#btnUndoAction:not(.disabled):hover
+#btnUndoAction:hover
 {
 	cursor: pointer;
 	background-color: #1282b3;
+}
+#btnUndoAction.btnDisabled { background-color: #064058 }
+#btnUndoAction.btnDisabled:hover
+{
+	cursor: not-allowed;
+	background-color: #064058;
 }
 #eventHistory
 {
 	left: 1px;
 	width: 24.6%;
-	border-top-left-radius: 4px;
+	border-right: 1px solid #fff;
 	white-space: nowrap;
 	overflow: hidden;
 }
@@ -1090,10 +1099,9 @@ span.r {color: #ef282a; background: none}
 	cursor: pointer;
 }
 .button:hover,
-.btnSkip:hover
-{
-	background-color: #1799d1;
-}
+.btnSkip:hover,
+#btnUndoAction:hover
+{ background-color: #1799d1 }
 .button * { pointer-events: none }
 .disabled, .btnDisabled, .scientist.button.btnDisabled
 {

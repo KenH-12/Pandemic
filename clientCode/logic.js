@@ -383,6 +383,7 @@ class Step
 		unhide($container);
 
 		highlightTurnProcedureStep(this.name);
+		enableUndoIfLegal();
 	}
 
 	resume()
@@ -558,6 +559,7 @@ function disableActions()
 	disablePawnEvents();
 	unbindDiseaseCubeEvents();
 	disableResearchStationDragging();
+	disableUndo();
 }
 
 function enableAvailableActions()
@@ -3450,6 +3452,7 @@ async function drawStep()
 			afterClick: "hide"
 		});
 	disableEventCards();
+	disableUndo();
 
 	const cardKeys = await performDrawStep()
 		.catch((reason) => log(reason));
@@ -6288,6 +6291,7 @@ async function infectionStep()
 		$btnContinue.stop();
 		// Infection card is being drawn and resolved.
 		disableEventCards();
+		disableUndo();
 
 		events = await requestAction(infectCity);
 		
@@ -8897,10 +8901,35 @@ function collapsePlayerDiscardPile()
 	});
 }
 
-$("#btnUndoAction").click(function()
+function enableUndoIfLegal()
 {
-	undoAction();
-});
+	if (getLastEvent().isUndoable)
+		enableUndo();
+	else
+		disableUndo();
+}
+
+function enableUndo()
+{
+	$("#btnUndoAction")
+		.off("click")
+		.removeClass("btnDisabled")
+		.click(function() { undoAction() })
+		.attr("title", "Undo last action");
+}
+
+function disableUndo()
+{
+	$("#btnUndoAction")
+		.off("click")
+		.addClass("btnDisabled")
+		.removeAttr("title");
+}
+
+function getLastEvent()
+{
+	return data.events[data.events.length - 1];
+}
 
 async function undoAction()
 {

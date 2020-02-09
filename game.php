@@ -147,7 +147,7 @@
 						</div>
 
 						<div id='eventHistory' class='bottomPanelDiv'></div>
-						<div id='btnUndoAction' class='bottomPanelDiv' title='Undo last action'>&#x2B8C;</div>
+						<div id='btnUndoAction' class='bottomPanelDiv btnDisabled'>&#x2B8C;</div>
 						
 						<div id='cureMarkerContainer' class='bottomPanelDiv'>
 							<p class='title'>

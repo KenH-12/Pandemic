@@ -16,7 +16,6 @@ additionally, when [0 actions remaining] is shown in gray during the 'hand limit
 TO DO
 -----
 formalize the animation of revoking cures or eradications
-restrict undoability to legal scenarios
 animate eventHistory more smoothly to the new position
 in animateUndoEvents, the functions passed to animateUndo methods should be exported from some other file instead.
 
