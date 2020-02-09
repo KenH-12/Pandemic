@@ -77,7 +77,10 @@
         $response["undoneEventIds"] = array($eventID);
         deleteEvent($mysqli, $game, $eventID);
 
-        if (roleHasTooManyCards($mysqli, $game, $role))
+        // Only check if a role has too many cards if the current step is not 'Epidemic Intensify'
+        // because any epidemics that were drawn must be resolved before discarding to 7 cards.
+        if (getCurrentStepName($mysqli, $game) !== "epIntensify"
+            && roleHasTooManyCards($mysqli, $game, $role))
         {
             $prevStep = getPreviousDiscardStepName($mysqli, $game);
             $response["prevStepName"] = updateStep($mysqli, $game, $currentStep, $prevStep, $activeRole);
