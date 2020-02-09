@@ -3653,8 +3653,7 @@ function getDrawnPlayerCardTargetProperties({ player, isContingencyCard } = {})
 		top: top,
 		left: guideOffset.left
 	};
-
-	log("targetProperties: ", targetProperties);
+	
 	return targetProperties;
 }
 
@@ -9057,7 +9056,10 @@ function removeEventIcon(event)
 			return resolve();
 		}
 		
-		const $icon = $("#eventHistory").children("img").last(),
+		const $eventHistory = $("#eventHistory"),
+			scrollLeft = $eventHistory.scrollLeft(),
+			$icon = $eventHistory.children("img").last(),
+			iconWidth = $icon.outerWidth() + 1,
 			alt = $icon.attr("alt");
 
 		if (alt !== event.name)
@@ -9066,11 +9068,21 @@ function removeEventIcon(event)
 			return false;
 		}
 
-		$icon.fadeOut(function()
-		{
-			$icon.remove();
-			resolve();
+		animatePromise({
+			$elements: $icon,
+			desiredProperties: { opacity: 0.1 },
+			duration: 100
 		});
+
+		await animatePromise({
+			$elements: $eventHistory,
+			desiredProperties: { scrollLeft: scrollLeft - iconWidth },
+			easing: "easeOutSine"
+		});
+
+		$icon.remove();
+
+		resolve();
 	});
 }
 
