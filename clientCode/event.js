@@ -159,7 +159,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
 		actionPathName: "movementAction",
-		propertyNames: ["originKey", "destinationKey", "cardKey"]
+		propertyNames: ["originKey", "destinationKey", "discardKey"]
 	},
 	pass: {
 		name: "Pass Actions",
@@ -889,22 +889,17 @@ class Eradication extends Event
 	}
 }
 
-class OperationsFlight extends Event
+class OperationsFlight extends MovementAction
 {
 	constructor(event, cities)
     {
-		super(event);
-		this.isUndoable = true;
-		this.origin = cities[this.originKey];
-		this.destination = cities[this.destinationKey];
-		this.discard = cities[this.cardKey];
+		super(event, cities);
+		this.discard = cities[this.discardKey];
     }
 
     getDetails()
     {
 		return `${super.getDetails()}
-				<p>Origin: ${getLocatableCityName(this.origin)}</p>
-				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				<p>Discarded: </p>
 				${this.discard.getPlayerCard({ noTooltip: true })}`;
     }
