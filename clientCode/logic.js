@@ -8906,7 +8906,7 @@ function enableUndoIfLegal()
 	if (getLastEvent().isUndoable)
 		enableUndo();
 	else
-		disableUndo();
+		disableUndo({ undoIsIllegal: true });
 }
 
 function enableUndo()
@@ -8918,12 +8918,12 @@ function enableUndo()
 		.attr("title", "Undo last action");
 }
 
-function disableUndo()
+function disableUndo({ undoIsIllegal } = {})
 {
 	$("#btnUndoAction")
 		.off("click")
 		.addClass("btnDisabled")
-		.removeAttr("title");
+		.attr("title", undoIsIllegal ? `${getLastEvent().name} events cannot be undone.` : "Cannot undo at this time...");
 }
 
 function getLastEvent()

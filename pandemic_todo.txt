@@ -21,9 +21,6 @@ in animateUndoEvents, the functions passed to animateUndo methods should be expo
 
 when the contingency card is hovered, indicate that it's 'in contingency'
 
-what happens when a card is animated back to a player's hand from the discard pile when it's not visible?
-	what about from the removed cards container?
-
 position auto-treat vial on img load event
 
 event history
