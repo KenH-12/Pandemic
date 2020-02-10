@@ -2957,44 +2957,10 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 		giver.expandPanelIfCollapsed(),
 		receiver.expandPanelIfCollapsed()
 	]);
-	await animateShareKnowledge(giver, receiver, cardKey);
+	await giver.giveCard(cardKey, receiver);
 	appendEventHistoryIconOfType(eventType);
-
-	giver.removeCardsFromHand(cardKey);
-	receiver.addCardKeysToHand(cardKey);
 	
 	proceed();
-}
-
-function animateShareKnowledge(giver, receiver, cardKey)
-{
-	return new Promise(resolve =>
-	{
-		const $card = giver.$panel.find(`.playerCard[data-key='${cardKey}']`),
-			initialProperties = $card.offset(),
-			$insertAfterMe = receiver.$panel.children(".role, .playerCard").last(),
-			desiredOffset = $insertAfterMe.offset();
-
-		initialProperties.width = $card.width();
-		desiredOffset.top += $insertAfterMe.height();
-		
-		$card.appendTo("body")
-			.css(
-			{
-				...initialProperties,
-				...{
-					"position": "absolute",
-					"z-index": "5"
-				}
-			})
-			.animate(desiredOffset,
-			getDuration(data, "dealCard"),
-			function()
-			{
-				$card.removeAttr("style").insertAfter($insertAfterMe);
-				resolve();
-			});
-	});
 }
 
 function promptResearchStationRelocation()
@@ -4153,6 +4119,42 @@ class Player
 				function()
 				{
 					$card.removeAttr("style").insertAfter($insertAfterElement);
+					resolve();
+				});
+		});
+	}
+
+	giveCard(cardKey, receiver)
+	{
+		return new Promise(resolve =>
+		{
+			const $card = this.$panel.find(`.playerCard[data-key='${cardKey}']`),
+				initialProperties = $card.offset(),
+				$insertAfterMe = receiver.$panel.children(".role, .playerCard").last(),
+				desiredOffset = $insertAfterMe.offset(),
+				giver = this;
+	
+			initialProperties.width = $card.width();
+			desiredOffset.top += $insertAfterMe.height();
+			
+			$card.appendTo("body")
+				.css(
+				{
+					...initialProperties,
+					...{
+						"position": "absolute",
+						"z-index": "5"
+					}
+				})
+				.animate(desiredOffset,
+				getDuration(data, "dealCard"),
+				function()
+				{
+					$card.removeAttr("style").insertAfter($insertAfterMe);
+
+					giver.removeCardsFromHand(cardKey);
+					receiver.addCardKeysToHand(cardKey);
+
 					resolve();
 				});
 		});
@@ -9024,10 +9026,11 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				await event.animateUndo(placeDiseaseCubes);
 			else if (event instanceof ResearchStationPlacement)
 				await event.animateUndo(data, animateResearchStationBackToSupply, wasContingencyCard);
-			else if (event instanceof ShareKnowledge)
-				await event.animateUndo(animateShareKnowledge);
 			else if (event instanceof OneQuietNight)
-				await event.animateUndo(wasContingencyCard, indicateOneQuietNightStep);
+			{
+				await event.animateUndo(wasContingencyCard);
+				indicateOneQuietNightStep({ off: true });
+			}
 			else if (event instanceof ResilientPopulation)
 				await event.animateUndo(wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
 			else if (typeof event.animateUndo === "function")

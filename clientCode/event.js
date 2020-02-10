@@ -804,16 +804,13 @@ class ShareKnowledge extends UndoableEvent
 				<p>${ isGiver ? "To" : "From" }: ${participant.newRoleTag()}</p>`;
 	}
 
-	animateUndo(animateShareKnowledge)
+	animateUndo()
 	{
 		return new Promise(async resolve =>
 		{
 			const { receiver, giver, cardKey } = this;
 
-			await animateShareKnowledge(receiver, giver, cardKey);
-
-			receiver.removeCardsFromHand(cardKey);
-			giver.addCardKeysToHand(cardKey);
+			await receiver.giveCard(cardKey, giver);
 
 			resolve();
 		});
@@ -1039,7 +1036,7 @@ class OneQuietNight extends UndoableEvent
 				${this.eventCard.getPlayerCard()}`;
     }
 
-	animateUndo(isContingencyCard, indicateOneQuietNightStep)
+	animateUndo(isContingencyCard)
 	{
 		return new Promise(async resolve =>
 		{
@@ -1052,8 +1049,6 @@ class OneQuietNight extends UndoableEvent
 				this.player.contingencyKey = cardKey;
 			else
 				this.player.addCardKeysToHand(cardKey);
-			
-			indicateOneQuietNightStep({ off: true });
 			
 			resolve();
 		});
