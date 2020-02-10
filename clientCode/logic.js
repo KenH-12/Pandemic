@@ -1893,15 +1893,16 @@ async function planContingency(cardKey)
 	disableActions();
 	resetActionPrompt();
 	
-	const eventType = eventTypes.planContingency,
+	const contingencyPlanner = getActivePlayer(),
+		eventType = eventTypes.planContingency,
 		$eventCard = $("#playerDiscard").find(`.playerCard[data-key='${cardKey}']`);
 
 	await Promise.all([
 		requestAction(eventType, { cardKey }),
-		animateCardToHand($eventCard, { isContingencyCard: true })
+		contingencyPlanner.animateCardToHand($eventCard, { isContingencyCard: true })
 	]);
 
-	getActivePlayer().contingencyKey = cardKey;
+	contingencyPlanner.contingencyKey = cardKey;
 	$eventCard.addClass("contingency");
 
 	appendEventHistoryIconOfType(eventType);
@@ -3610,9 +3611,10 @@ async function revealPlayerCard(cardKey, $container)
 
 async function animateCardsToHand($cards)
 {
-	await getActivePlayer().expandPanelIfCollapsed();
+	const player = getActivePlayer();
 
-	const targetProperties = getDrawnPlayerCardTargetProperties();
+	await player.expandPanelIfCollapsed();
+	const targetProperties = player.getDrawnPlayerCardTargetProperties();
 	
 	// If the second card is not an epidemic, both cards will be moved to the player's hand at once,
 	// and the first card should be offset from the second.
@@ -3621,7 +3623,7 @@ async function animateCardsToHand($cards)
 		lastCardTop += targetProperties.height + 2; // + 2 for slight separation
 	
 	// There will always be 2 cards to handle.
-	animateCardToHand($cards.last(),
+	player.animateCardToHand($cards.last(),
 	{
 		...targetProperties,
 		...{ top: lastCardTop }
@@ -3633,70 +3635,7 @@ async function animateCardsToHand($cards)
 		await sleep(getDuration(data, "dealCard"));
 	// Returning the second Promise (instead of Promise.all) avoids an issue where the cards
 	// can swap positions after being inserted into the hand.
-	return animateCardToHand($cards.first(), targetProperties);
-}
-
-function getDrawnPlayerCardTargetProperties({ player, isContingencyCard } = {})
-{
-	player = player || getActivePlayer();
-
-	const $guide = player.$panel.children().last(),
-		guideHeight = $guide.height(),
-		guideOffset = isContingencyCard ? player.$panel.children(".role").offset() : $guide.offset(),
-		$exampleCard = $("#playerPanelContainer").find(".playerCard").first(),
-		exampleCardHeight = $exampleCard ? $exampleCard.height() : false,
-		top = exampleCardHeight ? guideOffset.top + exampleCardHeight : guideOffset.top + guideHeight;
-	
-	const targetProperties = {
-		width: $guide.width(),
-		height: exampleCardHeight || guideHeight,
-		top: top,
-		left: guideOffset.left
-	};
-	
-	return targetProperties;
-}
-
-function animateCardToHand($card, { player, targetProperties, isContingencyCard } = {})
-{
-	player = player || getActivePlayer();
-	targetProperties = targetProperties || getDrawnPlayerCardTargetProperties({ player, isContingencyCard });
-	
-	// Some initial values should be calculated before the Promise is made.
-	const initialOffset = $card.offset(),
-		initialWidth = $card.width();
-
-	return new Promise(resolve =>
-	{
-		if ($card.hasClass("epidemic"))
-			return resolve();
-
-		const $rolePanel = player.$panel;
-		
-		let $insertAfterElement;
-		if (isContingencyCard) // Contingency cards are placed within the .role div
-			$insertAfterElement = $rolePanel.children(".role").children().first();
-		else
-			$insertAfterElement = $rolePanel.children(".role, .playerCard").last();
-		
-		$card.appendTo("#rightPanel") // The animation is smoother if the $card is first appended to #rightPanel.
-			.css(
-			{
-				...{
-					position: "absolute",
-					zIndex: "5",
-					width: initialWidth
-				},
-				...initialOffset
-			})
-			.animate(targetProperties,
-			getDuration(data, "dealCard"),
-			function()
-			{
-				$card.removeAttr("style").insertAfter($insertAfterElement);
-				resolve();
-			});
-	});
+	return player.animateCardToHand($cards.first(), targetProperties);
 }
 
 function resizeAll()
@@ -4178,6 +4117,64 @@ class Player
 	isHoldingAnyCityCard()
 	{
 		return (this.cardKeys.filter( cardKey => isCityKey(cardKey) ).length > 0);
+	}
+
+	animateCardToHand($card, { targetProperties, isContingencyCard } = {})
+	{
+		targetProperties = targetProperties || this.getDrawnPlayerCardTargetProperties({ isContingencyCard });
+		
+		// Some initial values should be calculated before the Promise is made.
+		const initialOffset = $card.offset(),
+			initialWidth = $card.width();
+
+		return new Promise(resolve =>
+		{
+			if ($card.hasClass("epidemic"))
+				return resolve();
+
+			let $insertAfterElement;
+			if (isContingencyCard) // Contingency cards are placed within the .role div
+				$insertAfterElement = this.$panel.children(".role").children().first();
+			else
+				$insertAfterElement = this.$panel.children(".role, .playerCard").last();
+			
+			$card.appendTo("#rightPanel") // The animation is smoother if the $card is first appended to #rightPanel.
+				.css(
+				{
+					...{
+						position: "absolute",
+						zIndex: "5",
+						width: initialWidth
+					},
+					...initialOffset
+				})
+				.animate(targetProperties,
+				getDuration(data, "dealCard"),
+				function()
+				{
+					$card.removeAttr("style").insertAfter($insertAfterElement);
+					resolve();
+				});
+		});
+	}
+
+	getDrawnPlayerCardTargetProperties({ isContingencyCard } = {})
+	{
+		const $guide = this.$panel.children().last(),
+			guideHeight = $guide.height(),
+			guideOffset = isContingencyCard ? this.$panel.children(".role").offset() : $guide.offset(),
+			$exampleCard = $("#playerPanelContainer").find(".playerCard").first(),
+			exampleCardHeight = $exampleCard ? $exampleCard.height() : false,
+			top = exampleCardHeight ? guideOffset.top + exampleCardHeight : guideOffset.top + guideHeight;
+		
+		const targetProperties = {
+			width: $guide.width(),
+			height: exampleCardHeight || guideHeight,
+			top: top,
+			left: guideOffset.left
+		};
+		
+		return targetProperties;
 	}
 
 	appendCardToHand($card)
@@ -9022,19 +9019,17 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 			if (event instanceof MovementAction
 				|| event instanceof DiscoverACure
 				|| event instanceof Airlift)
-				await event.animateUndo(data, animateCardToHand, wasContingencyCard);
+				await event.animateUndo(data, wasContingencyCard);
 			else if (event instanceof DiseaseCubeRemoval)
 				await event.animateUndo(placeDiseaseCubes);
 			else if (event instanceof ResearchStationPlacement)
-				await event.animateUndo(data, animateCardToHand, animateResearchStationBackToSupply, wasContingencyCard);
+				await event.animateUndo(data, animateResearchStationBackToSupply, wasContingencyCard);
 			else if (event instanceof ShareKnowledge)
 				await event.animateUndo(animateShareKnowledge);
 			else if (event instanceof OneQuietNight)
-				await event.animateUndo(animateCardToHand, wasContingencyCard, indicateOneQuietNightStep);
+				await event.animateUndo(wasContingencyCard, indicateOneQuietNightStep);
 			else if (event instanceof ResilientPopulation)
-				await event.animateUndo(animateCardToHand, wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
-			else if (event instanceof Discard)
-				await event.animateUndo(animateCardToHand);
+				await event.animateUndo(wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
 			else if (typeof event.animateUndo === "function")
 				await event.animateUndo();
 			
