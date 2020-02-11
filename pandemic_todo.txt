@@ -15,8 +15,6 @@ additionally, when [0 actions remaining] is shown in gray during the 'hand limit
 
 TO DO
 -----
-in animateUndoEvents, the functions passed to animateUndo methods should be exported from some other file instead.
-
 when the contingency card is hovered, indicate that it's 'in contingency'
 
 position auto-treat vial on img load event

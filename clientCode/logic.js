@@ -6344,7 +6344,7 @@ async function infectionPreventionAnimation({ preventionCode, cityKey })
 	const { quarantine, medicAutoTreat, eradicated } = infectionPreventionCodes;
 
 	if (preventionCode === quarantine)
-		return quarantineAnimation(cityKey);
+		return quarantineAnimation();
 	else if (preventionCode === medicAutoTreat)
 		return medicAutoTreatAnimation(cityKey);
 	else if (preventionCode === eradicated)
@@ -6482,21 +6482,10 @@ function hideMedicAutoTreatCircle()
 	});
 }
 
-async function quarantineAnimation(cityKey)
+async function quarantineAnimation()
 {
-	await showQuarantineArea(1000);
-
-	await sleep(getDuration(data, "mediumInterval"));
-
-	await specialEventAlert(
-	{
-		title: "INFECTION PREVENTED",
-		description: `${getCity(cityKey).name} is quarantined.`,
-		eventClass: "quarantineSpecialist",
-		visibleMs: 1500
-	});
-
-	await sleep(getDuration(data, "shortInterval"));
+	await showQuarantineArea(750);
+	await sleep(1500);
 	
 	return hideQuarantineArea();
 }
