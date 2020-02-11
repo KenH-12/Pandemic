@@ -6418,15 +6418,6 @@ async function medicAutoTreatAnimation()
 
 	await sleep(getDuration(data, "longInterval"));
 
-	await specialEventAlert(
-	{
-		title: "INFECTION PREVENTED!",
-		description: "The Medic prevents placing disease cubes of <i>cured</i> diseases in his location.",
-		eventClass: "medic"
-	});
-
-	await sleep(getDuration(data, "shortInterval"));
-
 	const $elements = $circle.add($cureMarker)
 	await animatePromise(
 	{

@@ -36,9 +36,6 @@ show the actual event card in the action prompt?
 
 ensure that role cards appear on screen as is done with event cards
 
-remove quarantine special event alert
-	and auto-treat
-
 create MovementEvent class as a bridge between Event and all movement action event types
 
 hovering over an epidemic card should show the full card
