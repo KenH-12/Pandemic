@@ -526,6 +526,7 @@ function disableActions()
 	unbindDiseaseCubeEvents();
 	disableResearchStationDragging();
 	disableUndo();
+	eventHistory.disableScrollButtons();
 }
 
 function enableAvailableActions()
@@ -8882,16 +8883,16 @@ async function undoAction()
 
 	if (!event)
 		return false;
+	
+	disableActions();
+	await eventHistory.scrollToEnd({ leaveButtonsDisabled: true });
 
 	if (currentStepIs("draw"))
 		$("#cardDrawContainer").addClass("hidden").find(".button").off("click");
 	else if (currentStepIs("hand limit"))
 		removeDiscardPrompt();
 	else
-	{
 		resetActionPrompt({ actionCancelled: true });
-		disableActions();
-	}
 
 	const {
 		undoneEventIds,
@@ -8985,48 +8986,11 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 			
 			if (wasContingencyCard) await collapsePlayerDiscardPile();
 
-			await removeEventIcon(event);
+			if (event instanceof ForecastPlacement)
+				event.detachFromDrawEvent();
+			else
+				await eventHistory.removeIcon(event);
 		}
-		resolve();
-	});
-}
-
-function removeEventIcon(event)
-{
-	return new Promise(async resolve =>
-	{
-		if (event instanceof ForecastPlacement)
-		{
-			event.detachFromDrawEvent();
-			return resolve();
-		}
-		
-		const $eventHistory = $("#eventHistory"),
-			scrollLeft = $eventHistory.scrollLeft(),
-			$icon = $eventHistory.children("img").last(),
-			iconWidth = $icon.outerWidth() + 1,
-			alt = $icon.attr("alt");
-
-		if (alt !== event.name)
-		{
-			console.error(`Encountered unexpected icon ('${alt}') when attempting to remove event icon: '${event.name}'`);
-			return false;
-		}
-
-		animatePromise({
-			$elements: $icon,
-			desiredProperties: { opacity: 0.1 },
-			duration: 100
-		});
-
-		await animatePromise({
-			$elements: $eventHistory,
-			desiredProperties: { scrollLeft: scrollLeft - iconWidth },
-			easing: "easeOutSine"
-		});
-
-		$icon.remove();
-
 		resolve();
 	});
 }

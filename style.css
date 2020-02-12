@@ -360,8 +360,8 @@ span.r {color: #ef282a; background: none}
 .eventHistoryButton.btnDisabled { background-color: #064058 }
 .eventHistoryButton.btnDisabled:hover
 {
-	cursor: not-allowed;
-	background-color: #064058;
+	cursor: default;
+	background-color: #064058 !important;
 }
 #eventHistory
 {

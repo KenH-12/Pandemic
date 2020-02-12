@@ -22,7 +22,6 @@ when the contingency card is hovered, indicate that it's 'in contingency'
 position auto-treat vial on img load event
 
 event history
-	slideshow buttons
 	remove icons which are not visible?
 	detailed tooltips
 		game end
