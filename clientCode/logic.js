@@ -49,6 +49,7 @@ import Event, {
 	StartingHands,
 	PassActions
 } from "./event.js";
+import EventHistory from "./eventHistory.js";
 
 $(function(){
 const data =
@@ -138,7 +139,8 @@ const data =
 	steps: {},
 	events: [],
 	eventHistoryQueue: []
-};
+},
+eventHistory = new EventHistory();
 
 function parseEvents(events)
 {
@@ -280,19 +282,15 @@ function addToEventHistoryQueue(events)
 
 function appendEventHistoryIcons()
 {
-	const $eventHistory = $("#eventHistory");
-	
 	for (let event of data.eventHistoryQueue)
-		appendEventHistoryIcon($eventHistory, event);
+		appendEventHistoryIcon(event);
 	
 	data.eventHistoryQueue.length = 0;
-	setEventHistoryScrollPosition();
+	eventHistory.scrollToEnd();
 }
 
 function appendEventHistoryIconOfType(targetEventType)
 {
-	const $eventHistory = $("#eventHistory");
-	
 	let event,
 		oneOrMoreIconsWereAppended = false;
 	for (let i = 0; i < data.eventHistoryQueue.length; i++)
@@ -301,7 +299,7 @@ function appendEventHistoryIconOfType(targetEventType)
 		
 		if (event.isOfType(targetEventType))
 		{
-			appendEventHistoryIcon($eventHistory, event);
+			appendEventHistoryIcon(event);
 			data.eventHistoryQueue.splice(i, 1);
 			oneOrMoreIconsWereAppended = true;
 			break;
@@ -309,47 +307,14 @@ function appendEventHistoryIconOfType(targetEventType)
 	}
 
 	if (oneOrMoreIconsWereAppended)
-		setEventHistoryScrollPosition({ addingNewIcon: true });
+		eventHistory.scrollToEnd({ addingNewIcon: true });
 }
 
-function appendEventHistoryIcon($eventHistory, event)
+function appendEventHistoryIcon(event)
 {
 	const $icon = $(getEventIconHtml(getEventType(event.code), { event }));
 	bindEventIconHoverEvents($icon, event);
-	$eventHistory.append($icon);
-}
-
-function setEventHistoryScrollPosition({ addingNewIcon } = {})
-{
-	const $eventHistory = $("#eventHistory"),
-		overflow = getHorizontalOverflow($eventHistory);
-	
-	if (addingNewIcon && overflow <= 0)
-		return slideInNewEventIcon($eventHistory);
-	
-	$eventHistory.animate({ scrollLeft: overflow });
-}
-
-async function slideInNewEventIcon($eventHistory)
-{
-	const $icons = $eventHistory.children("img"),
-		$newIcon = $icons.last().addClass("hidden"),
-		freeSpace = $eventHistory.width() - ($icons.length - 1) * $newIcon.width();
-	
-	$newIcon.css("margin-left", freeSpace);
-
-	await Promise.race([
-		resolvePromiseOnLoad($newIcon),
-		sleep(250)
-	]);
-
-	await animatePromise({
-		$elements: $newIcon.removeClass("hidden"),
-		desiredProperties: { marginLeft: 0 },
-		easing: "easeOutQuad"
-	});
-
-	$newIcon.removeAttr("style");
+	eventHistory.appendIcon($icon);
 }
 
 class Step
@@ -3723,7 +3688,7 @@ function resizeBottomPanelElements()
 		.children().height(ehContainerHeight)
 		.css("line-height", ehContainerHeight*1.07 + "px");
 	
-	setEventHistoryScrollPosition();
+	eventHistory.scrollToEnd();
 }
 
 function resizeRightPanelElements()

@@ -147,9 +147,9 @@
 						</div>
 
 						<div id='eventHistoryContainer' class='bottomPanelDiv'>
-							<div id='btnEventHistoryBack' class='eventHistoryButton' title='See older events'>&#x2B9C;</div>
+							<div class='eventHistoryButton btnBack' title='See older events'>&#x2B9C;</div>
 							<div id='eventHistory'></div>
-							<div id='btnEventHistoryForward' class='eventHistoryButton' title='See more recent events'>&#x2B9E;</div>
+							<div class='eventHistoryButton btnForward' title='See newer events'>&#x2B9E;</div>
 							<div id='btnUndo' class='eventHistoryButton btnDisabled'>&#x2B8C;</div>
 						</div>
 						
