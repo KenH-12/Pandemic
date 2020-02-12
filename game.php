@@ -146,8 +146,12 @@
 							<img src='images/pieces/outbreaksMarker.png' alt='Outbreaks Marker'/>
 						</div>
 
-						<div id='eventHistory' class='bottomPanelDiv'></div>
-						<div id='btnUndoAction' class='bottomPanelDiv btnDisabled'>&#x2B8C;</div>
+						<div id='eventHistoryContainer' class='bottomPanelDiv'>
+							<div id='btnEventHistoryBack' class='eventHistoryButton' title='See older events'>&#x2B9C;</div>
+							<div id='eventHistory'></div>
+							<div id='btnEventHistoryForward' class='eventHistoryButton' title='See more recent events'>&#x2B9E;</div>
+							<div id='btnUndo' class='eventHistoryButton btnDisabled'>&#x2B8C;</div>
+						</div>
 						
 						<div id='cureMarkerContainer' class='bottomPanelDiv'>
 							<p class='title'>

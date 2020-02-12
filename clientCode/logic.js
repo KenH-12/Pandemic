@@ -286,7 +286,7 @@ function appendEventHistoryIcons()
 		appendEventHistoryIcon($eventHistory, event);
 	
 	data.eventHistoryQueue.length = 0;
-	setEventHistoryScrollPosition($eventHistory);
+	setEventHistoryScrollPosition();
 }
 
 function appendEventHistoryIconOfType(targetEventType)
@@ -309,7 +309,7 @@ function appendEventHistoryIconOfType(targetEventType)
 	}
 
 	if (oneOrMoreIconsWereAppended)
-		setEventHistoryScrollPosition($eventHistory, { addingNewIcon: true });
+		setEventHistoryScrollPosition({ addingNewIcon: true });
 }
 
 function appendEventHistoryIcon($eventHistory, event)
@@ -319,9 +319,10 @@ function appendEventHistoryIcon($eventHistory, event)
 	$eventHistory.append($icon);
 }
 
-function setEventHistoryScrollPosition($eventHistory, { addingNewIcon } = {})
+function setEventHistoryScrollPosition({ addingNewIcon } = {})
 {
-	const overflow = getHorizontalOverflow($eventHistory);
+	const $eventHistory = $("#eventHistory"),
+		overflow = getHorizontalOverflow($eventHistory);
 	
 	if (addingNewIcon && overflow <= 0)
 		return slideInNewEventIcon($eventHistory);
@@ -3700,8 +3701,9 @@ function positionRemovedInfectionCardsContainer()
 
 function resizeBottomPanelElements()
 {
-	const panelOffsetTop = data.boardHeight - data.topPanelHeight;
-	$(".bottomPanelDiv")
+	const $eventHistoryContainer = $("#eventHistoryContainer"),
+		panelOffsetTop = data.boardHeight - data.topPanelHeight;
+	$(".bottomPanelDiv").not($eventHistoryContainer)
 		.height(data.topPanelHeight)
 		.offset({ top: panelOffsetTop });
 
@@ -3715,13 +3717,13 @@ function resizeBottomPanelElements()
 		.height(data.topPanelHeight + titleHeight)
 		.offset({ top: panelOffsetTop - titleHeight });
 	
-	const $eventHistory = $("#eventHistory"),
-		$btnUndoAction = $("#btnUndoAction"),
-		eventHistoryHeight = data.topPanelHeight * 0.42;
-	$eventHistory.add($btnUndoAction).height(eventHistoryHeight)
-		.offset({ top: panelOffsetTop + data.topPanelHeight*0.58 });
-	$btnUndoAction.css("line-height", eventHistoryHeight * 1.1 +"px");
-	setEventHistoryScrollPosition($eventHistory);
+	const ehContainerHeight = data.topPanelHeight * 0.42;
+	$eventHistoryContainer.height(ehContainerHeight)
+		.offset({ top: panelOffsetTop + data.topPanelHeight*0.58 })
+		.children().height(ehContainerHeight)
+		.css("line-height", ehContainerHeight*1.07 + "px");
+	
+	setEventHistoryScrollPosition();
 }
 
 function resizeRightPanelElements()
@@ -8889,7 +8891,7 @@ function enableUndoIfLegal()
 
 function enableUndo()
 {
-	$("#btnUndoAction")
+	$("#eventHistoryContainer").find("#btnUndo")
 		.off("click")
 		.removeClass("btnDisabled")
 		.click(function() { undoAction() })
@@ -8898,7 +8900,7 @@ function enableUndo()
 
 function disableUndo({ undoIsIllegal } = {})
 {
-	$("#btnUndoAction")
+	$("#eventHistoryContainer").find("#btnUndo")
 		.off("click")
 		.addClass("btnDisabled")
 		.attr("title", undoIsIllegal ? `${getLastEvent().name} events cannot be undone.` : "Cannot undo at this time...");

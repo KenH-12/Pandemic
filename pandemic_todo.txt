@@ -15,6 +15,8 @@ additionally, when [0 actions remaining] is shown in gray during the 'hand limit
 
 TO DO
 -----
+for things that get the target cursor, underline their title when they are hovered to make it clear which element the target refers to
+
 when the contingency card is hovered, indicate that it's 'in contingency'
 
 position auto-treat vial on img load event
@@ -33,10 +35,6 @@ event history
 			epidemic intensify should have a max height, and should be scrollable
 
 show the actual event card in the action prompt?
-
-ensure that role cards appear on screen as is done with event cards
-
-create MovementEvent class as a bridge between Event and all movement action event types
 
 hovering over an epidemic card should show the full card
 

@@ -316,7 +316,7 @@ span.r {color: #ef282a; background: none}
 }
 
 #topPanel,
-.bottomPanelDiv:not(#btnUndoAction):not(#cureMarkerContainer)
+.bottomPanelDiv:not(#cureMarkerContainer)
 {
 	position: absolute;
 	background-color: #252525;
@@ -327,41 +327,52 @@ span.r {color: #ef282a; background: none}
 	vertical-align: top;
 }
 
-#btnUndoAction
+#eventHistoryContainer
 {
-	left: 24.7%;
-	width: 2.6%;
-	text-align: center;
-	font-size: 26px;
-	font-weight: 700;
+	width: 27.5%;
 	border: 1px solid #fff;
 	border-left: none;
-	border-top-right-radius: 4px;
-	background-color: #0c658b;
 }
-#btnUndoAction:hover
+#eventHistoryContainer > div
+{
+	display: inline-block;
+	vertical-align: top;
+	border-left: 1px solid #fff;
+}
+.eventHistoryButton
+{
+	width: 6%;
+	background-color: #0c658b;
+	text-align: center;
+	font-size: 18px;
+}
+#btnUndo
+{
+	width: 9%;
+	font-size: 26px;
+	font-weight: 700;
+}
+.eventHistoryButton:hover
 {
 	cursor: pointer;
 	background-color: #1282b3;
 }
-#btnUndoAction.btnDisabled { background-color: #064058 }
-#btnUndoAction.btnDisabled:hover
+.eventHistoryButton.btnDisabled { background-color: #064058 }
+.eventHistoryButton.btnDisabled:hover
 {
 	cursor: not-allowed;
 	background-color: #064058;
 }
 #eventHistory
 {
-	left: 1px;
-	width: 24.6%;
-	border-right: 1px solid #fff;
+	width: 79%;
 	white-space: nowrap;
 	overflow: hidden;
 }
 #eventHistory img
 {
 	display: inline-block;
-	width: 12.8%;
+	width: 15%;
 	margin: 1px;
 	margin-left: 0;
 	border-radius: 20%;
@@ -1100,7 +1111,7 @@ span.r {color: #ef282a; background: none}
 }
 .button:hover,
 .btnSkip:hover,
-#btnUndoAction:hover
+#btnUndo:hover
 { background-color: #1799d1 }
 .button * { pointer-events: none }
 .disabled, .btnDisabled, .scientist.button.btnDisabled
@@ -1420,6 +1431,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 {
 	color: #fff;
 	font-size: 15px;
+	filter: drop-shadow(0px 0px 3px #1799d1);
 }
 
 #quarantineArea
