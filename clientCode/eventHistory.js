@@ -6,6 +6,7 @@ export default class EventHistory
         this.$iconContainer = this.$container.find("#eventHistory");
         this.$btnBack = this.$container.find(".btnBack");
         this.$btnForward = this.$container.find(".btnForward");
+        this.$btnUndo = this.$container.find("#btnUndo");
 
         this.scrollLeft = 0;
     }
@@ -186,5 +187,22 @@ export default class EventHistory
         
         if (scrollLeft === overflow)
             this.disableForwardButton();
+    }
+
+    enableUndo(undoAction)
+    {
+        this.$btnUndo
+            .off("click")
+            .removeClass("btnDisabled")
+            .click(function() { undoAction() })
+            .attr("title", "Undo last action");
+    }
+
+    disableUndo({ undoIsIllegal, lastEventName } = {})
+    {
+        this.$btnUndo
+            .off("click")
+            .addClass("btnDisabled")
+            .attr("title", undoIsIllegal ? `${lastEventName} events cannot be undone.` : "Cannot undo at this time...");
     }
 }

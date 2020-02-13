@@ -331,7 +331,8 @@ class Step
 	indicate()
 	{
 		const $container = $("#indicatorContainer"),
-			activePlayer = getActivePlayer();
+			activePlayer = getActivePlayer(),
+			lastEvent = getLastEvent();
 
 		if (typeof this.setDescription === "function")
 			this.setDescription();
@@ -349,7 +350,11 @@ class Step
 		unhide($container);
 
 		highlightTurnProcedureStep(this.name);
-		enableUndoIfLegal();
+		
+		if (lastEvent.isUndoable)
+			eventHistory.enableUndo(undoAction);
+		else
+			eventHistory.disableUndo({ undoIsIllegal: true, lastEventName: lastEvent.name });
 	}
 
 	resume()
@@ -525,7 +530,7 @@ function disableActions()
 	disablePawnEvents();
 	unbindDiseaseCubeEvents();
 	disableResearchStationDragging();
-	disableUndo();
+	eventHistory.disableUndo();
 	eventHistory.disableScrollButtons();
 }
 
@@ -3386,7 +3391,7 @@ async function drawStep()
 			afterClick: "hide"
 		});
 	disableEventCards();
-	disableUndo();
+	eventHistory.disableUndo();
 
 	const cardKeys = await performDrawStep()
 		.catch((reason) => log(reason));
@@ -6257,7 +6262,7 @@ async function infectionStep()
 		$btnContinue.stop();
 		// Infection card is being drawn and resolved.
 		disableEventCards();
-		disableUndo();
+		eventHistory.disableUndo();
 
 		events = await requestAction(infectCity);
 		
@@ -8845,31 +8850,6 @@ function collapsePlayerDiscardPile()
 				resolve();
 			});
 	});
-}
-
-function enableUndoIfLegal()
-{
-	if (getLastEvent().isUndoable)
-		enableUndo();
-	else
-		disableUndo({ undoIsIllegal: true });
-}
-
-function enableUndo()
-{
-	$("#eventHistoryContainer").find("#btnUndo")
-		.off("click")
-		.removeClass("btnDisabled")
-		.click(function() { undoAction() })
-		.attr("title", "Undo last action");
-}
-
-function disableUndo({ undoIsIllegal } = {})
-{
-	$("#eventHistoryContainer").find("#btnUndo")
-		.off("click")
-		.addClass("btnDisabled")
-		.attr("title", undoIsIllegal ? `${getLastEvent().name} events cannot be undone.` : "Cannot undo at this time...");
 }
 
 function getLastEvent()

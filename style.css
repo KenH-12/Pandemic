@@ -363,11 +363,14 @@ span.r {color: #ef282a; background: none}
 	cursor: default;
 	background-color: #064058 !important;
 }
+#btnUndo.btnDisabled:hover { cursor: not-allowed }
 #eventHistory
 {
 	width: 79%;
 	white-space: nowrap;
 	overflow: hidden;
+	border-top: none;
+	border-bottom: none;
 }
 #eventHistory img
 {
