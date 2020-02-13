@@ -421,7 +421,7 @@ span.r {color: #ef282a; background: none}
 	background-color: #252525;
 	clip-path: polygon(50% 65%, 0 0, 100% 0);
 }
-#eventDetails .locatable:hover { border-bottom: 1px solid #fff }
+#eventDetails .locatable:hover { text-decoration: underline }
 #eventDetails .infectionCard
 {
 	height: 18px;
@@ -925,6 +925,14 @@ span.r {color: #ef282a; background: none}
 { cursor: url("images/target_black.png"), auto }
 .playerCard.b,
 #eventDetails .locatable { cursor: url("images/target_white.png"), auto }
+.playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template):hover,
+.infectionCard:not(.template):hover .cityName,
+.playerPanel .role *:not(.eventCard):hover,
+#roleIndicator:hover,
+.roleTag:hover,
+.playerCard.b:hover,
+#eventDetails .locatable:hover
+{ text-decoration: underline; }
 .playerCard * { pointer-events: none }
 .playerPanel > .playerCard:first-of-type { margin-top: 4px }
 .playerPanel .playerCard.eventCard:not(.unavailable) { cursor: pointer }
