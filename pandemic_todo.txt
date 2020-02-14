@@ -1,8 +1,5 @@
 BUGS
 ----
-dispatching a pawn via drive/ferry to a city containing another pawn is counted as a rendezvous event
-	drive/ferry and shuttle flight should take priority over rendezvous
-
 play airlift from contingency to move medic to city where auto-treat will occur, then undo the airlift
 	the player discards expands twice for some reason
 
@@ -15,6 +12,8 @@ additionally, when [0 actions remaining] is shown in gray during the 'hand limit
 
 TO DO
 -----
+change "x actions remaining" to 4 lights which turn off as actions are used
+
 when the contingency card is hovered, indicate that it's 'in contingency'
 
 position auto-treat vial on img load event

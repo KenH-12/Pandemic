@@ -2612,15 +2612,15 @@ async function tryDispatchPawn(playerToDispatch)
 function determineDispatchDetails(playerToDispatch)
 {
 	const {
-			rendezvous,	
 			driveFerry,
+			rendezvous,	
 			shuttleFlight,
 			directFlight,
 			charterFlight
 		} = eventTypes,
 		dispatchMethods = [
-			rendezvous,
 			driveFerry,
+			rendezvous,
 			shuttleFlight,
 			directFlight,
 			charterFlight
@@ -2630,7 +2630,7 @@ function determineDispatchDetails(playerToDispatch)
 	for (let method of dispatchMethods)
 	{
 		destination = getDestination(method, { player: playerToDispatch, dispatching: true });
-
+		
 		if (destination)
 			return { destination, method };
 	}
