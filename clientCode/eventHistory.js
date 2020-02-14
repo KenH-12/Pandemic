@@ -89,7 +89,7 @@ export default class EventHistory
             const overflow = this.getOverflow();
             
             if (addingNewIcon && overflow <= 0)
-                return slideInNewIcon();
+                return this.slideInNewIcon();
             
             this.disableForwardButton();
                 

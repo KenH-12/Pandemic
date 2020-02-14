@@ -6,15 +6,15 @@ sometimes the city card populations aren't shown when animating the 'determine t
 when [0 actions remaining] is shown in gray during the 'hand limit' step, the 'draw 2 cards' play step is highlighted
 	(or at least it is after refreshing the 'hand limit' step)
 
-observe the current step while doing the following:
-	shareknowledge with active player to trigger hand limit step
-	discard
-	undo discard
-	undo share knowledge
+role tags in the action prompt receive the target cursor but do not locate the pawn
+	(observed while prompting share knowledge)
+player cards in the share knowledge prompt receive the underline when hovered but do not locate the city
 
 TO DO
 -----
 undo plan contingency
+
+allow undoable actions to happen without excess confirmation
 
 change "x actions remaining" to 4 lights which turn off as actions are used
 

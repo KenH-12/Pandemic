@@ -1107,8 +1107,9 @@ function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eve
     
     if ($eventToUndo && $eventToUndo["eventType"] === $DISCARD)
         $prevStepName = getPreviousDiscardStepName($mysqli, $game);
-    else if ($currentStepName === "hand limit"
-        || $eventToUndo && $eventToUndo["eventType"] === $PASS_ACTIONS)
+    else if ($currentStepName === "hand limit")
+        $prevStepName = "action " . (countActionsTakenThisTurn($mysqli, $game));
+    else if ($eventToUndo && $eventToUndo["eventType"] === $PASS_ACTIONS)
         $prevStepName = "action " . (countActionsTakenThisTurn($mysqli, $game) + 1);
     else if ($currentStepName === "draw")
         $prevStepName = "action 4";
