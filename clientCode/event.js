@@ -409,7 +409,9 @@ export default class Event
 	}
 }
 
-class StartingHands extends Event
+class PermanentEvent extends Event {}
+
+class StartingHands extends PermanentEvent
 {
 	constructor(event, cities, eventCards)
 	{
@@ -499,7 +501,7 @@ class StartingHands extends Event
 	}
 }
 
-class InitialInfection extends Event
+class InitialInfection extends PermanentEvent
 {
 	constructor(event, cities)
 	{
@@ -1182,7 +1184,7 @@ class ResilientPopulation extends UndoableEvent
 	}
 }
 
-class Forecast extends Event
+class Forecast extends PermanentEvent
 {
 	constructor(event, cities)
     {
@@ -1257,7 +1259,7 @@ class PassActions extends UndoableEvent
 	}
 }
 
-class CardDraw extends Event
+class CardDraw extends PermanentEvent
 {
 	constructor(event, cities, eventCards)
     {
@@ -1333,7 +1335,7 @@ const infectionPreventionCodes = {
 	medicAutoTreat: "m"
 };
 
-class InfectCity extends Event
+class InfectCity extends PermanentEvent
 {
 	constructor(event, cities)
     {
@@ -1360,7 +1362,7 @@ class InfectCity extends Event
     }
 }
 
-class EpidemicIncrease extends Event
+class EpidemicIncrease extends PermanentEvent
 {
 	constructor(event)
 	{
@@ -1376,7 +1378,7 @@ class EpidemicIncrease extends Event
     }
 }
 
-class EpidemicInfect extends Event
+class EpidemicInfect extends PermanentEvent
 {
 	constructor(event, cities)
     {
@@ -1416,7 +1418,7 @@ class EpidemicInfect extends Event
     }
 }
 
-class EpidemicIntensify extends Event
+class EpidemicIntensify extends PermanentEvent
 {
 	constructor(event, cities)
     {
@@ -1439,7 +1441,7 @@ class EpidemicIntensify extends Event
     }
 }
 
-class Outbreak extends Event
+class Outbreak extends PermanentEvent
 {
 	constructor(event, cities, arrayContainingTriggerEvent)
     {
@@ -1529,7 +1531,7 @@ class Outbreak extends Event
 	}
 }
 
-class OutbreakInfection extends Event
+class OutbreakInfection extends PermanentEvent
 {
 	constructor(event, cities, arrayContainingOutbreakEvent)
     {
@@ -1631,6 +1633,7 @@ export {
 	getEventType,
 	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
+	PermanentEvent,
 	StartingHands,
 	InitialInfection,
 	MovementAction,

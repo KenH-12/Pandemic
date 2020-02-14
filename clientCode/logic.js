@@ -14,6 +14,7 @@ import Event, {
 	getEventType,
 	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
+	PermanentEvent,
 	MovementAction,
 	DriveFerry,
 	DirectFlight,
@@ -351,7 +352,7 @@ class Step
 
 		highlightTurnProcedureStep(this.name);
 		
-		if (lastEvent.isUndoable)
+		if (lastEventCanBeUndone())
 			eventHistory.enableUndo(undoAction);
 		else
 			eventHistory.disableUndo({ undoIsIllegal: true, lastEventName: lastEvent.name });
@@ -8857,9 +8858,26 @@ function getLastEvent()
 	return data.events[data.events.length - 1];
 }
 
+function lastEventCanBeUndone()
+{
+	let event;
+	for (let i = data.events.length - 1; i >= 0; i--)
+	{
+		event = data.events[i];
+
+		if (event instanceof PermanentEvent)
+			return false;
+		
+		if (event.isUndoable)
+			return true;
+	}
+
+	return false;
+}
+
 async function undoAction()
 {
-	const { event, eventIndex } = getLatestUndoableEvent();
+	const { event, eventIndex } = getLastUndoableEvent();
 
 	if (!event)
 		return false;
@@ -8909,7 +8927,7 @@ async function undoAction()
 		resumeCurrentStep();
 }
 
-function getLatestUndoableEvent()
+function getLastUndoableEvent()
 {
 	let event, i;
 	for (i = data.events.length - 1; i >= 0; i--)
