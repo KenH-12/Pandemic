@@ -9,6 +9,8 @@ export default class EventHistory
         this.$btnUndo = this.$container.find("#btnUndo");
 
         this.scrollLeft = 0;
+        this.scrollDuration = 300;
+        this.scrollEasing = "easeOutCubic";
     }
 
     appendIcon($icon)
@@ -93,7 +95,9 @@ export default class EventHistory
                 
             await animatePromise({
                 $elements: this.$iconContainer,
-                desiredProperties: { scrollLeft: overflow }
+                desiredProperties: { scrollLeft: overflow },
+                duration: this.scrollDuration,
+                easing: this.scrollEasing
             });
 
             this.scrollLeft = overflow;
@@ -154,12 +158,12 @@ export default class EventHistory
 
     scrollBack()
     {
-        const { $iconContainer } = this,
+        const { $iconContainer, scrollDuration, scrollEasing } = this,
             newScrollLeft = $iconContainer.scrollLeft() - $iconContainer.width(),
             scrollLeft = newScrollLeft > 0 ? newScrollLeft : 0;
         
         $iconContainer.stop()
-            .animate({ scrollLeft });
+            .animate({ scrollLeft }, scrollDuration, scrollEasing);
         
         if (this.scrollLeft !== scrollLeft)
             this.enableForwardButton();
@@ -172,13 +176,13 @@ export default class EventHistory
 
     scrollForward()
     {
-        const { $iconContainer } = this,
+        const { $iconContainer, scrollDuration, scrollEasing } = this,
             overflow = this.getOverflow(),
             newScrollLeft = $iconContainer.scrollLeft() + $iconContainer.width(),
             scrollLeft = newScrollLeft > overflow ? overflow : newScrollLeft;
         
         $iconContainer.stop()
-            .animate({ scrollLeft });
+            .animate({ scrollLeft }, scrollDuration, scrollEasing);
         
         if (this.scrollLeft !== scrollLeft)
             this.enableBackButton();
