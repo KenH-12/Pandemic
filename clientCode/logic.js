@@ -8958,7 +8958,7 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 					break;
 			}
 	
-			if (wasContingencyCard)
+			if (wasContingencyCard && !event.wasTriggered)
 			{
 				await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
 				await sleep(getDuration(data, "shortInterval"));
@@ -8982,7 +8982,7 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 			else if (typeof event.animateUndo === "function")
 				await event.animateUndo();
 			
-			if (wasContingencyCard) await collapsePlayerDiscardPile();
+			if (wasContingencyCard && !event.wasTriggered) await collapsePlayerDiscardPile();
 
 			if (event instanceof ForecastPlacement)
 				event.detachFromDrawEvent();

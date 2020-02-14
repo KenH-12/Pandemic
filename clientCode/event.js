@@ -773,6 +773,12 @@ class TreatDisease extends DiseaseCubeRemoval
 
 class AutoTreatDisease extends DiseaseCubeRemoval
 {
+	constructor(event, cities)
+    {
+		super(event, cities);
+		this.wasTriggered = true;
+	}
+	
 	// While AutoTreatDisease is undoable and inherits from UndoableEvent,
 	// its instances are triggered by other UndoableEvents -- the undoing of which triggers
 	// any AutoTreatDisease events that they triggered to be undone in turn.
@@ -869,6 +875,12 @@ class DiscoverACure extends UndoableEvent
 
 class Eradication extends Event
 {
+	constructor(event)
+    {
+		super(event);
+		this.wasTriggered = true;
+	}
+	
 	getDetails()
 	{
 		const color = getColorWord(this.diseaseColor);

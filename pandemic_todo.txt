@@ -1,8 +1,5 @@
 BUGS
 ----
-play airlift from contingency to move medic to city where auto-treat will occur, then undo the airlift
-	the player discards expands twice for some reason
-
 sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
 	find a way to make sure it happens
 
