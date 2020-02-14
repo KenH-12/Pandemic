@@ -432,7 +432,8 @@ class Step
 			return console.error("hand limit reached but card counts are inconsistent.");
 		}
 
-		this.description = `<span class='disabled'>[${numActionsRemaining} Action${pluralizer} Remaining]</span><br /><br />`;
+		this.description = `<span class='disabled'>[${numActionsRemaining} Action${pluralizer} Remaining]</span><br /><br />
+Hand Limit Exceeded!<br/>`;
 
 		if (playerWithTooManyCards.rID !== getActivePlayer().rID)
 		{
@@ -465,8 +466,10 @@ function highlightTurnProcedureStep(stepName)
 {
 	const releventStepNames = ["action", "draw", "epidemic", "discard", "infect"];
 	
-	// Only interested in the first word
-	stepName = stepName.split(" ")[0];
+	if (stepName === "hand limit")
+		stepName = "action";
+	else
+		stepName = stepName.split(" ")[0];// Only interested in the first word
 
 	// There are 3 different epidemic steps, all of which start with "ep"
 	if (stepName.substring(0, 2) === "ep")

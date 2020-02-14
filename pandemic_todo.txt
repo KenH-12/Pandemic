@@ -3,9 +3,14 @@ BUGS
 sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
 	find a way to make sure it happens
 
-refreshing the page during the 'hand limit' step causes the 'PLAY' steps to remain hidden
-additionally, when [0 actions remaining] is shown in gray during the 'hand limit' step, the 'draw 2 cards' play step is highlighted
+when [0 actions remaining] is shown in gray during the 'hand limit' step, the 'draw 2 cards' play step is highlighted
 	(or at least it is after refreshing the 'hand limit' step)
+
+observe the current step while doing the following:
+	shareknowledge with active player to trigger hand limit step
+	discard
+	undo discard
+	undo share knowledge
 
 TO DO
 -----
