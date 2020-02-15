@@ -2612,15 +2612,15 @@ function determineDispatchDetails(playerToDispatch)
 {
 	const {
 			driveFerry,
-			rendezvous,	
 			shuttleFlight,
+			rendezvous,	
 			directFlight,
 			charterFlight
 		} = eventTypes,
 		dispatchMethods = [
 			driveFerry,
-			rendezvous,
 			shuttleFlight,
+			rendezvous,
 			directFlight,
 			charterFlight
 		];
