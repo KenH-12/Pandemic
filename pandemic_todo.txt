@@ -13,6 +13,8 @@ TO DO
 -----
 allow undoable actions to happen without excess confirmation
 
+drive/ferry prompt needs styling
+
 change "x actions remaining" to 4 lights which turn off as actions are used
 
 when the contingency card is hovered, indicate that it's 'in contingency'

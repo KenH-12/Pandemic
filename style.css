@@ -364,6 +364,7 @@ span.r {color: #ef282a; background: none}
 	background-color: #064058 !important;
 }
 #btnUndo.btnDisabled:hover { cursor: not-allowed }
+.eventHistoryButton:active { color: #0c658b }
 #eventHistory
 {
 	width: 79%;

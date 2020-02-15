@@ -17,7 +17,7 @@ const eventTypes = {
 		hasIcon: true,
 		code: "df",
 		rules: ["Discard a city card to move to the city named on the card."],
-		instructions: "Select a Card:",
+		instructions: "Select a Destination:",
 		dispatchInstructions: `To dispatch a pawn via Direct Flight,
 discard the city card that matches the destination city.
 The card must come from the Dispatcher&#39;s hand.`,

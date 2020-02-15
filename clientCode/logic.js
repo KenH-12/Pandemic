@@ -1405,15 +1405,11 @@ const actionInterfacePopulator = {
 		
 		const cardKeys = getActivePlayer()[`valid${directFlight.name}DestinationKeys`]();
 			
-		actionInterfacePopulator.appendOptionButtons("playerCard", cardKeys, function($clicked)
+		actionInterfacePopulator.appendOptionButtons("playerCard", cardKeys, 
+			function($clicked)
 			{
-				const destination = getCity($clicked.data("key"));
-				data.promptedTravelPathProperties = { destination };
-				promptAction(
-					{
-						eventType: directFlight,
-						destination
-					});
+				$clicked.off("mouseleave"); // prevents the call to hideTravelPathArrow
+				movementAction(directFlight, getCity($clicked.data("key")));
 			})
 			.$actionInterface.find(".playerCard")
 				.hover(function() { showTravelPathArrow({ destination: getCity($(this).attr("data-key")) }) },
