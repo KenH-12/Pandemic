@@ -39,7 +39,7 @@ export default class EventHistory
 
             animatePromise({
                 $elements: $icon,
-                desiredProperties: { opacity: 0.1 },
+                desiredProperties: { opacity: 0 },
                 duration: 100
             });
 

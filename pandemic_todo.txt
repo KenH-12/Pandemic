@@ -11,8 +11,6 @@ hovering over event cards in the discard pile should not show the 'play at any t
 
 TO DO
 -----
-allow undoable actions to happen without excess confirmation
-
 drive/ferry prompt needs styling
 shuttle flight prompt needs styling
 
