@@ -1879,7 +1879,6 @@ async function planContingency(cardKey)
 	]);
 
 	contingencyPlanner.contingencyKey = cardKey;
-	$eventCard.addClass("contingency");
 
 	appendEventHistoryIconOfType(eventType);
 	proceed();
@@ -4077,7 +4076,10 @@ class Player
 
 			let $insertAfterElement;
 			if (isContingencyCard) // Contingency cards are placed within the .role div
+			{
+				$card.removeClass("removed").addClass("contingency");
 				$insertAfterElement = this.$panel.children(".role").children().first();
+			}
 			else
 				$insertAfterElement = this.$panel.children(".role, .playerCard").last();
 			
@@ -8975,6 +8977,8 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				await event.animateUndo(placeDiseaseCubes);
 			else if (event instanceof ResearchStationPlacement)
 				await event.animateUndo(data, animateResearchStationBackToSupply, wasContingencyCard);
+			else if (event instanceof PlanContingency)
+				await event.animateUndo(animateDiscardPlayerCard);
 			else if (event instanceof OneQuietNight)
 			{
 				await event.animateUndo(wasContingencyCard);

@@ -916,7 +916,7 @@ class OperationsFlight extends MovementAction
     }
 }
 
-class PlanContingency extends Event
+class PlanContingency extends UndoableEvent
 {
 	constructor(event, eventCards)
     {
@@ -930,7 +930,21 @@ class PlanContingency extends Event
 		return `${super.getDetails()}
 				<p>Stored Event Card:</p>
 				${this.eventCard.getPlayerCard({ noTooltip: true })}`;
-    }
+	}
+	
+	animateUndo(animateDiscardPlayerCard)
+	{
+		return new Promise(async resolve =>
+		{
+			const contingencyPlanner = this.player,
+				$card = contingencyPlanner.$panel.find(".playerCard.eventCard.contingency");
+			
+			await animateDiscardPlayerCard($card.removeClass("contingency"));
+			contingencyPlanner.contingencyKey = false;
+
+			resolve();
+		});
+	}
 }
 
 class DispatchPawn extends MovementAction

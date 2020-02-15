@@ -33,7 +33,7 @@
 
         $mysqli->autocommit(FALSE);
 
-        moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $eventCardKey);
+        moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKey);
         $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
         
         $response["undoneEventIds"] = array($eventID);
