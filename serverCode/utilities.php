@@ -427,7 +427,7 @@ function moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $car
                         AND cardKey = '$cardKey'");
 
         if ($mysqli->affected_rows != 1)
-                throw new Exception("Failed to discard player card ($cardKey): " . $mysqli->error);
+                throw new Exception("Failed to move player card ($cardKey) from '$currentPile' to '$newPile': " . $mysqli->error);
     }
 }
 

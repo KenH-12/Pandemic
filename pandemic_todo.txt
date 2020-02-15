@@ -3,9 +3,6 @@ BUGS
 sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
 	find a way to make sure it happens
 
-when [0 actions remaining] is shown in gray during the 'hand limit' step, the 'draw 2 cards' play step is highlighted
-	(or at least it is after refreshing the 'hand limit' step)
-
 role tags in the action prompt receive the target cursor but do not locate the pawn
 	(observed while prompting share knowledge)
 player cards in the share knowledge prompt receive the underline when hovered but do not locate the city
