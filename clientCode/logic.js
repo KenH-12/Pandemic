@@ -1228,15 +1228,11 @@ const actionInterfacePopulator = {
 		
 		bindRoleCardHoverEvents();
 	},
-	replaceInstructions(newSubtitle, { lastParagraph } = {})
+	replaceInstructions(newInstructions, nthOption = 0)
 	{
-		const $subtitle = actionInterfacePopulator.$actionInterface.find("p.instructions");
+		const $instructions = actionInterfacePopulator.$actionInterface.find("p.instructions");
 
-		// There are cases where two action instructions are present.
-		if (lastParagraph)
-			$subtitle.last().html(newSubtitle);
-		else
-			$subtitle.first().html(newSubtitle);
+		$instructions.eq(nthOption).html(newInstructions);
 
 		return actionInterfacePopulator;
 	},
@@ -1353,26 +1349,46 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.chooseFlightType.name]({ destination })
 	{
-		// If the player can reach the destination via Direct Flight,
-		// but also via one other flight type, present *two options.
-		// *See the comment in getMovementDetails as to why a maximum of two options are presented.
-		const { operationsFlight, charterFlight, directFlight } = eventTypes;
+		const {
+				operationsFlight,
+				charterFlight,
+				directFlight
+			} = eventTypes,
+			flightTypes = [
+				operationsFlight,
+				charterFlight
+			],
+			player = getActivePlayer();
 		
-		let firstOption;
-		if (getActivePlayer().canOperationsFlight())
-			firstOption = operationsFlight;
-		else
-			firstOption = charterFlight;
+		let nthOption = 0,
+			canDoFlightType;
+		
+		for (let flightType of flightTypes)
+		{
+			canDoFlightType = `can${toPascalCase(flightType.name)}`;
+			
+			if (player[canDoFlightType]())
+			{
+				if (nthOption)
+					actionInterfacePopulator.appendDivision();
+				
+				actionInterfacePopulator.appendDescriptiveElements(flightType);
+				actionInterfacePopulator[flightType.name]({ destination, nthOption });
 
-		actionInterfacePopulator.appendDescriptiveElements(firstOption)
-		actionInterfacePopulator[firstOption.name]({ destination });
-		
-		actionInterfacePopulator.appendDivision().appendDescriptiveElements(directFlight);
-		actionInterfacePopulator[directFlight.name]({ destination });
+				nthOption++;
+			}
+		}
+
+		// The destination must be taken into account when checking whether Direct Flight is an option.
+		if (player.canDirectFlightTo(destination))
+		{
+			actionInterfacePopulator.appendDivision().appendDescriptiveElements(directFlight);
+			actionInterfacePopulator[directFlight.name]({ destination, nthOption });
+		}
 
 		return true;
 	},
-	[eventTypes.charterFlight.name]({ destination })
+	[eventTypes.charterFlight.name]({ destination, nthOption })
 	{
 		const charterFlight = eventTypes.charterFlight;
 	
@@ -1388,7 +1404,7 @@ const actionInterfacePopulator = {
 		const currentCity = getActivePlayer().getLocation();
 		
 		actionInterfacePopulator
-			.replaceInstructions(`Destination: ${destination.name}`)
+			.replaceInstructions(`Destination: ${destination.name}`, nthOption)
 			.appendDiscardPrompt(
 			{
 				cardKeys: currentCity.key,
@@ -1396,19 +1412,14 @@ const actionInterfacePopulator = {
 			});
 		return true;
 	},
-	[eventTypes.directFlight.name]({ destination })
+	[eventTypes.directFlight.name]({ destination, nthOption })
 	{
 		const directFlight = eventTypes.directFlight;
 	
 		if (destination)
 		{
-			// NOTE: If a player drags and drops a pawn on a city
-			// which is a valid Direct Flight and Charter Flight destination,
-			// both action interfaces will be displayed.
-			// Charter Flight is usually the better option,
-			// therefore Direct Flight is always shown second, hence { lastParagraph: true }.
 			actionInterfacePopulator
-				.replaceInstructions(`Destination: ${destination.name}`, { lastParagraph: true })
+				.replaceInstructions(`Destination: ${destination.name}`, nthOption)
 				.appendDiscardPrompt(
 				{
 					cardKeys: destination.key,
@@ -3317,25 +3328,10 @@ function getMovementDetails()
 		
 		if (destination)
 		{
-			// If the movement type requires a discard, the player must confirm the action before it is executed.
 			if (movementTypeRequiresDiscard(eventType))
 			{
-				// If reaching the destination is possible via Direct Flight,
-				// and also possible via charterFlight or operationsFlight,
-				// allow the player to choose the flight type.
-				const player = getActivePlayer(),
-					multipleFlightTypeOptionsExist = (eventType.code === directFlight.code
-													&& (player.canCharterFlight() || player.canOperationsFlight()));
-				
-				if (multipleFlightTypeOptionsExist)
+				if (getActivePlayer().hasMultipleFlightOptions(destination))
 					eventType = eventTypes.chooseFlightType;
-				// Note that prompting the player to choose between charterFlight and operationsFlight
-				// would be silly, because operationsFlight is a strictly better version of charterFlight.
-				// If the player wishes to perform charterFlight over operationsFlight for some reason,
-				// they can explicitly click the charterFlight button instead of allowing this function
-				// to determine that operationsFlight is an option.
-				// Therefore, chooseFlightType applies only when directFlight is possible along with at least
-				// one other flight type.
 				
 				return {
 					waitingForConfirmation: true,
@@ -4223,6 +4219,11 @@ class Player
 		return false;
 	}
 
+	canDirectFlightTo(destination)
+	{
+		return this[`valid${eventTypes.directFlight.name}DestinationKeys`]().includes(destination.key);
+	}
+
 	canCharterFlight()
 	{
 		// Charter Flight requires the card that matches the player's current location.
@@ -4463,6 +4464,32 @@ class Player
 				destinationKeys.push(key);
 
 		return destinationKeys;
+	}
+
+	hasMultipleFlightOptions(destination)
+	{
+		const {
+			charterFlight,
+				operationsFlight
+			} = eventTypes,
+			flightTypes = [
+				charterFlight,
+				operationsFlight
+			];
+		
+		// The destination must be considered for Direct Flight, but is irrelevant for Charter Flight and Operations Flight.
+		let numOptions = this.canDirectFlightTo(destination) ? 1 : 0,
+			canDoFlightType;
+
+		for (let flightType of flightTypes)
+		{
+			canDoFlightType = `can${toPascalCase(flightType.name)}`;
+
+			if (this[canDoFlightType]() && ++numOptions > 1)
+				return true;
+		}
+		
+		return false;
 	}
 }
 

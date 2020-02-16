@@ -156,7 +156,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		hasIcon: true,
 		code: "of",
 		capableRoleName: "Operations Expert",
-		rules: ["Once per turn, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
+		rules: ["<i>Once per turn</i>, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
 		actionPathName: "movementAction",
 		propertyNames: ["originKey", "destinationKey", "discardKey"]
