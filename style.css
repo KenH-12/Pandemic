@@ -1141,7 +1141,8 @@ span.r {color: #ef282a; background: none}
 	font-size: 18px;
 	margin: 10px 0 0 2px;
 }
-.actionCategory .button
+.actionCategory .button,
+.actionPromptOption
 {
 	width: 100%;
 	margin: 0 0 2px 0;
@@ -1270,10 +1271,10 @@ span.r {color: #ef282a; background: none}
 .discardPrompt .playerCard { margin-bottom: 5px; }
 .actionPromptOption
 {
-	width: 94%;
-	margin: 0 3% 3px 3%;
+	font-size: 20px;
+	margin-bottom: 5px;
+	padding: 2px 0;
 }
-
 #btnCancelAction
 {
 	margin-top: 10px;

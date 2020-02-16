@@ -11,9 +11,6 @@ hovering over event cards in the discard pile should not show the 'play at any t
 
 TO DO
 -----
-drive/ferry prompt needs styling
-shuttle flight prompt needs styling
-
 change "x actions remaining" to 4 lights which turn off as actions are used
 
 when the contingency card is hovered, indicate that it's 'in contingency'

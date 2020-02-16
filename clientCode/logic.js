@@ -6939,9 +6939,7 @@ function placeDiseaseCube(city, diseaseColor, cubeSupplyOffset)
 
 function newCityButton(city)
 {
-	const $btn = $(`<div class='button actionPromptOption' data-key='${city.key}'>
-					${city.name}
-				</div>`);
+	const $btn = $(`<div class='button actionPromptOption' data-key='${city.key}'>${city.name}</div>`);
 	
 	$btn.hover(function() { showTravelPathArrow({ destination: city }) },
 	function() { hideTravelPathArrow() })
