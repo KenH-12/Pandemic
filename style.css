@@ -24,7 +24,6 @@ body
 	-moz-user-select: none;      /* Firefox */
 	-ms-user-select: none;       /* Internet Explorer/Edge */
 }
-::-webkit-scrollbar {display: none;}
 #container
 {
 	min-width: 1024px;
@@ -692,9 +691,9 @@ span.r {color: #ef282a; background: none}
 #rightPanel
 {
 	float: right;
-	overflow-y: scroll;
 	border-left: 1px solid #fff;
 }
+.scrollable { overflow-y: scroll }
 #indicatorContainer
 {
 	padding: 7px;
@@ -1302,7 +1301,7 @@ span.r {color: #ef282a; background: none}
 	font-size: 18px;
 	padding: 20px 0 10px 0;
 	width: 100%;
-	margin: 25px 0 10px 0;
+	margin: 10px 0;
 	border: none;
 	background-color: #09154f !important;
 }
@@ -1312,14 +1311,16 @@ span.r {color: #ef282a; background: none}
 	height: 1px;
 	background-color: #fff;
 	z-index: 1;
-	margin: 0 2% -10px 2%;
+	margin: 0 2% -17px 2%;
 }
-.actionInterfaceDivision p
+.actionInterfaceDivision h2
 {
 	z-index: 2;
 	background-color: #09154f !important;
 	width: 16%;
 	margin-left: 42%;
+	font-family: 'Exo 2', sans-serif;
+	font-size: 24px;
 }
 .diseaseColorOption
 {

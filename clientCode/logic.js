@@ -1131,6 +1131,19 @@ function resetActionPrompt({ actionCancelled } = {})
 		$actionPrompt.parent().addClass("hidden");
 		enablePawnEvents();
 	}
+
+	setRightPanelScrollability();
+}
+
+function setRightPanelScrollability()
+{
+	const $rightPanel = $("#rightPanel"),
+		scrollable = "scrollable";
+
+	if (isOverflowingVertically($rightPanel))
+		$rightPanel.addClass(scrollable);
+	else
+		$rightPanel.removeClass(scrollable);
 }
 
 function promptAction(actionProperties)
@@ -1160,6 +1173,7 @@ function promptAction(actionProperties)
 	}
 
 	unhide($actionsContainer);
+	setRightPanelScrollability();
 }
 
 function populateActionInterface(actionProperties)
@@ -1246,7 +1260,7 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.$actionInterface.append(
 			`<div class='actionInterfaceDivision'>
 				<div class='actionInterfaceDivisionLine'></div>
-				<p>OR</p>
+				<h2>OR</h2>
 			<div>`);
 		
 		return actionInterfacePopulator;

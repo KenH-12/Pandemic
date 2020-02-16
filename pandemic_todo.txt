@@ -11,6 +11,8 @@ hovering over event cards in the discard pile should not show the 'play at any t
 
 TO DO
 -----
+when the action prompt is overflowing, add a cancel button at the top as well
+
 change "x actions remaining" to 4 lights which turn off as actions are used
 
 when the contingency card is hovered, indicate that it's 'in contingency'
