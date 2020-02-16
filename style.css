@@ -1301,7 +1301,7 @@ span.r {color: #ef282a; background: none}
 	font-size: 18px;
 	padding: 20px 0 7px 0;
 	width: 100%;
-	margin: 10px 0;
+	margin-top: 10px;
 	border: none;
 	background-color: #09154f !important;
 	filter: drop-shadow(0px 0px 3px #fff);
@@ -1339,6 +1339,7 @@ span.r {color: #ef282a; background: none}
 	padding: 5px 1%;
 	background-color: #353535;
 }
+.actionInterfaceDivision + .shareableCards { margin-top: 10px }
 
 .shareableCards > p
 {
