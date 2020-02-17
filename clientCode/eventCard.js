@@ -16,15 +16,20 @@ export default class EventCard
 	{
 		return `<div class='playerCard eventCard' data-key='${this.key}'>${this.name.toUpperCase()}</div>`;
     }
+
+    getFullCard()
+    {
+        return $(`<div class='eventCardFull' data-key='${this.key}'>
+                    <h5>EVENT</h5>
+                    <h3>${this.name.toUpperCase()}</h3>
+                    <img src='images/cards/event/${toCamelCase(this.name)}.jpg' alt='${this.name}' />
+                    ${this.getRules()}
+                </div>`);
+    }
     
     async showFullCard($eventCard, { boardWidth, boardHeight })
     {
-        const $fullCard = $(`<div id='eventCardFull'>
-                                <h5>EVENT</h5>
-                                <h3>${this.name.toUpperCase()}</h3>
-                                <img src='images/cards/event/${toCamelCase(this.name)}.jpg' alt='${this.name}' />
-                                ${this.getRules()}
-                            </div>`),
+        const $fullCard = this.getFullCard(),
             $cardImg = $fullCard.children("img");
         
         $fullCard.appendTo("#boardContainer")
@@ -77,7 +82,7 @@ function bindEventCardHoverEvents(boardDimensions, { $containingElement } = {})
             $this = $(this);
             eventCards[$this.data("key")].showFullCard($this, boardDimensions);
         },
-        function() { $("#eventCardFull, #disabledEventCard.tooltip").remove() });
+        function() { $("#boardContainer").children(".eventCardFull, #disabledEventCard.tooltip").remove() });
 }
 
 function getFullCardOffset($eventCard, $fullCard, boardWidth)

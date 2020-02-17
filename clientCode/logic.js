@@ -1201,6 +1201,12 @@ const actionInterfacePopulator = {
 		if (eventType.code === eventTypes.chooseFlightType.code)
 			return;
 		
+		const { $actionInterface } = actionInterfacePopulator;
+		
+		if (isEventCardKey(eventType.cardKey))
+			return $actionInterface.append(eventCards[eventType.cardKey].getFullCard())
+				.append(`<p class='instructions'>${eventType.instructions || ""}</p>`);
+		
 		const $actionTitleContainer = $(`<div class='actionTitle'></div>`),
 			$rules = $("<div class='rules'></div>");
 
@@ -1216,7 +1222,7 @@ const actionInterfacePopulator = {
 		for (let paragraph of eventType.rules)
 			$rules.append(`<p>${paragraph}</p>`);
 		
-		actionInterfacePopulator.$actionInterface
+		$actionInterface
 			.append($actionTitleContainer)
 			.append($rules)
 			.append(`<p class='instructions'>${eventType.instructions || ""}</p>`);
@@ -1287,23 +1293,31 @@ const actionInterfacePopulator = {
 	},
 	appendDiscardPrompt({ cardKeys, promptMsg, onConfirm })
 	{
-		const $discardPrompt = $(`<div class='discardSelections'></div>`),
+		const { $actionInterface } = actionInterfacePopulator,
+			$discardPrompt = $(`<div class='discardSelections'></div>`),
 			buttonClass = "btnConfirmAction",
-			isContingencyCard = typeof cardKeys === "string" && isContingencyCardKey(cardKeys);
+			isEventCard = typeof cardKeys === "string" && isEventCardKey(cardKeys),
+			isContingencyCard = isEventCard && isContingencyCardKey(cardKeys);
 
 		let buttonText = false;
 		
-		if (isContingencyCard)
+		if (isEventCard)
 		{
-			promptMsg = `${getPlayer("Contingency Planner").newSpecialAbilityTag()}<br />`;
-			buttonText = "PLAY AND REMOVE";
+			if (isContingencyCard)
+			{
+				promptMsg = `${getPlayer("Contingency Planner").newSpecialAbilityTag()}<br />`;
+				buttonText = "PLAY AND REMOVE EVENT CARD";
+			}
+			else
+				buttonText = "PLAY EVENT CARD";
 		}
 
 		if (promptMsg)
 			$discardPrompt.append(`<p>${promptMsg}</p>`);
 
-		for (let key of ensureIsArray(cardKeys))
-			$discardPrompt.append(newPlayerCard(getCityOrEventCardObject(key)));
+		if (!(typeof cardKeys === "string" && isEventCardKey(cardKeys)))
+			for (let key of ensureIsArray(cardKeys))
+				$discardPrompt.append(newPlayerCard(getCityOrEventCardObject(key)));
 		
 		bindCityLocatorClickEvents({ $containingElement: $discardPrompt });
 
@@ -1316,7 +1330,7 @@ const actionInterfacePopulator = {
 				onConfirm();
 			});
 
-		actionInterfacePopulator.$actionInterface.append($discardPrompt);
+		$actionInterface.append($discardPrompt);
 
 		bindEventCardHoverEvents(data, { $containingElement: $discardPrompt });
 		if (isContingencyCard)

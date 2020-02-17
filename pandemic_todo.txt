@@ -9,6 +9,10 @@ player cards in the share knowledge prompt receive the underline when hovered bu
 
 hovering over event cards in the discard pile should not show the 'play at any time, except' description
 
+the grant station's initial offset appears inexact
+
+sometimes the eventHistory scrollToEnd cuts off a but of the last icon when the page is reloaded
+
 TO DO
 -----
 action rules take up too much space
@@ -33,8 +37,6 @@ event history
 			travel paths for movement actions and research station relocations?
 			outbreak spread paths?
 			epidemic intensify should have a max height, and should be scrollable
-
-show the actual event card in the action prompt?
 
 hovering over an epidemic card should show the full card
 
