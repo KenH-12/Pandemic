@@ -15,6 +15,8 @@ sometimes the eventHistory scrollToEnd cuts off a but of the last icon when the 
 
 TO DO
 -----
+if forecastPlacement is prompted, the disabled event card description should mention that Forecast must be resolved before doing anything else
+
 action rules take up too much space
 	make them visible through tooltips (hover a "?" icon)
 

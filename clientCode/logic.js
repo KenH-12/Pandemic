@@ -1196,14 +1196,14 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.$actionInterface.children().not("#btnCancelAction").remove();
 		return actionInterfacePopulator;
 	},
-	appendDescriptiveElements(eventType)
+	appendDescriptiveElements(eventType, { showEventCardDescription } = {})
 	{
 		if (eventType.code === eventTypes.chooseFlightType.code)
 			return;
 		
 		const { $actionInterface } = actionInterfacePopulator;
 		
-		if (isEventCardKey(eventType.cardKey))
+		if (!showEventCardDescription && isEventCardKey(eventType.cardKey))
 			return $actionInterface.append(eventCards[eventType.cardKey].getFullCard())
 				.append(`<p class='instructions'>${eventType.instructions || ""}</p>`);
 		
@@ -1960,6 +1960,12 @@ async function forecastDraw(forecastEventToLoad)
 
 	indicatePromptingEventCard();
 
+	const eventType = eventTypes.forecast;
+	actionInterfacePopulator.$actionInterface.children(".eventCardFull").remove();
+	actionInterfacePopulator.$actionInterface.prepend(`<div class='actionTitle'>
+														${getEventIconHtml(eventType)}<h2>${eventType.name.toUpperCase()}</h2>
+													</div>`);
+	
 	const forecastEvent = forecastEventToLoad || (await requestAction(eventTypes.forecast)).shift();
 
 	// If loading an unresolved forecast, the event card will already be in the discard pile.
@@ -1987,7 +1993,7 @@ function animateForecastDraw(cardKeys)
 		const { $container, $cardContainer } = newForecastContainer();
 		
 		actionInterfacePopulator
-			.replaceInstructions("Click and drag to rearrange the cards. When done, the cards will be put back on top of the deck in order from bottom to top.")
+			.replaceInstructions("Click and drag to rearrange the top 6 cards of the infection deck. When done, the cards will be put back on top of the deck in order from bottom to top.")
 			.concealSubtitle()
 			.$actionInterface.append($container);
 
