@@ -2,14 +2,6 @@ BUGS
 ----
 sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
 	find a way to make sure it happens
-
-sometimes the eventHistory scrollToEnd cuts off a but of the last icon when the page is reloaded
-
-discover cure, triggering eradication
-	check eradication icon
-	undo
-	discover cure again
-
 TO DO
 -----
 action rules take up too much space
@@ -184,8 +176,6 @@ instead of counting the cubes on the board, keep a cubeCount column in the game 
 do steps need a procedure? perhaps they only need a single method
 
 for the valid[eventType.name]DestinationKeys methods, use camelcase eventType names.
-
-in the discard prompts (like discover cure) the card text is weirdly large and pixellated
 
 use a similar draggable approach to pawn dragging?
 

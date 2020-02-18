@@ -33,14 +33,14 @@
 
         moveCardsToPile($mysqli, $game, "player", "discard", $role, $cardKeys);
 
-        $diseaseColor = getCityColor($mysqli, $cardKeys[0]);
-        $diseaseStatus = "rampant";
-        setDiseaseStatus($mysqli, $game, $diseaseColor, $diseaseStatus);
-
         $response["undoneEventIds"] = array($eventID);
         // Undo any auto-treat disease and eradication events that were triggered by discovering a cure.
         if ($triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
             $response["undoneEventIds"] = array_merge($response["undoneEventIds"], $triggeredEventIds);
+        
+        $diseaseColor = getCityColor($mysqli, $cardKeys[0]);
+        $diseaseStatus = "rampant";
+        setDiseaseStatus($mysqli, $game, $diseaseColor, $diseaseStatus);
        
         $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
         deleteEvent($mysqli, $game, $eventID);

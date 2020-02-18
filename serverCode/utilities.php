@@ -585,7 +585,7 @@ function setDiseaseStatus($mysqli, $game, $diseaseColor, $newStatus)
         throw new Exception("Failed to set disease status ($diseaseColor, $newStatus): " . $mysqli->error);
 
     // Record and return any "eradicaton" events
-    if ($newStatus == "eradicated")
+    if ($newStatus === "eradicated")
         return recordEvent($mysqli, $game, "er", $diseaseColor);
 }
 

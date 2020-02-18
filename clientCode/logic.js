@@ -3298,8 +3298,7 @@ function eradicationEvent(diseaseColor)
 {
 	return new Promise(async resolve =>
 	{
-		$(`#cureMarker${diseaseColor.toUpperCase()}`)
-			.prop("src", `images/pieces/cureMarker_${diseaseColor}_eradicated.png`);
+		flipCureMarkerToEradicated(diseaseColor);
 
 		data.cures[diseaseColor] = "eradicated";
 		
@@ -3313,6 +3312,16 @@ function eradicationEvent(diseaseColor)
 		appendEventHistoryIconOfType(eventTypes.eradication);
 		resolve();
 	});
+}
+
+function flipCureMarkerToEradicated(diseaseColor, $cureMarker)
+{
+	if (!diseaseColor)
+		return false;
+	
+	$cureMarker = $cureMarker.length ? $cureMarker : $(`#cureMarker${diseaseColor.toUpperCase()}`)
+	
+	$cureMarker.prop("src", `images/pieces/cureMarker_${diseaseColor}_eradicated.png`);
 }
 
 function finishActionStep()
@@ -7085,21 +7094,16 @@ async function discoverACure(cardKeys)
 	// 2. The only remaining cubes of the disease color on the board were removed by an auto-treat disease event.
 	//		(the eradication was triggered by the auto-treat event which was triggered by discovering the cure)
 	// Therefore if there are no auto-treat events, the cause is number 1.
-	let newDiseaseStatus = "cured";
-	if (!autoTreatEvents.length && eradicationEvents.length)
-		newDiseaseStatus = "eradicated";
+	const newDiseaseStatus = eradicationEvents.length && !autoTreatEvents.length ? "eradicated" : "cured";
 	
 	data.cures[diseaseColor] = newDiseaseStatus;
 	data.cures.remaining--;
 	
 	await animateDiscoverCure(diseaseColor, newDiseaseStatus);
-	appendEventHistoryIconOfType(discoverACure);
 
 	if (data.gameEndCause)
 		return endGame();
 
-	// The auto-treat event (if there is one) would have been the cause of eradication (if eradication occured),
-	// so we pass both here.
 	if (autoTreatEvents.length)
 		await animateAutoTreatDiseaseEvents([ ...autoTreatEvents, ...eradicationEvents ]);
 
@@ -7197,7 +7201,8 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 {
 	return new Promise(async resolve =>
 	{
-		const $cureMarker = newCureMarker(diseaseColor, diseaseStatus, { isForReveal: true });
+		const $cureMarker = newCureMarker(diseaseColor, "cured", { isForReveal: true }),
+			{ discoverACure, eradication } = eventTypes;
 
 		$cureMarker.css("opacity", 0.1)
 			.animate({ opacity: 1 }, getDuration(data, "specialEventBannerReveal") * 8, "easeOutQuad");
@@ -7211,18 +7216,20 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 			title: "DISCOVERED A CURE!",
 			description,
 			eventClass: diseaseColor
-			
 		});
+		appendEventHistoryIconOfType(discoverACure);
 
 		if (diseaseStatus === "eradicated")
 		{
+			flipCureMarkerToEradicated(diseaseColor, $cureMarker);
 			description = `No new disease cubes of this color will be placed on the board.`;
 			await specialEventAlert(
-				{
-					title: "DISEASE ERADICATED!",
-					description,
-					eventClass: diseaseColor
-				});
+			{
+				title: "DISEASE ERADICATED!",
+				description,
+				eventClass: diseaseColor
+			});
+			appendEventHistoryIconOfType(eradication);
 		}
 
 		await animatePromise(
@@ -7242,9 +7249,6 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 			.attr("id", `cureMarker${diseaseColor.toUpperCase()}`);
 		
 		positionCureMarkers();
-		
-		if (data.cures.remaining > 0)
-			await sleep(1500);
 		
 		resolve();
 	});
