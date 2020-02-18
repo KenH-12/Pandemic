@@ -3,13 +3,14 @@ BUGS
 sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
 	find a way to make sure it happens
 
-role tags in the action prompt receive the target cursor but do not locate the pawn
-	(observed while prompting share knowledge)
-player cards in the share knowledge prompt receive the underline when hovered but do not locate the city
-
 hovering over event cards in the discard pile should not show the 'play at any time, except' description
 
 sometimes the eventHistory scrollToEnd cuts off a but of the last icon when the page is reloaded
+
+discover cure, triggering eradication
+	check eradication icon
+	undo
+	discover cure again
 
 TO DO
 -----

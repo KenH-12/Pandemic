@@ -1458,7 +1458,7 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.buildResearchStation.name]({ stationRelocationKey })
 	{
-		const $actionInterface = actionInterfacePopulator.$actionInterface;
+		const { $actionInterface } = actionInterfacePopulator;
 
 		if (getResearchStationSupplyCount() === 0 && !stationRelocationKey)
 			return promptResearchStationRelocation();
@@ -1477,6 +1477,7 @@ const actionInterfacePopulator = {
 		if (playerIsOperationsExpert) // no city card is required
 		{
 			actionInterfacePopulator.appendSpecialAbilityRule(eventTypes.buildResearchStation);
+			locatePawnOnRoleTagClick($actionInterface);
 			
 			const $btnConfirm = $("<div class='button'>CONFIRM</div>");
 			$btnConfirm.click(function() { buildResearchStation(stationRelocationKey) });
@@ -1498,7 +1499,7 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.treatDisease.name]()
 	{
-		const $actionInterface = actionInterfacePopulator.$actionInterface,
+		const { $actionInterface } = actionInterfacePopulator,
 			player = getActivePlayer(),
 			city = player.getLocation(),
 			diseaseColorOptions = city.getDiseaseColorOptions();
@@ -1535,7 +1536,7 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.shareKnowledge.name]({ shareKnowledgeParticipant })
 	{
-		const $actionInterface = actionInterfacePopulator.$actionInterface,
+		const { $actionInterface } = actionInterfacePopulator,
 			player = getActivePlayer(),
 			researcherRole = "Researcher";
 		
@@ -1573,7 +1574,6 @@ const actionInterfacePopulator = {
 				});
 
 				$actionInterface.append($shareKnowledgePlayerOptions);
-				bindRoleCardHoverEvents();
 			}
 		}
 		
@@ -1620,18 +1620,20 @@ const actionInterfacePopulator = {
 				$cardOptions.off("click");
 				shareKnowledge(player, participant, $(this).data("key"));
 			});
-
-			bindRoleCardHoverEvents();
 		}
 
 		if (showResearcherSpecialAbilityRule)
 			actionInterfacePopulator.appendSpecialAbilityRule(eventTypes.shareKnowledge);
+		
+		bindRoleCardHoverEvents();
+		locatePawnOnRoleTagClick($actionInterface);
 
 		return true;
 	},
 	[eventTypes.discoverACure.name]()
 	{
-		const player = getActivePlayer(),
+		const { $actionInterface } = actionInterfacePopulator,
+			player = getActivePlayer(),
 			eventType = eventTypes.discoverACure,
 			useableCardKeys = player.getCardsForDiscoverACure(),
 			$cardSelectionPrompt = new DiscardPrompt(
@@ -1643,10 +1645,13 @@ const actionInterfacePopulator = {
 				onConfirm: discoverACure
 			});
 		
-		actionInterfacePopulator.$actionInterface.append($cardSelectionPrompt);
+		$actionInterface.append($cardSelectionPrompt);
 
 		if (player.role === "Scientist")
+		{
 			actionInterfacePopulator.appendSpecialAbilityRule(eventType);
+			locatePawnOnRoleTagClick($actionInterface);
+		}
 
 		return true;
 	},
@@ -1741,6 +1746,7 @@ const actionInterfacePopulator = {
 
 			actionInterfacePopulator.replaceInstructions(newSubtitle);
 			bindRoleCardHoverEvents();
+			locatePawnOnRoleTagClick(actionInterfacePopulator.$actionInterface);
 		}
 
 		return true;
@@ -1857,7 +1863,7 @@ const actionInterfacePopulator = {
 		if (currentStepIs("infect cities") && getEventsOfTurn(eventTypes.infectCity).length)
 			actionInterfacePopulator.replaceInstructions(`<span class='r'>This card skips the <i>next</i> Infect Cities step. Please wait until the the current Infect Cities step has completed.</span>`);
 		else if (isOneQuietNight())
-			actionInterfacePopulator.replaceInstructions(`<span class='r'>One Quiet Night has already been played this turn! It cannot be played twice in the same turn.</span>`)
+			actionInterfacePopulator.replaceInstructions(`<span class='r'>One Quiet Night has already been played this turn! It cannot be played twice on the same turn.</span>`)
 		else
 		{
 			actionInterfacePopulator.appendDiscardPrompt(
@@ -2985,7 +2991,7 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 
 function promptResearchStationRelocation()
 {
-	const $actionInterface = actionInterfacePopulator.$actionInterface;
+	const { $actionInterface } = actionInterfacePopulator;
 	// Prompt the player to choose a city from which to relocate a research station.
 	actionInterfacePopulator.replaceInstructions(`<span class='r'>Research Station Supply is empty!</span>
 	<br />Select a City from which to relocate a Research Station.`);
