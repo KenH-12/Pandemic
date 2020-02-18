@@ -1755,6 +1755,8 @@ const actionInterfacePopulator = {
 		{
 			planContingency($clicked.data("key"));
 		});
+
+		bindEventCardHoverEvents(data, actionInterfacePopulator.$actionInterface);
 		
 		return true;
 	},

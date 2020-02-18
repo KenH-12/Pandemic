@@ -211,9 +211,6 @@ the stored procedure increment_gamephase...
 
 facedown infectioncards need to be repositioned by resizeBoard
 
-contingency planner's color should be slightly darker to contrast the board and the white text
-dark gray background areas should be slighty lighter to contrast black cards
-
 ensure that the game initiated properly
 
 replace php associative arrays with objects
@@ -235,10 +232,6 @@ prevent pinpoint rectangles from triggering mouse events -- they mess with the d
 consider changing the color of the bottom panel -- black discards blend in
 
 use fetch instead of ajax
-
-modules
-
-contingency planner's pawn is hard to see -- make it slightly darker?
 
 use em instead of px for font sizes?
 
