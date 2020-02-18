@@ -27,7 +27,7 @@ export default class EventCard
                 </div>`);
     }
     
-    async showFullCard($eventCard, { boardWidth, boardHeight })
+    async showFullCard($eventCard, { boardWidth, boardHeight, promptingEventType })
     {
         const $fullCard = this.getFullCard(),
             $cardImg = $fullCard.children("img");
@@ -40,7 +40,7 @@ export default class EventCard
             ensureFullCardIsOnScreen($fullCard, boardHeight);
             
             if ($eventCard.hasClass("unavailable"))
-                showDisabledEventCardTooltip($fullCard);
+                showDisabledEventCardTooltip($fullCard, promptingEventType);
         });
     }
 
@@ -110,7 +110,7 @@ function ensureFullCardIsOnScreen($fullCard, boardHeight)
         $fullCard.offset({ top: boardHeight - fullCardHeight });
 }
 
-function showDisabledEventCardTooltip($fullEventCard)
+function showDisabledEventCardTooltip($fullEventCard, promptingEventType)
 {
     const $tooltip = $(`<div class='tooltip' id='disabledEventCard'>
                         <p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
@@ -118,6 +118,9 @@ function showDisabledEventCardTooltip($fullEventCard)
                     </div>`).appendTo("#boardContainer"),
         tooltipOffset = $fullEventCard.offset();
     
+    if (promptingEventType.code === eventTypes.forecastPlacement.code)
+        $tooltip.prepend("<p>* You must complete the Forecast event before doing anything else.</p>");
+
     tooltipOffset.left += $fullEventCard.outerWidth() + data.MARGIN;
     $tooltip.offset(tooltipOffset);
 }

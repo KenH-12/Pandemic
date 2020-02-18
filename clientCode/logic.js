@@ -2615,10 +2615,12 @@ function animateContingencyCardRemoval()
 	{
 		const $card = getContingencyCardElement().removeClass("contingency").addClass("removed");
 
+		disablePlayerDiscardHoverEvents();
 		await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
 		await animateDiscardPlayerCard($card, { removingContingencyCard: true });
 		await sleep(getDuration(data, "longInterval"));
 		await collapsePlayerDiscardPile();
+		enablePlayerDiscardHoverEvents();
 
 		resolve();
 	});
@@ -7561,6 +7563,7 @@ async function setup()
 	bindPlayerDeckHover();
 	bindInfectionDeckHover();
 	bindEventCardHoverEvents(data);
+	enablePlayerDiscardHoverEvents();
 	
 	if (forecastInProgress())
 	{
@@ -8815,10 +8818,16 @@ function bindInfectionDiscardHover()
 bindInfectionDiscardHover();
 function unbindInfectionDiscardHover() { $("#infectionDiscard").unbind("mouseenter mouseleave") }
 
-$("#playerDiscard").hover(
-	function() { expandPlayerDiscardPile() },
-	function() { collapsePlayerDiscardPile() }
-);
+function enablePlayerDiscardHoverEvents()
+{
+	$("#playerDiscard").off("mouseenter mouseleave")
+		.hover(function() { expandPlayerDiscardPile() }, function() { collapsePlayerDiscardPile() });
+}
+
+function disablePlayerDiscardHoverEvents()
+{
+	$("#playerDiscard").off("mouseenter mouseleave");
+}
 
 function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 {

@@ -9,14 +9,10 @@ player cards in the share knowledge prompt receive the underline when hovered bu
 
 hovering over event cards in the discard pile should not show the 'play at any time, except' description
 
-the grant station's initial offset appears inexact
-
 sometimes the eventHistory scrollToEnd cuts off a but of the last icon when the page is reloaded
 
 TO DO
 -----
-if forecastPlacement is prompted, the disabled event card description should mention that Forecast must be resolved before doing anything else
-
 action rules take up too much space
 	make them visible through tooltips (hover a "?" icon)
 
