@@ -3,8 +3,6 @@ BUGS
 sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
 	find a way to make sure it happens
 
-hovering over event cards in the discard pile should not show the 'play at any time, except' description
-
 sometimes the eventHistory scrollToEnd cuts off a but of the last icon when the page is reloaded
 
 discover cure, triggering eradication

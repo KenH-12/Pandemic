@@ -939,7 +939,7 @@ class PlanContingency extends UndoableEvent
 			const contingencyPlanner = this.player,
 				$card = contingencyPlanner.$panel.find(".playerCard.eventCard.contingency");
 			
-			await animateDiscardPlayerCard($card.removeClass("contingency"));
+			await animateDiscardPlayerCard($card.removeClass("contingency unavailable"));
 			contingencyPlanner.contingencyKey = false;
 
 			resolve();
