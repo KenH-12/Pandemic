@@ -1286,7 +1286,7 @@ span.r {color: #ef282a; background: none}
 	margin-bottom: 5px;
 	padding: 2px 0;
 }
-#btnCancelAction
+.btnCancelAction
 {
 	margin-top: 10px;
 	padding: 3px;
@@ -1299,7 +1299,8 @@ span.r {color: #ef282a; background: none}
 	background-color: rgb(63, 58, 58);
 	cursor: pointer;
 }
-#btnCancelAction:hover { background-color: rgb(82, 82, 82) }
+.rules + .btnCancelAction { margin-top: 2px }
+.btnCancelAction:hover { background-color: rgb(82, 82, 82) }
 #actionInterface .diseaseCube
 {
 	display: inline-block;

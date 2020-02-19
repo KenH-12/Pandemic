@@ -4,11 +4,6 @@ sometimes the city card populations aren't shown when animating the 'determine t
 	find a way to make sure it happens
 TO DO
 -----
-action rules take up too much space
-	make them visible through tooltips (hover a "?" icon)
-
-when the action prompt is overflowing, add a cancel button at the top as well
-
 change "x actions remaining" to 4 lights which turn off as actions are used
 
 when the contingency card is hovered, indicate that it's 'in contingency'

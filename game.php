@@ -319,7 +319,7 @@
 
 							<div id='actionPrompt' class='hidden'>
 								<div id='actionInterface'></div>
-								<div id='btnCancelAction'>Cancel</div>
+								<div class='btnCancelAction'>Cancel</div>
 							</div>
 						</div>
 

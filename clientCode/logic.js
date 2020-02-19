@@ -1073,7 +1073,7 @@ function hideEventIconDetails()
 function enableBtnCancelAction()
 {
 	log("enableBtnCancelAction()");
-	$("#btnCancelAction").off("click").click(function()
+	$(".btnCancelAction").off("click").click(function()
 	{
 		resetActionPrompt({ actionCancelled: true });
 		resumeCurrentStep();
@@ -1083,7 +1083,7 @@ function enableBtnCancelAction()
 function disableBtnCancelAction()
 {
 	log("disableBtnCancelAction()");
-	$("#btnCancelAction").off("click").css("display", "none");
+	$(".btnCancelAction").off("click").css("display", "none");
 }
 
 function resetActionPrompt({ actionCancelled } = {})
@@ -1138,12 +1138,25 @@ function resetActionPrompt({ actionCancelled } = {})
 function setRightPanelScrollability()
 {
 	const $rightPanel = $("#rightPanel"),
-		scrollable = "scrollable";
+		scrollable = "scrollable",
+		{ $actionInterface } = actionInterfacePopulator,
+		$cancelButtons = $actionInterface.parent().find(".btnCancelAction");
 
 	if (isOverflowingVertically($rightPanel))
+	{
 		$rightPanel.addClass(scrollable);
+
+		if ($actionInterface.is(":visible") && $cancelButtons.length === 1)
+		{
+			$actionInterface.find(".rules").after("<div class='btnCancelAction'>Cancel</div>");
+			enableBtnCancelAction();
+		}
+	}
 	else
+	{
 		$rightPanel.removeClass(scrollable);
+		$cancelButtons.not(":last").remove();
+	}
 }
 
 function promptAction(actionProperties)
@@ -1193,7 +1206,7 @@ const actionInterfacePopulator = {
 	$actionInterface: $("#actionInterface"),
 	clear()
 	{
-		actionInterfacePopulator.$actionInterface.children().not("#btnCancelAction").remove();
+		actionInterfacePopulator.$actionInterface.children().not(".btnCancelAction").remove();
 		return actionInterfacePopulator;
 	},
 	appendDescriptiveElements(eventType, { showEventCardDescription } = {})
