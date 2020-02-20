@@ -4,7 +4,8 @@ sometimes the city card populations aren't shown when animating the 'determine t
 	find a way to make sure it happens
 TO DO
 -----
-change "x actions remaining" to 4 lights which turn off as actions are used
+show action rules in a tooltip when a disabled action button is hovered
+	indicate that the action is not currently possible
 
 position auto-treat vial on img load event
 
@@ -67,7 +68,7 @@ make sure the height limit on the expanded infection discards functions properly
 
 IDEAS
 -----
-make the current play step glow
+change "x actions remaining" to 4 lights which turn off as actions are used
 
 skippable infection steps and epidemics
 

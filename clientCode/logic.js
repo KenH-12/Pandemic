@@ -4142,7 +4142,9 @@ class Player
 			let $insertAfterElement;
 			if (isContingencyCard) // Contingency cards are placed within the .role div
 			{
-				$card.removeClass("removed").addClass("contingency");
+				$card.off("mouseenter mouseleave")
+					.removeClass("removed")
+					.addClass("contingency");
 				$insertAfterElement = this.$panel.children(".role").children().first();
 			}
 			else
@@ -6258,6 +6260,8 @@ function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 			{
 				$card.insertAfter($guide)
 					.removeAttr("style");
+				
+				bindEventCardHoverEvents(data, { $containingElement: $container });
 			});
 	
 	return sleep(getDuration(data, "discardPlayerCard") * data.playerCardAnimationInterval);
