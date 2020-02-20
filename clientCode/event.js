@@ -1,6 +1,6 @@
 "use strict";
 
-import { eventCards } from "./eventCard.js";
+import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 
 const eventTypes = {
 	driveFerry: {
@@ -932,7 +932,7 @@ class PlanContingency extends UndoableEvent
 				${this.eventCard.getPlayerCard({ noTooltip: true })}`;
 	}
 	
-	animateUndo(animateDiscardPlayerCard)
+	animateUndo(gameData, animateDiscardPlayerCard)
 	{
 		return new Promise(async resolve =>
 		{
@@ -941,6 +941,8 @@ class PlanContingency extends UndoableEvent
 			
 			await animateDiscardPlayerCard($card.removeClass("contingency unavailable"));
 			contingencyPlanner.contingencyKey = false;
+
+			bindEventCardHoverEvents(gameData);
 
 			resolve();
 		});

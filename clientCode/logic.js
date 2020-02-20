@@ -1927,7 +1927,7 @@ async function planContingency(cardKey)
 	
 	const contingencyPlanner = getActivePlayer(),
 		eventType = eventTypes.planContingency,
-		$eventCard = $("#playerDiscard").find(`.playerCard[data-key='${cardKey}']`);
+		$eventCard = $("#playerDiscard").find(`.playerCard[data-key='${cardKey}']`).off("mouseenter mouseleave");
 
 	await Promise.all([
 		requestAction(eventType, { cardKey }),
@@ -3892,10 +3892,7 @@ function bindRoleCardHoverEvents()
 			if (player)
 				player.showRoleCard($hoveredElement);
 		},
-		function()
-		{
-			$(".roleCard").remove();
-		});
+		function() { $(".roleCard, #contingencyWrapper").remove() });
 }
 
 class Player
@@ -3918,20 +3915,27 @@ class Player
 
 	async showRoleCard($hoveredElement)
 	{
-		const $panel = this.$panel,
+		const {
+				$panel,
+				camelCaseRole,
+				role,
+				roleCardBullets,
+				contingencyKey
+			} = this,
 			hoveredElementOffset = $hoveredElement.length ? $hoveredElement.offset() : false,
 			roleCardOffset = hoveredElementOffset || $panel.offset(),
 			CARD_MARGIN = 5,
-			$roleCard = $(`<div class='roleCard ${this.camelCaseRole}'>
-							<h3>${this.role}</h3>
+			$roleCard = $(`<div class='roleCard ${camelCaseRole}'>
+							<h3>${role}</h3>
 							<img	class='rolePortrait'
-									src='images/cards/roles/${this.camelCaseRole}.jpg'
-									alt='${this.role} Role Card' />
+									src='images/cards/roles/${camelCaseRole}.jpg'
+									alt='${role} Role Card' />
 							<ul></ul>
 						</div>`),
-			$specialAbilities = $roleCard.children("ul");
+			$specialAbilities = $roleCard.children("ul"),
+			showFullContingencyCard = role === "Contingency Planner" && contingencyKey && !hoveredElementOffset;
 		
-		for (let bullet of this.roleCardBullets)
+		for (let bullet of roleCardBullets)
 			$specialAbilities.append(`<li><span>${bullet}</span></li>`);
 
 		$roleCard.appendTo("#boardContainer");
@@ -3964,6 +3968,9 @@ class Player
 		}
 		
 		$roleCard.offset(roleCardOffset);
+
+		if (showFullContingencyCard)
+			eventCards[contingencyKey].showFullCard($panel.find(".eventCard.contingency"), data);
 	}
 
 	newRoleTag()
@@ -4688,7 +4695,7 @@ function appendPlayerPanel(player)
 		numPlayers = Object.keys(data.players).length,
 		$panel = $(`<div class='playerPanel playerPanel${numPlayers} hidden' id='${camelCaseRole}'>
 						<div class='name'>${name}</div>
-						<div class='role ${camelCaseRole}' title='Click to locate pawn'>
+						<div class='role ${camelCaseRole}'>
 							<p>${role}</p>
 						</div>
 						<div class='btnCollapseExpand collapse' title='collapse'>
@@ -9067,7 +9074,7 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 			else if (event instanceof ResearchStationPlacement)
 				await event.animateUndo(data, animateResearchStationBackToSupply, wasContingencyCard);
 			else if (event instanceof PlanContingency)
-				await event.animateUndo(animateDiscardPlayerCard);
+				await event.animateUndo(data, animateDiscardPlayerCard);
 			else if (event instanceof OneQuietNight)
 			{
 				await event.animateUndo(wasContingencyCard);

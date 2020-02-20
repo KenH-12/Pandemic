@@ -268,9 +268,11 @@ span.r {color: #ef282a; background: none}
 }
 .eventCard.unavailable:active { background: #8a181a }
 
-#boardContainer > .eventCardFull
+#boardContainer > .eventCardFull,
+#contingencyWrapper
+{ width: 17% }
+.eventCardFull
 {
-	width: 17%;
 	padding-bottom: 3px;
 	border-top-left-radius: 8px;
 	border-bottom-right-radius: 8px;
@@ -301,7 +303,23 @@ span.r {color: #ef282a; background: none}
 	margin-bottom: 3px;
 }
 #disabledEventCard.tooltip { width: 300px }
-
+#contingencyWrapper
+{
+	padding: 8px;
+	padding-top: 2px;
+	border-top-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+#contingencyWrapper > h2
+{
+	font-size: 16px;
+	color: #000;
+}
+#contingencyWrapper > .eventCardFull
+{
+	width: 100%;
+	border: 1px solid #fff;
+}
 .pawnArrow.airlift > div,
 .airlift:not(.pawnArrow)
 {
@@ -1051,7 +1069,8 @@ span.r {color: #ef282a; background: none}
 
 .contingencyPlanner:not(.pawnArrow),
 .pawnArrow.contingencyPlanner:not(.dispatch) > div,
-#btnPlanContingency
+#btnPlanContingency,
+#contingencyWrapper
 { background-image: linear-gradient(to bottom, #76d9da, #0b6f90) }
 .role.contingencyPlanner > .playerCard
 {
@@ -1063,11 +1082,11 @@ span.r {color: #ef282a; background: none}
 .roleCard
 {
 	width: 17%;
-	border: 2px solid #fff;
 	border-radius: 8px;
 }
 .roleCard,
-#boardContainer > .eventCardFull
+#boardContainer > .eventCardFull,
+#contingencyWrapper
 {
 	position: absolute;
 	z-index: 12;

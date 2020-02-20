@@ -17,19 +17,26 @@ export default class EventCard
 		return `<div class='playerCard eventCard' data-key='${this.key}'>${this.name.toUpperCase()}</div>`;
     }
 
-    getFullCard()
+    getFullCard(isContingencyCard)
     {
-        return $(`<div class='eventCardFull' data-key='${this.key}'>
-                    <h5>EVENT</h5>
-                    <h3>${this.name.toUpperCase()}</h3>
-                    <img src='images/cards/event/${toCamelCase(this.name)}.jpg' alt='${this.name}' />
-                    ${this.getRules()}
-                </div>`);
+        const $fullCard = $(`<div class='eventCardFull' data-key='${this.key}'>
+                                <h5>EVENT</h5>
+                                <h3>${this.name.toUpperCase()}</h3>
+                                <img src='images/cards/event/${toCamelCase(this.name)}.jpg' alt='${this.name}' />
+                                ${this.getRules()}
+                            </div>`);
+        
+        if (isContingencyCard)
+            return $(`<div id='contingencyWrapper'>
+                        <h2>Stored Event card:</h2>
+                    </div>`).append($fullCard);
+        
+        return $fullCard;
     }
     
-    async showFullCard($eventCard, { boardWidth, boardHeight, promptingEventType })
+    showFullCard($eventCard, { boardWidth, boardHeight, promptingEventType })
     {
-        const $fullCard = this.getFullCard(),
+        const $fullCard = this.getFullCard($eventCard.hasClass("contingency")),
             $cardImg = $fullCard.children("img");
         
         $fullCard.appendTo("#boardContainer")
@@ -76,13 +83,14 @@ function bindEventCardHoverEvents(boardDimensions, { $containingElement } = {})
         $eventCards = $containingElement ? $containingElement.find(eventCardSelector) : $(eventCardSelector);
     
     let $this;
-    $eventCards.off("mouseenter mouseleave")
+    $eventCards.not(".contingency")
+        .off("mouseenter mouseleave")
         .hover(function()
         {
             $this = $(this);
             eventCards[$this.data("key")].showFullCard($this, boardDimensions);
         },
-        function() { $("#boardContainer").children(".eventCardFull, #disabledEventCard.tooltip").remove() });
+        function() { $("#boardContainer").children("#contingencyWrapper, .eventCardFull, #disabledEventCard.tooltip").remove() });
 }
 
 function getFullCardOffset($eventCard, $fullCard, boardWidth)
@@ -93,7 +101,16 @@ function getFullCardOffset($eventCard, $fullCard, boardWidth)
     
     if ($eventCard.closest(".playerPanel").length
         || $eventCard.closest("#eventDetails").length)
+    {
         fullCardOffset.left += eventCardWidth + data.MARGIN;
+
+        if ($eventCard.hasClass("contingency"))
+        {
+            const $roleCard = $(".roleCard");
+            fullCardOffset.left += $roleCard.width() + data.MARGIN;
+            fullCardOffset.top = $roleCard.offset().top;
+        }
+    }
     else if ($eventCard.closest("#playerDiscard").length)
         fullCardOffset.left -= fullCardWidth + data.MARGIN;
     else if ($eventCard.closest("#rightPanel").length)

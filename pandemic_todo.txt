@@ -6,8 +6,6 @@ TO DO
 -----
 change "x actions remaining" to 4 lights which turn off as actions are used
 
-when the contingency card is hovered, indicate that it's 'in contingency'
-
 position auto-treat vial on img load event
 
 event history
