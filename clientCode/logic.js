@@ -3279,7 +3279,7 @@ function flipCureMarkerToEradicated(diseaseColor, $cureMarker)
 	if (!diseaseColor)
 		return false;
 	
-	$cureMarker = $cureMarker.length ? $cureMarker : $(`#cureMarker${diseaseColor.toUpperCase()}`)
+	$cureMarker = $cureMarker ? $cureMarker : $(`#cureMarker${diseaseColor.toUpperCase()}`)
 	
 	$cureMarker.prop("src", `images/pieces/cureMarker_${diseaseColor}_eradicated.png`);
 }
@@ -6408,7 +6408,7 @@ async function medicAutoTreatAnimation()
 		$circle = newMedicAutoTreatCircle(),
 		duration = 500;
 	
-	positionAutoTreatCircleComponents($circle, $cureMarker);
+	$cureMarker.on("load", function() { positionAutoTreatCircleComponents($circle, $cureMarker) });
 	
 	animatePromise(
 	{
@@ -6445,7 +6445,7 @@ function showMedicAutoTreatCircle({ color, fadeInMs } = {})
 		$circle = newMedicAutoTreatCircle(),
 		$cureMarker = newCureMarker(color || city.color, "cured", { isForMedicAutoTreat: true })
 	
-	positionAutoTreatCircleComponents($circle, $cureMarker);
+	$cureMarker.on("load", function() { positionAutoTreatCircleComponents($circle, $cureMarker) });
 	
 	animatePromise(
 	{

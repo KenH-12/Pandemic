@@ -4,8 +4,6 @@ sometimes the city card populations aren't shown when animating the 'determine t
 	find a way to make sure it happens
 TO DO
 -----
-position auto-treat vial on img load event
-
 event history
 	remove icons which are not visible?
 	detailed tooltips
