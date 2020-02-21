@@ -42,13 +42,10 @@ export default class EventCard
         $fullCard.appendTo("#boardContainer")
             .offset(getFullCardOffset($eventCard, $fullCard, boardWidth));
 
-        $cardImg.on("load", function()
-        {
-            ensureFullCardIsOnScreen($fullCard, boardHeight);
-            
-            if ($eventCard.hasClass("unavailable"))
-                showDisabledEventCardTooltip($fullCard, promptingEventType);
-        });
+        $cardImg.on("load", function() { ensureFullCardIsOnScreen($fullCard, boardHeight) });
+
+        if ($eventCard.hasClass("unavailable"))
+            showDisabledEventCardTooltip($fullCard, promptingEventType);
     }
 
     getRules()
@@ -135,7 +132,7 @@ function showDisabledEventCardTooltip($fullEventCard, promptingEventType)
                     </div>`).appendTo("#boardContainer"),
         tooltipOffset = $fullEventCard.offset();
     
-    if (promptingEventType.code === eventTypes.forecastPlacement.code)
+    if (promptingEventType && promptingEventType.code === eventTypes.forecastPlacement.code)
         $tooltip.prepend("<p>* You must complete the Forecast event before doing anything else.</p>");
 
     tooltipOffset.left += $fullEventCard.outerWidth() + data.MARGIN;

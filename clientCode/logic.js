@@ -603,9 +603,9 @@ function enableEventCards({ resilientPopulationOnly } = {})
 	}
 	
 	$eventCards.removeClass("unavailable")
-		.click(function(event)
+		.click(function(e)
 		{
-			event.stopPropagation();
+			e.stopPropagation();
 			
 			const eventType = getEventCardEventType($(this).data("key"));
 			
@@ -3892,7 +3892,7 @@ function bindRoleCardHoverEvents()
 			if (player)
 				player.showRoleCard($hoveredElement);
 		},
-		function() { $(".roleCard, #contingencyWrapper").remove() });
+		function() { $(".roleCard, #contingencyWrapper, #disabledEventCard").remove() });
 }
 
 class Player
@@ -3970,7 +3970,7 @@ class Player
 		$roleCard.offset(roleCardOffset);
 
 		if (showFullContingencyCard)
-			eventCards[contingencyKey].showFullCard($panel.find(".eventCard.contingency"), data);
+			eventCards[contingencyKey].showFullCard(getContingencyCardElement(), data);
 	}
 
 	newRoleTag()
@@ -4708,10 +4708,7 @@ function appendPlayerPanel(player)
 	
 	$panel.appendTo("#playerPanelContainer")
 		.children(".role")
-		.click(function()
-			{
-				player.pinpointLocation();
-			})
+		.on("click", ":not(.eventCard)", function() { player.pinpointLocation() })
 		.siblings(".btnCollapseExpand").click(function() { togglePlayerPanel($(this)) });
 	
 	player.$panel = $panel;
