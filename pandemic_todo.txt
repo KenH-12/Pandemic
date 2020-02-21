@@ -4,9 +4,6 @@ sometimes the city card populations aren't shown when animating the 'determine t
 	find a way to make sure it happens
 TO DO
 -----
-show action rules in a tooltip when a disabled action button is hovered
-	indicate that the action is not currently possible
-
 position auto-treat vial on img load event
 
 event history

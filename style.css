@@ -410,11 +410,46 @@ span.r {color: #ef282a; background: none}
 	color: #fff;
 	padding: 4px;
 	border-radius: 5px;
-	filter: drop-shadow(-4px -4px 6px #000);
 }
 .tooltip > p { margin: 3px 0 }
 
-#eventDetails { font-size: 16px }
+.actionButtonTooltip
+{
+	width: 300px;
+}
+.actionButtonTooltip h3
+{
+	font-family: 'Exo 2', sans-serif;
+	font-size: 20px;
+}
+.actionButtonTooltip .actionNotPossible
+{
+	color: #666;
+	text-align: center;
+	border-top: 1px solid #666;
+	border-bottom: 1px solid #666;
+	padding: 2px 0;
+}
+.actionButtonTooltip p
+{
+	margin-top: 3px;
+	line-height: 16px;
+}
+.actionButtonTooltip h3 + p
+{
+	border-top: 1px solid #fff;
+	padding-top: 5px;
+}
+.actionButtonTooltip .specialAbilityRule
+{
+	border-bottom: 1px solid #fff;
+}
+
+#eventDetails
+{
+	font-size: 16px;
+	filter: drop-shadow(-4px -4px 6px #000);
+}
 #eventDetails .title
 {
 	font-size: 17px;
@@ -1086,7 +1121,8 @@ span.r {color: #ef282a; background: none}
 }
 .roleCard,
 #boardContainer > .eventCardFull,
-#contingencyWrapper
+#contingencyWrapper,
+.tooltip
 {
 	position: absolute;
 	z-index: 12;
@@ -1163,7 +1199,7 @@ span.r {color: #ef282a; background: none}
 	font-size: 18px;
 	margin: 10px 0 0 2px;
 }
-.actionCategory .button,
+.actionButton,
 .actionPromptOption
 {
 	width: 100%;
@@ -1176,13 +1212,13 @@ span.r {color: #ef282a; background: none}
 .actionCategory > .btnDisabled:not(.wait)
 { cursor: help }
 .wait { cursor: wait }
-.actionCategory .button *
+.actionButton *
 {
 	display: inline-block;
 	vertical-align: middle;
 	pointer-events: none;
 }
-.actionCategory .button > .actionIcon
+.actionButton > .actionIcon
 {
 	width: 17%;
 	padding: 0;
@@ -1199,38 +1235,10 @@ span.r {color: #ef282a; background: none}
 	width: 77%;
 	text-align: left;
 }
-.actionNotPossible
-{
-	font-size: 12px;
-	line-height: 12px;
-	width: 100%;
-	border-top: 1px solid #777;
-	border-bottom: 1px solid #777;
-	padding-bottom: 2px;
-}
-.disabledActionRules
-{
-	font-family: 'Ropa Sans', sans-serif;
-	font-size: 16px;
-	text-align: left;
-	padding: 0 5px;
-	margin-top: 1px;
-	color: #fff;
-}
-.disabledActionRules > p
-{
-	margin-top: 3px;
-	line-height: 16px;
-}
-.disabledActionRules .specialAbilityRule
-{
-	border-bottom: 1px solid #fff;
-}
 .specialAbilityRule::before
 {
 	content: "* ";
 }
-.button.scientist .disabledActionRules,
 .button.scientist .specialAbilityRule
 {
 	color : #000;

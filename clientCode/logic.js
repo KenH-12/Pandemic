@@ -530,9 +530,9 @@ function disableActions()
 		.off("click")
 		.addClass("btnDisabled wait");
 
+	unbindDiseaseCubeEvents();
 	disableEventCards();
 	disablePawnEvents();
-	unbindDiseaseCubeEvents();
 	disableResearchStationDragging();
 	eventHistory.disableUndo();
 	eventHistory.disableScrollButtons();
@@ -545,7 +545,7 @@ function enableAvailableActions()
 		player = getActivePlayer();
 	
 	$actionsContainer.find(".button")
-		.off("click mouseleave")
+		.off("click mousenter mouseleave")
 		.addClass("btnDisabled")
 		.removeClass("wait");
 	
@@ -764,8 +764,6 @@ function enableAvailableActionButtons(player)
 
 		if (player[`can${actionName}`]())
 			enableActionButton(`btn${actionName}`);
-		else
-			bindDisabledActionButtonEvents(`btn${actionName}`);
 	}
 }
 
@@ -791,8 +789,6 @@ function enableAvailableSpecialActionButtons($actionsContainer, player)
 		
 		if (player[`can${actionName}`]())
 			enableActionButton(`btn${actionName}`);
-		else
-			bindDisabledActionButtonEvents(`btn${actionName}`);
 	}
 
 	// if no special actions are available, hide the special action button group
@@ -813,93 +809,45 @@ function enableActionButton(buttonID)
 		.removeClass("btnDisabled hidden")
 		.click(function()
 		{
+			$(".actionButtonTooltip").remove();
 			promptAction({ eventType: eventTypes[actionName] });
 		});
 }
 
-function bindDisabledActionButtonEvents(actionButtonID)
+function bindActionButtonHoverEvents()
 {
-	const $btn = $(`#${actionButtonID}`),
-		eventType = eventTypes[toCamelCase(actionButtonID.substring(3))],
-		initialHeight = $btn.height();
+	const actionButtonSelector = ".actionButton",
+		TOOLTIP_MARGIN = 5;
+
+	let $this,
+		eventType;
 	
-	$btn.off("click")
-		.click(function()
+	$(document).on("mouseenter", actionButtonSelector, function()
 		{
-			$btn.off("click")
-				.click(function()
-				{
-					$btn.off("click mouseleave");
-					hideActionRules($btn, initialHeight, eventType);
-				});
+			$this = $(this);
+			eventType = eventTypes[toCamelCase($this.attr("id").substring(3))];
+
+			const disabledMsg = $this.hasClass("btnDisabled") ? "<p class='actionNotPossible'>This action is not currently possible.</p>" : "",
+				$tooltip = $(`<div class='tooltip actionButtonTooltip'>
+								<h3>${eventType.name}</h3>
+								${disabledMsg}
+							</div>`),
+				offset = $this.offset();
+
+			for (let rule of eventType.rules)
+				$tooltip.append(`<p>${rule}</p>`);
 			
-			showActionRules($btn, eventType);
+			$tooltip.appendTo("#boardContainer");
+
+			offset.left -= $tooltip.outerWidth() + TOOLTIP_MARGIN;
+
+			const tooltipHeight = $tooltip.outerHeight() + TOOLTIP_MARGIN;
+			if (offset.top + tooltipHeight > data.boardHeight)
+				offset.top = data.boardHeight - tooltipHeight;
+			
+			$tooltip.offset(offset);
 		})
-		.removeClass("hidden");
-}
-
-async function showActionRules($actionButton, eventType)
-{
-	const initialHeight = $actionButton.height(),
-		actionRules = [...eventType.rules];
-	
-	if (eventType.relatedRoleName === getActivePlayer().role)
-		actionRules.unshift(`<span class='specialAbilityRule'>${eventType.relatedRoleRule}</span>`);
-
-	$actionButton.stop().removeAttr("style")
-		.html(`${$actionButton.html()}<br />
-			<span class='actionNotPossible'>( this action is not currently possible )</span>
-			<span class='disabledActionRules'>
-				<p>${actionRules.join("</p><p>")}</p>
-			</span>`);
-
-	const eventualHeight = $actionButton.height();
-
-	await animatePromise(
-	{
-		$elements: $actionButton,
-		initialProperties: { height: initialHeight },
-		desiredProperties: { height: eventualHeight },
-		duration: 500,
-		easing: "easeOutQuad"
-	});
-	
-
-	$actionButton.off("mouseleave")
-		.mouseleave(function()
-		{
-			$actionButton.off("mouseleave");
-
-			hideActionRules($actionButton, initialHeight, eventType);
-		})
-		.removeAttr("style");
-}
-
-async function hideActionRules($actionButton, initialHeight, eventType)
-{
-	const expandedHeight = $actionButton.stop().height();
-
-	await animatePromise(
-	{
-		$elements: $actionButton,
-		initialProperties: { height: expandedHeight },
-		desiredProperties: { height: initialHeight },
-		duration: 200
-	});
-
-	$actionButton.html(getActionButtonContents(eventType)).removeAttr("style");
-	bindDisabledActionButtonEvents($actionButton.attr("id"));
-}
-
-function getActionButtonContents(eventType)
-{
-	const { name } = eventType;
-
-	if (!eventType.hasIcon)
-		return name.toUpperCase();
-
-	return `${getEventIconHtml(eventType)}
-			<div class='actionName'>${name.toUpperCase()}</div>`;
+		.on("mouseleave", actionButtonSelector, function() { $(".actionButtonTooltip").remove() });
 }
 
 function getEventIconHtml(eventType, { event } = {})
@@ -1533,11 +1481,7 @@ const actionInterfacePopulator = {
 					markTreatableDiseaseCubes($cubesOfColor.last());
 				},
 				function() { unmarkTreatableDiseaseCubes($cubes) })
-				.click(function()
-				{
-					resetActionPrompt();
-					treatDisease(false, getColorClass($(this)));
-				});
+				.click(function(){ treatDisease(false, getColorClass($(this))) });
 
 			delayExecution(resizeTreatDiseaseOptions, 1);
 			return true;
@@ -1816,7 +1760,6 @@ const actionInterfacePopulator = {
 	[eventTypes.governmentGrant.name]({ targetCity, relocationKey })
 	{
 		disablePawnEvents();
-		unbindDiseaseCubeEvents();
 		
 		data.promptingEventType = eventTypes.governmentGrant;
 		
@@ -3270,6 +3213,7 @@ function movementActionDiscard(eventType, destination, { playerToDispatch, opera
 async function treatDisease($cube, diseaseColor)
 {
 	disableActions();
+	resetActionPrompt();
 	
 	const city = getActivePlayer().getLocation(),
 		eventType = eventTypes.treatDisease;
@@ -3340,10 +3284,7 @@ function flipCureMarkerToEradicated(diseaseColor, $cureMarker)
 function finishActionStep()
 {
 	if (currentStepIs("action 4"))
-	{
-		unbindDiseaseCubeEvents();
 		$("#actionsContainer").slideUp();
-	}
 	
 	proceed();
 }
@@ -3797,8 +3738,6 @@ function resizeAndRepositionPieces()
 		const cubeWidth = getDimension(data, "cubeWidth");
 		$("#boardContainer > .diseaseCube").width(cubeWidth).height(cubeWidth);
 		data.cubeWidth = cubeWidth;
-	
-		actionStepInProgress() ? bindDiseaseCubeEvents() : unbindDiseaseCubeEvents();
 	
 		positionAutoTreatCircleComponents();
 		
@@ -5512,20 +5451,26 @@ function updateCubeSupplyCount(cubeColor, { addend, newCount } = {})
 
 function bindDiseaseCubeEvents()
 {
-	unbindDiseaseCubeEvents();
-	
 	const player = getActivePlayer(),
 		{ cityKey } = player,
-		$cubes = $("#boardContainer").children(`.${cityKey}.diseaseCube`);
+		$cubes = $("#boardContainer").children(`.${cityKey}.diseaseCube`),
+		$btnTreatDisease = $("#btnTreatDisease");
 	
 	$cubes.attr("title", "Click to Treat Disease")
-		.hover(function() { markTreatableDiseaseCubes($(this)) },
-			function() { unmarkTreatableDiseaseCubes($cubes) })
+		.off("click mouseenter mouseleave")
+		.hover(function()
+		{
+			if (!$btnTreatDisease.hasClass("btnDisabled"))
+				markTreatableDiseaseCubes($(this));
+		},
+		function() { unmarkTreatableDiseaseCubes($cubes) })
 		.click(function()
 		{
-			unbindDiseaseCubeEvents();
-			resetActionPrompt();
-			treatDisease($(this));
+			if (!$btnTreatDisease.hasClass("btnDisabled"))
+			{
+				unmarkTreatableDiseaseCubes($cubes);
+				treatDisease($(this));
+			}
 		});
 	
 	let $this;
@@ -5535,18 +5480,13 @@ function bindDiseaseCubeEvents()
 		if ($this.is(":hover"))
 			markTreatableDiseaseCubes($this);
 	});
+}
 
-	const $btnTreatDisease = $(`#btnTreatDisease`);
-	$btnTreatDisease.hover(
-		function()
-		{
-			if (!$(this).hasClass("btnDisabled"))
-				markTreatableDiseaseCubes($cubes.last(), { hoveredOverButton: true });
-		},
-		function() { unmarkTreatableDiseaseCubes($cubes) });
-
-	if ($btnTreatDisease.is(":hover") && !$btnTreatDisease.hasClass("btnDisabled"))
-		markTreatableDiseaseCubes($cubes.last(), { hoveredOverButton: true });
+function unbindDiseaseCubeEvents()
+{
+	$("#boardContainer").children(".diseaseCube")
+		.off("click mouseenter mouseleave")
+		.removeAttr("title");
 }
 
 function markTreatableDiseaseCubes($hoveredCube, { hoveredOverButton } = {})
@@ -5582,17 +5522,6 @@ function unmarkTreatableDiseaseCubes($cubes)
 {
 	$cubes.removeClass("cubeToRemove")
 		.children(".cubeSlash").remove();
-}
-
-function unbindDiseaseCubeEvents()
-{
-	$("#boardContainer").children(".diseaseCube")
-		.unbind("click mouseenter mouseleave")
-		.removeAttr("title")
-		.removeClass("cubeToRemove")
-		.children(".cubeSlash").remove();
-	
-	$("#btnTreatDisease").off("mouseenter mousleave");
 }
 
 function highlightEpidemicStep($epidemic, epidemicStep)
@@ -7593,8 +7522,9 @@ async function setup()
 
 	bindPlayerDeckHover();
 	bindInfectionDeckHover();
-	bindEventCardHoverEvents(data);
 	enablePlayerDiscardHoverEvents();
+	bindEventCardHoverEvents(data);
+	bindActionButtonHoverEvents();
 	
 	if (forecastInProgress())
 	{
