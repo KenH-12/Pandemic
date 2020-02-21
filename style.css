@@ -442,7 +442,8 @@ span.r {color: #ef282a; background: none}
 }
 .actionButtonTooltip .specialAbilityRule
 {
-	border-bottom: 1px solid #fff;
+	border-top: 1px dashed #fff;
+	padding-top: 3px;
 }
 
 #eventDetails

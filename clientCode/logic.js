@@ -837,6 +837,9 @@ function bindActionButtonHoverEvents()
 			for (let rule of eventType.rules)
 				$tooltip.append(`<p>${rule}</p>`);
 			
+			if (eventType.relatedRoleName && getActivePlayer().role === eventType.relatedRoleName)
+				$tooltip.append(`<p class='specialAbilityRule'>${eventType.relatedRoleRule}</p>`);
+			
 			$tooltip.appendTo("#boardContainer");
 
 			offset.left -= $tooltip.outerWidth() + TOOLTIP_MARGIN;

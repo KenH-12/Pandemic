@@ -76,7 +76,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "shareKnowledge",
 		propertyNames: ["cardKey", "giverRoleID", "receiverRoleID"],
 		relatedRoleName: "Researcher",
-		relatedRoleRule: "The Researcher may <i>give</i> a City card without needing to be in the city that matches the card."
+		relatedRoleRule: "The Researcher may <i>give</i> a city card without needing to be in the city that matches the card."
 	},
 	treatDisease: {
 		name: "Treat Disease",
