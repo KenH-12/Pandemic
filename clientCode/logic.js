@@ -585,9 +585,20 @@ function useRoleColorForRelatedActionButtons(role)
 
 		if (role === action.relatedRoleName)
 			$actionButton.addClass(toCamelCase(role));
+		else if (action.name === "Share Knowledge" && activePlayerCanTakeFromResearcher())
+			$actionButton.addClass("researcher");
 		else
 			$actionButton.removeClass(toCamelCase(action.relatedRoleName));
 	}
+}
+
+function activePlayerCanTakeFromResearcher()
+{
+	const researcher = getPlayer("Researcher");
+
+	return researcher &&
+		researcher.isHoldingAnyCityCard() &&
+		researcher.cityKey === getActivePlayer().cityKey;
 }
 
 function enableEventCards({ resilientPopulationOnly } = {})
@@ -837,8 +848,10 @@ function bindActionButtonHoverEvents()
 			for (let rule of eventType.rules)
 				$tooltip.append(`<p>${rule}</p>`);
 			
-			if (eventType.relatedRoleName && getActivePlayer().role === eventType.relatedRoleName)
-				$tooltip.append(`<p class='specialAbilityRule'>${eventType.relatedRoleRule}</p>`);
+			if (eventType.relatedRoleName
+				&& (getActivePlayer().role === eventType.relatedRoleName
+					|| eventType.name === "Share Knowledge" && activePlayerCanTakeFromResearcher()))
+				$tooltip.append(`<p class='specialAbilityRule'>${replaceRoleNamesWithRoleTags(eventType.relatedRoleRule)}</p>`);
 			
 			$tooltip.appendTo("#boardContainer");
 
@@ -4548,6 +4561,17 @@ function getSpecialAbilityRule(eventType)
 	const { relatedRoleName, relatedRoleRule } = eventType;
 
 	return relatedRoleRule.replace(relatedRoleName, getPlayer(relatedRoleName).newRoleTag());
+}
+
+function replaceRoleNamesWithRoleTags(string)
+{
+	let player;
+	for (let rID in data.players)
+	{
+		player = data.players[rID];
+		string = string.replace(player.role, player.newRoleTag());
+	}
+	return string;
 }
 
 function operationsFlightWasUsedThisTurn()

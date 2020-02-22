@@ -437,11 +437,11 @@ span.r {color: #ef282a; background: none}
 	border-top: 1px solid #fff;
 	padding-top: 5px;
 }
-.actionButtonTooltip 
 .actionButtonTooltip .specialAbilityRule
 {
+	margin-top: 10px;
 	border-top: 1px dashed #fff;
-	padding-top: 3px;
+	padding-top: 5px;
 }
 
 #eventDetails
