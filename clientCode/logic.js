@@ -829,7 +829,7 @@ function bindActionButtonHoverEvents()
 
 			const disabledMsg = $this.hasClass("btnDisabled") ? "<p class='actionNotPossible'>This action is not currently possible.</p>" : "",
 				$tooltip = $(`<div class='tooltip actionButtonTooltip'>
-								<h3>${eventType.name}</h3>
+								<h3>${eventType.name.toUpperCase()}</h3>
 								${disabledMsg}
 							</div>`),
 				offset = $this.offset();

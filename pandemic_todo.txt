@@ -23,11 +23,6 @@ when a piece lands behind part of a playerPanel, the panel should become transpa
 find some other way to convey that the cost of some actions is to discard whichever card(s)
 	e.g. "Cost:"
 
-the pinpointers should appear behind...
-	the player deck container
-	the rs supply
-	the event history
-
 rendezvous button
 
 rules / instructions / FAQ
