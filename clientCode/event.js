@@ -162,11 +162,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 		propertyNames: ["originKey", "destinationKey", "discardKey"]
 	},
 	pass: {
-		name: "Pass Actions",
+		name: "Pass",
 		hasIcon: true,
 		code: "pa",
 		propertyNames: [],
-		rules: [`Forfeit your remaining actions and proceed to the "Draw 2 cards" step.`],
+		rules: [`Forfeit your remaining actions for this turn and proceed to the "Draw 2 cards" step.`],
 		instructions: "Pass on your remaining actions for this turn?",
 		actionPathName: "passActions",
 		propertyNames: ["numActionsForfeited"]

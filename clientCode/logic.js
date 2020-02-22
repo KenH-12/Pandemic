@@ -816,23 +816,23 @@ function enableActionButton(buttonID)
 
 function bindActionButtonHoverEvents()
 {
-	const actionButtonSelector = ".actionButton",
+	const actionInfoSelector = ".actionInfo",
 		TOOLTIP_MARGIN = 5;
 
-	let $this,
+	let $btn,
 		eventType;
 	
-	$(document).on("mouseenter", actionButtonSelector, function()
+	$(document).on("mouseenter", actionInfoSelector, function()
 		{
-			$this = $(this);
-			eventType = eventTypes[toCamelCase($this.attr("id").substring(3))];
+			$btn = $(this).closest(".actionButton");
+			eventType = eventTypes[toCamelCase($btn.attr("id").substring(3))];
 
-			const disabledMsg = $this.hasClass("btnDisabled") ? "<p class='actionNotPossible'>This action is not currently possible.</p>" : "",
+			const disabledMsg = $btn.hasClass("btnDisabled") ? "<p class='actionNotPossible'>This action is not currently possible.</p>" : "",
 				$tooltip = $(`<div class='tooltip actionButtonTooltip'>
 								<h3>${eventType.name.toUpperCase()}</h3>
 								${disabledMsg}
 							</div>`),
-				offset = $this.offset();
+				offset = $btn.offset();
 
 			for (let rule of eventType.rules)
 				$tooltip.append(`<p>${rule}</p>`);
@@ -850,7 +850,7 @@ function bindActionButtonHoverEvents()
 			
 			$tooltip.offset(offset);
 		})
-		.on("mouseleave", actionButtonSelector, function() { $(".actionButtonTooltip").remove() });
+		.on("mouseleave", actionInfoSelector, function() { $(".actionButtonTooltip").remove() });
 }
 
 function getEventIconHtml(eventType, { event } = {})

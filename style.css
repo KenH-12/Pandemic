@@ -1210,31 +1210,45 @@ span.r {color: #ef282a; background: none}
 	font-size: 18px;
 }
 .actionCategory > .btnDisabled:not(.wait)
-{ cursor: help }
+{ cursor: default }
 .wait { cursor: wait }
-.actionButton *
+.actionButton * { display: inline-block }
+.actionButton *:not(.actionInfo)
 {
-	display: inline-block;
 	vertical-align: middle;
 	pointer-events: none;
 }
 .actionButton > .actionIcon
 {
 	width: 17%;
-	padding: 0;
+	padding: 2px 0;
 	margin: 0 2%;
 }
 .actionIcon img
 {
 	width: 96%;
-	padding: 2%;
+	padding: 0 2%;
 	border-radius: 15%;
 }
 .actionName
 {
-	width: 77%;
+	width: 65%;
 	text-align: left;
 }
+.actionInfo
+{
+	width: 6%;
+	margin: 0 2%;
+	font-size: 14px;
+	pointer-events: all;
+}
+.actionButton:not(.btnDisabled) .actionInfo:hover
+{
+	color: #000;
+	cursor: pointer;
+}
+.btnDisabled .actionInfo:hover { color: #fff }
+
 .specialAbilityRule::before
 {
 	content: "* ";

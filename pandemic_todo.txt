@@ -20,9 +20,6 @@ hovering over an epidemic card should show the full card
 
 when a piece lands behind part of a playerPanel, the panel should become transparent
 
-find some other way to convey that the cost of some actions is to discard whichever card(s)
-	e.g. "Cost:"
-
 rendezvous button
 
 rules / instructions / FAQ
