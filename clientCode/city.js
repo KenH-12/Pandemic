@@ -80,11 +80,11 @@ export default class City
 		return { left: x, top: y };
 	}
 
-	getAreaDiv(gameData)
+	getAreaDiv(boardDimensions)
 	{
 		const $areaDiv = $(`<div class='areaDiv ${this.key}'></div>`),
-			offset = this.getOffset(gameData),
-			{ cityWidth } = gameData,
+			offset = this.getOffset(boardDimensions),
+			{ cityWidth } = boardDimensions,
 			halfCityWidth = cityWidth / 2;
 
 		offset.top -= halfCityWidth;

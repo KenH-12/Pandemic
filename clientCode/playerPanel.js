@@ -1,5 +1,7 @@
 "use strict";
 
+import { cities } from "./city.js";
+
 export default class PlayerPanel
 {
     constructor(player, numPlayers)
@@ -8,6 +10,10 @@ export default class PlayerPanel
         this.upChevron = "&#187;";
         this.collapseExpandMs = 200;
         this.$panel = appendPanelAndBindEventHandlers(this, player, numPlayers);
+
+        // To keep track of the cities on the board which are occluded by this PlayerPanel
+		// or which contain pieces that are occluded by this PlayerPanel (necessitating panel transparency).
+		this.occlusionKeys = new Set();
         
         player.$panel = this.$panel;
     }
@@ -94,6 +100,74 @@ export default class PlayerPanel
 		
 			resolve();
 		});
+    }
+    
+    checkOcclusion(boardDimensions, citiesToCheck)
+	{
+		citiesToCheck = citiesToCheck ? ensureIsArray(citiesToCheck) : cities;
+		
+		if (Array.isArray(citiesToCheck))
+		{
+			for (let city of citiesToCheck)
+				this.addOrRemoveOcclusion(city, boardDimensions);
+		}
+		else
+			for (let key in cities)
+				this.addOrRemoveOcclusion(cities[key], boardDimensions);
+	}
+
+	addOrRemoveOcclusion(city, boardDimensions)
+	{
+        if (this.occludes(city, boardDimensions))
+		{
+			this.addOcclusion(city);
+			log("panel occludes ", city.name);
+		}
+		else
+			this.removeOcclusion(city);
+	}
+
+	occludes(city, boardDimensions)
+	{
+		if (city.percentFromLeft > boardDimensions.panelOcclusionLimit)
+			return false;
+		
+		const panel = this.$panel[0],
+			$cityArea = city.getAreaDiv(boardDimensions);
+
+		if (elementsOverlap(panel, $cityArea[0]))
+		{
+			$cityArea.remove();
+			log("areaDiv occluded");
+			return true;
+		}
+
+		let occlusionDetected = false;
+		$("#boardContainer").children(`.${city.key}`).each(function()
+		{
+			if (elementsOverlap(panel, $(this)[0]))
+			{
+				log("piece occluded");
+				occlusionDetected = true;
+				return false;
+			}
+		});
+		
+		return occlusionDetected;
+	}
+
+	addOcclusion(city)
+	{
+		this.occlusionKeys.add(city.key);
+		this.$panel.addClass("transparent");
+	}
+
+	removeOcclusion(city)
+	{
+		this.occlusionKeys.delete(city.key);
+
+		if (this.occlusionKeys.size === 0)
+            this.$panel.removeClass("transparent");
 	}
 }
 
