@@ -900,7 +900,10 @@ span.r {color: #ef282a; background: none}
 .playerPanel3 { width: 32.4% }
 .playerPanel4 { width: 24.1% }
 #playerPanelContainer .playerPanel:not(.hidden) { display: inline-block }
-
+.playerPanel.transparent { opacity: 0.4 }
+.playerPanel.transparent:hover,
+.playerPanel.transparent.collapsed{ opacity: 1 }
+.transparent { transition: opacity 0.4s }
 .name, .role
 {
 	width: 100%;
@@ -915,8 +918,8 @@ span.r {color: #ef282a; background: none}
 }
 .role
 {
-	font-family: 'Oswald', sans-serif;
-	font-size: 14px;
+	font-size: 18px;
+	font-weight: 700;
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #fff;
 }

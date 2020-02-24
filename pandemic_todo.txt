@@ -2,6 +2,9 @@ BUGS
 ----
 sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
 	find a way to make sure it happens
+
+the treat disease action icon looks weird for some reason
+
 TO DO
 -----
 event history

@@ -508,3 +508,14 @@ function getInfectionRate(epidemicCount)
 	
 	return 3;
 }
+
+function elementsOverlap(element1, element2)
+{
+	const rect1 = element1.getBoundingClientRect(),
+		rect2 = element2.getBoundingClientRect();
+	
+	return !(rect1.right < rect2.left || 
+		rect1.left > rect2.right || 
+		rect1.bottom < rect2.top || 
+		rect1.top > rect2.bottom);
+}

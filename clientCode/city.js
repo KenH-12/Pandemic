@@ -80,6 +80,23 @@ export default class City
 		return { left: x, top: y };
 	}
 
+	getAreaDiv(gameData)
+	{
+		const $areaDiv = $(`<div class='areaDiv ${this.key}'></div>`),
+			offset = this.getOffset(gameData),
+			{ cityWidth } = gameData,
+			halfCityWidth = cityWidth / 2;
+
+		offset.top -= halfCityWidth;
+		offset.left -= halfCityWidth;
+
+		$areaDiv.width(cityWidth)
+			.height(cityWidth)
+			.offset(offset);
+		
+		return $areaDiv.appendTo("#boardContainer");
+	}
+
 	getResearchStation()
 	{
 		return $(`.researchStation[data-key='${this.key}']`);
@@ -232,7 +249,7 @@ export default class City
 				$this.animate(newOffset, pawnAnimationDuration, gameData.easings.pawnAnimation);
 			else
 				$this.offset(newOffset);
-			
+
 			i++;
 		});
 
@@ -418,7 +435,7 @@ const cities = {};
 					{ key: "mani-sanf", points: ["b"] }
 				],
 				...getPacificTraversalPoints({ direction: "west" })	
-			] 
+			]
 		},
 		{
 			name: "chicago",

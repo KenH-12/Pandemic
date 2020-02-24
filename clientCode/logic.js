@@ -3637,13 +3637,18 @@ function resetPinpointRectangles()
 
 function resizeTopPanelElements()
 {
-	$("#topPanel > div").css("height", "auto");
+	const $topPanel = $("#topPanel"),
+		$topPanelDivs = $topPanel.children("div");
+	
+	$topPanelDivs.css("height", "auto");
 	data.topPanelHeight = $("#topPanel").height();
-	$("#topPanel > div").height(data.topPanelHeight);
+	$topPanelDivs.height(data.topPanelHeight);
 	resizeCubeSupplies();
 	data.infectionDeckOffset = $("#imgInfectionDeck").offset();
 
 	resizeInfectionDiscardElements();
+	
+	data.PANEL_OCCLUSION_LIMIT = $topPanel.offset().left;
 }
 
 function resizeCubeSupplies()
@@ -3850,6 +3855,12 @@ function bindRoleCardHoverEvents()
 		function() { $(".roleCard, #contingencyWrapper, #disabledEventCard").remove() });
 }
 
+function managePlayerPanelOcclusion()
+{
+	for (let rID in data.players)
+		data.players[rID].checkPanelOcclusion();
+}
+
 class Player
 {
 	constructor({ uID, pID, rID, nextTurnID, name, role, roleCardText, cityKey })
@@ -3866,6 +3877,10 @@ class Player
 		this.cityKey = cityKey;
 		
 		this.cardKeys = [];
+
+		// To keep track of cities which on the board which are occluded by this player's panel
+		// or which contain pieces that are occluded by this player's panel (necessitating panel transparency).
+		this.panelOcclusionKeys = new Set();
 	}
 
 	async showRoleCard($hoveredElement)
@@ -3988,6 +4003,84 @@ class Player
 		
 			resolve();
 		});
+	}
+
+	checkPanelOcclusion(citiesToCheck)
+	{
+		citiesToCheck = citiesToCheck ? ensureIsArray(citiesToCheck) : cities;
+		
+		if (Array.isArray(citiesToCheck))
+		{
+			for (let city of citiesToCheck)
+				this.addOrRemoveOcclusion(city);
+		}
+		else
+			for (let key in cities)
+				this.addOrRemoveOcclusion(getCity(key));
+	}
+
+	addOrRemoveOcclusion(city)
+	{
+		if (this.panelOccludesCity(city))
+		{
+			this.addPanelOcclusion(city);
+			log("panel occludes ", city.name);
+		}
+		else
+			this.removePanelOcclusion(city);
+	}
+
+	panelOccludesCity(city)
+	{
+		if (city.percentFromLeft > data.PANEL_OCCLUSION_LIMIT)
+			return false;
+		
+		const panel = this.$panel[0],
+			$cityArea = city.getAreaDiv(data);
+
+		if (elementsOverlap(panel, $cityArea[0]))
+		{
+			$cityArea.remove();
+			log("areaDiv occluded");
+			return true;
+		}
+
+		let occlusionDetected = false;
+		$("#boardContainer").children(`.${city.key}`).each(function()
+		{
+			if (elementsOverlap(panel, $(this)[0]))
+			{
+				log("piece occluded");
+				occlusionDetected = true;
+				return false;
+			}
+		});
+		
+		return occlusionDetected;
+	}
+
+	addPanelOcclusion(city)
+	{
+		this.panelOcclusionKeys.add(city.key);
+		this.makePanelTransparent();
+	}
+
+	removePanelOcclusion(city)
+	{
+		this.panelOcclusionKeys.delete(city.key);
+
+		if (this.panelOcclusionKeys.size === 0)
+			this.makePanelOpaque();
+	}
+
+	makePanelTransparent()
+	{
+		this.$panel.addClass("transparent");
+	}
+
+	makePanelOpaque()
+	{
+		this.$panel.removeClass("transparent");
 	}
 
 	getPawnOffset()
@@ -7544,6 +7637,8 @@ async function setup()
 
 	if (isOneQuietNight())
 		indicateOneQuietNightStep();
+	
+	managePlayerPanelOcclusion();
 
 	await removeCurtain();
 
