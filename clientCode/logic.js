@@ -1,5 +1,6 @@
 "use strict";
 
+import PlayerPanel from "./playerPanel.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 import {
 	cities,
@@ -3569,7 +3570,7 @@ async function animateCardsToHand($cards)
 {
 	const player = getActivePlayer();
 
-	await player.expandPanelIfCollapsed();
+	await player.panel.expandIfCollapsed();
 	const targetProperties = player.getDrawnPlayerCardTargetProperties();
 	
 	// If the second card is not an epidemic, both cards will be moved to the player's hand at once,
@@ -3992,17 +3993,6 @@ class Player
 	pinpointLocation()
 	{
 		pinpointCity(this.cityKey, { pinpointClass: `${this.camelCaseRole}Border` });
-	}
-
-	expandPanelIfCollapsed()
-	{
-		return new Promise(async resolve =>
-		{
-			if (this.$panel.hasClass("collapsed"))
-				await togglePlayerPanel(this.$panel.find(".btnCollapseExpand"));
-		
-			resolve();
-		});
 	}
 
 	checkPanelOcclusion(citiesToCheck)
@@ -4697,17 +4687,20 @@ function instantiatePlayers(playerInfoArray)
 		return;
 	}
 
-	let player;
+	let player,
+		numPlayers = 0;
+	
 	for (let pInfo of playerInfoArray)
 	{
 		player = new Player(pInfo);
 		data.players[player.rID] = player;
+		numPlayers++;
 	}
 
 	for (let rID of getTurnOrder())
 	{
 		player = data.players[rID];
-		appendPlayerPanel(player);
+		player.panel = new PlayerPanel(player, numPlayers);
 
 		if (data.gameIsResuming)
 		{
@@ -4748,94 +4741,6 @@ function appendPawnToBoard(player)
 	$("#boardContainer")
 		.append(player.$pawn)
 		.append(player.$pawnArrow);
-}
-
-function appendPlayerPanel(player)
-{
-	const { camelCaseRole, name, role } = player,
-		numPlayers = Object.keys(data.players).length,
-		$panel = $(`<div class='playerPanel playerPanel${numPlayers} hidden' id='${camelCaseRole}'>
-						<div class='name'>${name}</div>
-						<div class='role ${camelCaseRole}'>
-							<p>${role}</p>
-						</div>
-						<div class='btnCollapseExpand collapse' title='collapse'>
-							<p class='numCardsInHand hidden'>— 0 cards in hand —</p>
-							<div>&#187;</div>
-						</div>
-					</div>`);
-	
-	$panel.appendTo("#playerPanelContainer")
-		.children(".role")
-		.on("click", ":not(.eventCard)", function() { player.pinpointLocation() })
-		.siblings(".btnCollapseExpand").click(function() { togglePlayerPanel($(this)) });
-	
-	player.$panel = $panel;
-}
-
-function togglePlayerPanel($btnCollapseExpand)
-{
-	return new Promise(async resolve =>
-	{
-		const initialButtonHeight = $btnCollapseExpand.stop().height(),
-			collapse = "collapse",
-			expand = "expand",
-			upChevron = "&#187;",
-			downChevron = "&#171;",
-			$cards = $btnCollapseExpand.siblings(".playerCard").stop(),
-			duration = 200;
-
-		let resultingButtonHeight;
-		if ($btnCollapseExpand.hasClass(collapse))
-		{
-			$btnCollapseExpand.removeClass(collapse)
-				.addClass(expand)
-				.attr("title", expand)
-				.children().first().removeClass("hidden")
-				.next().html(downChevron)
-				.closest(".playerPanel").addClass("collapsed");
-			
-			resultingButtonHeight = $btnCollapseExpand.height();
-
-			$cards.slideUp(duration);
-			
-			await animatePromise(
-			{
-				$elements: $btnCollapseExpand,
-				initialProperties: { height: initialButtonHeight },
-				desiredProperties: { height: resultingButtonHeight },
-				duration
-			});
-
-			$btnCollapseExpand.removeAttr("style");
-			resolve();
-		}
-		else
-		{
-			$btnCollapseExpand.removeClass(expand)
-				.addClass(collapse)
-				.attr("title", collapse)
-				.children().first().addClass("hidden")
-				.next().html(upChevron)
-				.closest(".playerPanel").removeClass("collapsed");
-			
-			
-			resultingButtonHeight = $btnCollapseExpand.height();
-
-			$cards.slideDown(duration, function() { $(this).removeAttr("style") });
-			
-			await animatePromise(
-			{
-				$elements: $btnCollapseExpand,
-				initialProperties: { height: initialButtonHeight },
-				desiredProperties: { height: resultingButtonHeight },
-				duration
-			});
-
-			$btnCollapseExpand.removeAttr("style");
-			resolve();
-		}
-	});
 }
 
 function hideTravelPathArrow()
@@ -6252,7 +6157,7 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 	{
 		if (player)
 		{
-			await player.expandPanelIfCollapsed();
+			await player.panel.expandIfCollapsed();
 			await sleep(getDuration(data, "shortInterval"));
 		}
 		
@@ -7140,7 +7045,7 @@ async function discoverACure(cardKeys)
 	disableActions();
 	
 	const player = getActivePlayer();
-	await player.expandPanelIfCollapsed();
+	await player.panel.expandIfCollapsed();
 	
 	const diseaseColor = getDiseaseColor(cardKeys[0]),
 		{ discoverACure, eradication, autoTreatDisease } = eventTypes,
