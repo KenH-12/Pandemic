@@ -5,8 +5,17 @@ sometimes the city card populations aren't shown when animating the 'determine t
 
 the treat disease action icon looks weird for some reason
 
+the right panel scrollbar does not appear when the action buttons exceed the page height
+
 TO DO
 -----
+extract any repetitive playerPanel logic and put it into the PlayerPanel class
+trigger panel occlusion checks -- make sure the panel expands for the check
+	disease cube placements/removals
+	pawn movements
+	research station placements/movements/removals
+	player card movements
+
 event history
 	remove icons which are not visible?
 	detailed tooltips

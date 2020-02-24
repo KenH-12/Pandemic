@@ -3648,8 +3648,6 @@ function resizeTopPanelElements()
 	data.infectionDeckOffset = $("#imgInfectionDeck").offset();
 
 	resizeInfectionDiscardElements();
-	
-	data.panelOcclusionLimit = $topPanel.offset().left;
 }
 
 function resizeCubeSupplies()

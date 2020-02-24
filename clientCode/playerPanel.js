@@ -2,6 +2,9 @@
 
 import { cities } from "./city.js";
 
+// Only the northernmost cities which are directly under player panels need to be checked for occlusion.
+const cityKeysToCheckForOcclusion = ["sanf", "chic", "mont", "newy", "lond"];
+
 export default class PlayerPanel
 {
     constructor(player, numPlayers)
@@ -104,15 +107,13 @@ export default class PlayerPanel
     
     checkOcclusion(boardDimensions, citiesToCheck)
 	{
-		citiesToCheck = citiesToCheck ? ensureIsArray(citiesToCheck) : cities;
-		
 		if (Array.isArray(citiesToCheck))
 		{
 			for (let city of citiesToCheck)
 				this.addOrRemoveOcclusion(city, boardDimensions);
 		}
 		else
-			for (let key in cities)
+			for (let key of cityKeysToCheckForOcclusion)
 				this.addOrRemoveOcclusion(cities[key], boardDimensions);
 	}
 
@@ -129,10 +130,10 @@ export default class PlayerPanel
 
 	occludes(city, boardDimensions)
 	{
-		if (city.percentFromLeft > boardDimensions.panelOcclusionLimit)
-			return false;
-		
-		const panel = this.$panel[0],
+        if (!cityKeysToCheckForOcclusion.includes(city.key))
+            return false;
+        
+        const panel = this.$panel[0],
 			$cityArea = city.getAreaDiv(boardDimensions);
 
 		if (elementsOverlap(panel, $cityArea[0]))
