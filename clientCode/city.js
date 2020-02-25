@@ -246,7 +246,10 @@ export default class City
 			};
 			
 			if (animatePawns)
+			{
+				checkMovementResultForPanelOcclusion($this, newOffset, gameData);
 				$this.animate(newOffset, pawnAnimationDuration, gameData.easings.pawnAnimation);
+			}
 			else
 				$this.offset(newOffset);
 
@@ -1231,8 +1234,8 @@ const pacificPaths = {
 
 function getPacificPath(key)
 {
-	if (key in data.pacificPaths)
-		return data.pacificPaths[key];
+	if (key in pacificPaths)
+		return pacificPaths[key];
 	
 	return console.error(`pacificPath does not exist: '${key}'`);
 }
@@ -1254,6 +1257,14 @@ function getPacificTraversalPoints({ direction })
 			{ key: "bottom-left", points: ["bl"] }
 		];
 	}
+}
+
+function checkMovementResultForPanelOcclusion($piece, newOffset, gameData)
+{
+	const { players } = gameData;
+
+	for (let rID in players)
+		players[rID].panel.checkMovementResultForOcclusion($piece, newOffset, gameData);
 }
 
 export {

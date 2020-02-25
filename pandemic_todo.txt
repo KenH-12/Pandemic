@@ -9,12 +9,19 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
-extract any repetitive playerPanel logic and put it into the PlayerPanel class
 trigger panel occlusion checks -- make sure the panel expands for the check
 	disease cube placements/removals
-	pawn movements
 	research station placements/movements/removals
 	player card movements
+	dragging pawns / research stations
+
+consider removing the special actions container
+	dispatch pawn and operations flight are movement actions
+	plan contingency is an other action
+
+don't offset tooltip/card drop shadows
+
+treat disease button should receive hover background-color when a treatable cube is hovered
 
 event history
 	remove icons which are not visible?

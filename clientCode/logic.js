@@ -3031,7 +3031,7 @@ async function buildResearchStation(relocationKey)
 	// "As an action, build a research station in his current city without discarding a city card"
 	if (!playerIsOperationsExpert)
 	{
-		await movePlayerCardsToDiscards({ player, $card: player.getCardElementFromHand(city.key) });
+		await movePlayerCardsToDiscards({ player, $card: player.panel.getCard(city.key) });
 		player.removeCardsFromHand(city.key);
 	}
 
@@ -3220,7 +3220,7 @@ function movementActionDiscard(eventType, destination, { playerToDispatch, opera
 		else if (eventCode === charterFlight.code)
 			discardKey = playerToDispatch ? playerToDispatch.cityKey : player.cityKey;
 
-		await movePlayerCardsToDiscards({ player, $card: player.getCardElementFromHand(discardKey) });
+		await movePlayerCardsToDiscards({ player, $card: player.panel.getCard(discardKey) });
 		player.removeCardsFromHand(discardKey);
 
 		resolve();
@@ -3774,6 +3774,9 @@ function resizeAndRepositionPieces()
 					city.cluster(data);
 			}
 		}
+
+		managePlayerPanelOcclusion();
+
 		resolve();
 	});
 }
@@ -3854,10 +3857,10 @@ function bindRoleCardHoverEvents()
 		function() { $(".roleCard, #contingencyWrapper, #disabledEventCard").remove() });
 }
 
-function managePlayerPanelOcclusion()
+function managePlayerPanelOcclusion(citiesToCheck)
 {
 	for (let rID in data.players)
-		data.players[rID].panel.checkOcclusion(data);
+		data.players[rID].panel.checkOcclusion(data, citiesToCheck);
 }
 
 class Player
@@ -3978,7 +3981,9 @@ class Player
 				destination.cluster(data, { animatePawns: true }),
 				origin.cluster(data, { animatePawns: true })
 			]);
+
 			hideTravelPathArrow();
+			managePlayerPanelOcclusion(origin);
 
 			resolve();
 		});
@@ -4128,7 +4133,7 @@ class Player
 	{
 		return new Promise(resolve =>
 		{
-			const $card = this.$panel.find(`.playerCard[data-key='${cardKey}']`),
+			const $card = this.panel.getCard(cardKey),
 				initialProperties = $card.offset(),
 				$insertAfterMe = receiver.$panel.children(".role, .playerCard").last(),
 				desiredOffset = $insertAfterMe.offset(),
@@ -4179,18 +4184,6 @@ class Player
 		return targetProperties;
 	}
 
-	appendCardToHand($card)
-	{
-		$card.insertBefore(this.$panel.children(".btnCollapseExpand"));
-	}
-
-	// Given a cardKey from the player's hand,
-	// returns a jQuery object containing the corresponding .playerCard element
-	getCardElementFromHand(cardKey)
-	{
-		return this.$panel.find(`.playerCard[data-key='${cardKey}']`);
-	}
-
 	// Appends either a single cardKey or an array of cardKeys to this Player's cardKeys array.
 	// Excludes Epidemic cards because they go straight to the discard pile after being resolved.
 	addCardKeysToHand(cardKeys)
@@ -4200,7 +4193,7 @@ class Player
 			...ensureIsArray(cardKeys).filter(key => !isEpidemicKey(key))
 		];
 
-		this.updateCollapsedPanelCardCount();
+		this.panel.setCollapsedCardCount(this.cardKeys.length);
 	}
 
 	// Removes the card element from the player's panel,
@@ -4210,17 +4203,11 @@ class Player
 	{
 		for (let key of ensureIsArray(cardKeys))
 		{
-			this.$panel.find(`.playerCard[data-key='${key}']`).remove();
+			this.panel.removeCard(key);
 			this.cardKeys.splice(this.cardKeys.indexOf(key), 1);
 		}
 
-		this.updateCollapsedPanelCardCount();
-	}
-
-	updateCollapsedPanelCardCount()
-	{
-		this.$panel.find(".numCardsInHand")
-			.html(`— ${this.cardKeys.length} card${this.cardKeys.length === 1 ? "" : "s"} in hand —`);
+		this.panel.setCollapsedCardCount(this.cardKeys.length);
 	}
 
 	canDirectFlight()
@@ -6081,7 +6068,7 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 		if (player && Array.isArray(cardKeys))
 		{
 			for (let cardKey of cardKeys)
-				await animateDiscardPlayerCard(player.getCardElementFromHand(cardKey));
+				await animateDiscardPlayerCard(player.panel.getCard(cardKey));
 			
 			completionInterval *= (1 - data.playerCardAnimationInterval);
 		}
@@ -7178,7 +7165,7 @@ function loadPlayerCards(playerCards)
 		{
 			player = data.players[card.pileID];
 			player.addCardKeysToHand(card.key);
-			player.appendCardToHand($card);
+			player.panel.appendCard($card);
 		}
 		else if (card.pile === "discard")
 			$card.insertAfter($discardPileTitle);

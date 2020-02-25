@@ -751,7 +751,7 @@ span.r {color: #ef282a; background: none}
 .scrollable { overflow-y: scroll }
 #indicatorContainer
 {
-	padding: 7px;
+	padding: 2px 7px;
 	border-bottom: 2px solid #4ec6e1;
 	background-color: #353535;
 	border: none;
@@ -769,9 +769,15 @@ span.r {color: #ef282a; background: none}
 }
 #roleIndicator
 {
-	font-size: 20px;
 	font-weight: 700;
+	font-size: 20px;
+	line-height: 24px;
+	height: 26px;
 }
+#roleIndicator,
+.playerPanel .role
+{ font-family: "Oswald", sans-serif }
+
 .action:not(.step), .destination
 {
 	display: block;
@@ -896,9 +902,13 @@ span.r {color: #ef282a; background: none}
 	position: relative;
 	z-index: 6;
 }
-.playerPanel2 { width: 49.1% }
-.playerPanel3 { width: 32.4% }
-.playerPanel4 { width: 24.1% }
+.playerPanel-2 { width: 49.1% }
+.playerPanel-2 .role,
+.playerPanel-3 .role
+{ font-size: 18px }
+.playerPanel-3 { width: 32.4% }
+.playerPanel-4 { width: 24.1% }
+.playerPanel-4 .role { font-size: 14px }
 #playerPanelContainer .playerPanel:not(.hidden) { display: inline-block }
 .playerPanel.transparent { opacity: 0.4 }
 .playerPanel.transparent:hover,
@@ -918,8 +928,7 @@ span.r {color: #ef282a; background: none}
 }
 .role
 {
-	font-size: 18px;
-	font-weight: 700;
+	line-height: 22px;
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #fff;
 }
@@ -1223,7 +1232,7 @@ span.r {color: #ef282a; background: none}
 }
 .actionButton > .actionIcon
 {
-	width: 17%;
+	width: 16.5%;
 	padding: 2px 0;
 	margin: 0 2%;
 }
@@ -1235,7 +1244,7 @@ span.r {color: #ef282a; background: none}
 }
 .actionName
 {
-	width: 65%;
+	width: 65.5%;
 	text-align: left;
 }
 .actionInfo

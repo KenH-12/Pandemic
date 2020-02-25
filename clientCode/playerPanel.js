@@ -89,27 +89,48 @@ export default class PlayerPanel
         });
     }
 
+    expandIfCollapsed()
+    {
+        return new Promise(async resolve =>
+        {
+            if (this.$panel.hasClass("collapsed"))
+                await this.expand();
+        
+            resolve();
+        });
+    }
+
     getCards()
     {
         return this.$btnCollapseExpand.siblings(".playerCard");
     }
 
-    expandIfCollapsed()
+    getCard(cardKey)
 	{
-		return new Promise(async resolve =>
-		{
-			if (this.$panel.hasClass("collapsed"))
-                await this.expand();
-		
-			resolve();
-		});
+		return this.$panel.find(`.playerCard[data-key='${cardKey}']`);
     }
+    
+    appendCard($card)
+    {
+        $card.insertBefore(this.$panel.children(".btnCollapseExpand"));
+    }
+
+    removeCard(cardKey)
+    {
+        this.$panel.find(`.playerCard[data-key='${cardKey}']`).remove();
+    }
+
+    setCollapsedCardCount(cardCount)
+	{
+		this.$panel.find(".numCardsInHand")
+			.html(`— ${cardCount} card${cardCount === 1 ? "" : "s"} in hand —`);
+	}
     
     checkOcclusion(boardDimensions, citiesToCheck)
 	{
-		if (Array.isArray(citiesToCheck))
+		if (citiesToCheck)
 		{
-			for (let city of citiesToCheck)
+			for (let city of ensureIsArray(citiesToCheck))
 				this.addOrRemoveOcclusion(city, boardDimensions);
 		}
 		else
@@ -155,7 +176,18 @@ export default class PlayerPanel
 		});
 		
 		return occlusionDetected;
-	}
+    }
+
+    checkMovementResultForOcclusion($piece, newOffset, boardDimensions)
+    {
+        const currentOffset = $piece.offset();
+
+        $piece.offset(newOffset);
+
+        this.checkOcclusion(boardDimensions, getCityFromPiece($piece));
+
+        $piece.offset(currentOffset);
+    }
 
 	addOcclusion(city)
 	{
@@ -165,17 +197,25 @@ export default class PlayerPanel
 
 	removeOcclusion(city)
 	{
-		this.occlusionKeys.delete(city.key);
+        if (this.occlusionKeys.has(city.key))
+            log("removed occlusion:", city.name);
+        
+        this.occlusionKeys.delete(city.key);
 
-		if (this.occlusionKeys.size === 0)
+        if (this.occlusionKeys.size === 0)
+        {
+            if (this.$panel.hasClass("transparent"))
+                log("No occlusions remain!");
+            
             this.$panel.removeClass("transparent");
-	}
+        }
+    }
 }
 
 function appendPanelAndBindEventHandlers(panel, player, numPlayers)
 {
     const { camelCaseRole, name, role } = player,
-        $panel = $(`<div class='playerPanel playerPanel${numPlayers} hidden' id='${camelCaseRole}'>
+        $panel = $(`<div class='playerPanel playerPanel-${numPlayers} hidden' id='${camelCaseRole}'>
                         <div class='name'>${name}</div>
                         <div class='role ${camelCaseRole}'>
                             <p>${role}</p>
@@ -199,4 +239,11 @@ function appendPanelAndBindEventHandlers(panel, player, numPlayers)
         });
     
     return $panel;
+}
+
+function getCityFromPiece($piece)
+{
+    for (let c of $piece.attr("class").split(" "))
+        if (cities.hasOwnProperty(c))
+            return cities[c];
 }
