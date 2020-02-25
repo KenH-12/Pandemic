@@ -6,10 +6,11 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the treat disease action icon looks weird for some reason
 
 the right panel scrollbar does not appear when the action buttons exceed the page height
+	or does it...? perhaps just not on page load
 
 TO DO
 -----
-trigger panel occlusion checks -- make sure the panel expands for the check
+trigger panel occlusion checks
 	disease cube placements/removals
 	research station placements/movements/removals
 	player card movements

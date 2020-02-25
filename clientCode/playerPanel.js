@@ -21,7 +21,7 @@ export default class PlayerPanel
         player.$panel = this.$panel;
     }
 
-    collapse()
+    collapse({ duration } = {})
     {
         return new Promise(async resolve =>
         {
@@ -30,6 +30,8 @@ export default class PlayerPanel
                 collapse = "collapse",
                 expand = "expand",
                 $cards = this.getCards().stop();
+            
+            duration = isNaN(duration) ? collapseExpandMs : duration;
             
             $btnCollapseExpand.removeClass(collapse)
                 .addClass(expand)
@@ -40,14 +42,14 @@ export default class PlayerPanel
             
             const resultingButtonHeight = $btnCollapseExpand.height();
 
-            $cards.slideUp(collapseExpandMs);
+            $cards.slideUp(duration);
             
             await animatePromise(
             {
                 $elements: $btnCollapseExpand,
                 initialProperties: { height: initialButtonHeight },
                 desiredProperties: { height: resultingButtonHeight },
-                duration: collapseExpandMs
+                duration
             });
             $btnCollapseExpand.removeAttr("style");
 
@@ -55,7 +57,7 @@ export default class PlayerPanel
         });
     }
 
-    expand()
+    expand({ duration } = {})
     {
         return new Promise(async resolve =>
         {
@@ -64,6 +66,8 @@ export default class PlayerPanel
                 collapse = "collapse",
                 expand = "expand",
                 $cards = this.getCards().stop();
+            
+            duration = isNaN(duration) ? collapseExpandMs : duration;
             
             $btnCollapseExpand.removeClass(expand)
                 .addClass(collapse)
@@ -74,14 +78,14 @@ export default class PlayerPanel
             
             const resultingButtonHeight = $btnCollapseExpand.height();
 
-            $cards.slideDown(collapseExpandMs, function() { $(this).removeAttr("style") });
+            $cards.slideDown(duration, function() { $(this).removeAttr("style") });
             
             await animatePromise(
             {
                 $elements: $btnCollapseExpand,
                 initialProperties: { height: initialButtonHeight },
                 desiredProperties: { height: resultingButtonHeight },
-                duration: collapseExpandMs
+                duration
             });
             $btnCollapseExpand.removeAttr("style");
 
@@ -89,12 +93,12 @@ export default class PlayerPanel
         });
     }
 
-    expandIfCollapsed()
+    expandIfCollapsed({ duration } = {})
     {
         return new Promise(async resolve =>
         {
             if (this.$panel.hasClass("collapsed"))
-                await this.expand();
+                await this.expand({ duration });
         
             resolve();
         });
@@ -126,16 +130,22 @@ export default class PlayerPanel
 			.html(`— ${cardCount} card${cardCount === 1 ? "" : "s"} in hand —`);
 	}
     
-    checkOcclusion(boardDimensions, citiesToCheck)
+    async checkOcclusion(boardDimensions, citiesToCheck)
 	{
-		if (citiesToCheck)
+        const wasCollapsed = this.$panel.hasClass("collapsed");
+        this.expandIfCollapsed({ duration: 0 });
+        
+        if (citiesToCheck)
 		{
 			for (let city of ensureIsArray(citiesToCheck))
 				this.addOrRemoveOcclusion(city, boardDimensions);
 		}
 		else
 			for (let key of cityKeysToCheckForOcclusion)
-				this.addOrRemoveOcclusion(cities[key], boardDimensions);
+                this.addOrRemoveOcclusion(cities[key], boardDimensions);
+        
+        if (wasCollapsed)
+            this.collapse({ duration: 0 });
 	}
 
 	addOrRemoveOcclusion(city, boardDimensions)
