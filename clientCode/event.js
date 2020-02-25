@@ -616,7 +616,7 @@ class MovementAction extends UndoableEvent
 
 			if (this.discardKey)
 			{
-				await this.player.animateCardToHand($("#playerDiscard").children(`[data-key='${this.discardKey}']`));
+				await this.player.panel.animateReceiveCard($("#playerDiscard").children(`[data-key='${this.discardKey}']`), gameData);
 				this.player.addCardKeysToHand(this.discardKey);
 			}
 			
@@ -701,7 +701,7 @@ class ResearchStationPlacement extends UndoableEvent
 		if (cardKey)
 		{
 			const $card = $("#playerDiscard").find(`[data-key='${cardKey}']`);
-			await this.player.animateCardToHand($card, { isContingencyCard });
+			await this.player.panel.animateReceiveCard($card, gameData, { isContingencyCard });
 
 			if (isContingencyCard)
 				this.player.contingencyKey = cardKey;
@@ -853,7 +853,7 @@ class DiscoverACure extends UndoableEvent
 		return new Promise(async resolve =>
 		{
 			for (let key of this.cardKeys)
-				await this.player.animateCardToHand($("#playerDiscard").children(`.playerCard[data-key='${key}']`));
+				await this.player.panel.animateReceiveCard($("#playerDiscard").children(`.playerCard[data-key='${key}']`), gameData);
 			
 			this.player.addCardKeysToHand(this.cardKeys);
 
@@ -1029,12 +1029,10 @@ class Airlift extends UndoableEvent
 	{
 		return new Promise(async resolve =>
 		{
-			log("this.player: ", this.player);
-			
 			const cardKey = this.eventCard.key,
 				$card = $("#playerDiscard").find(`[data-key='${cardKey}']`);
 			
-			await this.player.animateCardToHand($card, { isContingencyCard });
+			await this.player.panel.animateReceiveCard($card, gameData, { isContingencyCard });
 
 			if (isContingencyCard)
 				this.player.contingencyKey = cardKey;
@@ -1066,14 +1064,14 @@ class OneQuietNight extends UndoableEvent
 				${this.eventCard.getPlayerCard()}`;
     }
 
-	animateUndo(isContingencyCard)
+	animateUndo(gameData, isContingencyCard)
 	{
 		return new Promise(async resolve =>
 		{
 			const cardKey = this.eventCard.key,
 				$card = $("#playerDiscard").find(`[data-key='${cardKey}']`);
 			
-			await this.player.animateCardToHand($card, { isContingencyCard });
+			await this.player.panel.animateReceiveCard($card, gameData, { isContingencyCard });
 
 			if (isContingencyCard)
 				this.player.contingencyKey = cardKey;
@@ -1132,7 +1130,7 @@ class ResilientPopulation extends UndoableEvent
 		});
 	}
 	
-	animateUndo(isContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile)
+	animateUndo(gameData, isContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile)
 	{
 		return new Promise(async resolve =>
 		{
@@ -1143,7 +1141,7 @@ class ResilientPopulation extends UndoableEvent
 				$infectionCard = $removedCardsContainer.children(`[data-key='${this.cardKey}']`),
 				$neighborCard = $discardPile.children(`[data-key='${this.neighborCardKey}']`);
 
-			await this.player.animateCardToHand($eventCard, { isContingencyCard });
+			await this.player.panel.animateReceiveCard($eventCard, gameData, { isContingencyCard });
 
 			if (isContingencyCard)
 				this.player.contingencyKey = eventCardKey;
@@ -1342,12 +1340,12 @@ class Discard extends UndoableEvent
 				${discards}`;
 	}
 	
-	animateUndo()
+	animateUndo(gameData)
 	{
 		return new Promise(async resolve =>
 		{
 			for (let key of this.cardKeys)
-				await this.player.animateCardToHand($("#playerDiscard").children(`.playerCard[data-key='${key}']`));
+				await this.player.panel.animateReceiveCard($("#playerDiscard").children(`.playerCard[data-key='${key}']`), gameData);
 			
 			this.player.addCardKeysToHand(this.cardKeys);
 

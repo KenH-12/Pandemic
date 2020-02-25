@@ -123,6 +123,71 @@ export default class PlayerPanel
     {
         this.$panel.find(`.playerCard[data-key='${cardKey}']`).remove();
     }
+    
+    animateReceiveCard($card, boardDimensions, { targetProperties, isContingencyCard } = {})
+	{
+		targetProperties = targetProperties || this.getCardTargetProperties({ isContingencyCard });
+		
+		// Some initial values should be calculated before the Promise is made.
+		const initialOffset = $card.offset(),
+            initialWidth = $card.width(),
+            panel = this;
+
+		return new Promise(resolve =>
+		{
+			if ($card.hasClass("epidemic"))
+				return resolve();
+
+			let $insertAfterElement;
+			if (isContingencyCard) // Contingency cards are placed within the .role div
+			{
+				$card.off("mouseenter mouseleave")
+					.removeClass("removed")
+					.addClass("contingency");
+				$insertAfterElement = this.$panel.children(".role").children().first();
+			}
+			else
+				$insertAfterElement = this.$panel.children(".role, .playerCard").last();
+			
+			$card.appendTo("#rightPanel") // The animation is smoother if the $card is first appended to #rightPanel.
+				.css(
+				{
+					...{
+						position: "absolute",
+						zIndex: "5",
+						width: initialWidth
+					},
+					...initialOffset
+				})
+				.animate(targetProperties, 500,
+				function()
+				{
+                    $card.removeAttr("style").insertAfter($insertAfterElement);
+                    panel.checkOcclusion(boardDimensions);
+
+					resolve();
+				});
+		});
+    }
+    
+    getCardTargetProperties({ isContingencyCard } = {})
+	{
+		const $guide = this.$panel.children().last(),
+			guideHeight = $guide.height(),
+			guideOffset = isContingencyCard ? this.$panel.children(".role").offset() : $guide.offset(),
+			$exampleCard = $("#playerPanelContainer").find(".playerCard").first(),
+			exampleCardHeight = $exampleCard ? $exampleCard.height() : false,
+			top = exampleCardHeight ? guideOffset.top + exampleCardHeight : guideOffset.top + guideHeight;
+		
+		const targetProperties = {
+			width: $guide.width(),
+			height: exampleCardHeight || guideHeight,
+			top: top,
+			left: guideOffset.left
+		};
+		
+		return targetProperties;
+	}
 
     setCollapsedCardCount(cardCount)
 	{
