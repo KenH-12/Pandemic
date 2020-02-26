@@ -13,7 +13,6 @@ TO DO
 trigger panel occlusion checks
 	disease cube placements/removals
 	research station placements/movements/removals
-	player card movements
 	dragging pawns / research stations
 
 consider removing the special actions container

@@ -2597,6 +2597,7 @@ function animateContingencyCardRemoval()
 		disablePlayerDiscardHoverEvents();
 		await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
 		await animateDiscardPlayerCard($card, { removingContingencyCard: true });
+		getPlayer("Contingency Planner").panel.checkOcclusion(data);
 		await sleep(getDuration(data, "longInterval"));
 		await collapsePlayerDiscardPile();
 		enablePlayerDiscardHoverEvents();
@@ -2933,18 +2934,6 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 		receiver = activePlayer;
 	}
 
-	let players = [giver, receiver],
-		string;
-	for (let p of players)
-	{
-		string = "";
-		for (let key of p.cardKeys)
-		{
-			string += key + ",";
-		}
-		log(`${p.role} cardKeys: ${string}`);
-	}
-
 	await requestAction(eventType,
 		{
 			giver: giver.rID,
@@ -2953,8 +2942,8 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 		});
 
 	await Promise.all([
-		giver.expandPanelIfCollapsed(),
-		receiver.expandPanelIfCollapsed()
+		giver.panel.expandIfCollapsed(),
+		receiver.panel.expandIfCollapsed()
 	]);
 	await giver.giveCard(cardKey, receiver);
 	appendEventHistoryIconOfType(eventType);
@@ -4087,14 +4076,19 @@ class Player
 
 	giveCard(cardKey, receiver)
 	{
-		return new Promise(resolve =>
+		return new Promise(async resolve =>
 		{
+			await Promise.all([
+				this.panel.expandIfCollapsed(),
+				receiver.panel.expandIfCollapsed()
+			]);
+			
 			const $card = this.panel.getCard(cardKey),
 				initialProperties = $card.offset(),
 				$insertAfterMe = receiver.$panel.children(".role, .playerCard").last(),
 				desiredOffset = $insertAfterMe.offset(),
 				giver = this;
-	
+
 			initialProperties.width = $card.width();
 			desiredOffset.top += $insertAfterMe.height();
 			
@@ -4115,6 +4109,9 @@ class Player
 
 					giver.removeCardsFromHand(cardKey);
 					receiver.addCardKeysToHand(cardKey);
+
+					giver.panel.checkOcclusion(data);
+					receiver.panel.checkOcclusion(data);
 
 					resolve();
 				});
@@ -6017,6 +6014,7 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 			completionInterval += 50;
 		}
 
+		player.panel.checkOcclusion(data);
 		await sleep(completionInterval);
 		resolve();
 	});
