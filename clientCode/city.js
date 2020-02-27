@@ -152,6 +152,7 @@ export default class City
 		city.hasResearchStation = true;
 		researchStationKeys.add(city.key);
 
+		this.cluster(gameData, { animatePawns: true });
 		return city.cluster(gameData, { animateResearchStation: true, stationInitialOffset, animatePawns: true });
 	}
 	
