@@ -1,5 +1,4 @@
 "use strict";
-
 import { cities } from "./city.js";
 
 // Only the northernmost cities which are directly under player panels need to be checked for occlusion.
@@ -216,10 +215,7 @@ export default class PlayerPanel
 	addOrRemoveOcclusion(city, boardDimensions)
 	{
         if (this.occludes(city, boardDimensions))
-		{
 			this.addOcclusion(city);
-			log("panel occludes ", city.name);
-		}
 		else
 			this.removeOcclusion(city);
 	}
@@ -235,7 +231,6 @@ export default class PlayerPanel
 		if (elementsOverlap(panel, $cityArea[0]))
 		{
 			$cityArea.remove();
-			log("areaDiv occluded");
 			return true;
 		}
 
@@ -244,7 +239,6 @@ export default class PlayerPanel
 		{
 			if (elementsOverlap(panel, $(this)[0]))
 			{
-				log("piece occluded");
 				occlusionDetected = true;
 				return false;
 			}
@@ -253,20 +247,26 @@ export default class PlayerPanel
 		return occlusionDetected;
     }
 
-    checkMovementResultForOcclusion($piece, newOffset, boardDimensions)
+    checkMovementResultsForOcclusion(city, resultsToCheck, boardDimensions)
     {
-        const currentOffset = $piece.offset();
+        for (let result of resultsToCheck)
+        {
+            result.currentOffset = result.$piece.offset();
+            result.$piece.offset(result.newOffset);
+        }
+        
+        this.checkOcclusion(boardDimensions, city);
 
-        $piece.offset(newOffset);
-
-        this.checkOcclusion(boardDimensions, getCityFromPiece($piece));
-
-        $piece.offset(currentOffset);
+        for (let result of resultsToCheck)
+            result.$piece.offset(result.currentOffset);
     }
 
 	addOcclusion(city)
 	{
-		this.occlusionKeys.add(city.key);
+        if (!this.occlusionKeys.has(city.key))
+            log("new occlusion: ", city.name);
+        
+        this.occlusionKeys.add(city.key);
 		this.$panel.addClass("transparent");
 	}
 
@@ -314,11 +314,4 @@ function appendPanelAndBindEventHandlers(panel, player, numPlayers)
         });
     
     return $panel;
-}
-
-function getCityFromPiece($piece)
-{
-    for (let c of $piece.attr("class").split(" "))
-        if (cities.hasOwnProperty(c))
-            return cities[c];
 }

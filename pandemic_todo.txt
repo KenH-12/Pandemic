@@ -12,8 +12,10 @@ TO DO
 -----
 trigger panel occlusion checks
 	disease cube placements/removals
-	research station placements/movements/removals
+	research station movements
 	dragging pawns / research stations
+
+make the playerpanel transparency transition happen both ways
 
 consider removing the special actions container
 	dispatch pawn and operations flight are movement actions
@@ -22,6 +24,9 @@ consider removing the special actions container
 don't offset tooltip/card drop shadows
 
 treat disease button should receive hover background-color when a treatable cube is hovered
+
+what if a player receives only event cards in their starting hand?
+	what does the "determine turn order" animation do?
 
 event history
 	remove icons which are not visible?
@@ -59,7 +64,9 @@ handle errors
 
 add tests
 
-include recently dealt infection cards / cardbacks in the resize event
+include in resize events...
+	recently dealt infection cards / cardbacks
+	research station width
 
 make sure things look ok for different screen sizes
 

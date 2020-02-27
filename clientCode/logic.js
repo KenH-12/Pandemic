@@ -3586,6 +3586,7 @@ async function animateCardsToHand($cards)
 
 function resizeAll()
 {
+	log("resizeAll()");
 	return new Promise(resolve =>
 	{
 		resizeBoard();
@@ -6014,7 +6015,9 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 			completionInterval += 50;
 		}
 
-		player.panel.checkOcclusion(data);
+		if (player)
+			player.panel.checkOcclusion(data);
+		
 		await sleep(completionInterval);
 		resolve();
 	});
