@@ -8,14 +8,29 @@ the treat disease action icon looks weird for some reason
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
+the full epidemic card for the second epidemic drawn (before reloading the page) doesn't slide down
+
+after epidemic intensify, the undo action button tooltip says "epidemic infect events cannot be undone"
+	but after clicking "continue" the tooltip is correct
+
 TO DO
 -----
 trigger panel occlusion checks
-	disease cube placements/removals
-	research station movements
 	dragging pawns / research stations
 
 make the playerpanel transparency transition happen both ways
+
+give the "infecting" class z-index to cubes being returned to the supply
+	rename the "infecting" class to something that makes sense both ways
+
+change the font on the epidemic special event alert
+	the font-size should be larger
+
+large black font the yellow background causes the text to look funny
+	discover a cure prompt
+	special event alerts (discover a cure)
+
+epidemic intensify's event details should display the number of discards at the top
 
 consider removing the special actions container
 	dispatch pawn and operations flight are movement actions
@@ -42,7 +57,8 @@ event history
 
 hovering over an epidemic card should show the full card
 
-when a piece lands behind part of a playerPanel, the panel should become transparent
+the white diease cubes for the initial infections should slide in from the right
+consider putting a gradient on the setup container
 
 rendezvous button
 

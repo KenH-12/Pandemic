@@ -148,7 +148,6 @@ function parseEvents(events)
 {
 	return new Promise(resolve =>
 		{
-			log("parseEvents()");
 			const parsedEvents = [];
 		
 			// events could be an array of objects or a single object
@@ -541,7 +540,6 @@ function disableActions()
 
 function enableAvailableActions()
 {
-	log("enableAvailableActions()");
 	const $actionsContainer = $("#actionsContainer"),
 		player = getActivePlayer();
 	
@@ -691,7 +689,6 @@ function disablePawnEvents()
 
 function enablePawnEvents()
 {
-	log("enablePawnEvents()");
 	const actionStep = actionStepInProgress(),
 		activePlayer = getActivePlayer(),
 		airlifting = eventTypeIsBeingPrompted(eventTypes.airlift),
@@ -706,15 +703,11 @@ function enablePawnEvents()
 		if (airlifting
 			|| (actionStep && (dispatcherIsActive || rID === activePlayer.rID)))
 		{
-			log(`enabled ${player.role}'s pawn`);
 			player.enablePawn();
 			pawnsAreEnabled = true;
 		}
 		else
-		{
-			log(`disabled ${player.role}'s pawn`);
 			player.disablePawn();
-		}
 	}
 
 	if (pawnsAreEnabled)
@@ -730,8 +723,6 @@ function getAllResearchStations()
 
 function enableResearchStationDragging()
 {
-	log("enableResearchStationDragging()");
-	
 	for (let $rs of getAllResearchStations())
 		$rs.draggable("enable").addClass("relocatable");
 }
@@ -1037,7 +1028,6 @@ function hideEventIconDetails()
 
 function enableBtnCancelAction()
 {
-	log("enableBtnCancelAction()");
 	$(".btnCancelAction").off("click").click(function()
 	{
 		resetActionPrompt({ actionCancelled: true });
@@ -5205,7 +5195,7 @@ function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestin
 		startingProperties.width = startingWidth;
 		startingProperties.height = startingWidth;
 		
-		$newCube.css(startingProperties);
+		$newCube.css(startingProperties).addClass("infecting");
 	}
 	
 	return $newCube;
@@ -6818,8 +6808,8 @@ function placeDiseaseCube(city, diseaseColor, cubeSupplyOffset)
 {
 	return new Promise(async resolve =>
 	{
-		appendNewCubeToBoard(diseaseColor, city.key, { prepareAnimation: true })
-			.offset(cubeSupplyOffset)
+		const $cube = appendNewCubeToBoard(diseaseColor, city.key, { prepareAnimation: true })
+			.offset(cubeSupplyOffset);
 		
 		city.incrementCubeCount(data.diseaseCubeSupplies);
 
@@ -6827,6 +6817,7 @@ function placeDiseaseCube(city, diseaseColor, cubeSupplyOffset)
 		{
 			supplyCubeBounceEffect(diseaseColor);
 			await city.clusterDiseaseCubes(data, { animate: true });
+			$cube.removeClass("infecting");
 		}
 		
 		resolve();

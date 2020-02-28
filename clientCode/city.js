@@ -2,7 +2,16 @@
 
 export default class City
 {
-	constructor({ key, name, percentFromTop, percentFromLeft, connectedCityKeys, quarantineBoundaries, color })
+	constructor({
+		key,
+		name,
+		color,
+		percentFromTop,
+		percentFromLeft,
+		connectedCityKeys,
+		quarantineBoundaries,
+		checksPanelOcclusion = false
+	})
 	{
 		this.key = key;
 		this.name = capitalizeWords(name);
@@ -11,6 +20,7 @@ export default class City
 		this.percentFromLeft = percentFromLeft;
 		this.connectedCityKeys = connectedCityKeys; // string array
 		this.quarantineBoundaries = quarantineBoundaries;
+		this.checksPanelOcclusion = checksPanelOcclusion;
 		
 		this.hasResearchStation = false;
 		
@@ -112,7 +122,6 @@ export default class City
 			$rs = $("#boardContainer > .researchStation.grantStation");
 			stationInitialOffset = $rs.offset();
 
-			log("stationInitialOffset:", stationInitialOffset);
 			$rs.replaceWith(newResearchStationElement(this.key))
 				.removeAttr("style");
 			researchStationKeys.delete("grantStation");
@@ -203,6 +212,10 @@ export default class City
             cityOffset = this.getOffset(gameData),
             { pawnHeight, pawnWidth } = gameData,
 			coordsArray = [],
+			{ checksPanelOcclusion } = this;
+		
+		let movementResultsToCheckForOcclusion;
+		if (checksPanelOcclusion)
 			movementResultsToCheckForOcclusion = [];
 		
 		let pawnTop = cityOffset.top - pawnHeight,
@@ -214,7 +227,7 @@ export default class City
 			const $researchStation = this.getResearchStation(),
 				desiredStationOffset = this.getResearchStationOffset(gameData);
 			
-			if (animateResearchStation)
+			if (checksPanelOcclusion && animateResearchStation)
 				movementResultsToCheckForOcclusion.push({ $piece: $researchStation, newOffset: desiredStationOffset });
 			
 			this.clusterResearchStation(gameData,
@@ -261,7 +274,9 @@ export default class City
 			
 			if (animatePawns)
 			{
-				movementResultsToCheckForOcclusion.push({ $piece: $this, newOffset });
+				if (checksPanelOcclusion)
+					movementResultsToCheckForOcclusion.push({ $piece: $this, newOffset });
+				
 				$this.animate(newOffset, pawnAnimationDuration, gameData.easings.pawnAnimation);
 			}
 			else
@@ -270,12 +285,28 @@ export default class City
 			i++;
 		});
 
-		checkMovementResultsForPanelOcclusion(this, movementResultsToCheckForOcclusion, gameData);
-
 		// reset to default
 		setDuration(gameData, "pawnAnimation", 250);
 
-		this.clusterDiseaseCubes(gameData, { animate: (animateCubes || animatePawns) });
+		if (animateCubes || animatePawns)
+		{
+			const desiredDiseaseCubeOffsets = this.getDiseaseCubeOffsets(gameData);
+			
+			if (checksPanelOcclusion)
+			{
+				movementResultsToCheckForOcclusion = [
+					...movementResultsToCheckForOcclusion,
+					...formatCubeOffsetsForPanelOcclusionCheck(desiredDiseaseCubeOffsets)
+				];
+			}
+
+			this.clusterDiseaseCubes(gameData, { desiredDiseaseCubeOffsets, animate: true });
+		}
+		else
+			this.clusterDiseaseCubes(gameData);
+
+		if (checksPanelOcclusion)
+			checkMovementResultsForPanelOcclusion(this, movementResultsToCheckForOcclusion, gameData);
 
 		// Return a Promise with the most relevant duration.
 		let ms = 0;
@@ -331,21 +362,58 @@ export default class City
 		return rsOffset;
 	}
 
-	clusterDiseaseCubes(gameData, { animate } = {})
+	clusterDiseaseCubes(gameData, { animate, desiredDiseaseCubeOffsets } = {})
 	{
-		const $cubes = $(`.diseaseCube.${this.key}`),
-			colors = new Set(),
-			coordinates = {},
-			cityOffset = this.getOffset(gameData, "cube"),
-			cubeWidth = getDimension(gameData, "cubeWidth"),
-			numPawnsInCity = this.getOccupants(gameData.players).length,
-			duration = animate ? getDuration(gameData, "cubePlacement") : 0;
-		
-		if (!$cubes.length)
-			return;
-		
-		$cubes.each(function(){ colors.add(getColorClass($(this))) });
+		return new Promise(async resolve =>
+		{
+			const $cubes = $(`.diseaseCube.${this.key}`),
+				duration = animate ? getDuration(gameData, "cubePlacement") : 0,
+				easing = gameData.easings.cubePlacement;
+			
+			if (!$cubes.length)
+				return resolve();
+			
+			if (!desiredDiseaseCubeOffsets)
+			{
+				desiredDiseaseCubeOffsets = this.getDiseaseCubeOffsets(gameData, $cubes);
 
+				if (this.checksPanelOcclusion)
+					checkMovementResultsForPanelOcclusion(this, formatCubeOffsetsForPanelOcclusionCheck(desiredDiseaseCubeOffsets), gameData);
+			}
+	
+			let $cubesOfColor, coords;
+			for (let color in desiredDiseaseCubeOffsets)
+			{
+				$cubesOfColor = $cubes.filter(`.${color}`);
+	
+				for (let i = 0; i < $cubesOfColor.length; i++)
+				{
+					coords = desiredDiseaseCubeOffsets[color][i];
+
+					if (animate)
+						$cubesOfColor.eq(i).animate(coords, getDuration(gameData, duration), easing);
+					else
+						$cubesOfColor.eq(i).offset(coords);
+				}
+			}
+			
+			await sleep(getDuration(gameData, duration));
+			resolve();
+		});
+	}
+
+	getDiseaseCubeOffsets(gameData, $cubes)
+	{
+		const colors = new Set(),
+			cityOffset = this.getOffset(gameData, "cube"),
+			{ players, cubeWidth } = gameData,
+			numPawnsInCity = this.getOccupants(players).length,
+			offsets = {};
+
+		$cubes = $cubes || $(`.diseaseCube.${this.key}`);
+
+		$cubes.each(function(){ colors.add(getColorClass($(this))) });
+	
 		let topAdjustment;
 		if (numPawnsInCity > 2
 			|| (this.hasResearchStation && ($cubes.length > 1 || numPawnsInCity > 0)))
@@ -354,16 +422,20 @@ export default class City
 			topAdjustment = cubeWidth / 2;
 
 		// Get y values to create a column for each color.
-		let top;
+		let top, $cubesOfColor;
 		for (let color of [...colors])
 		{
+			offsets[color] = [];
+			$cubesOfColor = $cubes.filter(`.${color}`);
 			top = cityOffset.top + topAdjustment;
-			coordinates[color] = [];
-			
-			for (let i = 0; i < $cubes.filter(`.${color}`).length; i++)
+
+			for (let i = 0; i < $cubesOfColor.length; i++)
 			{
-				top -= cubeWidth * 0.5
-				coordinates[color].push({ top });
+				top -= cubeWidth * 0.5;
+				offsets[color].push({
+					top,
+					$piece: this.checksPanelOcclusion ? $cubesOfColor.eq(i) : false,
+				});
 			}
 		}
 
@@ -375,8 +447,8 @@ export default class City
 			MAX_COL_HEIGHT = MAX_CUBES_OF_COLOR_ON_CITY + MAX_INFECTIONS_PER_OUTBREAK;
 
 		for (let i = MIN_COL_HEIGHT; i <= MAX_COL_HEIGHT; i++)
-			for (let color in coordinates)
-				if (coordinates[color].length === i)
+			for (let color in offsets)
+				if (offsets[color].length === i)
 					colorOrder.push(color);
 
 		// Get x values to separate each column.
@@ -386,30 +458,16 @@ export default class City
 		
 		for (let color of colorOrder)
 		{
-			for (let coord of coordinates[color])
+			for (let coord of offsets[color])
 			{
 				coord.left = left;
 				coord.width = cubeWidth;
 				coord.height = cubeWidth;
 			}
-			
 			left += cubeWidth;
 		}
 
-		let $cubesOfColor;
-		for (let color in coordinates)
-		{
-			$cubesOfColor = $cubes.filter(`.${color}`);
-
-			for (let i = 0; i < $cubesOfColor.length; i++)
-			{
-				if (animate)
-					$cubesOfColor.eq(i).animate(coordinates[color][i], getDuration(gameData, duration), gameData.easings.cubePlacement);
-				else
-					$cubesOfColor.eq(i).offset(coordinates[color][i]);
-			}
-		}
-		return sleep(getDuration(gameData, duration));
+		return offsets;
 	}
 
 	getPlayerCard({ noTooltip, includePopulation } = {})
@@ -449,6 +507,7 @@ const cities = {};
 			color: "u",
 			percentFromTop: 0.332,
 			percentFromLeft: 0.047,
+			checksPanelOcclusion: true,
 			connectedCityKeys: ["toky", "mani", "chic", "losa"],
 			quarantineBoundaries: [
 				...[
@@ -476,6 +535,7 @@ const cities = {};
 			color: "u",
 			percentFromTop: 0.293,
 			percentFromLeft: 0.143,
+			checksPanelOcclusion: true,
 			connectedCityKeys: ["atla", "mont", "sanf", "losa", "mexi"],
 			quarantineBoundaries: [
 				{ key: "chic", points: ["t"] },
@@ -490,6 +550,7 @@ const cities = {};
 			color: "u",
 			percentFromTop: 0.288,
 			percentFromLeft: 0.217,
+			checksPanelOcclusion: true,
 			connectedCityKeys: ["chic", "wash", "newy"],
 			quarantineBoundaries: [
 				{ key: "chic", points: ["tl", "bl"] },
@@ -504,6 +565,7 @@ const cities = {};
 			color: "u",
 			percentFromTop: 0.299,
 			percentFromLeft: 0.275,
+			checksPanelOcclusion: true,
 			connectedCityKeys: ["mont", "wash", "lond", "madr"],
 			quarantineBoundaries: [
 				{ key: "mont", points: ["tl", "bl"] },
@@ -545,6 +607,7 @@ const cities = {};
 			color: "u",
 			percentFromTop: 0.237,
 			percentFromLeft: 0.415,
+			checksPanelOcclusion: true,
 			connectedCityKeys: ["newy", "madr", "esse", "pari"],
 			quarantineBoundaries: [
 				{ key: "newy", points: ["tl", "bl"] },
@@ -1296,15 +1359,29 @@ function checkMovementResultsForPanelOcclusion(city, resultsToCheck, gameData)
 
 	for (let rID in players)
 		players[rID].panel.checkMovementResultsForOcclusion(city, resultsToCheck, gameData);
-	
-	let player;
-	for (let rID in players)
+}
+
+// Disease cube offsets are created as an object with a property for each color of disease cube the city contains.
+// Each color property contains an array of coordinates (one set of coordinates for each disease cube).
+function formatCubeOffsetsForPanelOcclusionCheck(diseaseCubeOffsets)
+{
+	let offsets = [];
+
+	for (let color in diseaseCubeOffsets)
 	{
-		player = players[rID];
-		log(player.role);
-		for (let key of [...player.panel.occlusionKeys])
-			log(key);
+		for (let offset of diseaseCubeOffsets[color])
+		{
+			offsets.push({
+				$piece: offset.$piece,
+				newOffset: {
+					top: offset.top,
+					left: offset.left
+				}
+			});
+		}
 	}
+	
+	return offsets;
 }
 
 export {

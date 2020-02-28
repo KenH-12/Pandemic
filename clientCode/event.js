@@ -375,9 +375,6 @@ export default class Event
 			const names = eventType.propertyNames,
 				values = details.split(",");
 			
-			log("names: ", names);
-			log("values: ", values);
-			
 			if (names.length === 1 && values.length > 1) // The single property is an array of values
 				this[names[0]] = values;
 			else

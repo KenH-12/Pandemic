@@ -95,9 +95,9 @@ body,
 #boardContainer > .pawn,
 #boardContainer > .researchStation,
 #boardContainer > .diseaseCube
-{
-	position: absolute;
-}
+{ position: absolute }
+#boardContainer > .diseaseCube.infecting { z-index: 7 }
+
 #travelPathArrowContainer
 {
 	position: relative;

@@ -192,9 +192,23 @@ export default class PlayerPanel
 	{
 		this.$panel.find(".numCardsInHand")
 			.html(`— ${cardCount} card${cardCount === 1 ? "" : "s"} in hand —`);
-	}
+    }
     
-    async checkOcclusion(boardDimensions, citiesToCheck)
+    checkMovementResultsForOcclusion(city, resultsToCheck, boardDimensions)
+    {
+        for (let result of resultsToCheck)
+        {
+            result.currentOffset = result.$piece.offset();
+            result.$piece.offset(result.newOffset);
+        }
+        
+        this.checkOcclusion(boardDimensions, city);
+
+        for (let result of resultsToCheck)
+            result.$piece.offset(result.currentOffset);
+    }
+    
+    checkOcclusion(boardDimensions, citiesToCheck)
 	{
         const wasCollapsed = this.$panel.hasClass("collapsed");
         this.expandIfCollapsed({ duration: 0 });
@@ -222,15 +236,12 @@ export default class PlayerPanel
 
 	occludes(city, boardDimensions)
 	{
-        if (!cityKeysToCheckForOcclusion.includes(city.key))
-            return false;
-        
         const panel = this.$panel[0],
 			$cityArea = city.getAreaDiv(boardDimensions);
 
 		if (elementsOverlap(panel, $cityArea[0]))
 		{
-			$cityArea.remove();
+            $cityArea.remove();
 			return true;
 		}
 
@@ -239,26 +250,12 @@ export default class PlayerPanel
 		{
 			if (elementsOverlap(panel, $(this)[0]))
 			{
-				occlusionDetected = true;
+                occlusionDetected = true;
 				return false;
 			}
 		});
 		
 		return occlusionDetected;
-    }
-
-    checkMovementResultsForOcclusion(city, resultsToCheck, boardDimensions)
-    {
-        for (let result of resultsToCheck)
-        {
-            result.currentOffset = result.$piece.offset();
-            result.$piece.offset(result.newOffset);
-        }
-        
-        this.checkOcclusion(boardDimensions, city);
-
-        for (let result of resultsToCheck)
-            result.$piece.offset(result.currentOffset);
     }
 
 	addOcclusion(city)
