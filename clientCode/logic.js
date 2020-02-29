@@ -4929,8 +4929,7 @@ function locatePawnOnRoleTagClick($containingElement)
 
 async function resolveOutbreaks(events)
 {
-	const { outbreak, outbreakInfection } = eventTypes,
-		pendingOutbreaks = events.filter(e => e instanceof Outbreak),
+	const pendingOutbreaks = events.filter(e => e instanceof Outbreak),
 		color = pendingOutbreaks[0].diseaseColor;
 	
 	let outbreakEvent,
@@ -5072,7 +5071,9 @@ async function resolveOutbreaks(events)
 
 			await sleep(500); // instead of awaiting both of the above
 		}
-		appendEventHistoryIconOfType(outbreak);
+
+		managePlayerPanelOcclusion();
+		appendEventHistoryIconOfType(eventTypes.outbreak);
 
 		if (diseaseCubeLimitExceeded(color)) // defeat -- return early
 			return sleep(getDuration(data, "shortInterval"));
