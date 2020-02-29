@@ -13,13 +13,21 @@ after epidemic intensify, the undo action button tooltip says "epidemic infect e
 
 during the epidemic intensify animation, hovering over the empty space in the infection discard container shows the target cursor
 
+outbreak cubes don't lose the "infecting" css class
+
+when the discard step is undone, the "infect city" button should be disabled
+
 TO DO
 -----
+there should be a "double epidemic!" special event alert
+
 on reload, if...
 	the current step is epIncrease,
 	2 epidemics were drawn this turn,
 	and the first epidemic has been resolved...
 		show the "NEXT EPIDEMIC" button instead of "INCREASE"
+
+make sure any event card can be played beween epidemics
 
 if no event cards can be played, the following should happen automatically instead of awaiting a click event
 	draw 2 cards?

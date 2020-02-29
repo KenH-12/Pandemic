@@ -5387,29 +5387,37 @@ function highlightEpidemicStep($epidemic, epidemicStep)
 function prepareEpidemicStep()
 {
 	return new Promise(async resolve =>
-		{
-			const numUnresolved = numEpidemicsToResolve(),
-				$container = $("#epidemicContainer"),
-				$epidemics = $container.children(".epidemicFull");
-			
-			const $epidemic = $epidemics.not(".resolved").last().removeClass("pending"),
-				returnValues = {
-					$epidemic: $epidemic,
-					$btn: $container.find(".button").addClass("btnDisabled").removeClass("hidden")
-				};
+	{
+		const numUnresolved = numEpidemicsToResolve(),
+			isBetweenEpidemics = betweenEpidemics(),
+			$container = $("#epidemicContainer"),
+			$epidemics = $container.children(".epidemicFull");
 		
-			if (numUnresolved === 2)
-				$epidemics.first().removeClass("hidden").addClass("pending");
+		if (isBetweenEpidemics)
+			$epidemics.last().addClass("resolved");
+		
+		const $epidemic = $epidemics.not(".resolved").last(),
+			returnValues = {
+				$epidemic: $epidemic,
+				$btn: $container.find(".button").addClass("btnDisabled")
+			};
+	
+		if (numUnresolved === 2 || isBetweenEpidemics)
+			$epidemics.first().removeClass("hidden").addClass("pending");
 
-			$container.removeClass("hidden");
-			$epidemic.removeClass("hidden")
-				.children(".hidden").slideDown(function()
-				{
-					unhide($(this));
-				});
+		$container.removeClass("hidden");
+		
+		if (!isBetweenEpidemics)
+			revealEpidemicFull($epidemic);
 
-			resolve(returnValues);
-		});
+		resolve(returnValues);
+	});
+}
+
+function revealEpidemicFull($epidemic)
+{
+	$epidemic.removeClass("hidden pending")
+		.children(".hidden").slideDown(function() { unhide($(this)) });
 }
 
 function specialEventAlert({ title, description, eventClass, visibleMs })
@@ -5458,7 +5466,7 @@ function specialEventAlert({ title, description, eventClass, visibleMs })
 // Returns true only if 2 epidemics were drawn on the same turn, the first has been resolved, and the second is waiting to be resolved.
 // On page 7 of the official rules, under EVENT CARDS:
 // "When 2 Epidemic cards are drawn together, events can be played after resolving the first epidemic."
-function waitingToResolveSecondEpidemicThisTurn()
+function betweenEpidemics()
 {
 	// The current step must be Epidemic Step 1: Increase, else we are not waiting to resolve an epidemic.
 	// Additionally, 1 epidemicIntensify event needs to have been recorded this turn, else 0 epidemics have been resolved this turn.
@@ -5471,15 +5479,17 @@ async function epidemicIncrease()
 	const { $epidemic, $btn } = await prepareEpidemicStep(),
 		eventType = eventTypes.epidemicIncrease;
 	
-	if (waitingToResolveSecondEpidemicThisTurn())
+	if (betweenEpidemics())
+	{
 		enableEventCards();
-	else
-		disableEventCards();
 
-	highlightEpidemicStep($epidemic, "increase");
-	await buttonClickPromise($btn.html("INCREASE").removeClass("btnDisabled"));
-	$btn.addClass("btnDisabled");
+		await buttonClickPromise($btn.html("NEXT EPIDEMIC").removeClass("btnDisabled hidden"));
+		revealEpidemicFull($epidemic);
+	}
+
 	disableEventCards();
+	$btn.addClass("btnDisabled");
+	highlightEpidemicStep($epidemic, "increase");
 	
 	const { 0: event } = await requestAction(eventType);
 
@@ -5580,14 +5590,6 @@ async function epidemicIntensify()
 	appendEventHistoryIconOfType(eventType);
 	
 	$epidemic.children(".highlighted").removeClass("highlighted");
-
-	// When 2 epidemics are drawn on the same turn,
-	// event cards may be played after resolving the first.
-	if (data.nextStep === "epIncrease")
-	{
-		enableEventCards();
-		await buttonClickPromise($btn.html("NEXT EPIDEMIC").removeClass("btnDisabled"));
-	}
 
 	$btn.addClass("btnDisabled");
 	disableEventCards();
@@ -7214,7 +7216,7 @@ function numEpidemicsToResolve()
 
 	const numEpsDrawnThisTurn = cardDrawEvent[0].cardKeys
 			.filter(key => isEpidemicKey(key)).length,
-		numEpsResolvedThisTurn =  getEventsOfTurn(epidemicIntensify).length;
+		numEpsResolvedThisTurn = getEventsOfTurn(epidemicIntensify).length;
 
 	return numEpsDrawnThisTurn - numEpsResolvedThisTurn;
 }
