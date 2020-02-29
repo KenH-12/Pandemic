@@ -3,8 +3,6 @@ BUGS
 sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
 	find a way to make sure it happens
 
-the treat disease action icon looks weird for some reason
-
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
