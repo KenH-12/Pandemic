@@ -13,15 +13,14 @@ the full epidemic card for the second epidemic drawn (before reloading the page)
 after epidemic intensify, the undo action button tooltip says "epidemic infect events cannot be undone"
 	but after clicking "continue" the tooltip is correct
 
+during the epidemic intensify animation, hovering over the empty space in the infection discard container shows the target cursor
+
 TO DO
 -----
 trigger panel occlusion checks
-	dragging pawns / research stations
+	outbreak cubes trigger transparency, but occlusion should be checked after dispersal
 
 make the playerpanel transparency transition happen both ways
-
-give the "infecting" class z-index to cubes being returned to the supply
-	rename the "infecting" class to something that makes sense both ways
 
 change the font on the epidemic special event alert
 	the font-size should be larger
