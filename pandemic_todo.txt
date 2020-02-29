@@ -15,6 +15,12 @@ during the epidemic intensify animation, hovering over the empty space in the in
 
 TO DO
 -----
+on reload, if...
+	the current step is epIncrease,
+	2 epidemics were drawn this turn,
+	and the first epidemic has been resolved...
+		show the "NEXT EPIDEMIC" button instead of "INCREASE"
+
 if no event cards can be played, the following should happen automatically instead of awaiting a click event
 	draw 2 cards?
 	infect city

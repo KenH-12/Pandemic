@@ -5578,18 +5578,17 @@ async function epidemicIntensify()
 			animateEpidemicIntensify()
 		]);
 	appendEventHistoryIconOfType(eventType);
+	
+	$epidemic.children(".highlighted").removeClass("highlighted");
 
 	// When 2 epidemics are drawn on the same turn,
 	// event cards may be played after resolving the first.
-	let finalBtnText = "CONTINUE";
 	if (data.nextStep === "epIncrease")
 	{
 		enableEventCards();
-		finalBtnText = "NEXT EPIDEMIC";
+		await buttonClickPromise($btn.html("NEXT EPIDEMIC").removeClass("btnDisabled"));
 	}
-	
-	$epidemic.children(".highlighted").removeClass("highlighted");
-	await buttonClickPromise($btn.html(finalBtnText).removeClass("btnDisabled"));
+
 	$btn.addClass("btnDisabled");
 	disableEventCards();
 	await finishIntensifyStep($epidemic, $btn);

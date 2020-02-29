@@ -818,9 +818,13 @@ function countEpidemicsDrawnOnTurn($mysqli, $game, $turnNum)
     return $numEpidemics;
 }
 
-function countEpidemicsResolvedOnTurn($mysqli, $game, $turnNum)
+function countEpidemicsResolvedOnTurn($mysqli, $game, $turnNum = false)
 {
+    if (!$turnNum)
+        $turnNum = getTurnNumber($mysqli, $game);
+    
     $INTENSIFY_EVENT_CODE = "et";
+    
     $numResolvedThisTurn = $mysqli->query("SELECT COUNT(*) AS 'numResolved'
                                             FROM vw_event
                                             WHERE game = $game
@@ -859,7 +863,7 @@ function checkEventCardLegality($mysqli, $game, $eventCardKey)
     $RESILIENT_POPULATION_KEY = "resi";
 
     if ($currentStep === "draw" && playerCardsWereDrawnThisTurn($mysqli, $game)
-        || ($currentStep === "epIncrease" && countEpidemicsResolvedOnTurn($mysqli, $game, $turnNum) !== 1) // 1.
+        || ($currentStep === "epIncrease" && countEpidemicsResolvedOnTurn($mysqli, $game) == 0) // 1.
         || $currentStep === "epInfect"
         || ($currentStep === "epIntensify" && $eventCardKey !== $RESILIENT_POPULATION_KEY)) // 2.
         throw new Exception("Event cards cannot be played between drawing and resolving a card.");
