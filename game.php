@@ -345,7 +345,7 @@
 						</div>
 
 						<div id='epidemicContainer' class='interface hidden'>
-							<div class='button btnContinue'>CONTINUE</div>
+							<div class='button btnContinue hidden'>CONTINUE</div>
 
 							<div class='epidemicFull hidden'>
 								<h2>EPIDEMIC</h2>

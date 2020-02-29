@@ -21,18 +21,13 @@ TO DO
 -----
 there should be a "double epidemic!" special event alert
 
-on reload, if...
-	the current step is epIncrease,
-	2 epidemics were drawn this turn,
-	and the first epidemic has been resolved...
-		show the "NEXT EPIDEMIC" button instead of "INCREASE"
+use css transitions on the epidemic steps' background-color
 
 make sure any event card can be played beween epidemics
 
 if no event cards can be played, the following should happen automatically instead of awaiting a click event
 	draw 2 cards?
 	infect city
-	epidemic increase
 	epidemic infect
 	epidemic intensify if Resilient Population can't be played
 	pass turn

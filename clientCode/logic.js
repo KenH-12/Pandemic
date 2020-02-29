@@ -5503,13 +5503,11 @@ async function epidemicInfect()
 {
 	disableEventCards();
 
-	const { $epidemic, $btn } = await prepareEpidemicStep(),
+	const { $epidemic } = await prepareEpidemicStep(),
 		eventType = eventTypes.epidemicInfect,
 		interval = getDuration(data, "longInterval");
 
 	highlightEpidemicStep($epidemic, "infect");
-	await buttonClickPromise($btn.html("INFECT").removeClass("btnDisabled"));
-	$btn.addClass("btnDisabled");
 
 	const { 0: events } = await Promise.all(
 		[
@@ -5578,7 +5576,7 @@ async function epidemicIntensify()
 	// Resilient Population may be played between the infect and intensify steps of an epidemic.
 	enableEventCards({ resilientPopulationOnly: true });
 	
-	await buttonClickPromise($btn.html("INTENSIFY").removeClass("btnDisabled"));
+	await buttonClickPromise($btn.html("INTENSIFY").removeClass("btnDisabled hidden"));
 	$btn.addClass("btnDisabled");
 	disableEventCards();
 
@@ -5707,16 +5705,13 @@ function updateInfectionRate(epidemicCount)
 async function animateEpidemicIntensify()
 {
 	const $container = $("#infectionDiscard"),
-		$title = $container.children(".title").first();
+		$title = $container.children(".title").first(),
+		$cards = $container.children(".infectionCard");
 	
 	unbindInfectionDiscardHover();
-	
-	await sleep(getDuration(data, "longInterval"));
 	await expandInfectionDiscardPile();
-	await sleep(getDuration(data, "longInterval"));
-	
-	const $cards = $container.children(".infectionCard"),
-		$veil = $container.children("#infDiscardVeil"),
+
+	const $veil = $container.children("#infDiscardVeil"),
 		$deck = $("#imgInfectionDeck"),
 		deckWidth = $deck.width(),
 		centerOfContainer = {
