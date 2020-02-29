@@ -915,7 +915,10 @@ span.r {color: #ef282a; background: none}
 .playerPanel.transparent { opacity: 0.4 }
 .playerPanel.transparent:hover,
 .playerPanel.transparent.collapsed{ opacity: 1 }
-.transparent { transition: opacity 0.4s }
+.transparent,
+.playerPanel:not(.transparent)
+{ transition: opacity 0.4s }
+
 .name, .role
 {
 	width: 100%;

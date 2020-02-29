@@ -17,8 +17,6 @@ during the epidemic intensify animation, hovering over the empty space in the in
 
 TO DO
 -----
-make the playerpanel transparency transition happen both ways
-
 if no event cards can be played, the following should happen automatically instead of awaiting a click event
 	draw 2 cards?
 	infect city
