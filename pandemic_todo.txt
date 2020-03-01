@@ -17,11 +17,16 @@ outbreak cubes don't lose the "infecting" css class
 
 when the discard step is undone, the "infect city" button should be disabled
 
+after a double epidemic draw, during the second epidemic,
+	playing resilient population to remove the only inf discard causes an server-sode error when intensify is requested
+
 TO DO
 -----
 there should be a "double epidemic!" special event alert
 
 use css transitions on the epidemic steps' background-color
+the pending epidemic shouldn't be so dark
+the margin-top of epidemic fulls should match the spacing of cards in the draw container
 
 make sure any event card can be played beween epidemics
 

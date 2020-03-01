@@ -345,8 +345,6 @@
 						</div>
 
 						<div id='epidemicContainer' class='interface hidden'>
-							<div class='button btnContinue hidden'>CONTINUE</div>
-
 							<div class='epidemicFull hidden'>
 								<h2>EPIDEMIC</h2>
 								<div class='increase hidden'>
@@ -378,6 +376,8 @@
 									<p>SHUFFLE THE CARDS IN THE INFECTION DISCARD PILE AND PUT THEM ON TOP OF THE INFECTION DECK.</p>
 								</div>
 							</div>
+
+							<div class='button btnContinue hidden'></div>
 						</div>
 
 						<div id='discardStepContainer' class='interface hidden'></div>

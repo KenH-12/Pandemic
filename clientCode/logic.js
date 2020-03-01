@@ -600,6 +600,38 @@ function activePlayerCanTakeFromResearcher()
 		researcher.cityKey === getActivePlayer().cityKey;
 }
 
+function anyPlayerHasAnyEventCard()
+{
+	const { players } = data;
+	let player;
+
+	for (let rID in players)
+	{
+		player = players[rID];
+
+		if (player.isHoldingAnyEventCard())
+			return true;
+	}
+	return false;
+}
+
+function anyPlayerHasResilientPopulation()
+{
+	const { players } = data,
+		resilientPopulationCardKey = eventTypes.resilientPopulation.cardKey;
+	
+	let player;
+
+	for (let rID in players)
+	{
+		player = players[rID];
+
+		if (player.isHoldingCardKey(resilientPopulationCardKey))
+			return true;
+	}
+	return false;
+}
+
 function enableEventCards({ resilientPopulationOnly } = {})
 {
 	log("enableEventCards()");
@@ -4057,12 +4089,18 @@ class Player
 
 	isHoldingCardKey(cardKey)
 	{
-		return this.cardKeys.includes(cardKey);
+		return this.cardKeys.includes(cardKey) || this.contingencyKey === cardKey;
 	}
 
 	isHoldingAnyCityCard()
 	{
-		return (this.cardKeys.filter( cardKey => isCityKey(cardKey) ).length > 0);
+		return (this.cardKeys.filter(cardKey => isCityKey(cardKey) ).length > 0);
+	}
+
+	isHoldingAnyEventCard()
+	{
+		return (this.cardKeys.filter(cardKey => isEventCardKey(cardKey) ).length > 0)
+			|| isEventCardKey(this.contingencyKey);
 	}
 
 	giveCard(cardKey, receiver)
@@ -5399,7 +5437,7 @@ function prepareEpidemicStep()
 		const $epidemic = $epidemics.not(".resolved").last(),
 			returnValues = {
 				$epidemic: $epidemic,
-				$btn: $container.find(".button").addClass("btnDisabled")
+				$btn: $container.find(".button")
 			};
 	
 		if (numUnresolved === 2 || isBetweenEpidemics)
@@ -5481,14 +5519,17 @@ async function epidemicIncrease()
 	
 	if (betweenEpidemics())
 	{
-		enableEventCards();
+		if (anyPlayerHasAnyEventCard())
+		{
+			enableEventCards();
+			await buttonClickPromise($btn.html("NEXT EPIDEMIC").removeClass("hidden"));
+		}
 
-		await buttonClickPromise($btn.html("NEXT EPIDEMIC").removeClass("btnDisabled hidden"));
+		$btn.addClass("hidden");
 		revealEpidemicFull($epidemic);
 	}
 
 	disableEventCards();
-	$btn.addClass("btnDisabled");
 	highlightEpidemicStep($epidemic, "increase");
 	
 	const { 0: event } = await requestAction(eventType);
@@ -5574,11 +5615,14 @@ async function epidemicIntensify()
 	highlightEpidemicStep($epidemic, "intensify");
 
 	// Resilient Population may be played between the infect and intensify steps of an epidemic.
-	enableEventCards({ resilientPopulationOnly: true });
-	
-	await buttonClickPromise($btn.html("INTENSIFY").removeClass("btnDisabled hidden"));
-	$btn.addClass("btnDisabled");
+	if (anyPlayerHasResilientPopulation())
+	{
+		enableEventCards({ resilientPopulationOnly: true });
+		
+		await buttonClickPromise($btn.html("INTENSIFY").removeClass("hidden"));
+	}
 	disableEventCards();
+	$btn.addClass("hidden");
 
 	await Promise.all(
 		[
@@ -5588,8 +5632,7 @@ async function epidemicIntensify()
 	appendEventHistoryIconOfType(eventType);
 	
 	$epidemic.children(".highlighted").removeClass("highlighted");
-
-	$btn.addClass("btnDisabled");
+	
 	disableEventCards();
 	await finishIntensifyStep($epidemic, $btn);
 
