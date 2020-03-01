@@ -5420,6 +5420,8 @@ function highlightEpidemicStep($epidemic, epidemicStep)
 {
 	$epidemic.children(".highlighted").removeClass("highlighted");
 	$epidemic.children(`.${epidemicStep}`).addClass("highlighted");
+
+	return sleep(500);
 }
 
 function prepareEpidemicStep()
@@ -5446,7 +5448,7 @@ function prepareEpidemicStep()
 		$container.removeClass("hidden");
 		
 		if (!isBetweenEpidemics)
-			revealEpidemicFull($epidemic);
+			await revealEpidemicFull($epidemic);
 
 		resolve(returnValues);
 	});
@@ -5455,7 +5457,9 @@ function prepareEpidemicStep()
 function revealEpidemicFull($epidemic)
 {
 	$epidemic.removeClass("hidden pending")
-		.children(".hidden").slideDown(function() { unhide($(this)) });
+		.children(".hidden").slideDown(400, function() { unhide($(this)) });
+
+	return sleep(400);
 }
 
 function specialEventAlert({ title, description, eventClass, visibleMs })
@@ -5526,11 +5530,11 @@ async function epidemicIncrease()
 		}
 
 		$btn.addClass("hidden");
-		revealEpidemicFull($epidemic);
+		await revealEpidemicFull($epidemic);
 	}
 
 	disableEventCards();
-	highlightEpidemicStep($epidemic, "increase");
+	await highlightEpidemicStep($epidemic, "increase");
 	
 	const { 0: event } = await requestAction(eventType);
 
@@ -5548,7 +5552,7 @@ async function epidemicInfect()
 		eventType = eventTypes.epidemicInfect,
 		interval = getDuration(data, "longInterval");
 
-	highlightEpidemicStep($epidemic, "infect");
+	await highlightEpidemicStep($epidemic, "infect");
 
 	const { 0: events } = await Promise.all(
 		[
@@ -5612,7 +5616,7 @@ async function epidemicIntensify()
 	} = await prepareEpidemicStep(),
 		eventType = eventTypes.epidemicIntensify;
 	
-	highlightEpidemicStep($epidemic, "intensify");
+	await highlightEpidemicStep($epidemic, "intensify");
 
 	// Resilient Population may be played between the infect and intensify steps of an epidemic.
 	if (anyPlayerHasResilientPopulation())

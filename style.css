@@ -859,10 +859,12 @@ span.r {color: #ef282a; background: none}
 {
 	padding: 10px;
 	background-color: #007034;
+	transition: background-color 0.5s;
 }
 .epidemicFull > div.highlighted
 {
 	background-color: #00a94f;
+	transition: background-color 0.5s;
 }
 .epidemicFull h3
 {
