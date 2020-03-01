@@ -5634,12 +5634,12 @@ async function epidemicIntensify()
 	$epidemic.children(".highlighted").removeClass("highlighted");
 	
 	disableEventCards();
-	await finishIntensifyStep($epidemic, $btn);
+	await finishIntensifyStep($epidemic);
 
 	proceed();
 }
 
-function finishIntensifyStep($epidemic, $btn)
+function finishIntensifyStep($epidemic)
 {
 	return new Promise(async resolve =>
 	{
@@ -5661,15 +5661,9 @@ function finishIntensifyStep($epidemic, $btn)
 		getInfectionContainer().addClass("hidden");
 	
 		if (data.nextStep === "epIncrease")
-		{
-			$btn.addClass("btnDisabled");
 			$epidemic.addClass("resolved");
-		}
 		else
-		{
-			$btn.addClass("hidden");
 			$(".epidemicFull").removeClass("resolved");
-		}
 
 		resolve();
 	});
@@ -5749,10 +5743,23 @@ async function animateEpidemicIntensify()
 {
 	const $container = $("#infectionDiscard"),
 		$title = $container.children(".title").first(),
-		$cards = $container.children(".infectionCard");
+		$cards = $container.children(".infectionCard"),
+		delay = getDuration(data, "longInterval");
 	
 	unbindInfectionDiscardHover();
 	await expandInfectionDiscardPile();
+
+	if ($cards.length === 0)
+	{
+		$title.html("[NO CARDS TO SHUFFLE]");
+		await sleep(delay * 2);
+		$title.html("INFECTION DISCARDS");
+
+		collapseInfectionDiscardPile();
+		bindInfectionDiscardHover();
+
+		return sleep(delay);
+	}
 
 	const $veil = $container.children("#infDiscardVeil"),
 		$deck = $("#imgInfectionDeck"),
@@ -5861,7 +5868,7 @@ async function animateEpidemicIntensify()
 	collapseInfectionDiscardPile();
 	bindInfectionDiscardHover();
 
-	return sleep(getDuration(data, "longInterval"));
+	return sleep(delay);
 }
 
 function shuffleAnimation($container, $elements, { numShuffles } = {})

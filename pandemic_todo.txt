@@ -17,9 +17,6 @@ outbreak cubes don't lose the "infecting" css class
 
 when the discard step is undone, the "infect city" button should be disabled
 
-after a double epidemic draw, during the second epidemic,
-	playing resilient population to remove the only inf discard causes an server-sode error when intensify is requested
-
 TO DO
 -----
 there should be a "double epidemic!" special event alert
@@ -33,9 +30,6 @@ make sure any event card can be played beween epidemics
 if no event cards can be played, the following should happen automatically instead of awaiting a click event
 	draw 2 cards?
 	infect city
-	epidemic infect
-	epidemic intensify if Resilient Population can't be played
-	pass turn
 
 change the font on the epidemic special event alert
 	the font-size should be larger
@@ -104,10 +98,6 @@ for multiplayer games, require permission for certain actions
 	share knowledge
 	dispatch pawn
 	airlift
-
-TO TEST
--------
-make sure the height limit on the expanded infection discards functions properly, including the scrolling
 
 IDEAS
 -----
@@ -178,6 +168,8 @@ in the discard prompt, give the x/y a red or green background with white text in
 
 SMALL FIXES
 -----------
+when the only infection discard is removed, the top of the removed cards container should stay aligned with the bottom of the top panel.
+
 eventTypes that are actions should have a getActionButton method
 
 center gameEnd text vertically

@@ -27,29 +27,59 @@
                                         WHERE game = $game
                                         AND pile = 'discard'
                                         ORDER BY cardIndex DESC");
-
-        // Shuffle the discard pile...
-        $shuffledDiscardPile = $mysqli->query("SELECT cardKey
-                                                FROM vw_infectionCard
-                                                WHERE game = $game
-                                                AND pile = 'discard'
-                                                ORDER BY RAND()");
         
-        if ($shuffledDiscardPile->num_rows == 0)
-            throw new Exception("Failed to retrieve infection discards (epidemic intensify): " . $mysqli->error);
+        $numCardsToShuffle = $discardPile->num_rows;
 
         $mysqli->autocommit(FALSE);
+        
+        $eventType = "et";
+        $details = $numCardsToShuffle;
+        $response["events"] = recordEvent($mysqli, $game, $eventType, $details);
+        
+        // It's possible that the only card in the discard pile was the one drawn by epidemic infect,
+        // and that card can be removed from the game by Resilient Population.
+        if ($numCardsToShuffle > 0)
+        {
+            // Get the discard pile in random order (shuffled)...
+            $shuffledDiscardPile = $mysqli->query("SELECT cardKey
+                                                    FROM vw_infectionCard
+                                                    WHERE game = $game
+                                                    AND pile = 'discard'
+                                                    ORDER BY RAND()");
+            
+            if ($shuffledDiscardPile->num_rows == 0)
+                throw new Exception("Failed to retrieve infection discards (epidemic intensify): " . $mysqli->error);
 
-        // Create an array of discarded infection card keys
-        $shuffledCardKeys = array();
-        while ($row = mysqli_fetch_assoc($shuffledDiscardPile))
-            $shuffledCardKeys[] = $row["cardKey"];
+            // Create an array of discarded infection card keys
+            $shuffledCardKeys = array();
+            while ($row = mysqli_fetch_assoc($shuffledDiscardPile))
+                $shuffledCardKeys[] = $row["cardKey"];
 
-        // Move the infection cards from the discard pile to the top of the deck
-        $cardType = "infection";
-        $currentPile = "discard";
-        $newPile = "deck";
-        moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $shuffledCardKeys);
+            // Move the infection cards from the discard pile to the top of the deck
+            $cardType = "infection";
+            $currentPile = "discard";
+            $newPile = "deck";
+            moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $shuffledCardKeys);
+
+            // Record the shuffled cardKeys for the event history.
+            $eventID = $response["events"]["id"];
+            $response["events"]["cardKeys"] = array();
+            
+            while ($row = mysqli_fetch_assoc($discardPile))
+            {
+                $cityKey = $row["cardKey"];
+                $cardIndex = $row["cardIndex"];
+                $mysqli->query("INSERT INTO epidemicIntensify
+                                    (eventID, cityKey, cardIndex)
+                                VALUES
+                                    ($eventID, '$cityKey', $cardIndex)");
+
+                if ($mysqli->affected_rows != 1)
+                    throw new Exception("Failed to insert into epidemicIntensify ($eventID, $cityKey): " . $mysqli->error);
+                
+                array_push($response["events"]["cardKeys"], $cityKey);
+            }
+        }
         
         // Get the epidemic cardKey and discard it
         $epidemicKey = $mysqli->query("SELECT cardKey
@@ -62,28 +92,6 @@
 
         $currentPile = "deck";
         discardPlayerCards($mysqli, $game, $currentPile, $epidemicKey);
-
-        $eventType = "et";
-        $details = count($shuffledCardKeys);
-        $response["events"] = recordEvent($mysqli, $game, $eventType, $details);
-
-        // Record the shuffled cardKeys for the event history.
-        $eventID = $response["events"]["id"];
-        $response["events"]["cardKeys"] = array();
-        while ($row = mysqli_fetch_assoc($discardPile))
-        {
-            $cityKey = $row["cardKey"];
-            $cardIndex = $row["cardIndex"];
-            $mysqli->query("INSERT INTO epidemicIntensify
-                                (eventID, cityKey, cardIndex)
-                            VALUES
-                                ($eventID, '$cityKey', $cardIndex)");
-
-            if ($mysqli->affected_rows != 1)
-                throw new Exception("Failed to insert into epidemicIntensify ($eventID, $cityKey): " . $mysqli->error);
-            
-            array_push($response["events"]["cardKeys"], $cityKey);
-        }
         
         // Determine next step...
         $turnNum = getTurnNumber($mysqli, $game);
