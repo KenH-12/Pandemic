@@ -5439,7 +5439,7 @@ function prepareEpidemicStep()
 		const $epidemic = $epidemics.not(".resolved").last(),
 			returnValues = {
 				$epidemic: $epidemic,
-				$btn: $container.find(".button")
+				$btn: $container.find(".button").addClass("hidden")
 			};
 	
 		if (numUnresolved === 2 || isBetweenEpidemics)
@@ -5526,10 +5526,11 @@ async function epidemicIncrease()
 		if (anyPlayerHasAnyEventCard())
 		{
 			enableEventCards();
+			
 			await buttonClickPromise($btn.html("NEXT EPIDEMIC").removeClass("hidden"));
+			$btn.addClass("hidden");
 		}
-
-		$btn.addClass("hidden");
+		
 		await revealEpidemicFull($epidemic);
 	}
 
@@ -5615,7 +5616,7 @@ async function epidemicIntensify()
 		$btn
 	} = await prepareEpidemicStep(),
 		eventType = eventTypes.epidemicIntensify;
-	
+
 	await highlightEpidemicStep($epidemic, "intensify");
 
 	// Resilient Population may be played between the infect and intensify steps of an epidemic.
@@ -5624,9 +5625,9 @@ async function epidemicIntensify()
 		enableEventCards({ resilientPopulationOnly: true });
 		
 		await buttonClickPromise($btn.html("INTENSIFY").removeClass("hidden"));
+		$btn.addClass("hidden");
 	}
 	disableEventCards();
-	$btn.addClass("hidden");
 
 	await Promise.all(
 		[

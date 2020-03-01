@@ -19,9 +19,6 @@ when the discard step is undone, the "infect city" button should be disabled
 
 TO DO
 -----
-the pending epidemic shouldn't be so dark
-the margin-top of epidemic fulls should match the spacing of cards in the draw container
-
 make sure any event card can be played beween epidemics
 
 if no event cards can be played, the following should happen automatically instead of awaiting a click event

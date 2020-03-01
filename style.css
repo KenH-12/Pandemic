@@ -854,7 +854,7 @@ span.r {color: #ef282a; background: none}
 	padding: 5px 0;
 	border-bottom: 2px solid #fff;
 }
-.epidemicFull.pending h2 { border-bottom: none; background-color: #007034;}
+.epidemicFull.pending h2 { border-bottom: none }
 .epidemicFull > div
 {
 	padding: 10px;
@@ -1018,7 +1018,6 @@ span.r {color: #ef282a; background: none}
 	width: 98%;
 	height: 30px;
 	line-height: 30px;
-	margin: 20px 1%;
 	font-size: 20px;
 	font-weight: 700;
 	overflow: hidden;
@@ -1026,6 +1025,7 @@ span.r {color: #ef282a; background: none}
 #cardDrawContainer .playerCard,
 .epidemicFull
 {
+	margin: 20px 1%;
 	border-top-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 }
