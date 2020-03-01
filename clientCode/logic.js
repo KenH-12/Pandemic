@@ -3431,7 +3431,7 @@ async function drawStep()
 	{
 		await specialEventAlert(
 		{
-			title: "EPIDEMIC!",
+			title: numEpidemicsToResolve() === 1 ? "EPIDEMIC!" : "DOUBLE EPIDEMIC!!",
 			eventClass: "epidemic",
 			visibleMs: 1250
 		});

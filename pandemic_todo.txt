@@ -19,8 +19,6 @@ when the discard step is undone, the "infect city" button should be disabled
 
 TO DO
 -----
-there should be a "double epidemic!" special event alert
-
 use css transitions on the epidemic steps' background-color
 the pending epidemic shouldn't be so dark
 the margin-top of epidemic fulls should match the spacing of cards in the draw container
