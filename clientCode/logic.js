@@ -3415,11 +3415,12 @@ async function drawStep()
 
 	// Event cards can be played before drawing.
 	enableEventCards();
-	await buttonClickPromise($btn.html("DRAW 2 CARDS"),
-		{
-			beforeClick: "fadeIn",
-			afterClick: "hide"
-		});
+	await buttonClickPromise($btn,
+	{
+		beforeClick: "fadeIn",
+		afterClick: "hide"
+	});
+
 	disableEventCards();
 	eventHistory.disableUndo();
 
@@ -8940,7 +8941,7 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				indicateOneQuietNightStep({ off: true });
 			}
 			else if (event instanceof ResilientPopulation)
-				await event.animateUndo(gameData, wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
+				await event.animateUndo(data, wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
 			else if (typeof event.animateUndo === "function")
 				await event.animateUndo();
 			

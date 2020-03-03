@@ -1132,19 +1132,27 @@ class ResilientPopulation extends UndoableEvent
 	{
 		return new Promise(async resolve =>
 		{
-			const eventCardKey = this.eventCard.key,
+			const {
+					eventCard,
+					player,
+					cardKey,
+					neighborCardKey,
+					neighborWasDrawnBefore
+				} = this,
+				eventCardKey = eventCard.key,
 				$eventCard = $("#playerDiscard").find(`[data-key='${eventCardKey}']`),
 				$discardPile = $("#infectionDiscard"),
+				$discardPileTitle = $discardPile.children(".title"),
 				$removedCardsContainer = $discardPile.children("#removedInfectionCards"),
-				$infectionCard = $removedCardsContainer.children(`[data-key='${this.cardKey}']`),
-				$neighborCard = $discardPile.children(`[data-key='${this.neighborCardKey}']`);
+				$infectionCard = $removedCardsContainer.children(`[data-key='${cardKey}']`),
+				$neighborCard = neighborCardKey ? $discardPile.children(`[data-key='${neighborCardKey}']`) : false;
 
-			await this.player.panel.animateReceiveCard($eventCard, gameData, { isContingencyCard });
+			await player.panel.animateReceiveCard($eventCard, gameData, { isContingencyCard });
 
 			if (isContingencyCard)
-				this.player.contingencyKey = eventCardKey;
+				player.contingencyKey = eventCardKey;
 			else
-				this.player.addCardKeysToHand(eventCardKey);
+				player.addCardKeysToHand(eventCardKey);
 			
 			await expandInfectionDiscardPile({ showRemovedCardsContainer: true });
 			await sleep(500);
@@ -1161,7 +1169,7 @@ class ResilientPopulation extends UndoableEvent
 			{
 				// Determine an appropriate scroll position before placing the card where it was in the pile.
 				let scrollTarget;
-				if (this.neighborWasDrawnBefore)
+				if (neighborWasDrawnBefore)
 				{
 					if ($neighborCard.prev().hasClass("infectionCard"))
 						scrollTarget = $neighborCard.prev().position().top;
@@ -1181,9 +1189,16 @@ class ResilientPopulation extends UndoableEvent
 			}
 			
 			// Animate the card to its proper position in the pile.
-			let desiredOffsetTop = $neighborCard.offset().top;
-			if (!this.neighborWasDrawnBefore)
-				desiredOffsetTop += $neighborCard.height();
+			let desiredOffsetTop;
+			if (neighborCardKey)
+			{
+				desiredOffsetTop = $neighborCard.offset().top;
+				if (!neighborWasDrawnBefore)
+					desiredOffsetTop += $neighborCard.height();
+			}
+			else
+				desiredOffsetTop = $discardPileTitle.offset().top + $discardPileTitle.outerHeight();
+
 			await animatePromise({
 				$elements: $infectionCard,
 				desiredProperties: { top: desiredOffsetTop },
@@ -1191,11 +1206,16 @@ class ResilientPopulation extends UndoableEvent
 			});
 			$infectionCard.css("z-index", "auto");
 			
-			// New infection discards are placed at the top of the pile.
-			if (this.neighborWasDrawnBefore)
-				$infectionCard.insertBefore($neighborCard);
+			if (neighborCardKey)
+			{
+				// New infection discards are placed at the top of the pile.
+				if (neighborWasDrawnBefore)
+					$infectionCard.insertBefore($neighborCard);
+				else
+					$infectionCard.insertAfter($neighborCard);
+			}
 			else
-				$infectionCard.insertAfter($neighborCard);
+				$infectionCard.insertAfter($discardPileTitle);
 
 			if (!$removedCardsContainer.children(".infectionCard").length)
 				$removedCardsContainer.addClass("hidden").removeAttr("style");
@@ -1456,13 +1476,19 @@ class EpidemicIntensify extends PermanentEvent
 
     getDetails()
     {
-		let infectionCards = "";
-		for (let city of this.cities)
-			infectionCards += city.getInfectionCard();
+		let details;
+		if (this.cities.length)
+		{
+			details = `<p>Shuffled ${this.cities.length} Cards:</p>`;
+
+			for (let city of this.cities)
+				details += city.getInfectionCard();
+		}
+		else
+			details = "<p>No cards to shuffle.</p>";
 		
 		return `${super.getDetails()}
-				<p>Pre-Intensify Discard Pile:</p>
-				${ infectionCards || "<p>— empty —</p>"}`;
+				${details}`;
     }
 }
 

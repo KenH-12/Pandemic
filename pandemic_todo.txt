@@ -17,15 +17,6 @@ when the discard step is undone, the "infect city" button should be disabled
 
 TO DO
 -----
-change the font on the epidemic special event alert
-	the font-size should be larger
-
-large black font the yellow background causes the text to look funny
-	discover a cure prompt
-	special event alerts (discover a cure)
-
-epidemic intensify's event details should display the number of discards at the top
-
 consider removing the special actions container
 	dispatch pawn and operations flight are movement actions
 	plan contingency is an other action

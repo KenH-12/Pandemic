@@ -1476,14 +1476,14 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	position: absolute;
 	z-index: 10;
 	width: 100%;
-	font-size: 36px;
+	font-size: 40px;
 	font-weight: bold;
 	text-align: center;
 	padding: 1%;
 }
 .specialEventDetails
 {
-	font-size: 20px;
+	font-size: 24px;
 }
 .specialEventImg
 {

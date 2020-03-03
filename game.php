@@ -341,7 +341,7 @@
 						</div>
 
 						<div id='cardDrawContainer' class='interface hidden'>
-							<div class='button btnContinue hidden'>CONTINUE</div>
+							<div class='button btnContinue hidden'>DRAW 2 CARDS</div>
 						</div>
 
 						<div id='epidemicContainer' class='interface hidden'>
