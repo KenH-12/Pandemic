@@ -5456,10 +5456,34 @@ function prepareEpidemicStep()
 
 function revealEpidemicFull($epidemic)
 {
-	$epidemic.removeClass("hidden pending")
-		.children(".hidden").slideDown(400, function() { unhide($(this)) });
+	const $epidemicSteps = $epidemic.children().not("h2"),
+		numHidden = $epidemicSteps.filter(".hidden").length;
 
-	return sleep(400);
+	$epidemic.removeClass("hidden pending")
+		.children().removeClass("hidden").removeAttr("style");
+	
+	if (numHidden === 0)
+		return sleep(0);
+	
+	let $step, stepHeight,
+		promise;
+	
+	for (let i = 0; i < $epidemicSteps.length; i++)
+	{
+		$step = $epidemicSteps.eq(i);
+		stepHeight = $step.outerHeight();
+
+		promise = animatePromise({
+			$elements: $step,
+			initialProperties: { height: 0 },
+			desiredProperties: { height: stepHeight },
+			easing: "easeOutQuad",
+			callback: () => $step.removeAttr("style")
+		});
+		
+		if ($step.is($epidemicSteps.last()))
+			return promise;
+	}
 }
 
 function specialEventAlert({ title, description, eventClass, visibleMs })
@@ -5526,7 +5550,7 @@ async function epidemicIncrease()
 		if (anyPlayerHasAnyEventCard())
 		{
 			enableEventCards();
-			
+
 			await buttonClickPromise($btn.html("NEXT EPIDEMIC").removeClass("hidden"));
 			$btn.addClass("hidden");
 		}
@@ -5648,19 +5672,19 @@ function finishIntensifyStep($epidemic)
 {
 	return new Promise(async resolve =>
 	{
-		// collapse epidemic card
+		// Collapse epidemic card
+		const $epidemicSteps = $epidemic.children().not("h2");
 		await animatePromise(
-			{
-				$elements: $epidemic.children().not("h2"),
-				desiredProperties: { height: 0 },
-				easing: "easeInQuad"
-			}
-		);
-		// hide the .epidemicFull and show a new epidemic playercard element to discard
+		{
+			$elements: $epidemicSteps,
+			desiredProperties: { height: 0 },
+			easing: "easeInQuad"
+		});
+		$epidemicSteps.addClass("hidden");
+
+		// Hide the .epidemicFull and show a new epidemic playercard element to discard
 		const $card = $(newPlayerCard("epidemic"));
-		$epidemic.addClass("hidden").before($card)
-			.children()
-			.removeAttr("style");
+		$epidemic.addClass("hidden").before($card);
 		await movePlayerCardsToDiscards({ $card });
 	
 		getInfectionContainer().addClass("hidden");
@@ -6168,7 +6192,7 @@ async function infectionStep()
 	
 	log("infectionStep()");
 	const $container = $("#infectCitiesContainer"),
-		$btnContinue = $container.find(".button").html("INFECT CITY"),
+		$btnContinue = $container.find(".button").html("INFECT CITY").addClass("hidden"),
 		{ infectCity } = eventTypes;
 	
 	let events,
@@ -6193,13 +6217,19 @@ async function infectionStep()
 	{
 		// Event cards cannot be played while resolving infection cards,
 		// but they can be played before, between, or after resolving infection cards.
-		enableEventCards();
-		await buttonClickPromise($btnContinue,
-			{
-				beforeClick: "fadeIn",
-				afterClick: "hide"
-			});
-		$btnContinue.stop();
+		if (anyPlayerHasAnyEventCard())
+		{
+			enableEventCards();
+			await buttonClickPromise($btnContinue,
+				{
+					beforeClick: "fadeIn",
+					afterClick: "hide"
+				});
+			$btnContinue.stop();
+		}
+		else
+			await sleep(500);
+		
 		// Infection card is being drawn and resolved.
 		disableEventCards();
 		eventHistory.disableUndo();
@@ -6509,22 +6539,9 @@ async function finishInfectionStep()
 {
 	log("finishInfectionStep()");
 	log("nextStep: ", data.nextStep);
-	const $container = getInfectionContainer(),
-		$btn = $container.find(".btnContinue");
+	const $container = getInfectionContainer();
 	
-	if (currentStepIs("infect cities"))
-	{
-		enableEventCards();
-	
-		await buttonClickPromise($btn.html("CONTINUE"),
-		{
-			beforeClick: "show",
-			afterClick: "hide"
-		});
-		disableEventCards();
-	}
-	else
-		await sleep(getDuration(data, "longInterval"));
+	await sleep(getDuration(data, "longInterval"));
 
 	let $cards = $container.find(".infectionCard");
 	while ($cards.length)

@@ -100,7 +100,7 @@ function buttonClickPromise($btn, { beforeClick, afterClick } = {})
 		});
 }
 
-function animatePromise({ $elements, initialProperties, desiredProperties, duration, easing })
+function animatePromise({ $elements, initialProperties, desiredProperties, duration, easing, callback })
 {
 	return new Promise(resolve =>
 		{
@@ -116,7 +116,12 @@ function animatePromise({ $elements, initialProperties, desiredProperties, durat
 				function()
 				{
 					if ($(this).is($elements.last()))
+					{
 						resolve();
+
+						if (typeof callback === "function")
+							callback();
+					}
 				});
 		});
 }

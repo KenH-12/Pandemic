@@ -6,8 +6,6 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
-the full epidemic card for the second epidemic drawn (before reloading the page) doesn't slide down
-
 after epidemic intensify, the undo action button tooltip says "epidemic infect events cannot be undone"
 	but after clicking "continue" the tooltip is correct
 
@@ -19,11 +17,14 @@ when the discard step is undone, the "infect city" button should be disabled
 
 TO DO
 -----
-make sure any event card can be played beween epidemics
-
 if no event cards can be played, the following should happen automatically instead of awaiting a click event
-	draw 2 cards?
+	continue from draw 2 cards
+
+if the last event is undoable, prompt the user to click continue before...
 	infect city
+	epidemic increase (2nd epidemic)
+	epidemic intensify
+	
 
 change the font on the epidemic special event alert
 	the font-size should be larger
