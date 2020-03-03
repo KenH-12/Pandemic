@@ -20,12 +20,6 @@ TO DO
 if no event cards can be played, the following should happen automatically instead of awaiting a click event
 	continue from draw 2 cards
 
-if the last event is undoable, prompt the user to click continue before...
-	infect city
-	epidemic increase (2nd epidemic)
-	epidemic intensify
-	
-
 change the font on the epidemic special event alert
 	the font-size should be larger
 

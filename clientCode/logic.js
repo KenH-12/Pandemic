@@ -5547,7 +5547,10 @@ async function epidemicIncrease()
 	
 	if (betweenEpidemics())
 	{
-		if (anyPlayerHasAnyEventCard())
+		// If two epidemics were drawn on the same turn, event cards can be played after resolving the first
+		// (but not during resolution of the second).
+		// We should also give the user a chance to undo the playing of any undoable event cards between epidemics.
+		if (anyPlayerHasAnyEventCard() || lastEventCanBeUndone())
 		{
 			enableEventCards();
 
@@ -5644,7 +5647,8 @@ async function epidemicIntensify()
 	await highlightEpidemicStep($epidemic, "intensify");
 
 	// Resilient Population may be played between the infect and intensify steps of an epidemic.
-	if (anyPlayerHasResilientPopulation())
+	// We should also give the user a chance to undo the Resilient Population event before beginning the intensify step.
+	if (anyPlayerHasResilientPopulation() || lastEventCanBeUndone())
 	{
 		enableEventCards({ resilientPopulationOnly: true });
 		
@@ -6217,7 +6221,7 @@ async function infectionStep()
 	{
 		// Event cards cannot be played while resolving infection cards,
 		// but they can be played before, between, or after resolving infection cards.
-		if (anyPlayerHasAnyEventCard())
+		if (anyPlayerHasAnyEventCard() || lastEventCanBeUndone())
 		{
 			enableEventCards();
 			await buttonClickPromise($btnContinue,
