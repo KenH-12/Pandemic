@@ -17,9 +17,6 @@ when the discard step is undone, the "infect city" button should be disabled
 
 TO DO
 -----
-if no event cards can be played, the following should happen automatically instead of awaiting a click event
-	continue from draw 2 cards
-
 change the font on the epidemic special event alert
 	the font-size should be larger
 
@@ -51,6 +48,8 @@ event history
 			travel paths for movement actions and research station relocations?
 			outbreak spread paths?
 			epidemic intensify should have a max height, and should be scrollable
+
+The background of the "DEFEAT" screen should be the epidemic color.
 
 hovering over an epidemic card should show the full card
 

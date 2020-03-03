@@ -3437,13 +3437,7 @@ async function drawStep()
 		});
 	}
 
-	await buttonClickPromise($btn.html("CONTINUE"),
-		{
-			beforeClick: "fadeIn",
-			afterClick: "hide"
-		});
-	$btn.stop();
-
+	await sleep(750);
 	finishDrawStep(cardKeys);
 }
 
