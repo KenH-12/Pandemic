@@ -5228,7 +5228,7 @@ function disperseOutbreakCubes(originCityKey, cubesToDisperse)
 	{
 		destinationKey = $cube.data("destinationKey");
 
-		$cube.removeClass(originCityKey)
+		$cube.removeClass(`${originCityKey} infecting`)
 			.addClass(destinationKey)
 			.removeAttr("data-destinationKey");
 		
