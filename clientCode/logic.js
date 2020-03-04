@@ -1084,6 +1084,9 @@ function resetActionPrompt({ actionCancelled } = {})
 	$actionPrompt.addClass("hidden").removeAttr("style");
 	$actionInterface.removeAttr("style");
 
+	hideTravelPathArrow();
+	hideResilientPopulationArrow();
+
 	// If a Direct Flight or Charter Flight action is cancelled,
 	// the player's pawn should be put back on their current location.
 	if (actionCancelled)
@@ -1106,8 +1109,6 @@ function resetActionPrompt({ actionCancelled } = {})
 		}
 		else if (eventTypeIsBeingPrompted(resilientPopulation))
 			resetInfectionDiscardClicksAndTooltips();
-		
-		hideTravelPathArrow();
 	}
 
 	data.promptingEventType = false;
@@ -2209,9 +2210,12 @@ function enableResilientPopulationSelection()
 
 	if ($infectionDiscards.length)
 	{
+		showResilientPopulationArrow();
+		
 		$infectionDiscards.off("click")
 			.click(function()
 			{
+				hideResilientPopulationArrow({ selectionWasMade: true });
 				promptAction(
 				{
 					eventType: eventTypes.resilientPopulation,
@@ -2224,6 +2228,46 @@ Select for removal?`);
 	}
 	else
 		actionInterfacePopulator.replaceInstructions("<span class='r'>The Infection Discard Pile is empty!<br />To play Resilient Population, there must be at least 1 card in the Infection Discard Pile.</span>");
+}
+
+async function showResilientPopulationArrow()
+{
+	const $arrow = $("#resilientPopulationArrow");
+	
+	if ($arrow.hasClass("doNotShow"))
+		return false;
+	
+	const initialOffset = positionResilientPopulationArrow($arrow),
+		bobDistance = $arrow.height() * 0.75;
+
+	while (!$arrow.hasClass("hidden"))
+		await bobUpAndDown($arrow, { initialOffset, bobDistance });
+}
+function positionResilientPopulationArrow($arrow)
+{
+	const $infectionDiscardPile = $("#infectionDiscard"),
+		offset = $infectionDiscardPile.offset();
+	
+	$arrow = $arrow || $("#resilientPopulationArrow");
+	makeElementsSquare($arrow.removeClass("hidden"));
+	
+	offset.top += data.topPanelHeight + $arrow.outerHeight() * 0.8;
+	offset.left += $infectionDiscardPile.outerWidth() / 2;
+	offset.left -= $arrow.outerWidth() / 2;
+
+	$arrow.offset(offset);
+
+	return offset;
+}
+function hideResilientPopulationArrow({ selectionWasMade } = {})
+{
+	const $arrow = $("#resilientPopulationArrow").stop().addClass("hidden"),
+		doNotShow = "doNotShow";
+
+	if (selectionWasMade)
+		$arrow.addClass(doNotShow);
+	else if (!eventTypeIsBeingPrompted(eventTypes.resilientPopulation))
+		$arrow.removeClass(doNotShow);
 }
 
 async function resilientPopulation(cardKeyToRemove)
@@ -8618,6 +8662,9 @@ function expandInfectionDiscardPile({ showRemovedCardsContainer } = {})
 			$container.stop().css("height", "auto");
 			positionRemovedInfectionCardsContainer();
 
+			if (eventTypeIsBeingPrompted(eventTypes.resilientPopulation))
+				hideResilientPopulationArrow();
+
 			if (showRemovedCardsContainer)
 			{
 				const $removedCardsContainer = $("#removedInfectionCards");
@@ -8672,7 +8719,13 @@ function collapseInfectionDiscardPile()
 					height: $("#topPanel").height()
 				},
 				getDuration(data, "discardPileCollapse"),
-				function() { resolve() });
+				function()
+				{
+					if (eventTypeIsBeingPrompted(eventTypes.resilientPopulation))
+						showResilientPopulationArrow();
+					
+					resolve();
+				});
 		});
 }
 

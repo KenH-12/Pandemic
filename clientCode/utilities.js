@@ -137,6 +137,35 @@ function resolvePromiseOnLoad($img)
 	});
 }
 
+function bobUpAndDown($e, { initialOffset, bobDistance, duration, easing } = {})
+{
+	return new Promise(async resolve =>
+	{
+		initialOffset = initialOffset || $e.offset();
+		easing = easing || "easeInOutSine";
+
+		const desiredProperties = {
+			left: initialOffset.left,
+			top: initialOffset.top - (bobDistance || $e.height())
+		};
+	
+		await animatePromise({
+			$elements: $e,
+			desiredProperties,
+			duration,
+			easing
+		});
+
+		await animatePromise({
+			$elements: $e,
+			desiredProperties: initialOffset,
+			duration,
+			easing
+		});
+		resolve();
+	});
+}
+
 function propertyStrobe($elements,
 	{
 		initialState,

@@ -124,6 +124,7 @@
 								<p class='title'>REMOVED FROM GAME:</p>
 							</div>
 						</div>
+						<div id='resilientPopulationArrow' class='hidden'><div></div></div>
 
 						<div id='travelPathArrowContainer'>
 							<div id='travelPathArrow'></div>
