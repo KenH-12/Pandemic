@@ -4092,29 +4092,10 @@ class Player
 		initialOffset.left -= $arrow.width() / 2;
 		$arrow.offset(initialOffset);
 
-		const desiredProperties = {
-				left: initialOffset.left,
-				top: initialOffset.top - $arrow.height() / 3
-			},
-			duration = 400,
-			easing = "easeInOutSine";
+		const bobDistance = $arrow.height() / 3;
 
 		while (!$arrow.hasClass("hidden"))
-		{
-			await animatePromise({
-				$elements: $arrow,
-				desiredProperties,
-				duration,
-				easing
-			});
-
-			await animatePromise({
-				$elements: $arrow,
-				desiredProperties: initialOffset,
-				duration,
-				easing
-			});
-		}
+			await bobUpAndDown($arrow, { initialOffset, bobDistance });
 	}
 
 	disablePawn()
