@@ -11,8 +11,6 @@ after epidemic intensify, the undo action button tooltip says "epidemic infect e
 
 during the epidemic intensify animation, hovering over the empty space in the infection discard container shows the target cursor
 
-when the discard step is undone, the "infect city" button should be disabled
-
 TO DO
 -----
 consider removing the special actions container

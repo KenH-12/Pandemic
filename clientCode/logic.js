@@ -6214,7 +6214,6 @@ async function infectionStep()
 	if (isOneQuietNight())
 		return skipInfectionStepForOneQuietNight();
 	
-	log("infectionStep()");
 	const $container = $("#infectCitiesContainer"),
 		$btnContinue = $container.find(".button").html("INFECT CITY").addClass("hidden"),
 		{ infectCity } = eventTypes;
@@ -8880,6 +8879,8 @@ async function undoAction()
 
 	if (currentStepIs("draw"))
 		$("#cardDrawContainer").addClass("hidden").find(".button").off("click");
+	else if (currentStepIs("infect cities"))
+		$("#infectCitiesContainer").addClass("hidden").find(".button").off("click");
 	else if (currentStepIs("hand limit"))
 		removeDiscardPrompt();
 	else
