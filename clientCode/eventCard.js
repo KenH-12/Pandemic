@@ -34,7 +34,7 @@ export default class EventCard
         return $fullCard;
     }
     
-    showFullCard($eventCard, { boardWidth, boardHeight, promptingEventType })
+    showFullCard($eventCard, { boardWidth, promptingEventType })
     {
         const $fullCard = this.getFullCard($eventCard.hasClass("contingency")),
             $cardImg = $fullCard.children("img");
@@ -42,7 +42,7 @@ export default class EventCard
         $fullCard.appendTo("#boardContainer")
             .offset(getFullCardOffset($eventCard, $fullCard, boardWidth));
 
-        $cardImg.on("load", function() { ensureFullCardIsOnScreen($fullCard, boardHeight) });
+        $cardImg.on("load", function() { ensureDivPositionIsWithinWindowHeight($fullCard) });
 
         if ($eventCard.hasClass("unavailable"))
             showDisabledEventCardTooltip($fullCard, promptingEventType);

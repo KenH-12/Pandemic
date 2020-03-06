@@ -357,6 +357,15 @@ function isOverflowingVertically($element)
 	return element.scrollHeight > element.clientHeight;
 }
 
+function ensureDivPositionIsWithinWindowHeight($div, margin = 5)
+{
+	const windowHeight = $(window).height(),
+		divHeight = $div.outerHeight() + margin;
+
+    if ($div.offset().top + divHeight > windowHeight)
+        $div.offset({ top: windowHeight - divHeight });
+}
+
 // Facilitates responsiveness where simple css rules fail
 // Returns a dimension value calculated using gameData.sizeRatios
 function getDimension(gameData, dimension,

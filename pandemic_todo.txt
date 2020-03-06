@@ -38,8 +38,6 @@ event history
 
 The background of the "DEFEAT" screen should be the epidemic color.
 
-hovering over an epidemic card should show the full card
-
 the white diease cubes for the initial infections should slide in from the right
 consider putting a gradient on the setup container
 

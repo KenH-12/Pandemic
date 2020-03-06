@@ -1008,6 +1008,7 @@ function showEventIconDetails($icon, event)
 	
 	bindRoleCardHoverEvents();
 	bindEventCardHoverEvents(data, { $containingElement: $detailsContainer });
+	bindEpidemicCardHoverEvents($detailsContainer);
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
 }
@@ -3967,10 +3968,6 @@ class Player
 			$roleCard.addClass("hidden");
 			await sleep(10);
 			$roleCard.removeClass("hidden");
-			const roleCardHeight = $roleCard.height();
-			
-			if (hoveredElementOffset.top + roleCardHeight > data.boardHeight)
-				roleCardOffset.top = data.boardHeight - roleCardHeight - CARD_MARGIN;
 			
 			if ($hoveredElement.closest("#eventDetails").length)
 			{
@@ -3987,6 +3984,7 @@ class Player
 		}
 		
 		$roleCard.offset(roleCardOffset);
+		ensureDivPositionIsWithinWindowHeight($roleCard);
 
 		if (showFullContingencyCard)
 			eventCards[contingencyKey].showFullCard(getContingencyCardElement(), data);
@@ -5710,6 +5708,7 @@ function finishIntensifyStep($epidemic)
 		const $card = $(newPlayerCard("epidemic"));
 		$epidemic.addClass("hidden").before($card);
 		await movePlayerCardsToDiscards({ $card });
+		bindEpidemicCardHoverEvents($("#playerDiscard"));
 	
 		getInfectionContainer().addClass("hidden");
 	
@@ -7205,6 +7204,7 @@ function loadPlayerCards(playerCards)
 	}
 	
 	bindCityLocatorClickEvents();
+	bindEpidemicCardHoverEvents($discardsContainer);
 	setPlayerDeckImgSize();
 	flagRemovedEventCardEvents();
 }
@@ -8843,6 +8843,44 @@ function collapsePlayerDiscardPile()
 				resolve();
 			});
 	});
+}
+
+function bindEpidemicCardHoverEvents($container)
+{
+	$container.find(".playerCard.epidemic")
+		.off("mouseenter mouseleave")
+		.hover(function() { showFullEpidemicCard($(this)) },
+			function() { $("#boardContainer").children(".epidemicFull").remove() });
+}
+
+function showFullEpidemicCard($epidemicCard)
+{
+	const offset = $epidemicCard.offset(),
+		margin = 5,
+		parentID = $epidemicCard.parent().attr("id"),
+		$fullEpidemicCard = $(`<div class='epidemicFull'>
+									<h2>EPIDEMIC</h2>
+									<div class='increase'>
+										<h3>1 — INCREASE</h3>
+										<p>MOVE THE INFECTION RATE MARKER FORWARD 1 SPACE.</P>
+									</div>
+									<div class='infect'>
+										<h3>2 — INFECT</h3>
+										<p>DRAW THE BOTTOM CARD FROM THE INFECTION DECK AND PUT 3 CUBES ON THAT CITY. DISCARD THAT CARD.</p>
+									</div>
+									<div class='intensify'>
+										<h3>3 — INTENSIFY</h3>
+										<p>SHUFFLE THE CARDS IN THE INFECTION DISCARD PILE AND PUT THEM ON TOP OF THE INFECTION DECK.</p>
+									</div>
+								</div>`).appendTo("#boardContainer");
+	
+	if (parentID === "playerDiscard" || parentID === "removedPlayerCards")
+		offset.left -= $fullEpidemicCard.outerWidth() + margin;
+	else if (parentID === "eventDetails")
+		offset.left += $("#eventDetails").width() + margin;
+
+	$fullEpidemicCard.offset(offset);
+	ensureDivPositionIsWithinWindowHeight($fullEpidemicCard);
 }
 
 function getLastEvent()

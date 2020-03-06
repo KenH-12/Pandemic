@@ -852,12 +852,15 @@ span.r {color: #ef282a; background: none}
 }
 #infectionDiscard .infectionCardContents { width: 100% }
 #epidemicContainer .btnDisabled { cursor: progress }
-.epidemicFull
+#epidemicContainer > .epidemicFull
 {
 	width: 98%;
 	margin: 2px 1%;
 	overflow: hidden;
 }
+#boardContainer > .epidemicFull { width: 250px }
+#boardContainer > .epidemicFull > div
+{ background: transparent }
 .epidemicFull h2
 {
 	font-size: 20px;
@@ -877,26 +880,19 @@ span.r {color: #ef282a; background: none}
 	background-color: #00a94f;
 	transition: background-color 0.5s;
 }
-.epidemicFull h3
+.epidemicFull h3 { font-size: 16px }
+#epidemicContainer .epidemicFull > div:not(.highlighted) h3
 {
-	font-size: 16px;
 	color: rgb(189, 189, 189);
-}
-.epidemicFull > div.highlighted h3
-{
-	color: #fff;
 }
 .epidemicFull p
 {
 	font-size: 12px;
 	font-weight: 700;
 	padding: 3px 0 0 12px;
-	color: rgb(172, 172, 1);
-}
-.epidemicFull > div.highlighted p
-{
 	color: yellow;
 }
+#epidemicContainer .epidemicFull > div:not(.highlighted) p { color: rgb(172, 172, 1) }
 #playerPanelContainer
 {
 	width: 44.3%;
@@ -1154,6 +1150,7 @@ span.r {color: #ef282a; background: none}
 }
 .roleCard,
 #boardContainer > .eventCardFull,
+#boardContainer > .epidemicFull,
 #contingencyWrapper,
 .tooltip
 {
