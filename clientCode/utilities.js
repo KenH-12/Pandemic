@@ -536,7 +536,7 @@ function newPlayerCard(relatedObject, { noTooltip } = {})
 	if (typeof relatedObject.getPlayerCard === "function")
 		return relatedObject.getPlayerCard({ noTooltip });
 
-	return `<div class='playerCard epidemic' data-key='epid'${ noTooltip ? "" : " title='Epidemic card'" }>EPIDEMIC</div>`;
+	return `<div class='playerCard epidemic' data-key='epid'>EPIDEMIC</div>`;
 }
 
 // Returns the Infection Rate (as seen on the Infection Rate Track on the game board)

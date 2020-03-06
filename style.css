@@ -1156,7 +1156,7 @@ span.r {color: #ef282a; background: none}
 {
 	position: absolute;
 	z-index: 12;
-	filter: drop-shadow(-4px 4px 6px #000);
+	filter: drop-shadow(0px 0px 6px #000);
 }
 .roleCard,
 .eventCardFull { font-size: 14px }
