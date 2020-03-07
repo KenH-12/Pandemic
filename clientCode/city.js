@@ -341,8 +341,7 @@ export default class City
 			$researchStation.animate(
 			{
 				top: desiredStationOffset.top,
-				left: desiredStationOffset.left,
-				width: gameData.stationWidth
+				left: desiredStationOffset.left
 			}, duration, gameData.easings.stationPlacement);
 		}
 		else
