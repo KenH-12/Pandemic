@@ -399,9 +399,9 @@ export default class Event
 
 	getDetails()
 	{
-		const name = this.displayName || this.name;
+		const name = (this.displayName || this.name).toUpperCase();
 		
-		return `<p class='title'>${name.toUpperCase()}</p>
+		return `<p class='title'>${name}<span class='eventTypeInfo'>&#9432;</span></p>
 				${ this.player ? `<p>Role: ${this.player.newRoleTag()}</p>` : "" }`;
 	}
 }

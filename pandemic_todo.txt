@@ -6,13 +6,32 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
+it's possible to mouseleave eventDetails without a role card disappearing
+	remove #eventTypeTooltip, role cards, full epidemics, and full event cards on eventDetails mouseleave event
+
 TO DO
 -----
+all event types which can appear in the event history need a rule set to display in their tooltips
+	starting hands
+	infect 9 cities
+	triggered events
+		eradication
+		auto-treat disease
+	infect city
+		preventions
+	epidemic steps
+		increase
+		infect
+			preventions
+		intensify
+	outbreak
+	game end
+
+indicate loading when waiting for a response from the server
+
 consider removing the special actions container
 	dispatch pawn and operations flight are movement actions
 	plan contingency is an other action
-
-treat disease button should receive hover background-color when a treatable cube is hovered
 
 what if a player receives only event cards in their starting hand?
 	what does the "determine turn order" animation do?
@@ -41,8 +60,6 @@ resign button
 
 compare client and server side hand sizes after drawing?
 
-rename the step indicator or whatever it's called
-
 handle errors
 	retrieveEventHistory
 
@@ -57,6 +74,8 @@ for multiplayer games, require permission for certain actions
 
 IDEAS
 -----
+treat disease button should receive hover background-color when a treatable cube is hovered
+
 change "x actions remaining" to 4 lights which turn off as actions are used
 
 skippable infection steps and epidemics

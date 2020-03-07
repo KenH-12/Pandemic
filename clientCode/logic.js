@@ -844,7 +844,7 @@ function enableActionButton(buttonID)
 		.removeClass("btnDisabled hidden")
 		.click(function()
 		{
-			$(".actionButtonTooltip").remove();
+			$("#eventTypeTooltip").remove();
 			promptAction({ eventType: eventTypes[actionName] });
 		});
 }
@@ -855,39 +855,75 @@ function bindActionButtonHoverEvents()
 		TOOLTIP_MARGIN = 5;
 
 	let $btn,
-		eventType;
+		eventType,
+		includeRelatedRoleRule,
+		$tooltip,
+		tooltipOffset;
 	
 	$(document).on("mouseenter", actionInfoSelector, function()
 		{
 			$btn = $(this).closest(".actionButton");
 			eventType = eventTypes[toCamelCase($btn.attr("id").substring(3))];
-
-			const disabledMsg = $btn.hasClass("btnDisabled") ? "<p class='actionNotPossible'>This action is not currently possible.</p>" : "",
-				$tooltip = $(`<div class='tooltip actionButtonTooltip'>
-								<h3>${eventType.name.toUpperCase()}</h3>
-								${disabledMsg}
-							</div>`),
-				offset = $btn.offset();
-
-			for (let rule of eventType.rules)
-				$tooltip.append(`<p>${rule}</p>`);
 			
-			if (eventType.relatedRoleName
-				&& (getActivePlayer().role === eventType.relatedRoleName
-					|| eventType.name === "Share Knowledge" && activePlayerCanTakeFromResearcher()))
-				$tooltip.append(`<p class='specialAbilityRule'>${replaceRoleNamesWithRoleTags(eventType.relatedRoleRule)}</p>`);
-			
-			$tooltip.appendTo("#boardContainer");
+			includeRelatedRoleRule = relatedRoleRuleApplies(eventType);
 
-			offset.left -= $tooltip.outerWidth() + TOOLTIP_MARGIN;
-
-			const tooltipHeight = $tooltip.outerHeight() + TOOLTIP_MARGIN;
-			if (offset.top + tooltipHeight > data.boardHeight)
-				offset.top = data.boardHeight - tooltipHeight;
+			$tooltip = getEventTypeTooltip(eventType,
+				{
+					actionNotPossible: $btn.hasClass("btnDisabled"),
+					includeRelatedRoleRule
+				}).appendTo("#boardContainer");
 			
-			$tooltip.offset(offset);
+			tooltipOffset = $btn.offset();
+			tooltipOffset.left -= $tooltip.outerWidth() + TOOLTIP_MARGIN;
+			$tooltip.offset(tooltipOffset);
+			ensureDivPositionIsWithinWindowHeight($tooltip);
 		})
-		.on("mouseleave", actionInfoSelector, function() { $(".actionButtonTooltip").remove() });
+		.on("mouseleave", actionInfoSelector, function() { $("#eventTypeTooltip").remove() });
+}
+
+function getEventTypeTooltip(eventType, { includeName = true, actionNotPossible, includeRelatedRoleRule } = {})
+{
+	let $tooltip = $("#eventTypeTooltip");
+	
+	if ($tooltip.length)
+		$tooltip.empty();
+	else
+		$tooltip = $(`<div id='eventTypeTooltip' class='tooltip'></div>`);
+	
+	if (includeName)
+		$tooltip.append(`<h3>${eventType.name.toUpperCase()}</h3>`);
+
+	if (actionNotPossible)
+		$tooltip.append("<p class='actionNotPossible'>This action is not currently possible.</p>");
+
+	for (let rule of eventType.rules)
+		$tooltip.append(`<p>${rule}</p>`);
+	
+	if (includeRelatedRoleRule)
+		$tooltip.append(`<p class='specialAbilityRule'>${replaceRoleNamesWithRoleTags(eventType.relatedRoleRule)}</p>`);
+	
+	return $tooltip;
+}
+
+function relatedRoleRuleApplies(eventType, { roleA, roleB } = {})
+{
+	if (!eventType.relatedRoleName)
+		return false;
+	
+	roleA = roleA || getActivePlayer().role;
+
+	if (roleA === eventType.relatedRoleName)
+		return true;
+	
+	// Share Knowledge is the only event type which has a related role rule that can apply to an
+	// event performed by a role which is not the related role (see the Researcher's special ability).
+	if (eventType.name !== "Share Knowledge")
+		return false;
+	
+	if (typeof roleB === "undefined")
+		return activePlayerCanTakeFromResearcher();
+	
+	return roleB === "Researcher";
 }
 
 function getEventIconHtml(eventType, { event } = {})
@@ -979,7 +1015,7 @@ function showEventIconDetails($icon, event)
 	
 	const $eventHistory = $("#eventHistory"),
 		$boardContainer = $("#boardContainer"),
-		$detailsContainer = $(`<div id='eventDetails' class='tooltip'>${event.getDetails()}</div>`).appendTo($boardContainer),
+		$detailsContainer = $(`<div id='eventDetails' class='tooltip' data-eventType='${event.code}'>${event.getDetails()}</div>`).appendTo($boardContainer),
 		$arrow = $("<div id='eventDetailsArrow'></div>").appendTo($boardContainer),
 		containerHeight = $detailsContainer.height(),
 		halfContainerWidth = Math.ceil($detailsContainer.width() / 2),
@@ -1006,6 +1042,7 @@ function showEventIconDetails($icon, event)
 	if (event instanceof StartingHands)
 		event.positionPopulationRanks($detailsContainer);
 	
+	bindEventDetailsInfoHoverEvents($detailsContainer);
 	bindRoleCardHoverEvents();
 	bindEventCardHoverEvents(data, { $containingElement: $detailsContainer });
 	bindEpidemicCardHoverEvents($detailsContainer);
@@ -1052,6 +1089,29 @@ function checkEventIconHovering()
 
 	if ($hovered.closest("#eventHistory").length)
 		$hovered.trigger("mouseenter");
+}
+
+function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
+{
+	const eventTypeInfoSelector = "#eventDetails .eventTypeInfo";
+
+	$(document).off("mouseenter mouseleave", eventTypeInfoSelector,)
+		.on("mouseenter", eventTypeInfoSelector,
+		function()
+		{
+			const $this = $(this),
+				eventType = getEventType($eventDetailsContainer.attr("data-eventType")),
+				roleA = $this.find(".roleTag").first().html(),
+				roleB = eventType.name === "ShareKnowledge" ? $this.find(".roleTag").last().html() : false,
+				includeRelatedRoleRule = relatedRoleRuleApplies(eventType, { roleA, roleB }),
+				tooltipOffset = $("#eventDetails").offset(),
+				$tooltip = getEventTypeTooltip(eventType, { includeName: false, includeRelatedRoleRule });
+			
+			tooltipOffset.left += $eventDetailsContainer.outerWidth() + 5;
+			$tooltip.offset(tooltipOffset).appendTo("#boardContainer");
+			ensureDivPositionIsWithinWindowHeight($tooltip);
+		})
+		.on("mouseleave", eventTypeInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }
 
 function hideEventIconDetails()

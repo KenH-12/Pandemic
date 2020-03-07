@@ -426,13 +426,17 @@ span.r {color: #ef282a; background: none}
 }
 .tooltip > p { margin: 3px 0 }
 
-.actionButtonTooltip { width: 250px }
-.actionButtonTooltip h3
+#eventTypeTooltip
+{
+	width: 250px;
+	pointer-events: none;
+}
+#eventTypeTooltip h3
 {
 	font-family: 'Exo 2', sans-serif;
 	font-size: 20px;
 }
-.actionButtonTooltip .actionNotPossible
+#eventTypeTooltip .actionNotPossible
 {
 	color: #666;
 	text-align: center;
@@ -440,17 +444,17 @@ span.r {color: #ef282a; background: none}
 	border-bottom: 1px solid #666;
 	padding: 2px 0;
 }
-.actionButtonTooltip p
+#eventTypeTooltip p
 {
 	margin-top: 3px;
 	line-height: 16px;
 }
-.actionButtonTooltip h3 + p
+#eventTypeTooltip h3 + p
 {
 	border-top: 1px solid #fff;
 	padding-top: 5px;
 }
-.actionButtonTooltip .specialAbilityRule
+#eventTypeTooltip .specialAbilityRule
 {
 	margin-top: 10px;
 	border-top: 1px dashed #fff;
@@ -462,14 +466,23 @@ span.r {color: #ef282a; background: none}
 	font-size: 16px;
 	filter: drop-shadow(-4px -4px 6px #000);
 }
-#eventDetails .title
+#eventDetails > .title
 {
-	font-size: 17px;
+	font-family: 'Exo 2', sans-serif;
+	font-size: 20px;
+	line-height: 20px;
 	text-align: center;
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #fff;
-	padding-top: 2px;
-	margin-bottom: 3px;
+	padding: 5px 0;
+	margin: 0 0 3px 5px;
+}
+#eventDetails > .title > .eventTypeInfo
+{
+	float: right;
+	font-size: 14px;
+	line-height: 20px;
+	margin-left: 5px;
 }
 #eventDetails .playerCard { margin: 2px 0 }
 #eventDetails .diseaseCube
@@ -1213,6 +1226,11 @@ span.r {color: #ef282a; background: none}
 .btnSkip:hover,
 #btnUndo:hover
 { background-color: #1799d1 }
+.button,
+.button:hover,
+.btnSkip:hover,
+#btnUndo:hover
+{ transition: background-color 0.2s }
 .button * { pointer-events: none }
 .disabled, .btnDisabled, .scientist.button.btnDisabled
 {
