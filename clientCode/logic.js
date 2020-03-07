@@ -5795,7 +5795,7 @@ async function animateEpidemicIntensify()
 {
 	const $container = $("#infectionDiscard"),
 		$title = $container.children(".title").first(),
-		$cards = $container.children(".infectionCard"),
+		$cards = $container.children(".infectionCard").addClass("template"), // template css class prevents the target cursor from appearing
 		delay = getDuration(data, "longInterval");
 	
 	unbindInfectionDiscardHover();

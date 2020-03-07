@@ -9,8 +9,6 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 after epidemic intensify, the undo action button tooltip says "epidemic infect events cannot be undone"
 	but after clicking "continue" the tooltip is correct
 
-during the epidemic intensify animation, hovering over the empty space in the infection discard container shows the target cursor
-
 TO DO
 -----
 consider removing the special actions container
