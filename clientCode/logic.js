@@ -3778,7 +3778,10 @@ function resizeRightPanelElements()
 	data.panelWidth = rightPanel.width();
 	
 	if ($("#infectionsContainer, #initialInfectionsContainer").not(".hidden").length)
+	{
 		positionInfectionPanelComponents();
+		positionFaceDownInfectionCards();
+	}
 	
 	resizeTreatDiseaseOptions();
 }
@@ -6799,7 +6802,7 @@ function dealFaceDownInfCard(elementIndex)
 			.children(".infectionCardContents").first();
 		
 		const containerTop = $container.offset().top,
-			$cardback = $(`<img class='drawnInfectionCard'
+			$cardback = $(`<img class='drawnInfectionCard' data-index='${elementIndex}'
 								src='images/cards/infectionCardback.png'
 								alt='Infection Card' />`);
 		
@@ -6824,6 +6827,31 @@ function dealFaceDownInfCard(elementIndex)
 			data.easings.dealCard,
 			function() { resolve() });
 	});
+}
+
+function positionFaceDownInfectionCards()
+{
+	const $cardbacks = $(".drawnInfectionCard");
+
+	if (!$cardbacks.length)
+		return false;
+
+	const width = getDimension(data, "diseaseIcon"),
+		left = data.boardWidth + 1;
+	
+	let $this, $container;
+	$cardbacks.each(function()
+	{
+		$this = $(this);
+		$container = getInfectionContainer().find(".infectionCard").eq($this.attr("data-index"));
+
+		$this.offset({
+			left,
+			top: $container.offset().top
+		}).width(width);
+	});
+
+	makeElementsSquare($cardbacks);
 }
 
 async function revealInfectionCard({ city, cityKey, index }, { forecasting } = {})

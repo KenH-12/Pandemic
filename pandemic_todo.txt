@@ -35,9 +35,6 @@ rendezvous button
 
 rules / instructions / FAQ
 
-consider using the Researcher's modifications on the Share Knowledge button
-when another player can take from the researcher
-
 standardize prompt appearance / button behaviour
 
 resign button
@@ -50,9 +47,6 @@ handle errors
 	retrieveEventHistory
 
 add tests
-
-include in resize events...
-	recently dealt infection cards / cardbacks
 
 make sure things look ok for different screen sizes
 
