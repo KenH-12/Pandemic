@@ -6664,7 +6664,7 @@ function positionInfectionPanelComponents()
 	{
 		$container.removeClass("hidden");
 		
-		$(".groupInfRate.hidden").css("margin-left", -data.panelWidth);
+		$(".groupInfRate.hidden").css("margin-left", data.panelWidth);
 		makeElementsSquare(".groupInfRate > div");
 		$(".groupInfRate").not(".hidden")
 			.each(function()

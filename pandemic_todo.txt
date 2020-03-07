@@ -6,9 +6,6 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
-after epidemic intensify, the undo action button tooltip says "epidemic infect events cannot be undone"
-	but after clicking "continue" the tooltip is correct
-
 TO DO
 -----
 consider removing the special actions container
@@ -33,9 +30,6 @@ event history
 			epidemic intensify should have a max height, and should be scrollable
 
 The background of the "DEFEAT" screen should be the epidemic color.
-
-the white diease cubes for the initial infections should slide in from the right
-consider putting a gradient on the setup container
 
 rendezvous button
 
