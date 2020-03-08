@@ -8,6 +8,10 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
+for event history info tooltips
+	show the classification at the top (setup step, action, etc)
+	surround it with "—", give it overflow: hidden, and add more "—" until it overflows
+
 all event types which can appear in the event history need a rule set to display in their tooltips
 	starting hands
 	infect 9 cities

@@ -225,7 +225,15 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Starting Hands",
 		hasIcon: true,
 		code: "sh",
-		propertyNames: ["cardKeys"]
+		propertyNames: ["cardKeys"],
+		rules: [
+			"Cards are dealt according to the number of roles:",
+			"2 roles: 4 cards each",
+			"3 roles: 3 cards each",
+			"4 roles: 2 cards each",
+			"<br/>",
+			"The turn order is decided by each role's highest city card population."
+		]
 	},
 	outbreak: {
 		name: "Outbreak",
