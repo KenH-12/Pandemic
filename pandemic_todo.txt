@@ -6,9 +6,6 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
-it's possible to mouseleave eventDetails without a role card disappearing
-	remove #eventTypeTooltip, role cards, full epidemics, and full event cards on eventDetails mouseleave event
-
 TO DO
 -----
 all event types which can appear in the event history need a rule set to display in their tooltips

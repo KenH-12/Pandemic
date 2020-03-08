@@ -1066,9 +1066,10 @@ function allowEventDetailsHovering($icon)
 	$document.off("mousemove")
 		.mousemove(function(e)
 		{
-			if (e.pageY < hoverBox.top
-				|| e.pageX < hoverBox.left
-				|| e.pageX > hoverBox.right
+			// The hoverbox is imperfect, so the -3's and +7 allow a bit of forgiveness.
+			if (e.pageY < hoverBox.top - 3
+				|| e.pageX < hoverBox.left - 3
+				|| e.pageX > hoverBox.right + 7
 				|| e.pageY > hoverBox.bottom
 				&& !$icon.is(":hover"))
 			{
@@ -1116,7 +1117,13 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 
 function hideEventIconDetails()
 {
-	$("#eventDetails, #eventDetailsArrow").remove();
+	$("#eventDetails")
+		.add("#eventDetailsArrow")
+		.add("#eventTypeTooltip")
+		.add(".roleCard")
+		.add(".epidemicFull")
+		.add(".eventCardFull")
+		.remove();
 }
 
 function enableBtnCancelAction()

@@ -484,6 +484,7 @@ span.r {color: #ef282a; background: none}
 	line-height: 20px;
 	margin-left: 5px;
 }
+#eventDetails > .title > .eventTypeInfo:hover { text-shadow: 0px 0px 3px #fff }
 #eventDetails .playerCard { margin: 2px 0 }
 #eventDetails .diseaseCube
 {
