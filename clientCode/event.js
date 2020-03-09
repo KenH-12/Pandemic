@@ -219,7 +219,17 @@ The card must come from the Dispatcher&#39;s hand.`,
 		displayName: "Infect 9 Cities",
 		hasIcon: true,
 		code: "ii",
-		propertyNames: ["cityKey", "numCubes"]
+		propertyNames: ["cityKey", "numCubes"],
+		rules: [
+			"At the start of the game, 9 infection cards are flipped over.",
+			"<br />",
+			"Disease cubes of the matching color are placed on those cities as follows:",
+			"3 disease cubes are placed on each of the first 3 cities.",
+			"2 disease cubes are placed on each of the second 3 cities.",
+			"1 disease cube is placed on each of the last 3 cities.",
+			"<br />",
+			"The 9 infection cards are then placed in the infection discard pile."
+		]
 	},
 	startingHands: {
 		name: "Starting Hands",
@@ -227,12 +237,12 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "sh",
 		propertyNames: ["cardKeys"],
 		rules: [
-			"Cards are dealt according to the number of roles:",
-			"2 roles: 4 cards each",
-			"3 roles: 3 cards each",
-			"4 roles: 2 cards each",
+			"At the start of the game, cards are dealt according to the number of roles:",
+			"2 roles -> 4 cards each",
+			"3 roles -> 3 cards each",
+			"4 roles -> 2 cards each",
 			"<br/>",
-			"The turn order is decided by each role's highest city card population."
+			"The turn order is decided by the single highest city card population in each role's starting hand."
 		]
 	},
 	outbreak: {
