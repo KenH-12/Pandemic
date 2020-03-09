@@ -16,8 +16,6 @@ all event types which can appear in the event history need a rule set to display
 	triggered events
 		eradication
 		auto-treat disease
-	infect city
-		preventions
 	epidemic steps
 		increase
 		infect
