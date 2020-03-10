@@ -21,7 +21,6 @@ all event types which can appear in the event history need a rule set to display
 		infect
 			preventions
 		intensify
-	outbreak
 	game end
 
 add an event history icon for shuffling the epidemics into the deck?

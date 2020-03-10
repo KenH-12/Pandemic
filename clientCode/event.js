@@ -215,7 +215,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		propertyNames: ["cityKey", "preventionCode"],
 		rules: [
 			"At the end of each turn, infection cards are flipped over one at a time.",
-			"The number of infection cards flipped over at the end of a turn is equal to the current <i>infection rate</i> (see the infection rate track in the top right of the board).",
+			"The number of infection cards flipped over at the end of a turn is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
 			"Each time an infection card is flipped over, a disease cube of the matching color is placed on the city named on the card.",
 			"If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in that city (a city cannot contain more than 3 cubes of a given disease color)."
 		]
@@ -255,7 +255,15 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Outbreak",
 		hasIcon: true,
 		code: "ob",
-		propertyNames: ["outbreakCount", "originKey", "diseaseColor", "triggeredByKey"]
+		propertyNames: ["outbreakCount", "originKey", "diseaseColor", "triggeredByKey"],
+		rules: [
+			"When a disease outbreak occurs, the outbreaks marker is moved forward 1 space on the Outbreaks Track.",
+			"Then, 1 cube of the disease color is placed on every city connected to the outbreaking city. If any of them already has 3 cubes of the disease color, a <i>chain reaction outbreak</i> occurs after the current outbreak is done.",
+			"<br/>",
+			"When a chain reaction outbreak occurs, the outbreaks marker is moved forward one space and disease cube are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> infection card.",
+			"<br/>",
+			"<span class='warning'>⚠️</span> If the outbreaks marker reaches the last space of the Outbreaks Track, the game ends and your team has lost!"
+		]
 	},
 	outbreakInfection: {
 		name: "Outbreak Infection",
