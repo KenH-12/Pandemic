@@ -189,7 +189,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "ec",
 		actionPathName: "epidemicIncrease",
 		propertyNames: ["epidemicCount"],
-		hasIcon: true
+		hasIcon: true,
+		rules: [
+			"The infection rate marker is moved forward 1 space on the Infection Rate Track",
+			"The current infection rate determines how many infection cards are flipped over during a turn's Infect Cities step."
+		]
 	},
 	epidemicInfect: {
 		name: "Epidemic Infect",
