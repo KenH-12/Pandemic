@@ -2,7 +2,8 @@
 
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 
-const eventTypes = {
+const insufficientCubesWarningRule = "<span class='warning'>⚠️</span> If the number of cubes <i>actually needed on the board</i> cannot be placed because there are not enough cubes in the supply, the game ends and your team has lost!",
+eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
 		hasIcon: true,
@@ -191,7 +192,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		propertyNames: ["epidemicCount"],
 		hasIcon: true,
 		rules: [
-			"The infection rate marker is moved forward 1 space on the Infection Rate Track",
+			"The infection rate marker is moved forward 1 space on the Infection Rate Track.",
 			"The current infection rate determines how many infection cards are flipped over during a turn's Infect Cities step."
 		]
 	},
@@ -200,7 +201,14 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "ef",
 		actionPathName: "epidemicInfect",
 		propertyNames: ["cityKey", "prevCubeCount", "preventionCode"],
-		hasIcon: true
+		hasIcon: true,
+		rules: [
+			"The <i>bottom</i> card of the Infection Deck is flipped over and 3 disease cubes of the matching color are placed on the named city.",
+			"If the city already contains cubes of this color, cubes are added until the city has 3 cubes of this color and then an <i>outbreak</i> of this disease occurs in the city.",
+			"The infection card is then placed in the Infection Discard Pile.",
+			"<br/>",
+			insufficientCubesWarningRule
+		]
 	},
 	epidemicIntensify: {
 		name: "Epidemic Intensify",
@@ -224,10 +232,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "infectCity",
 		propertyNames: ["cityKey", "preventionCode"],
 		rules: [
-			"At the end of each turn, infection cards are flipped over one at a time.",
-			"The number of infection cards flipped over at the end of a turn is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
-			"Each time an infection card is flipped over, a disease cube of the matching color is placed on the city named on the card.",
-			"If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in that city (a city cannot contain more than 3 cubes of a given disease color)."
+			"During the Infect Cities step, infection cards are flipped over one at a time. The number of infection cards flipped over at the end of a turn is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
+			"Each time an infection card is flipped over, a disease cube of the matching color is placed on the named city.",
+			"If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in that city.",
+			"<br/>",
+			insufficientCubesWarningRule
 		]
 	},
 	initialInfection: {

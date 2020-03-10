@@ -17,9 +17,6 @@ all event types which can appear in the event history need a rule set to display
 		eradication
 		auto-treat disease
 	epidemic steps
-		increase
-		infect
-			preventions
 		intensify
 	game end
 
