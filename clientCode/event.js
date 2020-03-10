@@ -215,7 +215,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "et",
 		actionPathName: "epidemicIntensify",
 		propertyNames: ["numDiscardsShuffled"],
-		hasIcon: true
+		hasIcon: true,
+		rules: ["The cards in the Infection Discard Pile are shuffled and then placed on top of the Infection Deck."]
 	},
 	discard: {
 		name: "Discard",
@@ -223,7 +224,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		hasIcon: true,
 		code: "ds",
 		actionPathName: "discardPlayerCards",
-		propertyNames: ["cardKeys"]
+		propertyNames: ["cardKeys"],
+		rules: ["If a role ever has more than 7 cards in their hand (after first resolving any Epidemic cards they may have drawn), they must discard cards or play Event cards until they have 7 cards in their hand."]
 	},
 	infectCity: {
 		name: "Infect City",
