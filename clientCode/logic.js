@@ -1122,7 +1122,7 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 			const eventType = getEventType($(this).attr("data-eventType")),
 				tooltipOffset = $("#eventDetails").offset(),
 				$tooltip = getEventTypeTooltip(eventType);
-			
+
 			tooltipOffset.left += $eventDetailsContainer.outerWidth() + 5;
 			$tooltip.offset(tooltipOffset).appendTo("#boardContainer");
 			ensureDivPositionIsWithinWindowHeight($tooltip);
@@ -1137,7 +1137,7 @@ function hideEventIconDetails()
 		.add("#eventTypeTooltip")
 		.add(".roleCard")
 		.add(".epidemicFull")
-		.add(".eventCardFull")
+		.add("#boardContainer > .eventCardFull")
 		.remove();
 }
 
