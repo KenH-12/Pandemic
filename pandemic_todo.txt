@@ -12,10 +12,6 @@ for event history info tooltips
 	show the classification at the top (setup step, action, etc)
 	surround it with "—", give it overflow: hidden, and add more "—" until it overflows
 
-all event types which can appear in the event history need a rule set to display in their tooltips
-	triggered events
-		auto-treat disease
-
 add an event history icon for shuffling the epidemics into the deck?
 	number of epidemics in deck can be known
 	full epidemic card can be viewed from the event history at the start of the game

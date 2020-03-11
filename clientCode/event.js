@@ -97,7 +97,12 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Auto-Treat Disease",
 		hasIcon: true,
 		code: "at",
-		propertyNames: ["cityKey", "diseaseColor", "numCubesRemoved"]
+		propertyNames: ["cityKey", "diseaseColor", "numCubesRemoved"],
+		rules: [
+			"If a disease has been <i>cured</i>, the Medic automatically removes all cubes of that color from a city, simply by entering it or being there. This does not take an action.",
+			"The Medic's automatic removal of cubes can occur on other roles' turns, if he is moved by the Dispatcher or the Airlift Event.",
+			"The Medic also prevents placing disease cubes (and outbreaks) of <i>cured</i> diseases in his location."
+		]
 	},
 	discoverACure: {
 		name: "Discover A Cure",
