@@ -152,7 +152,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: [
 			"The Dispatcher may, as an action, either:",
 			"<li>move any pawn to any city containing another pawn, or</li>",
-			"<li>move another player's pawn as if it were his own.</li>"
+			"<li>move another role's pawn as if it were his own.</li>",
+			"When moving another role's pawn as if it were his own, the Dispatcher must discard cards for Direct and Charter Flights from <i>his</i> hand. A card discarded for a Charter Flight must match the city the pawn is moving from."
 		],
 		instructions: "To dispatch a pawn, drag and drop it onto a city.",
 		actionPathName: "movementAction",
@@ -161,7 +162,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 	rendezvous: {
 		name: "Rendezvous",
 		code: "rv",
-		actionPathName: "movementAction"
+		actionPathName: "movementAction",
+		rules: ["The Dispatcher may, as an action, move any pawn to any city containing another pawn."]
 	},
 	operationsFlight: {
 		name: "Operations Flight",
@@ -1043,7 +1045,7 @@ class DispatchPawn extends MovementAction
 		
 		return `${super.getDetails()}
 				<p>Dispatched: ${this.dispatchedPlayer.newRoleTag()}</p>
-				<p>Dispatch Type: ${this.movementType.name}</p>
+				<p>Dispatch Type: <span class='hoverInfo' data-eventType='${this.movementType.code}'>${this.movementType.name}</span></p>
 				<p>Origin: ${getLocatableCityName(this.origin)}</p>
 				<p>Destination: ${getLocatableCityName(this.destination)}</p>
 				${ this.isRendezvous() ? this.rendezvousedWith() : "" }
