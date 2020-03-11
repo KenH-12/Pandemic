@@ -1034,6 +1034,8 @@ function showEventIconDetails($icon, event)
 			left: containerOffsetLeft
 		});
 	
+	enforceEventDetailsHeightLimit();
+	
 	iconOffset.top += topAdjustment;
 	$arrow.offset(iconOffset)
 		.width(iconWidth)
@@ -1048,6 +1050,30 @@ function showEventIconDetails($icon, event)
 	bindEpidemicCardHoverEvents($detailsContainer);
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
+}
+
+function enforceEventDetailsHeightLimit($detailsContainer)
+{
+	$detailsContainer = $detailsContainer || $("#eventDetails");
+
+	if (!$detailsContainer.length)
+		return false;
+	
+	const offsetTop = $detailsContainer.offset().top,
+		minOffsetTop = data.topPanelHeight + 5;
+	
+	if (offsetTop >= minOffsetTop)
+	{
+		$detailsContainer.removeClass("scrollable");
+		return false;
+	}
+
+	const currentHeight = $detailsContainer.height(),
+		heightReduction = minOffsetTop - offsetTop;
+
+	$detailsContainer.addClass("scrollable")
+		.height(currentHeight - heightReduction)
+		.offset({ top: minOffsetTop });
 }
 
 function allowEventDetailsHovering($icon)
@@ -3828,6 +3854,8 @@ function positionRemovedInfectionCardsContainer()
 
 function resizeBottomPanelElements()
 {
+	hideEventIconDetails();
+	
 	const $eventHistoryContainer = $("#eventHistoryContainer"),
 		panelOffsetTop = data.boardHeight - data.topPanelHeight;
 	$(".bottomPanelDiv").not($eventHistoryContainer)

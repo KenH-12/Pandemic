@@ -30,7 +30,6 @@ event history
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
 			travel paths for movement actions and research station relocations?
 			outbreak spread paths?
-			epidemic intensify should have a max height, and should be scrollable
 
 The background of the "DEFEAT" screen should be the epidemic color.
 
