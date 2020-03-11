@@ -6,6 +6,9 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
+role card appeared somewhat off screen
+	quarantined infection event details -> qs role tag
+
 TO DO
 -----
 add an event history icon for shuffling the epidemics into the deck?

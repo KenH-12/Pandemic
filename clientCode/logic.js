@@ -1136,7 +1136,7 @@ function hideEventIconDetails()
 		.add("#eventDetailsArrow")
 		.add("#eventTypeTooltip")
 		.add(".roleCard")
-		.add(".epidemicFull")
+		.add("#boardContainer > .epidemicFull")
 		.add("#boardContainer > .eventCardFull")
 		.remove();
 }
