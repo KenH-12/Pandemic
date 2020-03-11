@@ -1094,9 +1094,10 @@ function checkEventIconHovering()
 
 function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 {
-	const eventTypeInfoSelector = "#eventDetails .eventTypeInfo";
+	const eventTypeInfoSelector = "#eventDetails .eventTypeInfo",
+		hoverInfoSelector = "#eventDetails .hoverInfo";
 
-	$(document).off("mouseenter mouseleave", eventTypeInfoSelector,)
+	$(document).off("mouseenter mouseleave", eventTypeInfoSelector)
 		.on("mouseenter", eventTypeInfoSelector,
 		function()
 		{
@@ -1113,6 +1114,20 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 			ensureDivPositionIsWithinWindowHeight($tooltip);
 		})
 		.on("mouseleave", eventTypeInfoSelector, function() { $("#eventTypeTooltip").remove() });
+	
+	$(document).off("mouseenter mouseleave", hoverInfoSelector)
+		.on("mouseenter", hoverInfoSelector,
+		function()
+		{
+			const eventType = getEventType($(this).attr("data-eventType")),
+				tooltipOffset = $("#eventDetails").offset(),
+				$tooltip = getEventTypeTooltip(eventType);
+			
+			tooltipOffset.left += $eventDetailsContainer.outerWidth() + 5;
+			$tooltip.offset(tooltipOffset).appendTo("#boardContainer");
+			ensureDivPositionIsWithinWindowHeight($tooltip);
+		})
+		.on("mouseleave", hoverInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }
 
 function hideEventIconDetails()

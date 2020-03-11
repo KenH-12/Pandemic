@@ -14,7 +14,6 @@ for event history info tooltips
 
 all event types which can appear in the event history need a rule set to display in their tooltips
 	triggered events
-		eradication
 		auto-treat disease
 
 add an event history icon for shuffling the epidemics into the deck?

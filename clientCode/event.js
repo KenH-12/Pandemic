@@ -117,7 +117,13 @@ The card must come from the Dispatcher&#39;s hand.`,
 		displayName: "Disease Eradicated",
 		hasIcon: true,
 		code: "er",
-		propertyNames: ["diseaseColor"]
+		propertyNames: ["diseaseColor"],
+		rules: [
+			"If no cubes of a cured disease are left on the board, the disease is <i>eradicated</i>.",
+			"When cities of an eradicated disease are infected, no new disease cubes are placed there.",
+			"Removing the last cube of a disease that is not cured has no effect.",
+			"Eradicating a disease is not needed to win; once all diseases are cured, the game ends and your team wins!"
+		]
 	},
 	planContingency: {
 		name: "Plan Contingency",
@@ -936,8 +942,7 @@ class Eradication extends Event
 		const color = getColorWord(this.diseaseColor);
 		
 		return `${super.getDetails()}
-				<p>The ${color} disease has been eradicated!</p>
-				<p>(no new ${color} disease cubes will be placed on the board)</p>`;
+				<p>The ${color} disease has been eradicated!</p>`;
 	}
 
 	animateUndo()
@@ -1707,7 +1712,7 @@ function attachPlayersToEvents(players, getPlayer, events)
 				continue;
 			
 			if (event.preventionCode === infectionPreventionCodes.eradicated)
-				event.preventedBy = "Eradication";
+				event.preventedBy = `<span class='hoverInfo' data-eventType='${eventTypes.eradication.code}'>Eradication</span>`;
 			else if (event.preventionCode === infectionPreventionCodes.quarantine)
 			{
 				const qs = getPlayer("Quarantine Specialist");
