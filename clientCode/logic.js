@@ -8608,7 +8608,7 @@ function getDecidingTurnOrderCardPopulations()
 			if (city)
 				city.population = card.population;
 
-			if (Number(card.population) > highestPop)
+			if (Number(card.population) >= highestPop)
 			{
 				highestPop = Number(card.population);
 				cardWithHighestPop = card;
@@ -8619,7 +8619,6 @@ function getDecidingTurnOrderCardPopulations()
 		startingHandPopulations = startingHandPopulations.filter(c => c.role != cardWithHighestPop.role);
 	}
 
-	log("turnOrderCards: ", turnOrderCards);
 	return turnOrderCards;
 }
 

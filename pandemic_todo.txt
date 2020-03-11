@@ -20,9 +20,6 @@ consider removing the special actions container
 	dispatch pawn and operations flight are movement actions
 	plan contingency is an other action
 
-what if a player receives only event cards in their starting hand?
-	what does the "determine turn order" animation do?
-
 event history
 	remove icons which are not visible?
 	detailed tooltips
