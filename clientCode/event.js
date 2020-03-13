@@ -300,7 +300,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		]
 	},
 	outbreakInfection: {
-		name: "Outbreak Infection",
+		name: "Outbreak",
 		code: "oi",
 		propertyNames: ["originKey", "infectedKey", "diseaseColor", "preventionCode"]
 	},

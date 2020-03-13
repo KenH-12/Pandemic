@@ -360,7 +360,12 @@ function isOverflowingVertically($element)
 function ensureDivPositionIsWithinWindowHeight($div, margin = 5)
 {
 	const windowHeight = $(window).height(),
-		divHeight = $div.outerHeight() + margin;
+		$images = $div.find("img");
+	
+	for (let i = 0; i < $images.length; i++)
+		$images.eq(i).on("load", () => ensureDivPositionIsWithinWindowHeight($div));
+	
+	const divHeight = $div.outerHeight() + margin;
 
     if ($div.offset().top + divHeight > windowHeight)
         $div.offset({ top: windowHeight - divHeight });
