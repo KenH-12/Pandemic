@@ -1669,15 +1669,17 @@ const actionInterfacePopulator = {
 						showResearcherSpecialAbilityRule = true;
 				}
 
-				$shareKnowledgePlayerOptions.children().click(function()
-				{
-					$(".roleCard").remove();
-					promptAction(
-						{
-							eventType: eventTypes.shareKnowledge,
-							shareKnowledgeParticipant: data.players[$(this).data("role")]
-						});
-				});
+				$shareKnowledgePlayerOptions.children()
+					.addClass("playerOption")
+					.click(function()
+					{
+						$(".roleCard").remove();
+						promptAction(
+							{
+								eventType: eventTypes.shareKnowledge,
+								shareKnowledgeParticipant: data.players[$(this).data("role")]
+							});
+					});
 
 				$actionInterface.append($shareKnowledgePlayerOptions);
 			}
@@ -5091,7 +5093,7 @@ function bindCityLocatorClickEvents({ $containingElement } = {})
 
 function locatePawnOnRoleTagClick($containingElement)
 {
-	$containingElement.find(".roleTag")
+	$containingElement.find(".roleTag").not(".playerOption")
 		.off("click")
 		.click(function() { data.players[$(this).data("role")].pinpointLocation() });
 }

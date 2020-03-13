@@ -1027,7 +1027,7 @@ span.r {color: #ef282a; background: none}
 .infectionCard:not(.template):hover .cityName,
 .playerPanel .role *:not(.eventCard):hover,
 #roleIndicator:hover,
-.roleTag:hover,
+.roleTag:not(.playerOption):hover,
 .playerCard.b:hover,
 #eventDetails .locatable:hover
 { text-decoration: underline; }

@@ -24,7 +24,7 @@ INSERT INTO STEP (description) VALUES ('infect cities');
 INSERT INTO STEP (description) VALUES ('hand limit');
 
 INSERT INTO ROLE (roleName, cardText) VALUES ('Contingency Planner', 'As an action, take any discarded Event card and store it.&When you play the stored Event card, remove it from the game.&Limit: 1 stored Event card at a time, which is not part of your hand.');
-INSERT INTO ROLE (roleName, cardText) VALUES ('Dispatcher', 'Move another player''s pawn as if it were yours.&As an action, move any pawn to a city with another pawn.&Get permission before moving another player''s pawn.');
+INSERT INTO ROLE (roleName, cardText) VALUES ('Dispatcher', 'Move another role''s pawn as if it were yours.&As an action, move any pawn to a city with another pawn.');
 INSERT INTO ROLE (roleName, cardText) VALUES ('Medic', 'Remove all cubes of one color when doing Treat Disease.&Automatically remove cubes of cured diseases from the city you are in (and prevent them from being placed there).');
 INSERT INTO ROLE (roleName, cardText) VALUES ('Operations Expert', 'As an action, build a research station in the city you are in (no City card needed).&Once per turn as an action, move from a research station to any city by discarding any City card.');
 INSERT INTO ROLE (roleName, cardText) VALUES ('Quarantine Specialist', 'Prevent disease cube placements (and outbreaks) in the city you are in and all cities connected to it.');

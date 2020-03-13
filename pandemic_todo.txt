@@ -8,12 +8,6 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
-add an event history icon for shuffling the epidemics into the deck?
-	number of epidemics in deck can be known
-	full epidemic card can be viewed from the event history at the start of the game
-
-change dispatcher's card text
-
 indicate loading when waiting for a response from the server
 
 consider removing the special actions container
@@ -54,6 +48,8 @@ for multiplayer games, require permission for certain actions
 
 IDEAS
 -----
+display difficulty on board above infection rate
+
 treat disease button should receive hover background-color when a treatable cube is hovered
 
 change "x actions remaining" to 4 lights which turn off as actions are used
