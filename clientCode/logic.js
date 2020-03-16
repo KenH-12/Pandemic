@@ -7218,7 +7218,10 @@ async function endGame()
 	if (data.gameEndCause === "victory")
 		selectorToShow = "#victory";
 	else
+	{
 		selectorToShow = `#defeat, .${data.gameEndCause}Defeat`;
+		$curtain.addClass("epidemic");
+	}
 
 	$curtain.find(selectorToShow).removeClass(hidden)
 		.first().css("margin-top", data.boardHeight / 3);

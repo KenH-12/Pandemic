@@ -8,7 +8,20 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
+instead of using two back buttons when the action prompt is scrollable,
+	use one back button which has position:fixed
+
+use the travel path arrow when prompting government grant station placement
+	or execute the action on drop, because it's undoable
+
 indicate loading when waiting for a response from the server
+
+starting a new game
+	select difficulty
+	select roles?
+when the game is over
+	navigate back to home screen
+
 
 consider removing the special actions container
 	dispatch pawn and operations flight are movement actions
@@ -21,8 +34,6 @@ event history
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
 			travel paths for movement actions and research station relocations?
 			outbreak spread paths?
-
-The background of the "DEFEAT" screen should be the epidemic color.
 
 rendezvous button
 
