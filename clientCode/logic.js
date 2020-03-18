@@ -2522,6 +2522,7 @@ function newGrantStation()
 		});
 	
 	highlightResearchStationSupply($grantStation);
+	showGovernmentGrantArrow();
 }
 
 async function resetGrantStation({ $researchStation, cancelled } = {})
@@ -2587,8 +2588,37 @@ async function highlightResearchStationSupply($grantStation)
 }
 function turnOffResearchStationSupplyHighlight()
 {
+	$("#governmentGrantArrow").addClass("hidden");
 	$("#researchStationSupply").children(".researchStation").removeClass("bigGlow smallGlow");
 	$(".grantStation").removeClass("glowing");
+}
+
+async function showGovernmentGrantArrow()
+{
+	const $arrow = $("#governmentGrantArrow");
+
+	const initialOffset = positionGovernmentGrantArrow($arrow),
+		bobDistance = $arrow.height() * 0.75,
+		duration = 350;
+
+	while (!$arrow.hasClass("hidden"))
+		await bobUpAndDown($arrow, { initialOffset, bobDistance, duration });
+}
+function positionGovernmentGrantArrow($arrow)
+{
+	const $researchStationSupply = $("#researchStationSupply"),
+		offset = $researchStationSupply.offset();
+	
+	$arrow = $arrow || $("#governmentGrantArrow");
+	makeElementsSquare($arrow.removeClass("hidden"));
+	
+	offset.top -= $arrow.outerHeight();
+	offset.left += $researchStationSupply.outerWidth() / 2;
+	offset.left -= $arrow.outerWidth() / 2;
+
+	$arrow.offset(offset);
+
+	return offset;
 }
 
 function promptGovernmentGrantStationRelocation()

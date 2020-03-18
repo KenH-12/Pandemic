@@ -113,7 +113,9 @@ body,
 	z-index: 4;
 	width: 1.6%;
 }
-.pawnArrow, #resilientPopulationArrow
+.pawnArrow,
+#resilientPopulationArrow,
+#governmentGrantArrow
 {
 	width: 3%;
 	background-color: transparent;
@@ -122,17 +124,20 @@ body,
 }
 .pawnArrow.dispatch { width: 2% }
 .pawnArrow > div,
-#resilientPopulationArrow > div
+#resilientPopulationArrow > div,
+#governmentGrantArrow > div
 {
 	width: 100%;
 	height: 100%;
 }
-.pawnArrow > div
+.pawnArrow > div,
+#governmentGrantArrow > div
 {
 	clip-path: polygon(50% 30%, 100% 10%, 50% 100%, 0 10%);
 }
 .pawnArrow.dispatch > div { clip-path: polygon(50% 30%, 100% 10%, 50% 100%, 0 10%) }
-#resilientPopulationArrow
+#resilientPopulationArrow,
+#governmentGrantArrow
 {
 	width: 4%;
 	filter: drop-shadow(0px 0px 3px #fff);
@@ -334,7 +339,8 @@ span.r {color: #ef282a; background: none}
 }
 .pawnArrow.airlift > div,
 .airlift:not(.pawnArrow),
-#resilientPopulationArrow > div
+#resilientPopulationArrow > div,
+#governmentGrantArrow > div
 {
 	background: linear-gradient(to bottom right, 
 		#fff,

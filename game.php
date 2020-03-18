@@ -160,6 +160,7 @@
 							</p>
 						</div>
 
+						<div id='governmentGrantArrow' class='hidden'><div></div></div>
 						<div id='researchStationSupply' class='bottomPanelDiv'>
 							<p class='title'>RESEARCH STATION SUPPLY</p>
 							<p id='researchStationSupplyCount'>$MAX_RESEARCH_STATION_COUNT</p>
