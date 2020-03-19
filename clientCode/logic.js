@@ -1431,12 +1431,14 @@ const actionInterfacePopulator = {
 		
 		bindCityLocatorClickEvents({ $containingElement: $discardPrompt });
 
-		$discardPrompt.append(`<div class='button ${buttonClass}'>${buttonText || "DISCARD"}</div>`);
+		const $btnConfirm = $(`<div class='button ${buttonClass}'>${buttonText || "DISCARD"}</div>`);
+		$discardPrompt.append($btnConfirm);
+		animateButtonBackgroundColor($btnConfirm);
 
 		if (typeof onConfirm === "function")
-			$discardPrompt.children(`.${buttonClass}`).click(function()
+			$btnConfirm.click(function()
 			{
-				$(`.${buttonClass}`).off("click").addClass("btnDisabled");
+				$btnConfirm.off("click").addClass("btnDisabled");
 				onConfirm();
 			});
 
@@ -2349,10 +2351,11 @@ async function showResilientPopulationArrow()
 		return false;
 	
 	const initialOffset = positionResilientPopulationArrow($arrow),
-		bobDistance = $arrow.height() * 0.75;
+		bobDistance = $arrow.height() * 0.75,
+		duration = 350;
 
 	while (!$arrow.hasClass("hidden"))
-		await bobUpAndDown($arrow, { initialOffset, bobDistance });
+		await bobUpAndDown($arrow, { initialOffset, bobDistance, duration });
 }
 function positionResilientPopulationArrow($arrow)
 {
@@ -3600,6 +3603,8 @@ async function drawStep()
 
 	// Event cards can be played before drawing.
 	enableEventCards();
+
+	animateButtonBackgroundColor($btn);
 	await buttonClickPromise($btn,
 	{
 		beforeClick: "fadeIn",
@@ -6359,7 +6364,7 @@ async function infectionStep()
 		return skipInfectionStepForOneQuietNight();
 	
 	const $container = $("#infectCitiesContainer"),
-		$btnContinue = $container.find(".button").html("INFECT CITY").addClass("hidden"),
+		$btn = $container.find(".button").html("INFECT CITY").addClass("hidden"),
 		{ infectCity } = eventTypes;
 	
 	let events,
@@ -6369,7 +6374,7 @@ async function infectionStep()
 	$container.children(".infectionCard").remove();
 	// Create infection card template elements
 	for (let i = 0; i < data.infectionRate; i++)
-		$btnContinue.before(newInfectionCardTemplate());
+		$btn.before(newInfectionCardTemplate());
 		
 	positionInfectionPanelComponents();
 
@@ -6387,12 +6392,10 @@ async function infectionStep()
 		if (anyPlayerHasAnyEventCard() || lastEventCanBeUndone())
 		{
 			enableEventCards();
-			await buttonClickPromise($btnContinue,
-				{
-					beforeClick: "fadeIn",
-					afterClick: "hide"
-				});
-			$btnContinue.stop();
+			unhide($btn);
+			animateButtonBackgroundColor($btn);
+			await buttonClickPromise($btn);
+			$btn.addClass("hidden");
 		}
 		else
 			await sleep(500);

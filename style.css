@@ -1225,15 +1225,27 @@ span.r {color: #ef282a; background: none}
 	text-align: center;
 	padding: 5px 0;
 	margin-left: 12.5%;
-	border: 1px solid #fff;
 	background-color: #0c658b;
 	cursor: pointer;
 }
+#cardDrawContainer .button,
+#infectCitiesContainer .button,
+#epidemicContainer .button
+{
+	margin-top: 12.5%;
+	font-family: 'Exo 2', sans-serif;
+	font-size: 20px;
+}
+
+.button-secondary-color { background-color: #1799d1 }
+.button.flashing,
+.button-secondary-color { transition: background-color 0.6s }
+
 .button:hover,
 .btnSkip:hover,
 #btnUndo:hover
 { background-color: #1799d1 }
-.button,
+.button:not(.flashing),
 .button:hover,
 .btnSkip:hover,
 #btnUndo:hover
@@ -1246,7 +1258,6 @@ span.r {color: #ef282a; background: none}
 .btnDisabled
 {
 	background-color: #064058;
-	border: 1px solid #555;
 }
 .btnDisabled:hover { background-color: #064058 }
 .actionCategory h2
@@ -1259,7 +1270,6 @@ span.r {color: #ef282a; background: none}
 {
 	width: 100%;
 	margin: 0 0 2px 0;
-	border: none;
 	padding: 0;
 	font-family: 'Exo 2', sans-serif;
 	font-size: 18px;

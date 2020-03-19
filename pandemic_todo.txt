@@ -6,6 +6,8 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
+prompting a movement action doesn't hide the Resilient population arrow
+
 TO DO
 -----
 instead of using two back buttons when the action prompt is scrollable,

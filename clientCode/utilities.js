@@ -197,6 +197,25 @@ function propertyStrobe($elements,
 	});
 }
 
+async function animateButtonBackgroundColor($button)
+{
+	const flashing = "flashing",
+		secondaryButtonColors = "button-secondary-color",
+		interval = 600;
+
+	$button.addClass(flashing);
+
+	while (!$button.hasClass("hidden"))
+	{
+		$button.addClass(secondaryButtonColors);
+		await sleep(interval);
+		$button.removeClass(secondaryButtonColors);
+		await sleep(interval);
+	}
+
+	$button.removeClass(flashing);
+}
+
 // Useful for extracting numbers from the beginning of css property values such as border or padding.
 function getLeadingNumber(string)
 {
