@@ -2824,6 +2824,8 @@ async function tryDispatchPawn(playerToDispatch)
 	if (!dispatchDetails)
 		return invalidMovement(playerToDispatch.getLocation());
 	
+	hideResilientPopulationArrow();
+	
 	const { method, destination } = dispatchDetails;
 	
 	if (movementTypeRequiresDiscard(method))
@@ -3276,6 +3278,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			data.promptedTravelPathProperties = movementDetails;
 			promptAction(movementDetails);
 
+			hideResilientPopulationArrow();
 			originCity.cluster(data);
 			return false;
 		}
@@ -3293,6 +3296,8 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			{
 				data.promptedTravelPathProperties = movementDetails;
 				promptAction(movementDetails);
+
+				hideResilientPopulationArrow();
 				originCity.cluster(data);
 				return false;
 			}
