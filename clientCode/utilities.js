@@ -197,7 +197,7 @@ function propertyStrobe($elements,
 	});
 }
 
-async function animateButtonBackgroundColor($button)
+async function oscillateButtonBackgroundColor($button)
 {
 	const flashing = "flashing",
 		secondaryButtonColors = "button-secondary-color",
@@ -205,7 +205,7 @@ async function animateButtonBackgroundColor($button)
 
 	$button.addClass(flashing);
 
-	while (!$button.hasClass("hidden"))
+	while (!$button.hasClass("hidden") && !$button.hasClass("btnDisabled"))
 	{
 		$button.addClass(secondaryButtonColors);
 		await sleep(interval);
@@ -213,7 +213,7 @@ async function animateButtonBackgroundColor($button)
 		await sleep(interval);
 	}
 
-	$button.removeClass(flashing);
+	$button.removeClass(`${flashing} ${secondaryButtonColors}`);
 }
 
 // Useful for extracting numbers from the beginning of css property values such as border or padding.

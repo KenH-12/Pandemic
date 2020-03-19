@@ -1433,7 +1433,7 @@ const actionInterfacePopulator = {
 
 		const $btnConfirm = $(`<div class='button ${buttonClass}'>${buttonText || "DISCARD"}</div>`);
 		$discardPrompt.append($btnConfirm);
-		animateButtonBackgroundColor($btnConfirm);
+		oscillateButtonBackgroundColor($btnConfirm);
 
 		if (typeof onConfirm === "function")
 			$btnConfirm.click(function()
@@ -1774,6 +1774,7 @@ const actionInterfacePopulator = {
 			resetActionPrompt();
 			passActions();
 		});
+		oscillateButtonBackgroundColor($btnConfirm);
 
 		actionInterfacePopulator.$actionInterface.append($btnConfirm);
 
@@ -2892,8 +2893,6 @@ class DiscardPrompt
 {
 	constructor({ eventTypeCode, buttonText, cardKeys, numDiscardsRequired, onConfirm })
 	{
-		log("new DiscardPrompt...");
-		log("cardKeys: ", cardKeys);
 		this.eventTypeCode = eventTypeCode;
 		this.cardKeys = cardKeys;
 		this.numDiscardsRequired = numDiscardsRequired;
@@ -3035,6 +3034,8 @@ class DiscardPrompt
 				self.onConfirm(self.getDiscardSelectionKeys());
 			})
 			.removeClass("btnDisabled");
+		
+		oscillateButtonBackgroundColor($btn);
 	}
 }
 
@@ -3604,7 +3605,7 @@ async function drawStep()
 	// Event cards can be played before drawing.
 	enableEventCards();
 
-	animateButtonBackgroundColor($btn);
+	oscillateButtonBackgroundColor($btn);
 	await buttonClickPromise($btn,
 	{
 		beforeClick: "fadeIn",
@@ -5820,7 +5821,8 @@ async function epidemicIntensify()
 	{
 		enableEventCards({ resilientPopulationOnly: true });
 		
-		await buttonClickPromise($btn.html("INTENSIFY").removeClass("hidden"));
+		oscillateButtonBackgroundColor($btn.removeClass("hidden"));
+		await buttonClickPromise($btn.html("INTENSIFY"));
 		$btn.addClass("hidden");
 	}
 	disableEventCards();
@@ -6392,8 +6394,7 @@ async function infectionStep()
 		if (anyPlayerHasAnyEventCard() || lastEventCanBeUndone())
 		{
 			enableEventCards();
-			unhide($btn);
-			animateButtonBackgroundColor($btn);
+			oscillateButtonBackgroundColor($btn.removeClass("hidden"));
 			await buttonClickPromise($btn);
 			$btn.addClass("hidden");
 		}
