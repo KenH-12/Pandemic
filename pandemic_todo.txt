@@ -8,7 +8,9 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
-many of the messages displayed below the active role are not necessary
+cure vial tooltips
+
+dispath method hoverInfos should display the movement type's tooltip
 
 instead of using two back buttons when the action prompt is scrollable,
 	use one back button which has position:fixed

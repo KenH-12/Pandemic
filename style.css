@@ -1372,6 +1372,7 @@ span.r {color: #ef282a; background: none}
 	padding: 3%;
 	padding-bottom: none;
 }
+#actionInterface .instructions + .discardSelections { margin-top: -2.5% }
 #actionInterface .eventCardFull + .instructions { text-align: center }
 #actionPrompt .playerCard
 {
@@ -1442,6 +1443,7 @@ span.r {color: #ef282a; background: none}
 	font-family: 'Exo 2', sans-serif;
 	font-size: 26px;
 }
+.actionInterfaceDivision + .discardSelections { margin-top: 3% }
 .diseaseColorOption
 {
 	display: inline-block;

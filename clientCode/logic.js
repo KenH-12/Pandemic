@@ -444,16 +444,16 @@ Hand Limit Exceeded!<br/>`;
 	}
 
 	stepName = "draw";
-	steps[stepName] = new Step(stepName, "Draw 2 Cards", [drawStep]);
+	steps[stepName] = new Step(stepName, "", [drawStep]);
 
 	stepName = "epIncrease";
-	steps[stepName] = new Step(stepName, "Resolve Epidemics", [epidemicIncrease]);
+	steps[stepName] = new Step(stepName, "", [epidemicIncrease]);
 
 	stepName = "epInfect";
-	steps[stepName] = new Step(stepName, "Resolve Epidemics", [epidemicInfect]);
+	steps[stepName] = new Step(stepName, "", [epidemicInfect]);
 	
 	stepName = "epIntensify";
-	steps[stepName] = new Step(stepName, "Resolve Epidemics", [epidemicIntensify]);
+	steps[stepName] = new Step(stepName, "", [epidemicIntensify]);
 
 	stepName = "discard";
 	steps[stepName] = new Step(stepName, "Discard to 7 Cards", [discardStep]);
@@ -1401,7 +1401,7 @@ const actionInterfacePopulator = {
 		
 		return actionInterfacePopulator;
 	},
-	appendDiscardPrompt({ cardKeys, promptMsg, onConfirm })
+	appendDiscardPrompt({ cardKeys, promptMsg, buttonText, onConfirm } = {})
 	{
 		const { $actionInterface } = actionInterfacePopulator,
 			$discardPrompt = $(`<div class='discardSelections'></div>`),
@@ -1409,8 +1409,6 @@ const actionInterfacePopulator = {
 			isEventCard = typeof cardKeys === "string" && isEventCardKey(cardKeys),
 			isContingencyCard = isEventCard && isContingencyCardKey(cardKeys);
 
-		let buttonText = false;
-		
 		if (isEventCard)
 		{
 			if (isContingencyCard)
@@ -1530,10 +1528,11 @@ const actionInterfacePopulator = {
 		const currentCity = getActivePlayer().getLocation();
 		
 		actionInterfacePopulator
-			.replaceInstructions(`Destination: ${destination.name}`, nthOption)
+			.replaceInstructions(`Destination: ${destination.name}<br/>Discard:`, nthOption)
 			.appendDiscardPrompt(
 			{
 				cardKeys: currentCity.key,
+				buttonText: "CONFIRM",
 				onConfirm: function() { movementAction(charterFlight, destination) }
 			});
 		return true;
@@ -1545,10 +1544,11 @@ const actionInterfacePopulator = {
 		if (destination)
 		{
 			actionInterfacePopulator
-				.replaceInstructions(`Destination: ${destination.name}`, nthOption)
+				.replaceInstructions(`Destination: ${destination.name}<br/>Discard:`, nthOption)
 				.appendDiscardPrompt(
 				{
 					cardKeys: destination.key,
+					buttonText: "CONFIRM",
 					onConfirm: function() { movementAction(directFlight, destination) }
 				});
 			return true;
@@ -1584,7 +1584,6 @@ const actionInterfacePopulator = {
 			newSubtitle = `Move the research station from ${getCity(stationRelocationKey).name} to ${currentCity.name}?`;
 		else
 			newSubtitle = `Build research station in ${currentCity.name}?`;
-		actionInterfacePopulator.replaceInstructions(newSubtitle);
 
 		if (playerIsOperationsExpert) // no city card is required
 		{
@@ -1597,16 +1596,18 @@ const actionInterfacePopulator = {
 		}
 		else
 		{
+			newSubtitle += "<br/>Discard:";
+			
 			actionInterfacePopulator.appendDiscardPrompt(
 			{
 				cardKeys: currentCity.key,
-				onConfirm: function()
-				{
-					buildResearchStation(stationRelocationKey);
-				}
+				buttonText: "CONFIRM",
+				onConfirm: function() { buildResearchStation(stationRelocationKey) }
 			});
 		}
 
+		actionInterfacePopulator.replaceInstructions(newSubtitle);
+		oscillateButtonBackgroundColor($actionInterface.find(".button"));
 		return true;
 	},
 	[eventTypes.treatDisease.name]()
@@ -1812,46 +1813,40 @@ const actionInterfacePopulator = {
 
 		if (destination)
 		{
-			let newSubtitle = `Dispatch ${playerToDispatch.newRoleTag()} from ${getCity(playerToDispatch.cityKey).name} to ${destination.name}`;
+			let newSubtitle = `Dispatch ${playerToDispatch.newRoleTag()} from ${getCity(playerToDispatch.cityKey).name} to ${destination.name} `;
 			
 			if (dispatchMethod.code === chooseFlightType.code)
 			{
-				newSubtitle += "...";
+				newSubtitle += "...<br/><br/>";
 				
 				actionInterfacePopulator
 					.appendDiscardPrompt(
 					{
 						cardKeys: destination.key,
-						promptMsg: `via ${getDispatchInstructionTooltip(directFlight)}?`,
-						onConfirm: function()
-						{
-							movementAction(directFlight, destination, { playerToDispatch });
-						}
+						promptMsg: `via ${getDispatchInstructionTooltip(directFlight)}?<br/><br/>Discard:`,
+						buttonText: "CONFIRM",
+						onConfirm: function() { movementAction(directFlight, destination, { playerToDispatch }) }
 					})
 					.appendDivision()
 					.appendDiscardPrompt(
 					{
 						cardKeys: playerToDispatch.cityKey,
-						promptMsg: `via ${getDispatchInstructionTooltip(charterFlight)}?`,
-						onConfirm: function()
-						{
-							movementAction(charterFlight, destination, { playerToDispatch });
-						}
+						promptMsg: `via ${getDispatchInstructionTooltip(charterFlight)}?<br/><br/>Discard:`,
+						buttonText: "CONFIRM",
+						onConfirm: function() { movementAction(charterFlight, destination, { playerToDispatch }) }
 					});
 			}
 			else
 			{
-				newSubtitle += `<br />via ${getDispatchInstructionTooltip(dispatchMethod)}?`;
+				newSubtitle += `via ${getDispatchInstructionTooltip(dispatchMethod)}?<br/><br/>Discard:`;
 				
 				const discardKey = dispatchMethod.code === directFlight.code ? destination.key : playerToDispatch.cityKey;
 				
 				actionInterfacePopulator.appendDiscardPrompt(
 				{
 					cardKeys: discardKey,
-					onConfirm: function()
-					{
-						movementAction(dispatchMethod, destination, { playerToDispatch });
-					}
+					buttonText: "CONFIRM",
+					onConfirm: function() { movementAction(dispatchMethod, destination, { playerToDispatch }) }
 				});
 			}
 
@@ -5945,7 +5940,7 @@ function updateInfectionRate(epidemicCount)
 	
 	data.infectionRate = infRate;
 
-	data.steps["infect cities"].description = `Infection Rate: ${infRate}`;
+	data.steps["infect cities"].description = `Infect ${infRate} Cities`;
 }
 
 async function animateEpidemicIntensify()
