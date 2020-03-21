@@ -851,14 +851,12 @@ function enableActionButton(buttonID)
 
 function bindActionButtonHoverEvents()
 {
-	const actionInfoSelector = ".actionInfo",
-		TOOLTIP_MARGIN = 5;
+	const actionInfoSelector = ".actionInfo";
 
 	let $btn,
 		eventType,
 		includeRelatedRoleRule,
-		$tooltip,
-		tooltipOffset;
+		$tooltip;
 	
 	$(document).on("mouseenter", actionInfoSelector, function()
 		{
@@ -871,12 +869,9 @@ function bindActionButtonHoverEvents()
 				{
 					actionNotPossible: $btn.hasClass("btnDisabled"),
 					includeRelatedRoleRule
-				}).appendTo("#boardContainer");
+				});
 			
-			tooltipOffset = $btn.offset();
-			tooltipOffset.left -= $tooltip.outerWidth() + TOOLTIP_MARGIN;
-			$tooltip.offset(tooltipOffset);
-			ensureDivPositionIsWithinWindowHeight($tooltip);
+			positionTooltipRelativeToElement($btn, $tooltip);
 		})
 		.on("mouseleave", actionInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }
@@ -924,6 +919,22 @@ function relatedRoleRuleApplies(eventType, { roleA, roleB } = {})
 		return activePlayerCanTakeFromResearcher();
 	
 	return roleB === "Researcher";
+}
+
+function positionTooltipRelativeToElement($element, $tooltip, { juxtaposeTo = "left", tooltipMargin = 5 } = {})
+{
+	const tooltipOffset = $element.offset();
+
+	$tooltip.appendTo("#boardContainer");
+	
+	if (juxtaposeTo === "left")
+		tooltipOffset.left -= $tooltip.outerWidth() + tooltipMargin;
+	else if (juxtaposeTo === "right")
+		tooltipOffset.left += $element.outerWidth() + tooltipMargin;
+
+	$tooltip.offset(tooltipOffset);
+	
+	ensureDivPositionIsWithinWindowHeight($tooltip);
 }
 
 function getEventIconHtml(eventType, { event } = {})
@@ -1121,7 +1132,9 @@ function checkEventIconHovering()
 function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 {
 	const eventTypeInfoSelector = "#eventDetails .eventTypeInfo",
-		hoverInfoSelector = "#eventDetails .hoverInfo";
+		hoverInfoSelector = "#eventDetails .hoverInfo",
+		$eventDetails = $("#eventDetails"),
+		juxtaposeTo = "right";
 
 	$(document).off("mouseenter mouseleave", eventTypeInfoSelector)
 		.on("mouseenter", eventTypeInfoSelector,
@@ -1132,12 +1145,9 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 				roleA = $this.find(".roleTag").first().html(),
 				roleB = eventType.name === "ShareKnowledge" ? $this.find(".roleTag").last().html() : false,
 				includeRelatedRoleRule = relatedRoleRuleApplies(eventType, { roleA, roleB }),
-				tooltipOffset = $("#eventDetails").offset(),
 				$tooltip = getEventTypeTooltip(eventType, { includeName: false, includeRelatedRoleRule });
 			
-			tooltipOffset.left += $eventDetailsContainer.outerWidth() + 5;
-			$tooltip.offset(tooltipOffset).appendTo("#boardContainer");
-			ensureDivPositionIsWithinWindowHeight($tooltip);
+			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo });
 		})
 		.on("mouseleave", eventTypeInfoSelector, function() { $("#eventTypeTooltip").remove() });
 	
@@ -1146,12 +1156,9 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 		function()
 		{
 			const eventType = getEventType($(this).attr("data-eventType")),
-				tooltipOffset = $("#eventDetails").offset(),
 				$tooltip = getEventTypeTooltip(eventType);
 
-			tooltipOffset.left += $eventDetailsContainer.outerWidth() + 5;
-			$tooltip.offset(tooltipOffset).appendTo("#boardContainer");
-			ensureDivPositionIsWithinWindowHeight($tooltip);
+			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo });
 		})
 		.on("mouseleave", hoverInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }

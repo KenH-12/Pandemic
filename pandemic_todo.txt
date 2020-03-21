@@ -8,9 +8,6 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
-the 'choose flight type' interface should provide only the flight type options with descriptions viewable on hover
-	when a flight type is selected, the normal action interface should be displayed
-
 cure vial tooltips
 
 dispath method hoverInfos should display the movement type's tooltip
@@ -65,6 +62,9 @@ for multiplayer games, require permission for certain actions
 
 IDEAS
 -----
+the 'choose flight type' interface should provide only the flight type options with descriptions viewable on hover
+	when a flight type is selected, the normal action interface should be displayed
+
 display difficulty on board above infection rate
 
 treat disease button should receive hover background-color when a treatable cube is hovered

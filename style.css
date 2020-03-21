@@ -1103,7 +1103,7 @@ span.r {color: #ef282a; background: none}
 }
 .cardsToKeep .playerCard:last-of-type { margin-bottom: 0 !important }
 .btnConfirm { margin: 5px }
-.btnConfirmAction { margin-top: 10px }
+.btnConfirmAction { margin: 10px 0 }
 .scientist:not(.pawnArrow),
 .pawnArrow.scientist > div
 {
