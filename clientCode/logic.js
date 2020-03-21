@@ -526,7 +526,7 @@ function disableActions()
 	log("disableActions()");
 	const $actionsContainer = $("#actionsContainer");
 
-	$actionsContainer.find(".button")
+	$actionsContainer.find(".button").not("#btnCancelAction")
 		.off("click")
 		.addClass("btnDisabled wait");
 
@@ -543,8 +543,8 @@ function enableAvailableActions()
 	const $actionsContainer = $("#actionsContainer"),
 		player = getActivePlayer();
 	
-	$actionsContainer.find(".button")
-		.off("click mousenter mouseleave")
+	$actionsContainer.find(".button").not("#btnCancelAction")
+		.off("click")
 		.addClass("btnDisabled")
 		.removeClass("wait");
 	
@@ -1169,17 +1169,13 @@ function hideEventIconDetails()
 
 function enableBtnCancelAction()
 {
-	$(".btnCancelAction").off("click").click(function()
-	{
-		resetActionPrompt({ actionCancelled: true });
-		resumeCurrentStep();
-	}).css("display", "inline-block");
-}
-
-function disableBtnCancelAction()
-{
-	log("disableBtnCancelAction()");
-	$(".btnCancelAction").off("click").css("display", "none");
+	$("#btnCancelAction").off("click")
+		.click(function()
+		{
+			resetActionPrompt({ actionCancelled: true });
+			resumeCurrentStep();
+		})
+		.removeClass("hidden");
 }
 
 function resetActionPrompt({ actionCancelled } = {})
@@ -1235,25 +1231,12 @@ function resetActionPrompt({ actionCancelled } = {})
 function setRightPanelScrollability()
 {
 	const $rightPanel = $("#rightPanel"),
-		scrollable = "scrollable",
-		{ $actionInterface } = actionInterfacePopulator,
-		$cancelButtons = $actionInterface.parent().find(".btnCancelAction");
+		scrollable = "scrollable";
 
 	if (isOverflowingVertically($rightPanel))
-	{
 		$rightPanel.addClass(scrollable);
-
-		if ($actionInterface.is(":visible") && $cancelButtons.length === 1)
-		{
-			$actionInterface.find(".rules").after("<div class='btnCancelAction'>Cancel</div>");
-			enableBtnCancelAction();
-		}
-	}
 	else
-	{
 		$rightPanel.removeClass(scrollable);
-		$cancelButtons.not(":last").remove();
-	}
 }
 
 function promptAction(actionProperties)
@@ -1303,7 +1286,7 @@ const actionInterfacePopulator = {
 	$actionInterface: $("#actionInterface"),
 	clear()
 	{
-		actionInterfacePopulator.$actionInterface.children().not(".btnCancelAction").remove();
+		actionInterfacePopulator.$actionInterface.children().remove();
 		return actionInterfacePopulator;
 	},
 	appendDescriptiveElements(eventType, { showEventCardDescription } = {})
@@ -2075,7 +2058,7 @@ async function forecastDraw(forecastEventToLoad)
 {
 	data.promptingEventType = eventTypes.forecastPlacement;
 	
-	disableBtnCancelAction();
+	$("#btnCancelAction").off("click").addClass("hidden");
 	disableActions();
 	$(".discardSelections").remove();
 

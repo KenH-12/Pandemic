@@ -8,15 +8,15 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
+the 'choose flight type' interface should provide only the flight type options with descriptions viewable on hover
+	when a flight type is selected, the normal action interface should be displayed
+
 cure vial tooltips
 
 dispath method hoverInfos should display the movement type's tooltip
 
 for the dispatch pawn rules in the action prompt...
 	the discard rules should be available through an info icon next to the second bullet
-
-instead of using two back buttons when the action prompt is scrollable,
-	use one back button which has position:fixed
 
 use the travel path arrow when prompting government grant station placement
 	or execute the action on drop, because it's undoable

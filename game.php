@@ -337,8 +337,8 @@
 							</div>
 
 							<div id='actionPrompt' class='hidden'>
+								<div id='btnCancelAction' class='button'><span>&#x2B9C;</span><span>CANCEL</span></div>
 								<div id='actionInterface'></div>
-								<div class='btnCancelAction'>Cancel</div>
 							</div>
 						</div>
 
