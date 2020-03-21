@@ -1329,8 +1329,16 @@ const actionInterfacePopulator = {
 		
 		$actionTitleContainer.append(actionTitleContents);
 		
-		for (let paragraph of eventType.rules)
-			$rules.append(`<p>${paragraph}</p>`);
+		if (eventType.abbreviatedRulesetLength)
+		{
+			for (let i = 0; i < eventType.abbreviatedRulesetLength; i++)
+				$rules.append(`<p>${eventType.rules[i]}</p>`);
+		}
+		else
+		{
+			for (let paragraph of eventType.rules)
+				$rules.append(`<p>${paragraph}</p>`);
+		}
 		
 		$actionInterface
 			.append($actionTitleContainer)
@@ -1823,7 +1831,7 @@ const actionInterfacePopulator = {
 					.appendDiscardPrompt(
 					{
 						cardKeys: destination.key,
-						promptMsg: `via ${getDispatchInstructionTooltip(directFlight)}?<br/><br/>Discard:`,
+						promptMsg: `<span class='largeText'>via ${getDispatchInstructionTooltip(directFlight)}?</span><br/><br/>Discard:`,
 						buttonText: "CONFIRM",
 						onConfirm: function() { movementAction(directFlight, destination, { playerToDispatch }) }
 					})
@@ -1831,7 +1839,7 @@ const actionInterfacePopulator = {
 					.appendDiscardPrompt(
 					{
 						cardKeys: playerToDispatch.cityKey,
-						promptMsg: `via ${getDispatchInstructionTooltip(charterFlight)}?<br/><br/>Discard:`,
+						promptMsg: `<span class='largeText'>via ${getDispatchInstructionTooltip(charterFlight)}?</span><br/><br/>Discard:`,
 						buttonText: "CONFIRM",
 						onConfirm: function() { movementAction(charterFlight, destination, { playerToDispatch }) }
 					});

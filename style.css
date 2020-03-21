@@ -38,6 +38,7 @@ body,
 {
 	background-color: #09154f;
 }
+.largeText { font-size: 20px }
 #curtain
 {
 	position: fixed;

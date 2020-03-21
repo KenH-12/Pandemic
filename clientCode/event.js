@@ -155,6 +155,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"<li>move another role's pawn as if it were his own.</li>",
 			"When moving another role's pawn as if it were his own, the Dispatcher must discard cards for Direct and Charter Flights from <i>his</i> hand. A card discarded for a Charter Flight must match the city the pawn is moving from."
 		],
+		abbreviatedRulesetLength: 3,
 		instructions: "To dispatch a pawn, drag and drop it onto a city.",
 		actionPathName: "movementAction",
 		propertyNames: ["dispatchedRoleID", "originKey", "destinationKey", "movementTypeCode", "rolesAtRendezvousDestination"]

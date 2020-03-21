@@ -12,6 +12,9 @@ cure vial tooltips
 
 dispath method hoverInfos should display the movement type's tooltip
 
+for the dispatch pawn rules in the action prompt...
+	the discard rules should be available through an info icon next to the second bullet
+
 instead of using two back buttons when the action prompt is scrollable,
 	use one back button which has position:fixed
 
