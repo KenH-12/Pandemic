@@ -876,23 +876,24 @@ function bindActionButtonHoverEvents()
 		.on("mouseleave", actionInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }
 
-function getEventTypeTooltip(eventType, { includeName = true, actionNotPossible, includeRelatedRoleRule } = {})
+function getEventTypeTooltip(eventType, { includeName = true, actionNotPossible, includeRelatedRoleRule, isDispatchType } = {})
 {
 	let $tooltip = $("#eventTypeTooltip");
-	
+
 	if ($tooltip.length)
 		$tooltip.empty();
 	else
 		$tooltip = $(`<div id='eventTypeTooltip' class='tooltip'></div>`);
 	
 	if (includeName)
-		$tooltip.append(`<h3>${eventType.name.toUpperCase()}</h3>`);
+		$tooltip.append(`<h3>${ isDispatchType ? "DISPATCH VIA<br/>" : "" }${eventType.name.toUpperCase()}</h3>`);
 
 	if (actionNotPossible)
 		$tooltip.append("<p class='actionNotPossible'>This action is not currently possible.</p>");
 
-	for (let rule of eventType.rules)
-		$tooltip.append(`<p>${rule}</p>`);
+	
+	for (let rule of (isDispatchType ? eventTypes.dispatchPawn[toCamelCase(eventType.name) + "Rules"] : eventType.rules))
+			$tooltip.append(`<p>${rule}</p>`);
 	
 	if (includeRelatedRoleRule)
 		$tooltip.append(`<p class='specialAbilityRule'>${replaceRoleNamesWithRoleTags(eventType.relatedRoleRule)}</p>`);
@@ -921,7 +922,7 @@ function relatedRoleRuleApplies(eventType, { roleA, roleB } = {})
 	return roleB === "Researcher";
 }
 
-function positionTooltipRelativeToElement($element, $tooltip, { juxtaposeTo = "left", tooltipMargin = 5 } = {})
+function positionTooltipRelativeToElement($element, $tooltip, { juxtaposeTo = "left", $alignTopWithElement, tooltipMargin = 5 } = {})
 {
 	const tooltipOffset = $element.offset();
 
@@ -931,6 +932,9 @@ function positionTooltipRelativeToElement($element, $tooltip, { juxtaposeTo = "l
 		tooltipOffset.left -= $tooltip.outerWidth() + tooltipMargin;
 	else if (juxtaposeTo === "right")
 		tooltipOffset.left += $element.outerWidth() + tooltipMargin;
+	
+	if ($alignTopWithElement)
+		tooltipOffset.top = $alignTopWithElement.offset().top;
 
 	$tooltip.offset(tooltipOffset);
 	
@@ -1851,6 +1855,7 @@ const actionInterfacePopulator = {
 			actionInterfacePopulator.replaceInstructions(newSubtitle);
 			bindRoleCardHoverEvents();
 			locatePawnOnRoleTagClick(actionInterfacePopulator.$actionInterface);
+			bindDispatchTypeHoverEvents(actionInterfacePopulator.$actionInterface);
 		}
 
 		return true;
@@ -2878,10 +2883,31 @@ function getDispatchInstructionTooltip(eventType)
 		validEventTypeCodes = [directFlight.code, charterFlight.code];
 	
 	if (validEventTypeCodes.includes(eventType.code))
-		return `<span class='hoverInfo' title='${eventType.dispatchInstructions}'>${eventType.name}</span>`;
+		return `<span class='hoverInfo dispatchTypeInfo' data-eventType='${eventType.code}'>${eventType.name}</span>`;
 	
 	console.error("Failed not fetch dispatch instuctions: invalid event type.");
 	return "";
+}
+
+function bindDispatchTypeHoverEvents($container)
+{
+	const $elements = $container.length ? $container.find(".dispatchTypeInfo") : $(".dispatchTypeInfo"),
+		$rightPanel = $("#rightPanel");
+	
+	let $this,
+		$tooltip;
+	
+	$elements.hover(function()
+		{
+			$this = $(this);
+			$tooltip = getEventTypeTooltip(getEventType($this.attr("data-eventType")), { includeName: true, isDispatchType: true });
+			
+			positionTooltipRelativeToElement($rightPanel, $tooltip, { $alignTopWithElement: $this });
+		},
+		function()
+		{
+			$("#eventTypeTooltip").remove();
+		});
 }
 
 class DiscardPrompt

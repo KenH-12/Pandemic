@@ -3,6 +3,7 @@
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 
 const insufficientCubesWarningRule = "<span class='warning'>⚠️</span> If the number of cubes <i>actually needed on the board</i> cannot be placed because there are not enough cubes in the supply, the game ends and your team has lost!",
+dispatchDiscardRule = "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
 eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
@@ -153,7 +154,15 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"The Dispatcher may, as an action, either:",
 			"<li>move any pawn to any city containing another pawn, or</li>",
 			"<li>move another role's pawn as if it were his own.</li>",
-			"When moving another role's pawn as if it were his own, the Dispatcher must discard cards for Direct and Charter Flights from <i>his</i> hand. A card discarded for a Charter Flight must match the city the pawn is moving from."
+			`${dispatchDiscardRule} A card discarded for a Charter Flight must match the city the pawn is moving from.`
+		],
+		directFlightRules: [
+			"Discard a city card to dispatch a pawn to the city named on the card.",
+			dispatchDiscardRule
+		],
+		charterFlightRules: [
+			"Discard the city card that <i>matches</i> a pawn's location to move that pawn to <i>any</i> city.",
+			dispatchDiscardRule
 		],
 		abbreviatedRulesetLength: 3,
 		instructions: "To dispatch a pawn, drag and drop it onto a city.",

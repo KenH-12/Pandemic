@@ -10,11 +10,6 @@ TO DO
 -----
 cure vial tooltips
 
-dispath method hoverInfos should display the movement type's tooltip
-
-for the dispatch pawn rules in the action prompt...
-	the discard rules should be available through an info icon next to the second bullet
-
 use the travel path arrow when prompting government grant station placement
 	or execute the action on drop, because it's undoable
 
