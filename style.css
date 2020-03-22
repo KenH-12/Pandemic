@@ -12,7 +12,7 @@
 }
 body
 {
-	font-family: 'Electrolize', 'Oswald', sans-serif;
+	font-family: 'Electrolize', sans-serif;
 	color: #fff;
 	font-size: 16px;
 	
@@ -55,9 +55,7 @@ body,
 }
 #curtain h2,
 #curtain h3
-{
-	font-family: 'Oswald', sans-serif;
-}
+{ font-family: 'Oswald', sans-serif }
 #curtain h1 { font-size: 60px }
 #curtain h2 { font-size: 26px }
 #curtain h3 { font-size: 16px; font-weight: 400; }
@@ -810,7 +808,7 @@ span.r {color: #ef282a; background: none}
 }
 #roleIndicator,
 .playerPanel .role
-{ font-family: "Oswald", sans-serif }
+{ font-family: 'Oswald', 'Electrolize', sans-serif }
 
 .action:not(.step), .destination
 {
@@ -876,7 +874,6 @@ span.r {color: #ef282a; background: none}
 #epidemicContainer > .epidemicFull
 {
 	width: 98%;
-	margin: 2px 1%;
 	overflow: hidden;
 }
 #boardContainer > .epidemicFull { width: 250px }
@@ -1057,16 +1054,7 @@ span.r {color: #ef282a; background: none}
 	border-top-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 }
-#cardDrawContainer h2
-{
-	text-align: center;
-	font-size: 24px;
-	font-family: 'Oswald', sans-serif;
-}
-.discardPrompt
-{
-	padding: 0 5% 5px 5%;
-}
+.discardPrompt { padding: 0 5% 5px 5% }
 .cardsToKeep > .instructions
 {
 	font-size: 14px;
