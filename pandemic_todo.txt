@@ -8,9 +8,6 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
-for DispatchPawn event details, the dispatch type tooltips should specify isDispatchType: true
-	add dispatch type rules for other dispatch types
-
 cure vial tooltips
 
 use the travel path arrow when prompting government grant station placement

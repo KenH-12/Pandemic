@@ -892,7 +892,7 @@ function getEventTypeTooltip(eventType, { includeName = true, actionNotPossible,
 		$tooltip.append("<p class='actionNotPossible'>This action is not currently possible.</p>");
 
 	
-	for (let rule of (isDispatchType ? eventTypes.dispatchPawn[toCamelCase(eventType.name) + "Rules"] : eventType.rules))
+	for (let rule of (isDispatchType ? eventTypes.dispatchPawn[toCamelCase(eventType.name.replace("/","")) + "Rules"] : eventType.rules))
 			$tooltip.append(`<p>${rule}</p>`);
 	
 	if (includeRelatedRoleRule)
@@ -1159,10 +1159,11 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 		.on("mouseenter", hoverInfoSelector,
 		function()
 		{
-			const eventType = getEventType($(this).attr("data-eventType")),
-				$tooltip = getEventTypeTooltip(eventType);
+			const $this = $(this),
+				eventType = getEventType($this.attr("data-eventType")),
+				$tooltip = getEventTypeTooltip(eventType, { isDispatchType: $this.parent().html().includes("Dispatch Type") });
 
-			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo });
+			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo, $alignTopWithElement: $this });
 		})
 		.on("mouseleave", hoverInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }

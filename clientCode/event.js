@@ -156,14 +156,16 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"<li>move another role's pawn as if it were his own.</li>",
 			`${dispatchDiscardRule} A card discarded for a Charter Flight must match the city the pawn is moving from.`
 		],
+		driveFerryRules: ["Dispatch a pawn to a city connected by a white line to the one it is in."],
 		directFlightRules: [
 			"Discard a city card to dispatch a pawn to the city named on the card.",
 			dispatchDiscardRule
 		],
 		charterFlightRules: [
-			"Discard the city card that <i>matches</i> a pawn's location to move that pawn to <i>any</i> city.",
+			"Discard the city card that <i>matches</i> a pawn's location to dispatch that pawn to <i>any</i> city.",
 			dispatchDiscardRule
 		],
+		shuttleFlightRules: ["Dispatch a pawn from a city with a research station to any other city that has a research station."],
 		abbreviatedRulesetLength: 3,
 		instructions: "To dispatch a pawn, drag and drop it onto a city.",
 		actionPathName: "movementAction",
