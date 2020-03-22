@@ -1222,9 +1222,10 @@ span.r {color: #ef282a; background: none}
 {
 	width: 75%;
 	text-align: center;
+	font-family: 'Exo 2';
 	padding: 5px 0;
 	margin-left: 12.5%;
-	background-color: #0c658b;
+	background-color: #0e7aa8;
 	cursor: pointer;
 }
 #cardDrawContainer .button,
@@ -1346,10 +1347,10 @@ span.r {color: #ef282a; background: none}
 	border-radius: 15%;
 }
 .actionTitle + .instructions { border-top: 2px solid #fff }
+#actionInterface { font-family: 'Ropa Sans' }
 #actionInterface > .rules
 {
-	padding: 5px;
-	padding-bottom: 0;
+	padding: 8px 2% 0 2%;
 	border-top: 2px solid #fff;
 	border-bottom: 2px solid #fff;
 }
@@ -1400,13 +1401,15 @@ span.r {color: #ef282a; background: none}
 	padding: 0;
 	text-align: left;
 	font-family: 'Exo 2';
+	font-size: 15px;
 	cursor: pointer;
 }
 #btnCancelAction > * { vertical-align: middle }
 #btnCancelAction span:first-of-type
 {
 	font-size: 22px;
-	padding: 0 6%;
+	font-weight: 700;
+	margin: 0 6.5%;
 }
 #actionInterface .diseaseCube
 {

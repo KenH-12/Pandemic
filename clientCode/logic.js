@@ -886,7 +886,7 @@ function getEventTypeTooltip(eventType, { includeName = true, actionNotPossible,
 		$tooltip = $(`<div id='eventTypeTooltip' class='tooltip'></div>`);
 	
 	if (includeName)
-		$tooltip.append(`<h3>${ isDispatchType ? "DISPATCH VIA<br/>" : "" }${eventType.name.toUpperCase()}</h3>`);
+		$tooltip.append(`<h3>${ isDispatchType ? "DISPATCH PAWN VIA<br/> " : "" }${eventType.name.toUpperCase()}</h3>`);
 
 	if (actionNotPossible)
 		$tooltip.append("<p class='actionNotPossible'>This action is not currently possible.</p>");
