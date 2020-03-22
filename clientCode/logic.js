@@ -530,7 +530,7 @@ function disableActions()
 		.off("click")
 		.addClass("btnDisabled wait");
 
-	unbindDiseaseCubeEvents();
+	disableDiseaseCubeEvents();
 	disableEventCards();
 	disablePawnEvents();
 	disableResearchStationDragging();
@@ -557,7 +557,7 @@ function enableAvailableActions()
 	enableAvailableSpecialActionButtons($actionsContainer, player);
 	
 	enablePawnEvents();
-	bindDiseaseCubeEvents();
+	enableDiseaseCubeEvents();
 
 	enableEventCards();
 }
@@ -717,6 +717,8 @@ function disablePawnEvents()
 {
 	for (let rID in data.players)
 		data.players[rID].disablePawn();
+	
+	hideTravelPathArrow();
 }
 
 function enablePawnEvents()
@@ -1192,7 +1194,6 @@ function enableBtnCancelAction()
 
 function resetActionPrompt({ actionCancelled } = {})
 {
-	log("resetActionPrompt()");
 	const $actionInterface = $("#actionInterface"),
 		$actionPrompt = $actionInterface.parent();
 	
@@ -1225,7 +1226,7 @@ function resetActionPrompt({ actionCancelled } = {})
 		else if (eventTypeIsBeingPrompted(resilientPopulation))
 		{
 			resetInfectionDiscardClicksAndTooltips();
-			hideResilientPopulationArrow();
+			hideResilientPopulationArrow({ reset: true });
 		}
 
 		hideTravelPathArrow();
@@ -1916,6 +1917,7 @@ const actionInterfacePopulator = {
 	[eventTypes.governmentGrant.name]({ targetCity, relocationKey })
 	{
 		disablePawnEvents();
+		disableDiseaseCubeEvents();
 		
 		data.promptingEventType = eventTypes.governmentGrant;
 		
@@ -1947,6 +1949,9 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.resilientPopulation.name]({ cardKeyToRemove })
 	{
+		disablePawnEvents();
+		disableDiseaseCubeEvents();
+		
 		const eventType = eventTypes.resilientPopulation;
 		
 		data.promptingEventType = eventType;
@@ -2357,6 +2362,7 @@ async function showResilientPopulationArrow()
 		bobDistance = $arrow.height() * 0.75,
 		duration = 350;
 
+	$arrow.removeClass("hidden");
 	while (!$arrow.hasClass("hidden"))
 		await bobUpAndDown($arrow, { initialOffset, bobDistance, duration });
 }
@@ -2376,14 +2382,14 @@ function positionResilientPopulationArrow($arrow)
 
 	return offset;
 }
-function hideResilientPopulationArrow({ selectionWasMade } = {})
+function hideResilientPopulationArrow({ selectionWasMade, reset } = {})
 {
 	const $arrow = $("#resilientPopulationArrow").stop().addClass("hidden"),
 		doNotShow = "doNotShow";
 
 	if (selectionWasMade)
 		$arrow.addClass(doNotShow);
-	else if (!eventTypeIsBeingPrompted(eventTypes.resilientPopulation))
+	else if (reset || !eventTypeIsBeingPrompted(eventTypes.resilientPopulation))
 		$arrow.removeClass(doNotShow);
 }
 
@@ -2392,7 +2398,7 @@ async function resilientPopulation(cardKeyToRemove)
 	resetInfectionDiscardClicksAndTooltips();
 	resetActionPrompt();
 	disableActions();
-	unbindInfectionDiscardHover();
+	disableInfectionDiscardHoverEvents();
 
 	const eventType = eventTypes.resilientPopulation,
 		events = await requestAction(eventType, { cardKeyToRemove });
@@ -2402,7 +2408,8 @@ async function resilientPopulation(cardKeyToRemove)
 	appendEventHistoryIconOfType(eventType);
 
 	resizeInfectionDiscardElements();
-	bindInfectionDiscardHover();
+	enableInfectionDiscardHoverEvents();
+	hideResilientPopulationArrow({ reset: true });
 	resumeCurrentStep();
 }
 
@@ -2419,7 +2426,7 @@ function resetInfectionDiscardClicksAndTooltips()
 
 			setInfectionCardTitleAttribute($this, city);
 		})
-		.css({ cursor: "help" });
+		.css("cursor", "url('images/target_black.png'), auto");
 }
 
 async function resilientPopulationAnimation(cardKeyToRemove)
@@ -2827,8 +2834,6 @@ async function tryDispatchPawn(playerToDispatch)
 
 	if (!dispatchDetails)
 		return invalidMovement(playerToDispatch.getLocation());
-	
-	hideResilientPopulationArrow();
 	
 	const { method, destination } = dispatchDetails;
 	
@@ -3279,11 +3284,6 @@ async function buildResearchStation(relocationKey)
 
 async function movementAction(eventType, destination, { playerToDispatch, operationsFlightDiscardKey } = {})
 {
-	log(`movementAction(${eventType ? eventType.name : eventType},
-		${destination ? destination.name : destination},
-		${playerToDispatch ? playerToDispatch.role : playerToDispatch},
-		${operationsFlightDiscardKey})`);
-	
 	const player = playerToDispatch || getActivePlayer(),
 		originCity = player.getLocation();
 
@@ -3302,8 +3302,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 
 			data.promptedTravelPathProperties = movementDetails;
 			promptAction(movementDetails);
-
-			hideResilientPopulationArrow();
+			
 			originCity.cluster(data);
 			return false;
 		}
@@ -3321,8 +3320,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			{
 				data.promptedTravelPathProperties = movementDetails;
 				promptAction(movementDetails);
-
-				hideResilientPopulationArrow();
+				
 				originCity.cluster(data);
 				return false;
 			}
@@ -5555,7 +5553,7 @@ function updateCubeSupplyCount(cubeColor, { addend, newCount } = {})
 	$supplyCount.html(updatedCount);
 }
 
-function bindDiseaseCubeEvents()
+function enableDiseaseCubeEvents()
 {
 	const player = getActivePlayer(),
 		{ cityKey } = player,
@@ -5588,7 +5586,7 @@ function bindDiseaseCubeEvents()
 	});
 }
 
-function unbindDiseaseCubeEvents()
+function disableDiseaseCubeEvents()
 {
 	$("#boardContainer").children(".diseaseCube")
 		.off("click mouseenter mouseleave")
@@ -5995,7 +5993,7 @@ async function animateEpidemicIntensify()
 		$cards = $container.children(".infectionCard").addClass("template"), // template css class prevents the target cursor from appearing
 		delay = getDuration(data, "longInterval");
 	
-	unbindInfectionDiscardHover();
+	disableInfectionDiscardHoverEvents();
 	await expandInfectionDiscardPile();
 
 	if ($cards.length === 0)
@@ -6005,7 +6003,7 @@ async function animateEpidemicIntensify()
 		$title.html("INFECTION DISCARDS");
 
 		collapseInfectionDiscardPile();
-		bindInfectionDiscardHover();
+		enableInfectionDiscardHoverEvents();
 
 		return sleep(delay);
 	}
@@ -6115,7 +6113,7 @@ async function animateEpidemicIntensify()
 
 	$title.html("INFECTION DISCARDS");
 	collapseInfectionDiscardPile();
-	bindInfectionDiscardHover();
+	enableInfectionDiscardHoverEvents();
 
 	return sleep(delay);
 }
@@ -8950,15 +8948,15 @@ function bindInfectionDeckHover()
 	});
 }
 
-function bindInfectionDiscardHover()
+function enableInfectionDiscardHoverEvents()
 {
 	$("#infectionDiscard")
 		.unbind("mouseenter mouseleave")
 		.hover(function() { expandInfectionDiscardPile() },
 		function() { collapseInfectionDiscardPile() });
 }
-bindInfectionDiscardHover();
-function unbindInfectionDiscardHover() { $("#infectionDiscard").unbind("mouseenter mouseleave") }
+enableInfectionDiscardHoverEvents();
+function disableInfectionDiscardHoverEvents() { $("#infectionDiscard").unbind("mouseenter mouseleave") }
 
 function enablePlayerDiscardHoverEvents()
 {
@@ -9201,6 +9199,9 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 		if (!undoneEventIds)
 			return resolve();
 		
+		disableInfectionDiscardHoverEvents();
+		disablePlayerDiscardHoverEvents();
+		
 		let event;
 		for (let id of undoneEventIds.reverse())
 		{
@@ -9246,6 +9247,10 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 			else
 				await eventHistory.removeIcon(event);
 		}
+
+		enableInfectionDiscardHoverEvents();
+		enablePlayerDiscardHoverEvents();
+
 		resolve();
 	});
 }
