@@ -1201,9 +1201,6 @@ function resetActionPrompt({ actionCancelled } = {})
 	$actionPrompt.addClass("hidden").removeAttr("style");
 	$actionInterface.removeAttr("style");
 
-	hideTravelPathArrow();
-	hideResilientPopulationArrow();
-
 	// If a Direct Flight or Charter Flight action is cancelled,
 	// the player's pawn should be put back on their current location.
 	if (actionCancelled)
@@ -1222,10 +1219,16 @@ function resetActionPrompt({ actionCancelled } = {})
 			disableResearchStationDragging();
 			clusterAll({ researchStations: true });
 			turnOffResearchStationHighlights();
-			resetGrantStation({ cancelled: true });
+			turnOffResearchStationSupplyHighlight();
+			$("#boardContainer").children(".researchStation.grantStation").remove();
 		}
 		else if (eventTypeIsBeingPrompted(resilientPopulation))
+		{
 			resetInfectionDiscardClicksAndTooltips();
+			hideResilientPopulationArrow();
+		}
+
+		hideTravelPathArrow();
 	}
 
 	data.promptingEventType = false;
@@ -2501,20 +2504,20 @@ function newGrantStation()
 
 	let $grantStation = $boardContainer.find(".researchStation.grantStation");
 	
-	if ($grantStation.length)
-		return;
-	
-	$grantStation = $(`<img class='researchStation grantStation glowing' src='images/pieces/researchStation.png' />`);
-	
-	$boardContainer.append($grantStation);
+	if (!$grantStation.length)
+		$grantStation = $(`<img class='researchStation grantStation' src='images/pieces/researchStation.png' />`)
+			.appendTo("#boardContainer");
 
 	researchStationKeys.add("grantStation");
 	$grantStation.offset($("#researchStationSupply img").offset());
 	
-	$grantStation.draggable({ containment: $boardContainer })
+	setTravelPathArrowColor();
+	$grantStation.draggable({
+			containment: $boardContainer,
+			drag: function() { showTravelPathArrow({ $researchStation: $(this) }) }
+		})
 		.mousedown(function()
 		{
-			updateResearchStationSupplyCount();
 			turnOffResearchStationSupplyHighlight();
 
 			$(window).off("mouseup").mouseup(function()
@@ -2528,21 +2531,19 @@ function newGrantStation()
 	showGovernmentGrantArrow();
 }
 
-async function resetGrantStation({ $researchStation, cancelled } = {})
+async function resetGrantStation($grantStation, { invalidPlacement } = {})
 {
-	log("resetGrantStation()");
-	$researchStation = $researchStation || $("#boardContainer > .researchStation.grantStation");
+	$grantStation = $grantStation || $("#boardContainer > .researchStation.grantStation");
 
-	if (!$researchStation.length)
+	if (!$grantStation.length)
 		return false;
 	
-	if (cancelled)
-		turnOffResearchStationSupplyHighlight();
+	$grantStation.offset($("#researchStationSupply img").offset());
 
-	await animateResearchStationBackToSupply($researchStation);
+	if (invalidPlacement)
+		await animateInvalidTravelPath();
 	
-	if (!cancelled)
-		promptAction({ eventType: eventTypes.governmentGrant });
+	promptAction(data.promptedTravelPathProperties || { eventType: eventTypes.governmentGrant });
 }
 
 function animateResearchStationBackToSupply($researchStation)
@@ -2576,6 +2577,8 @@ function animateResearchStationBackToSupply($researchStation)
 async function highlightResearchStationSupply($grantStation)
 {
 	const $stationContainer = $("#researchStationSupply").children(".researchStation");
+
+	$grantStation.addClass("glowing");
 
 	while ($grantStation.hasClass("glowing"))
 	{
@@ -2666,16 +2669,15 @@ function turnOffResearchStationHighlights()
 
 function getGovernmentGrantTargetCity($researchStation)
 {
-	log("getGovernmentGrantTargetCity()");
 	const stationOffset = $researchStation.offset(),
 		distanceThreshold = getDimension(data, "piecePlacementThreshold"),
 		relocating = !$researchStation.hasClass("grantStation"),
 		relocationKey = relocating ? $researchStation.attr("data-key") : false,
 		eventType = eventTypes.governmentGrant;
 
-	// Measure from what looks like the element's center.
-	stationOffset.top += $researchStation.height() / 3;
-	stationOffset.left += $researchStation.width() / 3;
+	// Measure from the element's centre.
+	stationOffset.top += $researchStation.height() / 2;
+	stationOffset.left += $researchStation.width() / 2;
 
 	let targetCity;
 	for (let key in cities)
@@ -2684,7 +2686,6 @@ function getGovernmentGrantTargetCity($researchStation)
 		if (!targetCity.hasResearchStation
 			&& distanceBetweenPoints(stationOffset, targetCity.getOffset(data)) < distanceThreshold)
 		{
-			log("target: ", targetCity.name);
 			if (relocating)
 			{
 				const origin = getCity(relocationKey);
@@ -2694,27 +2695,31 @@ function getGovernmentGrantTargetCity($researchStation)
 				origin.clusterResearchStation(data);
 				showTravelPathArrow({ origin, destination: targetCity });
 			}
+			else
+			{
+				data.promptedTravelPathProperties = { $researchStation, destination: targetCity };
+				showTravelPathArrow();
+				resetGrantStation($researchStation);
+				turnOffResearchStationSupplyHighlight();
+			}
+			
 			return promptAction({ eventType, targetCity, relocationKey });
 		}
 	}
 
-	log("target not found");
-
 	if (relocating)
 	{
-		log("relocationKey:", relocationKey);
 		getCity(relocationKey).clusterResearchStation(data);
 		data.promptingEventType = eventType;
 		highlightAllResearchStations();
 		hideTravelPathArrow();
 	}
 	else
-		resetGrantStation($researchStation);
+		resetGrantStation($researchStation, { invalidPlacement: true });
 }
 
 async function governmentGrant(targetCity, relocationKey)
 {
-	data.promptingEventType = false;
 	resetActionPrompt();
 	disableActions();
 	
@@ -2731,11 +2736,11 @@ async function governmentGrant(targetCity, relocationKey)
 	{
 		await getCity(relocationKey).relocateResearchStationTo(data, targetCity);
 		turnOffResearchStationHighlights();
-		hideTravelPathArrow();
 	}
 	else
 		await targetCity.buildResearchStation(data, { animate: true, isGovernmentGrant: true });
 	
+	hideTravelPathArrow();
 	appendEventHistoryIconOfType(eventType);
 	resumeCurrentStep();
 }
@@ -4852,7 +4857,7 @@ function showTravelPathArrow(actionProperties)
 function setTravelPathArrowColor({ airlifting, relocatingResearchStation } = {})
 {
 	let cssClass;
-	if (airlifting)
+	if (airlifting || eventTypeIsBeingPrompted(eventTypes.governmentGrant))
 		cssClass = "airlift";
 	else if (relocatingResearchStation)
 		cssClass = "researchStationBackground";
@@ -4888,10 +4893,25 @@ function getTravelPathVector(actionProperties)
 		}
 		else
 		{
-			originOffset = getCity($researchStation.attr("data-key")).getOffset(data);
-			destinationOffset = $researchStation.offset();
-			destinationOffset.left += $researchStation.width() * 0.5;
-			destinationOffset.top += $researchStation.height() * 0.5;
+			if (eventTypeIsBeingPrompted(eventTypes.governmentGrant))
+			{
+				const $supplyStation = $("#researchStationSupply").find(".researchStation");
+
+				originOffset = $supplyStation.offset();
+				originOffset.left += $supplyStation.width() / 2;
+				originOffset.top += $supplyStation.height() / 2;
+			}
+			else
+				originOffset = getCity($researchStation.attr("data-key")).getOffset(data);
+			
+			if (destination)
+				destinationOffset = destination.getOffset(data);
+			else
+			{
+				destinationOffset = $researchStation.offset();
+				destinationOffset.left += $researchStation.width() / 2;
+				destinationOffset.top += $researchStation.height() / 2;
+			}
 		}
 	}
 	else if (typeof $pawn == "undefined") // Determine player and destination directly from the actionProperties.

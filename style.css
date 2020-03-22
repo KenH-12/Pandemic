@@ -160,6 +160,7 @@ body,
 {
 	z-index: 6;
 	cursor: pointer;
+	opacity: 0.7;
 }
 .diseaseCube
 {

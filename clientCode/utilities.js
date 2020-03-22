@@ -207,10 +207,10 @@ async function oscillateButtonBackgroundColor($button)
 
 	while (!$button.hasClass("hidden") && !$button.hasClass("btnDisabled"))
 	{
+		await sleep(interval);
 		$button.addClass(secondaryButtonColors);
 		await sleep(interval);
 		$button.removeClass(secondaryButtonColors);
-		await sleep(interval);
 	}
 
 	$button.removeClass(`${flashing} ${secondaryButtonColors}`);
