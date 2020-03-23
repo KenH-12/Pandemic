@@ -1033,8 +1033,11 @@ function showEventIconDetails($icon, event)
 	const $eventHistory = $("#eventHistory"),
 		$boardContainer = $("#boardContainer"),
 		$detailsContainer = $(`<div id='eventDetails' class='tooltip' data-eventType='${event.code}'>${event.getDetails()}</div>`).appendTo($boardContainer),
-		$arrow = $("<div id='eventDetailsArrow'></div>").appendTo($boardContainer),
-		containerHeight = $detailsContainer.height(),
+		$arrow = $("<div id='eventDetailsArrow'></div>").appendTo($boardContainer);
+	
+	resizeInfectionCards($detailsContainer);
+
+	const containerHeight = $detailsContainer.height(),
 		halfContainerWidth = Math.ceil($detailsContainer.width() / 2),
 		iconOffset = $icon.offset(),
 		iconWidth = $icon.outerWidth(),
@@ -3885,18 +3888,37 @@ function resizeCubeSupplies()
 function resizeInfectionDiscardElements()
 {
 	const $infDiscard = $("#infectionDiscard"),
-		cardHeight = getDimension(data, "infDiscardHeight"),
 		panelHeight = $("#topPanel").height();
 
 	positionRemovedInfectionCardsContainer("collapse");
 		
-	$infDiscard.css("height", panelHeight)
-		.find(".infectionCard")
-		.height(cardHeight)
+	$infDiscard.css("height", panelHeight);
+	resizeInfectionCards($infDiscard);
+	
+	$infDiscard.children("#infDiscardVeil").offset({ top: $infDiscard.children(".title").first().outerHeight() });
+}
+
+function resizeInfectionCards($container)
+{
+	$container = $container || $("#boardContainer");
+
+	const cardHeight = getDimension(data, "infDiscardHeight"),
+		$infectionCards = $container.find(".infectionCard");
+
+	$infectionCards.height(cardHeight)
 		.find(".cityName")
 		.css(getInfectionCardTextStyle());
 	
-	$infDiscard.children("#infDiscardVeil").offset({ top: $infDiscard.children(".title").first().outerHeight() });
+	if ($container.attr("id") === "eventDetails")
+	{
+		const cardWidth = data.boardWidth * 0.2,
+			newContainerWidth = cardWidth / .96;
+		
+		$infectionCards.children(".infectionCardContents").width(cardWidth);
+		
+		if ($container.width() < newContainerWidth)
+			$container.width(newContainerWidth);
+	}
 }
 
 function positionRemovedInfectionCardsContainer()

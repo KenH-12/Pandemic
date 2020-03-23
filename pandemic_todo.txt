@@ -8,8 +8,6 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
-manage height / line-height of infection cards displayed in event details
-
 cure vial tooltips
 
 indicate loading when waiting for a response from the server

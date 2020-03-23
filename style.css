@@ -511,14 +511,8 @@ span.r {color: #ef282a; background: none}
 #eventDetails .locatable:hover { text-decoration: underline }
 #eventDetails .infectionCard
 {
-	height: 18px;
-	margin-bottom: 8px;
-	min-width: 200px;
-}
-#eventDetails .infectionCardContents
-{
-	width: 96%;
 	font-size: 14px;
+	margin-bottom: 8px;
 }
 #eventDetails .infectionCard .cityName
 {
