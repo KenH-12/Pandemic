@@ -887,8 +887,10 @@ function getEventTypeTooltip(eventType, { includeName = true, actionNotPossible,
 	else
 		$tooltip = $(`<div id='eventTypeTooltip' class='tooltip'></div>`);
 	
+	// The "DISPATCH PAWN VIA" part of a title pertains to the Dispatcher's first special ability.
+	// Rendezvous is a special ability in its own right, so its tooltip doesn't require the prefix.
 	if (includeName)
-		$tooltip.append(`<h3>${ isDispatchType ? "DISPATCH PAWN VIA<br/> " : "" }${eventType.name.toUpperCase()}</h3>`);
+		$tooltip.append(`<h3>${ isDispatchType && eventType.code !== eventTypes.rendezvous.code ? "DISPATCH PAWN VIA<br/> " : "" }${eventType.name.toUpperCase()}</h3>`);
 
 	if (actionNotPossible)
 		$tooltip.append("<p class='actionNotPossible'>This action is not currently possible.</p>");
