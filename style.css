@@ -435,7 +435,7 @@ span.r {color: #ef282a; background: none}
 
 #eventTypeTooltip
 {
-	width: 250px;
+	width: 24%;
 	pointer-events: none;
 }
 #eventTypeTooltip h3
@@ -467,7 +467,6 @@ span.r {color: #ef282a; background: none}
 	border-top: 1px dashed #fff;
 	padding-top: 5px;
 }
-
 #eventDetails
 {
 	font-size: 16px;
@@ -538,7 +537,9 @@ span.r {color: #ef282a; background: none}
 	position: absolute;
 }
 
-#eventDetails .indent-1 { margin-left: 12px }
+#eventDetails .indent-1,
+#eventTypeTooltip li 
+{ margin-left: 12px }
 #eventDetails .indent-2 { margin-left: 30px }
 
 #cureMarkerContainer

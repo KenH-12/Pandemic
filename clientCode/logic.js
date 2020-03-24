@@ -872,7 +872,7 @@ function bindActionButtonHoverEvents()
 					includeRelatedRoleRule
 				});
 			
-			positionTooltipRelativeToElement($btn, $tooltip);
+			positionTooltipRelativeToElement($btn, $tooltip, { arrowShape: true });
 		})
 		.on("mouseleave", actionInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }
@@ -925,20 +925,30 @@ function relatedRoleRuleApplies(eventType, { roleA, roleB } = {})
 	return roleB === "Researcher";
 }
 
-function positionTooltipRelativeToElement($element, $tooltip, { juxtaposeTo = "left", $alignTopWithElement, tooltipMargin = 5 } = {})
+function positionTooltipRelativeToElement($element, $tooltip,
+	{
+		juxtaposeTo = "left",
+		$alignTopWithElement,
+		tooltipMargin,
+		arrowShape = false
+	} = {})
 {
-	const tooltipOffset = $element.offset();
+	tooltipMargin = tooltipMargin || data.boardWidth * 0.015;
+	
+	const elementOffset = $element.offset(),
+		tooltipOffset = elementOffset,
+		offsetAdjustment = arrowShape ? 0 : tooltipMargin;
 
 	$tooltip.appendTo("#boardContainer");
 	
 	if (juxtaposeTo === "left")
-		tooltipOffset.left -= $tooltip.outerWidth() + tooltipMargin;
+		tooltipOffset.left -= $tooltip.outerWidth() + offsetAdjustment;
 	else if (juxtaposeTo === "right")
-		tooltipOffset.left += $element.outerWidth() + tooltipMargin;
+		tooltipOffset.left += $element.outerWidth() + offsetAdjustment;
 	else if (juxtaposeTo === "bottom")
-		tooltipOffset.top += $element.outerHeight() + tooltipMargin;
+		tooltipOffset.top += $element.outerHeight() + offsetAdjustment;
 	else if (juxtaposeTo === "top")
-		tooltipOffset.top -= $tooltip.outerHeight() + tooltipMargin;
+		tooltipOffset.top -= $tooltip.outerHeight() + offsetAdjustment;
 	
 	if ($alignTopWithElement)
 		tooltipOffset.top = $alignTopWithElement.offset().top;
@@ -946,6 +956,47 @@ function positionTooltipRelativeToElement($element, $tooltip, { juxtaposeTo = "l
 	$tooltip.offset(tooltipOffset);
 	
 	ensureDivPositionIsWithinWindowHeight($tooltip);
+
+	if (arrowShape)
+		setTooltipArrowClipPath($tooltip, tooltipOffset, $element, elementOffset, tooltipMargin, { juxtaposeTo, $alignTopWithElement });
+}
+
+function setTooltipArrowClipPath($tooltip, tooltipOffset, $element, elementOffset, tooltipMargin,
+	{
+		juxtaposeTo = "left",
+		$alignTopWithElement
+	})
+{
+	const tooltipWidth = $tooltip.width(),
+		marginPercentageOfWidth = (tooltipMargin / tooltipWidth)*100,
+		tooltipHeight = $tooltip.height(),
+		marginPercentageOfHeight = (tooltipMargin / tooltipHeight)*100,
+		tooltipPadding = getLeadingNumber($tooltip.css("padding"));
+	
+	let actualArrowCentre,
+		arrowCentrePercentage,
+		clipPath;
+
+	if (juxtaposeTo === "left")
+	{
+		actualArrowCentre = ( $alignTopWithElement ? $alignTopWithElement.offset().top : elementOffset.top)
+			+ (( $alignTopWithElement ? $alignTopWithElement.height() : $element.height() ) / 2);
+		log("actualArrowCentre", actualArrowCentre);
+		arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.top) / tooltipHeight) * 100;
+		log("arrowCentrePercentage", arrowCentrePercentage);
+
+		clipPath = `polygon(0 0,
+					${100 - marginPercentageOfWidth}% 0,
+					${100 - marginPercentageOfWidth}% ${arrowCentrePercentage - (marginPercentageOfHeight / 2) }%,
+					100% ${arrowCentrePercentage}%,
+					${100 - marginPercentageOfWidth}% ${arrowCentrePercentage + (marginPercentageOfHeight / 2) }%,
+					${100 - marginPercentageOfWidth}% 100%,
+					0 100%)`;
+		
+		$tooltip.css("padding-right", `${tooltipPadding + tooltipMargin}px`);
+	}
+	
+	$tooltip.css({ clipPath });
 }
 
 function getEventIconHtml(eventType, { event } = {})
