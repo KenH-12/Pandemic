@@ -23,6 +23,11 @@ tooltips
 	infection rate track
 	outbreaks track
 
+tooltip arrow shape
+
+put strings in strings.js file
+	role card text
+
 indicate loading when waiting for a response from the server
 
 starting a new game

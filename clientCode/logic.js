@@ -718,8 +718,6 @@ function disablePawnEvents()
 {
 	for (let rID in data.players)
 		data.players[rID].disablePawn();
-	
-	hideTravelPathArrow();
 }
 
 function enablePawnEvents()
@@ -1267,7 +1265,6 @@ function setRightPanelScrollability()
 
 function promptAction(actionProperties)
 {
-	log(`promptAction(${actionProperties.eventType.code})`);
 	const $actionPrompt = $("#actionPrompt"),
 		$actionsContainer = $actionPrompt.parent(),
 		$actionCategories = $actionsContainer.children(".actionCategory"),
@@ -1948,6 +1945,8 @@ const actionInterfacePopulator = {
 
 			return true;
 		}
+		else
+			hideTravelPathArrow();
 
 		if (getResearchStationSupplyCount() === 0)
 			return promptGovernmentGrantStationRelocation();
@@ -1960,6 +1959,7 @@ const actionInterfacePopulator = {
 	[eventTypes.resilientPopulation.name]({ cardKeyToRemove })
 	{
 		disablePawnEvents();
+		hideTravelPathArrow();
 		disableDiseaseCubeEvents();
 		
 		const eventType = eventTypes.resilientPopulation;
