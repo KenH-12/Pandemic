@@ -1,9 +1,9 @@
 "use strict";
 
+import { strings } from "./strings.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 
-const insufficientCubesWarningRule = "<span class='warning'>⚠️</span> If the number of cubes <i>actually needed on the board</i> cannot be placed because there are not enough cubes in the supply, the game ends and your team has lost!",
-dispatchDiscardRule = "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
+const dispatchDiscardRule = "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
 eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
@@ -232,7 +232,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"If the city already contains cubes of this color, cubes are added until the city has 3 cubes of this color and then an <i>outbreak</i> of this disease occurs in the city.",
 			"The infection card is then placed in the Infection Discard Pile.",
 			"<br/>",
-			insufficientCubesWarningRule
+			strings.insufficientCubesWarning
 		]
 	},
 	epidemicIntensify: {
@@ -263,7 +263,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"Each time an infection card is flipped over, a disease cube of the matching color is placed on the named city.",
 			"If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in that city.",
 			"<br/>",
-			insufficientCubesWarningRule
+			strings.insufficientCubesWarning
 		]
 	},
 	initialInfection: {
@@ -308,7 +308,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"<br/>",
 			"When a chain reaction outbreak occurs, the outbreaks marker is moved forward one space and disease cube are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> infection card.",
 			"<br/>",
-			"<span class='warning'>⚠️</span> If the outbreaks marker reaches the last space of the Outbreaks Track, the game ends and your team has lost!"
+			strings.tooManyOutbreaksWarning
 		]
 	},
 	outbreakInfection: {

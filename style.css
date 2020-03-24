@@ -490,7 +490,9 @@ span.r {color: #ef282a; background: none}
 	line-height: 20px;
 	margin-left: 5px;
 }
-#eventDetails > .title > .eventTypeInfo:hover { text-shadow: 0px 0px 3px #fff }
+#eventDetails > .title > .eventTypeInfo:hover,
+#cubeSupplies .info:hover
+{ text-shadow: 0px 0px 3px #fff }
 #eventDetails .playerCard { margin: 2px 0 }
 #eventDetails .diseaseCube
 {
@@ -634,9 +636,11 @@ span.r {color: #ef282a; background: none}
 	padding-top: 3px;
 	border-bottom: 1px solid #fff;
 }
-#cubeSupplies
+#cubeSupplies { width: 56% }
+#cubeSupplies .info
 {
-	width: 56%;
+	font-size: 12px;
+	vertical-align: text-top;
 }
 .cubeSupply
 {

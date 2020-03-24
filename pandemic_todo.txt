@@ -8,7 +8,20 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
-cure vial tooltips
+tooltips
+	cured diseases container
+		cure vials
+			not cured
+			cured
+			eradicated
+	number of cards in...
+		infection deck
+		infection discards
+		player deck
+		player discards
+	research station supply
+	infection rate track
+	outbreaks track
 
 indicate loading when waiting for a response from the server
 

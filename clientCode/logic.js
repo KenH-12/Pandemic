@@ -1,5 +1,6 @@
 "use strict";
 
+import { strings } from "./strings.js";
 import PlayerPanel from "./playerPanel.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 import {
@@ -936,6 +937,10 @@ function positionTooltipRelativeToElement($element, $tooltip, { juxtaposeTo = "l
 		tooltipOffset.left -= $tooltip.outerWidth() + tooltipMargin;
 	else if (juxtaposeTo === "right")
 		tooltipOffset.left += $element.outerWidth() + tooltipMargin;
+	else if (juxtaposeTo === "bottom")
+		tooltipOffset.top += $element.outerHeight() + tooltipMargin;
+	else if (juxtaposeTo === "top")
+		tooltipOffset.top -= $tooltip.outerHeight() + tooltipMargin;
 	
 	if ($alignTopWithElement)
 		tooltipOffset.top = $alignTopWithElement.offset().top;
@@ -8971,6 +8976,18 @@ function bindInfectionDeckHover()
 		$(this).attr("title", `${numCardsInDeck} cards`);
 	});
 }
+
+$("#cubeSupplies").find("span.info").hover(function()
+{
+	const $supplyContainer = $(this).closest("#cubeSupplies"),
+		$tooltip = $(`<div id='cubeSuppliesTooltip' class='tooltip'>
+						${strings.diseaseCubeSupplyInfo}
+						<p>${strings.insufficientCubesWarning}</p>
+					</div>`)
+			.width($supplyContainer.width());
+
+	positionTooltipRelativeToElement($supplyContainer, $tooltip, { juxtaposeTo: "bottom" });
+}, function() { $("#cubeSuppliesTooltip").remove() });
 
 function enableInfectionDiscardHoverEvents()
 {

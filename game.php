@@ -72,7 +72,7 @@
 						<div id='topPanel'>
 
 							<div id='cubeSupplies'>
-								<p class='title'>DISEASE CUBE SUPPLY</p>
+								<p class='title'>DISEASE CUBE SUPPLY <span class='info'>&#9432;</span></p>
 								<div class='cubeSupply'>
 									<p id='ySupply'>$MAX_CUBE_SUPPLY_COUNT</p>
 									<div id='ySupplyCube' class='diseaseCube y'>
