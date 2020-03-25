@@ -1009,6 +1009,24 @@ function setTooltipArrowClipPath($tooltip, tooltipOffset, $element, elementOffse
 			$tooltip.css("padding-left", `${tooltipPadding + tooltipMargin}px`);
 		}
 	}
+	else // juxtaposeTo top or bottom
+	{
+		actualArrowCentre = elementOffset.left + ($element.width() / 2);
+		arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.left) / tooltipWidth) * 100;
+
+		if (juxtaposeTo === "bottom")
+		{
+			clipPath = `polygon(0 ${marginPercentageOfHeight}%,
+						${arrowCentrePercentage - (marginPercentageOfWidth / 2) }% ${marginPercentageOfHeight}%,
+						${arrowCentrePercentage}% 0,
+						${arrowCentrePercentage + (marginPercentageOfWidth / 2) }% ${marginPercentageOfHeight}%,
+						100% ${marginPercentageOfHeight}%,
+						100% 100%,
+						0 100%)`;
+			
+			$tooltip.css("padding-top", `${tooltipPadding + tooltipMargin}px`);
+		}
+	}
 	
 	$tooltip.css({ clipPath });
 }
@@ -9051,7 +9069,7 @@ $("#cubeSupplies").find("span.info").hover(function()
 					</div>`)
 			.width($supplyContainer.width());
 
-	positionTooltipRelativeToElement($supplyContainer, $tooltip, { juxtaposeTo: "bottom" });
+	positionTooltipRelativeToElement($supplyContainer, $tooltip, { juxtaposeTo: "bottom", arrowShape: true });
 }, function() { $("#cubeSuppliesTooltip").remove() });
 
 function enableInfectionDiscardHoverEvents()
