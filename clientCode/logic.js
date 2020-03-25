@@ -1014,7 +1014,19 @@ function setTooltipArrowClipPath($tooltip, tooltipOffset, $element, elementOffse
 		actualArrowCentre = elementOffset.left + ($element.width() / 2);
 		arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.left) / tooltipWidth) * 100;
 
-		if (juxtaposeTo === "bottom")
+		if (juxtaposeTo === "top")
+		{
+			clipPath = `polygon(0 0,
+						100% 0,
+						100% ${100 - marginPercentageOfHeight}%,
+						${arrowCentrePercentage + (marginPercentageOfWidth / 2) }% ${100 - marginPercentageOfHeight}%,
+						${arrowCentrePercentage} ${100 - marginPercentageOfHeight}%,
+						${arrowCentrePercentage - (marginPercentageOfWidth / 2) }% ${100 - marginPercentageOfHeight}%,
+						0 ${100 - marginPercentageOfHeight}%)`;
+	
+			$tooltip.css("padding-bottom", `${tooltipPadding + tooltipMargin}px`);
+		}
+		else if (juxtaposeTo === "bottom")
 		{
 			clipPath = `polygon(0 ${marginPercentageOfHeight}%,
 						${arrowCentrePercentage - (marginPercentageOfWidth / 2) }% ${marginPercentageOfHeight}%,
