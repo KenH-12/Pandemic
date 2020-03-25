@@ -1138,7 +1138,7 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 				includeRelatedRoleRule = relatedRoleRuleApplies(eventType, { roleA, roleB }),
 				$tooltip = getEventTypeTooltip(eventType, { includeName: false, includeRelatedRoleRule });
 			
-			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo, arrowShape: true });
+			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo });
 		})
 		.on("mouseleave", eventTypeInfoSelector, function() { $("#eventTypeTooltip").remove() });
 	
@@ -1150,7 +1150,7 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 				eventType = getEventType($this.attr("data-eventType")),
 				$tooltip = getEventTypeTooltip(eventType, { isDispatchType: $this.parent().html().includes("Dispatch Type") });
 
-			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo, $alignTopWithElement: $this, arrowShape: true });
+			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo, $verticalAlignWith: $this });
 		})
 		.on("mouseleave", hoverInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }
@@ -2900,7 +2900,7 @@ function bindDispatchTypeHoverEvents($container)
 			$this = $(this);
 			$tooltip = getEventTypeTooltip(getEventType($this.attr("data-eventType")), { includeName: true, isDispatchType: true });
 			
-			positionTooltipRelativeToElement($rightPanel, $tooltip, { $alignTopWithElement: $this });
+			positionTooltipRelativeToElement($rightPanel, $tooltip, { $verticalAlignWith: $this });
 		},
 		function()
 		{
@@ -8963,7 +8963,7 @@ $("#cubeSupplies").find("span.info").hover(function()
 					</div>`)
 			.width($supplyContainer.width());
 
-	positionTooltipRelativeToElement($supplyContainer, $tooltip, { juxtaposeTo: "bottom", arrowShape: true });
+	positionTooltipRelativeToElement($supplyContainer, $tooltip, { juxtaposeTo: "bottom" });
 }, function() { $("#cubeSuppliesTooltip").remove() });
 
 function enableInfectionDiscardHoverEvents()

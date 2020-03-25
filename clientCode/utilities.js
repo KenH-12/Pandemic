@@ -387,7 +387,10 @@ function ensureDivPositionIsWithinWindowHeight($div, margin = 5)
 	const divHeight = $div.outerHeight() + margin;
 
     if ($div.offset().top + divHeight > windowHeight)
-        $div.offset({ top: windowHeight - divHeight });
+		$div.offset({ top: windowHeight - divHeight });
+	
+	if ($div.hasClass("tooltip"))
+		setTooltipArrowClipPath($div);
 }
 
 // Facilitates responsiveness where simple css rules fail
@@ -590,46 +593,49 @@ function elementsOverlap(element1, element2)
 function positionTooltipRelativeToElement($element, $tooltip,
 	{
 		juxtaposeTo = "left",
-		$alignTopWithElement,
-		tooltipMargin,
-		arrowShape = false
+		$verticalAlignWith,
+		tooltipMargin
 	} = {})
 {
 	tooltipMargin = tooltipMargin || 15;
 	
 	const elementOffset = $element.offset(),
-		tooltipOffset = elementOffset,
-		offsetAdjustment = arrowShape ? 0 : tooltipMargin;
+		tooltipOffset = elementOffset;
 
-	$tooltip.appendTo("#boardContainer");
+	$tooltip.appendTo("#boardContainer")
+		.data("relatedElementId", $element.attr("id"))
+		.data("juxt", juxtaposeTo)
+		.data("margin", tooltipMargin);
+	
+	if ($verticalAlignWith)
+		$tooltip.data("verticalAlignId", $verticalAlignWith.attr("id"));
 	
 	if (juxtaposeTo === "left")
-		tooltipOffset.left -= $tooltip.outerWidth() + offsetAdjustment;
+		tooltipOffset.left -= $tooltip.outerWidth();
 	else if (juxtaposeTo === "right")
-		tooltipOffset.left += $element.outerWidth() + offsetAdjustment;
+		tooltipOffset.left += $element.outerWidth();
 	else if (juxtaposeTo === "bottom")
-		tooltipOffset.top += $element.outerHeight() + offsetAdjustment;
+		tooltipOffset.top += $element.outerHeight();
 	else if (juxtaposeTo === "top")
-		tooltipOffset.top -= $tooltip.outerHeight() + offsetAdjustment;
+		tooltipOffset.top -= $tooltip.outerHeight();
 	
-	if ($alignTopWithElement)
-		tooltipOffset.top = $alignTopWithElement.offset().top;
+	if ($verticalAlignWith)
+		tooltipOffset.top = $verticalAlignWith.offset().top;
 
 	$tooltip.offset(tooltipOffset);
 	
 	ensureDivPositionIsWithinWindowHeight($tooltip);
-
-	if (arrowShape)
-		setTooltipArrowClipPath($tooltip, tooltipOffset, $element, elementOffset, tooltipMargin, { juxtaposeTo, $alignTopWithElement });
 }
 
-function setTooltipArrowClipPath($tooltip, tooltipOffset, $element, elementOffset, tooltipMargin,
-	{
-		juxtaposeTo = "left",
-		$alignTopWithElement
-	})
+function setTooltipArrowClipPath($tooltip)
 {
-	const tooltipWidth = $tooltip.width(),
+	const tooltipOffset = $tooltip.offset(),
+		tooltipMargin = $tooltip.data("margin"),
+		$element = $(`#${$tooltip.data("relatedElementId")}`),
+		elementOffset = $element.offset(),
+		juxtaposeTo = $tooltip.data("juxt"),
+		$verticalAlignWith = $tooltip.data("verticalAlignId"),
+		tooltipWidth = $tooltip.width(),
 		marginPercentageOfWidth = (tooltipMargin / tooltipWidth)*100,
 		tooltipHeight = $tooltip.height(),
 		marginPercentageOfHeight = (tooltipMargin / tooltipHeight)*100,
@@ -641,8 +647,8 @@ function setTooltipArrowClipPath($tooltip, tooltipOffset, $element, elementOffse
 
 	if (["left", "right"].includes(juxtaposeTo))
 	{
-		actualArrowCentre = ( $alignTopWithElement ? $alignTopWithElement.offset().top : elementOffset.top)
-			+ (( $alignTopWithElement ? $alignTopWithElement.height() : $element.height() ) / 2);
+		actualArrowCentre = ( $verticalAlignWith ? $verticalAlignWith.offset().top : elementOffset.top)
+			+ (( $verticalAlignWith ? $verticalAlignWith.height() : $element.height() ) / 2);
 			
 		arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.top) / tooltipHeight) * 100;
 		

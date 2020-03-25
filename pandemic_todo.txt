@@ -8,6 +8,8 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
+tooltips need a wrapper for the drop-shadow to work
+
 tooltips
 	cured diseases container
 		cure vials
