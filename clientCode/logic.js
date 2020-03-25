@@ -977,23 +977,37 @@ function setTooltipArrowClipPath($tooltip, tooltipOffset, $element, elementOffse
 		arrowCentrePercentage,
 		clipPath;
 
-	if (juxtaposeTo === "left")
+	if (["left", "right"].includes(juxtaposeTo))
 	{
 		actualArrowCentre = ( $alignTopWithElement ? $alignTopWithElement.offset().top : elementOffset.top)
 			+ (( $alignTopWithElement ? $alignTopWithElement.height() : $element.height() ) / 2);
-		log("actualArrowCentre", actualArrowCentre);
+			
 		arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.top) / tooltipHeight) * 100;
-		log("arrowCentrePercentage", arrowCentrePercentage);
-
-		clipPath = `polygon(0 0,
-					${100 - marginPercentageOfWidth}% 0,
-					${100 - marginPercentageOfWidth}% ${arrowCentrePercentage - (marginPercentageOfHeight / 2) }%,
-					100% ${arrowCentrePercentage}%,
-					${100 - marginPercentageOfWidth}% ${arrowCentrePercentage + (marginPercentageOfHeight / 2) }%,
-					${100 - marginPercentageOfWidth}% 100%,
-					0 100%)`;
 		
-		$tooltip.css("padding-right", `${tooltipPadding + tooltipMargin}px`);
+		if (juxtaposeTo === "left")
+		{
+			clipPath = `polygon(0 0,
+						${100 - marginPercentageOfWidth}% 0,
+						${100 - marginPercentageOfWidth}% ${arrowCentrePercentage - (marginPercentageOfHeight / 2) }%,
+						100% ${arrowCentrePercentage}%,
+						${100 - marginPercentageOfWidth}% ${arrowCentrePercentage + (marginPercentageOfHeight / 2) }%,
+						${100 - marginPercentageOfWidth}% 100%,
+						0 100%)`;
+			
+			$tooltip.css("padding-right", `${tooltipPadding + tooltipMargin}px`);
+		}
+		else if (juxtaposeTo === "right")
+		{
+			clipPath = `polygon(${marginPercentageOfWidth}% 0,
+						100% 0,
+						100% 100%,
+						${marginPercentageOfWidth}% 100%,
+						${marginPercentageOfWidth}% ${arrowCentrePercentage + (marginPercentageOfHeight / 2) }%,
+						0 ${arrowCentrePercentage}%,
+						${marginPercentageOfWidth}% ${arrowCentrePercentage - (marginPercentageOfHeight / 2) }%)`;
+			
+			$tooltip.css("padding-left", `${tooltipPadding + tooltipMargin}px`);
+		}
 	}
 	
 	$tooltip.css({ clipPath });
@@ -1212,7 +1226,7 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 				includeRelatedRoleRule = relatedRoleRuleApplies(eventType, { roleA, roleB }),
 				$tooltip = getEventTypeTooltip(eventType, { includeName: false, includeRelatedRoleRule });
 			
-			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo });
+			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo, arrowShape: true });
 		})
 		.on("mouseleave", eventTypeInfoSelector, function() { $("#eventTypeTooltip").remove() });
 	
@@ -1224,7 +1238,7 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 				eventType = getEventType($this.attr("data-eventType")),
 				$tooltip = getEventTypeTooltip(eventType, { isDispatchType: $this.parent().html().includes("Dispatch Type") });
 
-			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo, $alignTopWithElement: $this });
+			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo, $alignTopWithElement: $this, arrowShape: true });
 		})
 		.on("mouseleave", hoverInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }
