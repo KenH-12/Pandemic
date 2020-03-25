@@ -882,24 +882,28 @@ function getEventTypeTooltip(eventType, { includeName = true, actionNotPossible,
 	let $tooltip = $("#eventTypeTooltip");
 
 	if ($tooltip.length)
-		$tooltip.empty();
+		$tooltip.children(".content").empty();
 	else
-		$tooltip = $(`<div id='eventTypeTooltip' class='tooltip'></div>`);
+		$tooltip = $(`<div id='eventTypeTooltip' class='tooltip'>
+						<div class='content'></div>
+					</div>`);
+	
+	const $tooltipContent = $tooltip.children(".content");
 	
 	// The "DISPATCH PAWN VIA" part of a title pertains to the Dispatcher's first special ability.
 	// Rendezvous is a special ability in its own right, so its tooltip doesn't require the prefix.
 	if (includeName)
-		$tooltip.append(`<h3>${ isDispatchType && eventType.code !== eventTypes.rendezvous.code ? "DISPATCH PAWN VIA<br/> " : "" }${eventType.name.toUpperCase()}</h3>`);
+		$tooltipContent.append(`<h3>${ isDispatchType && eventType.code !== eventTypes.rendezvous.code ? "DISPATCH PAWN VIA<br/> " : "" }${eventType.name.toUpperCase()}</h3>`);
 
 	if (actionNotPossible)
-		$tooltip.append("<p class='actionNotPossible'>This action is not currently possible.</p>");
+		$tooltipContent.append("<p class='actionNotPossible'>This action is not currently possible.</p>");
 
 	
 	for (let rule of (isDispatchType ? eventTypes.dispatchPawn[toCamelCase(eventType.name.replace("/","")) + "Rules"] : eventType.rules))
-			$tooltip.append(`<p>${rule}</p>`);
+			$tooltipContent.append(`<p>${rule}</p>`);
 	
 	if (includeRelatedRoleRule)
-		$tooltip.append(`<p class='specialAbilityRule'>${replaceRoleNamesWithRoleTags(eventType.relatedRoleRule)}</p>`);
+		$tooltipContent.append(`<p class='specialAbilityRule'>${replaceRoleNamesWithRoleTags(eventType.relatedRoleRule)}</p>`);
 	
 	return $tooltip;
 }
@@ -8958,8 +8962,10 @@ $("#cubeSupplies").find("span.info").hover(function()
 {
 	const $supplyContainer = $(this).closest("#cubeSupplies"),
 		$tooltip = $(`<div id='cubeSuppliesTooltip' class='tooltip'>
-						${strings.diseaseCubeSupplyInfo}
-						<p>${strings.insufficientCubesWarning}</p>
+						<div class='content'>
+							${strings.diseaseCubeSupplyInfo}
+							<p>${strings.insufficientCubesWarning}</p>
+						</div>
 					</div>`)
 			.width($supplyContainer.width());
 

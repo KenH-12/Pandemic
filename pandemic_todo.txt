@@ -8,7 +8,10 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
-tooltips need a wrapper for the drop-shadow to work
+event history tooltips need...
+	wrappers
+	arrows to be fixed
+	secondary tooltips need vertical alignment
 
 tooltips
 	cured diseases container

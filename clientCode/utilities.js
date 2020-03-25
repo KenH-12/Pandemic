@@ -639,6 +639,7 @@ function setTooltipArrowClipPath($tooltip)
 		marginPercentageOfWidth = (tooltipMargin / tooltipWidth)*100,
 		tooltipHeight = $tooltip.height(),
 		marginPercentageOfHeight = (tooltipMargin / tooltipHeight)*100,
+		$tooltipContent = $tooltip.children(".content"),
 		tooltipPadding = getLeadingNumber($tooltip.css("padding"));
 	
 	let actualArrowCentre,
@@ -662,9 +663,9 @@ function setTooltipArrowClipPath($tooltip)
 						${100 - marginPercentageOfWidth}% 100%,
 						0 100%)`;
 			
-			$tooltip.css("padding-right", `${tooltipPadding + tooltipMargin}px`);
+			$tooltipContent.css("padding-right", `${tooltipPadding + tooltipMargin}px`);
 		}
-		else if (juxtaposeTo === "right")
+		else // juxtaposeTo right
 		{
 			clipPath = `polygon(${marginPercentageOfWidth}% 0,
 						100% 0,
@@ -674,7 +675,7 @@ function setTooltipArrowClipPath($tooltip)
 						0 ${arrowCentrePercentage}%,
 						${marginPercentageOfWidth}% ${arrowCentrePercentage - (marginPercentageOfHeight / 2) }%)`;
 			
-			$tooltip.css("padding-left", `${tooltipPadding + tooltipMargin}px`);
+			$tooltipContent.css("padding-left", `${tooltipPadding + tooltipMargin}px`);
 		}
 	}
 	else // juxtaposeTo top or bottom
@@ -692,9 +693,9 @@ function setTooltipArrowClipPath($tooltip)
 						${arrowCentrePercentage - (marginPercentageOfWidth / 2) }% ${100 - marginPercentageOfHeight}%,
 						0 ${100 - marginPercentageOfHeight}%)`;
 	
-			$tooltip.css("padding-bottom", `${tooltipPadding + tooltipMargin}px`);
+			$tooltipContent.css("padding-bottom", `${tooltipPadding + tooltipMargin}px`);
 		}
-		else if (juxtaposeTo === "bottom")
+		else // juxtaposeTo bottom
 		{
 			clipPath = `polygon(0 ${marginPercentageOfHeight}%,
 						${arrowCentrePercentage - (marginPercentageOfWidth / 2) }% ${marginPercentageOfHeight}%,
@@ -704,9 +705,9 @@ function setTooltipArrowClipPath($tooltip)
 						100% 100%,
 						0 100%)`;
 			
-			$tooltip.css("padding-top", `${tooltipPadding + tooltipMargin}px`);
+			$tooltipContent.css("padding-top", `${tooltipPadding + tooltipMargin}px`);
 		}
 	}
 	
-	$tooltip.css({ clipPath });
+	$tooltipContent.css({ clipPath });
 }
