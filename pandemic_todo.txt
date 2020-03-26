@@ -8,8 +8,6 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
-tooltip padding on the side of the arrow needs to be fixed
-
 event history tooltips need...
 	wrappers
 	arrows to be fixed

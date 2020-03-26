@@ -640,7 +640,7 @@ function setTooltipArrowClipPath($tooltip)
 		tooltipHeight = $tooltip.height(),
 		marginPercentageOfHeight = (tooltipMargin / tooltipHeight)*100,
 		$tooltipContent = $tooltip.children(".content"),
-		tooltipPadding = getLeadingNumber($tooltip.css("padding"));
+		tooltipPadding = getLeadingNumber($tooltipContent.css("padding"));
 	
 	let actualArrowCentre,
 		arrowCentrePercentage,
