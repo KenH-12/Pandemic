@@ -1211,6 +1211,7 @@ function resetActionPrompt({ actionCancelled } = {})
 			turnOffResearchStationHighlights();
 			turnOffResearchStationSupplyHighlight();
 			$("#boardContainer").children(".researchStation.grantStation").remove();
+			researchStationKeys.delete("grantStation");
 		}
 		else if (eventTypeIsBeingPrompted(resilientPopulation))
 		{
@@ -1926,14 +1927,16 @@ const actionInterfacePopulator = {
 
 			return true;
 		}
-		else
-			hideTravelPathArrow();
 
 		if (getResearchStationSupplyCount() === 0)
 			return promptGovernmentGrantStationRelocation();
-
-		// The player is prompted to drag and drop a new station from the supply.
-		newGrantStation();
+		
+		if (!data.promptedTravelPathProperties)
+		{
+			hideTravelPathArrow();
+			highlightResearchStationSupply(newGrantStation());
+			showGovernmentGrantArrow();
+		}
 		
 		return true;
 	},
@@ -2057,7 +2060,6 @@ function forecastInProgress()
 	{
 		// A forecast must be resolved.
 		const forecastEventToLoad = forecastEventsThisTurn[numEvents - 1];
-		log("forecastEventToLoad: ", forecastEventToLoad);
 		promptAction({ eventType: forecast, forecastEventToLoad });
 
 		return true;
@@ -2525,8 +2527,7 @@ function newGrantStation()
 			});
 		});
 	
-	highlightResearchStationSupply($grantStation);
-	showGovernmentGrantArrow();
+	return $grantStation;
 }
 
 async function resetGrantStation($grantStation, { invalidPlacement } = {})
@@ -2540,8 +2541,6 @@ async function resetGrantStation($grantStation, { invalidPlacement } = {})
 
 	if (invalidPlacement)
 		await animateInvalidTravelPath();
-	
-	promptAction(data.promptedTravelPathProperties || { eventType: eventTypes.governmentGrant });
 }
 
 function animateResearchStationBackToSupply($researchStation)
@@ -2665,7 +2664,7 @@ function turnOffResearchStationHighlights()
 	data.promptingEventType = false;
 }
 
-function getGovernmentGrantTargetCity($researchStation)
+async function getGovernmentGrantTargetCity($researchStation)
 {
 	const stationOffset = $researchStation.offset(),
 		distanceThreshold = getDimension(data, "piecePlacementThreshold"),
@@ -2713,7 +2712,17 @@ function getGovernmentGrantTargetCity($researchStation)
 		hideTravelPathArrow();
 	}
 	else
-		resetGrantStation($researchStation, { invalidPlacement: true });
+	{
+		await resetGrantStation($researchStation, { invalidPlacement: true });
+
+		if (data.promptedTravelPathProperties)
+			showTravelPathArrow();
+		else
+		{
+			highlightResearchStationSupply($researchStation);
+			showGovernmentGrantArrow();
+		}
+	}
 }
 
 async function governmentGrant(targetCity, relocationKey)
