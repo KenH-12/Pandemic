@@ -1033,13 +1033,13 @@ function showEventIconDetails($icon, event)
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
 
-	if (event instanceof StartingHands)
-		event.positionPopulationRanks($detailsContainer);
-
-	resizeInfectionCards($detailsContainer);
 	enforceEventDetailsHeightLimit();
 	positionTooltipRelativeToElement($detailsContainer, $icon, { juxtaposeTo: "top" });
+	// The following must happen AFTER the tooltip is positioned.
 	bindRoleCardHoverEvents();
+	resizeInfectionCards($detailsContainer);
+	if (event instanceof StartingHands)
+		event.positionPopulationRanks($detailsContainer);
 }
 
 function enforceEventDetailsHeightLimit($detailsContainer)

@@ -420,7 +420,7 @@ span.r {color: #ef282a; background: none}
 	border-radius: 20%;
 }
 
-.tooltip
+.tooltip:not(#eventDetails)
 {
 	position: absolute;
 	z-index: 10;

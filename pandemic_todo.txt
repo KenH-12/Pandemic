@@ -6,10 +6,9 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
-starting hands tooltip columns are broken
-
 some tooltips are offset slightly from where they should be
-	infect city events
+	starting hand event info
+	infect city event info
 	discover a cure button info
 
 TO DO
