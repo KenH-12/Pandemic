@@ -8,6 +8,8 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
+when prompting government grant, make the research station glow transition more subtle
+
 event history tooltips need...
 	wrappers
 	arrows to be fixed

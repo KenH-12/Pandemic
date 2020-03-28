@@ -1028,7 +1028,6 @@ function showEventIconDetails($icon, event)
 							</div>`);
 	
 	bindEventDetailsInfoHoverEvents($detailsContainer);
-	bindRoleCardHoverEvents();
 	bindEventCardHoverEvents(data, { $containingElement: $detailsContainer });
 	bindEpidemicCardHoverEvents($detailsContainer);
 	locatePawnOnRoleTagClick($detailsContainer);
@@ -1040,6 +1039,7 @@ function showEventIconDetails($icon, event)
 	resizeInfectionCards($detailsContainer);
 	enforceEventDetailsHeightLimit();
 	positionTooltipRelativeToElement($detailsContainer, $icon, { juxtaposeTo: "top" });
+	bindRoleCardHoverEvents();
 }
 
 function enforceEventDetailsHeightLimit($detailsContainer)
