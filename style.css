@@ -532,10 +532,10 @@ span.r {color: #ef282a; background: none}
 	position: absolute;
 }
 
-#eventDetails .indent-1,
+.indent-1,
 #eventTypeTooltip li 
 { margin-left: 12px }
-#eventDetails .indent-2 { margin-left: 30px }
+.indent-2 { margin-left: 30px }
 
 #cureMarkerContainer
 {

@@ -6,8 +6,16 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
+starting hands tooltip columns are broken
+
+some tooltips are offset slightly from where they should be
+	infect city events
+	discover a cure button info
+
 TO DO
 -----
+if no event cards are held, the 'infect city' button should say 'infect n cities'
+
 when prompting government grant, make the research station glow transition more subtle
 
 event history tooltips need...
@@ -24,7 +32,6 @@ tooltips
 	number of cards in...
 		infection deck
 		infection discards
-		player deck
 		player discards
 	research station supply
 	infection rate track

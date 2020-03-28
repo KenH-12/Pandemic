@@ -3640,12 +3640,22 @@ async function drawStep()
 
 	if (data.nextStep === "epIncrease")
 	{
-		await specialEventAlert(
+		let title;
+		
+		if (numEpidemicsToResolve() === 1)
 		{
-			title: numEpidemicsToResolve() === 1 ? "EPIDEMIC!" : "DOUBLE EPIDEMIC!!",
-			eventClass: "epidemic",
-			visibleMs: 1250
-		});
+			data.epidemicCount++;
+			title = "EPIDEMIC!"
+		}
+		else
+		{
+			data.epidemicCount += 2;
+			title = "DOUBLE EPIDEMIC!!";
+		}
+
+		bindPlayerDeckHoverEvents();
+		
+		await specialEventAlert({ title, eventClass: "epidemic", visibleMs: 1250 });
 	}
 
 	await sleep(750);
@@ -8410,10 +8420,17 @@ function bindPlayerDeckHoverEvents()
 				return false;
 			
 			 const $this = $(this),
+				 { numPlayerCardsRemaining, numEpidemics, epidemicCount } = data,
+				 { playerDeckInfo, discardRule, outOfCardsWarning } = strings,
 				$tooltip = $(`<div id='playerDeckTooltip' class='tooltip'>
 									<div class='content'>
-										<p>Cards left in deck: ${data.numPlayerCardsRemaining}</p>
-										${strings.outOfCardsWarning}
+										<p>Cards left in deck: ${numPlayerCardsRemaining}</p>
+										<br/>
+										<p>Difficulty: ${getDifficultyName()}<br/><span class='indent-1'>-> ${numEpidemics} Epidemics</span><br/>Epidemic cards left in deck: ${numEpidemics - epidemicCount}</p>
+										<br/>
+										<p>${playerDeckInfo}</p>
+										<p>${discardRule}</p>
+										<p>${outOfCardsWarning}</p>
 									</div>
 								</div>`);
 			
