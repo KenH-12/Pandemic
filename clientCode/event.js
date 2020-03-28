@@ -207,7 +207,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"After a role does 4 actions, they must draw 2 cards from the player deck; any city cards or event cards drawn are added to their hand.",
 			"If your draws include any <i>Epidemic</i> cards, they must be resolved immediately.",
 			"<br/>",
-			"<span class='warning'>⚠️</span> If there are fewer than 2 cards left in the Player Deck when it is time to draw, the game ends and your team has lost!"			
+			strings.outOfCardsWarning
 		]
 	},
 	epidemicIncrease: {
