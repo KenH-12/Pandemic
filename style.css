@@ -495,6 +495,8 @@ span.r {color: #ef282a; background: none}
 #cubeSupplies .info:hover
 { text-shadow: 0px 0px 3px #fff }
 #eventDetails .playerCard { margin: 2px 0 }
+
+#eventDetails .cubes { white-space: nowrap }
 #eventDetails .diseaseCube
 {
 	display: inline-block;

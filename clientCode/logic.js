@@ -1033,11 +1033,11 @@ function showEventIconDetails($icon, event)
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
 
+	resizeInfectionCards($detailsContainer);
 	enforceEventDetailsHeightLimit();
 	positionTooltipRelativeToElement($detailsContainer, $icon, { juxtaposeTo: "top" });
 	// The following must happen AFTER the tooltip is positioned.
 	bindRoleCardHoverEvents();
-	resizeInfectionCards($detailsContainer);
 	if (event instanceof StartingHands)
 		event.positionPopulationRanks($detailsContainer);
 }
@@ -3900,12 +3900,14 @@ function resizeInfectionCards($container)
 {
 	$container = $container || $("#boardContainer");
 
-	const cardHeight = getDimension(data, "infDiscardHeight"),
-		$infectionCards = $container.find(".infectionCard");
+	const $infectionCards = $container.find(".infectionCard");
 
-	$infectionCards.height(cardHeight)
+	if (!$infectionCards.length)
+		return false;
+
+	$infectionCards.height(getDimension(data, "infDiscardHeight"))
 		.find(".cityName")
-		.css(getInfectionCardTextStyle());
+		.css(getInfectionCardTextStyle($container));
 	
 	if ($container.attr("id") === "eventDetails")
 	{
@@ -6817,12 +6819,22 @@ function getInfectionContainer()
 	return $("#" + containerID);
 }
 
-function getInfectionCardTextStyle()
+function getInfectionCardTextStyle($container)
 {
-	return {
-		"top": getDimension(data, "infDiscardNameTop") + "px",
-		"font-size": getDimension(data, "infDiscardFont") + "px"
-	};
+	const fontSize = getDimension(data, "infDiscardFont") + "px",
+		top = getDimension(data, "infDiscardNameTop"),
+		styleProperties = {
+			top,
+			fontSize,
+		};
+	
+	if ($container.attr("id") === "eventDetails")
+	{
+		styleProperties.top -= 1;
+		styleProperties.lineHeight = fontSize;
+	}
+
+	return styleProperties;
 }
 
 function discardInfectionCard($card, duration)
@@ -6854,7 +6866,7 @@ function discardInfectionCard($card, duration)
 						.children(".infectionCardContents")
 						.removeAttr("style")
 						.children(".cityName")
-						.css(getInfectionCardTextStyle());
+						.css(getInfectionCardTextStyle($discardPile));
 						
 					$card.height(getDimension(data, "infDiscardHeight"));
 

@@ -17,11 +17,6 @@ if no event cards are held, the 'infect city' button should say 'infect n cities
 
 when prompting government grant, make the research station glow transition more subtle
 
-event history tooltips need...
-	wrappers
-	arrows to be fixed
-	secondary tooltips need vertical alignment
-
 tooltips
 	cured diseases container
 		cure vials
@@ -35,8 +30,6 @@ tooltips
 	research station supply
 	infection rate track
 	outbreaks track
-
-tooltip arrow shape
 
 check government grant station relocation functionality
 
