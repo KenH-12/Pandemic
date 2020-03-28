@@ -376,7 +376,7 @@ function isOverflowingVertically($element)
 	return element.scrollHeight > element.clientHeight;
 }
 
-function ensureDivPositionIsWithinWindowHeight($div, margin = 5)
+function ensureDivPositionIsWithinWindowHeight($div, { margin = 5 } = {})
 {
 	const windowHeight = $(window).height(),
 		$images = $div.find("img");
@@ -391,6 +391,22 @@ function ensureDivPositionIsWithinWindowHeight($div, margin = 5)
 	
 	if ($div.hasClass("tooltip"))
 		setTooltipArrowClipPath($div);
+}
+
+function ensureDivPositionIsWithinWindowWidth($div, { margin = 5 } = {})
+{
+	const windowWidth = $(window).width(),
+		divWidth = $div.outerWidth() + margin,
+		divLeft = $div.offset().left;
+	
+	if (divLeft < 0)
+	{
+		$div.offset({ left: margin });
+		return false;
+	}
+		
+	if (divLeft + divWidth > windowWidth)
+		$div.offset({ top: windowWidth - divWidth });
 }
 
 // Facilitates responsiveness where simple css rules fail
@@ -590,12 +606,7 @@ function elementsOverlap(element1, element2)
 		rect1.top > rect2.bottom);
 }
 
-function positionTooltipRelativeToElement($element, $tooltip,
-	{
-		juxtaposeTo = "left",
-		$verticalAlignWith,
-		tooltipMargin
-	} = {})
+function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeTo = "left", tooltipMargin } = {})
 {
 	tooltipMargin = tooltipMargin || 15;
 	
@@ -607,23 +618,28 @@ function positionTooltipRelativeToElement($element, $tooltip,
 		.data("juxt", juxtaposeTo)
 		.data("margin", tooltipMargin);
 	
-	if ($verticalAlignWith)
-		$tooltip.data("verticalAlignId", $verticalAlignWith.attr("id"));
-	
-	if (juxtaposeTo === "left")
-		tooltipOffset.left -= $tooltip.outerWidth();
-	else if (juxtaposeTo === "right")
-		tooltipOffset.left += $element.outerWidth();
-	else if (juxtaposeTo === "bottom")
-		tooltipOffset.top += $element.outerHeight();
-	else if (juxtaposeTo === "top")
-		tooltipOffset.top -= $tooltip.outerHeight();
-	
-	if ($verticalAlignWith)
-		tooltipOffset.top = $verticalAlignWith.offset().top;
+	if (["left", "right"].includes(juxtaposeTo))
+	{
+		tooltipOffset.top -= Math.abs($element.height() - $tooltip.height()) / 2;
+		
+		if (juxtaposeTo === "left")
+			tooltipOffset.left -= $tooltip.outerWidth();
+		else if (juxtaposeTo === "right")
+			tooltipOffset.left += $element.outerWidth();
+	}
+	else // juxtaposeTo top or bottom
+	{
+		tooltipOffset.left -= Math.abs($element.width() - $tooltip.width()) / 2;
+
+		if (juxtaposeTo === "top")
+			tooltipOffset.top -= $tooltip.outerHeight() + tooltipMargin;
+		else // juxtaposeTo bottom
+			tooltipOffset.top += $element.outerHeight();
+	}
 
 	$tooltip.offset(tooltipOffset);
 	
+	ensureDivPositionIsWithinWindowWidth($tooltip, { margin: 2 });
 	ensureDivPositionIsWithinWindowHeight($tooltip);
 }
 
@@ -634,7 +650,6 @@ function setTooltipArrowClipPath($tooltip)
 		$element = $(`#${$tooltip.data("relatedElementId")}`),
 		elementOffset = $element.offset(),
 		juxtaposeTo = $tooltip.data("juxt"),
-		$verticalAlignWith = $tooltip.data("verticalAlignId"),
 		tooltipWidth = $tooltip.width(),
 		marginPercentageOfWidth = (tooltipMargin / tooltipWidth)*100,
 		tooltipHeight = $tooltip.height(),
@@ -644,26 +659,30 @@ function setTooltipArrowClipPath($tooltip)
 	
 	let actualArrowCentre,
 		arrowCentrePercentage,
-		clipPath;
+		arrowSideEdgePercentage,
+		clipPath,
+		paddingDirection;
 
 	if (["left", "right"].includes(juxtaposeTo))
 	{
-		actualArrowCentre = ( $verticalAlignWith ? $verticalAlignWith.offset().top : elementOffset.top)
-			+ (( $verticalAlignWith ? $verticalAlignWith.height() : $element.height() ) / 2);
-			
+		actualArrowCentre = elementOffset.top + ($element.height() / 2);
 		arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.top) / tooltipHeight) * 100;
+		
+		const halfArrowHeight = marginPercentageOfHeight / 2;
 		
 		if (juxtaposeTo === "left")
 		{
+			arrowSideEdgePercentage = 100 - marginPercentageOfWidth;
+			
 			clipPath = `polygon(0 0,
-						${100 - marginPercentageOfWidth}% 0,
-						${100 - marginPercentageOfWidth}% ${arrowCentrePercentage - (marginPercentageOfHeight / 2) }%,
+						${arrowSideEdgePercentage}% 0,
+						${arrowSideEdgePercentage}% ${arrowCentrePercentage - halfArrowHeight }%,
 						100% ${arrowCentrePercentage}%,
-						${100 - marginPercentageOfWidth}% ${arrowCentrePercentage + (marginPercentageOfHeight / 2) }%,
-						${100 - marginPercentageOfWidth}% 100%,
+						${arrowSideEdgePercentage}% ${arrowCentrePercentage + halfArrowHeight }%,
+						${arrowSideEdgePercentage}% 100%,
 						0 100%)`;
 			
-			$tooltipContent.css("padding-right", `${tooltipPadding + tooltipMargin}px`);
+			paddingDirection = "right";
 		}
 		else // juxtaposeTo right
 		{
@@ -671,11 +690,11 @@ function setTooltipArrowClipPath($tooltip)
 						100% 0,
 						100% 100%,
 						${marginPercentageOfWidth}% 100%,
-						${marginPercentageOfWidth}% ${arrowCentrePercentage + (marginPercentageOfHeight / 2) }%,
+						${marginPercentageOfWidth}% ${arrowCentrePercentage + (halfArrowHeight) }%,
 						0 ${arrowCentrePercentage}%,
-						${marginPercentageOfWidth}% ${arrowCentrePercentage - (marginPercentageOfHeight / 2) }%)`;
+						${marginPercentageOfWidth}% ${arrowCentrePercentage - (halfArrowHeight) }%)`;
 			
-			$tooltipContent.css("padding-left", `${tooltipPadding + tooltipMargin}px`);
+			paddingDirection = "left";
 		}
 	}
 	else // juxtaposeTo top or bottom
@@ -683,31 +702,36 @@ function setTooltipArrowClipPath($tooltip)
 		actualArrowCentre = elementOffset.left + ($element.width() / 2);
 		arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.left) / tooltipWidth) * 100;
 
+		const halfArrowWidth = marginPercentageOfWidth / 2;
+		
 		if (juxtaposeTo === "top")
 		{
+			arrowSideEdgePercentage = 100 - marginPercentageOfHeight;
+			
 			clipPath = `polygon(0 0,
 						100% 0,
-						100% ${100 - marginPercentageOfHeight}%,
-						${arrowCentrePercentage + (marginPercentageOfWidth / 2) }% ${100 - marginPercentageOfHeight}%,
-						${arrowCentrePercentage} ${100 - marginPercentageOfHeight}%,
-						${arrowCentrePercentage - (marginPercentageOfWidth / 2) }% ${100 - marginPercentageOfHeight}%,
-						0 ${100 - marginPercentageOfHeight}%)`;
-	
-			$tooltipContent.css("padding-bottom", `${tooltipPadding + tooltipMargin}px`);
+						100% ${arrowSideEdgePercentage}%,
+						${arrowCentrePercentage + halfArrowWidth }% ${arrowSideEdgePercentage}%,
+						${arrowCentrePercentage}% 100%,
+						${arrowCentrePercentage - halfArrowWidth }% ${arrowSideEdgePercentage}%,
+						0 ${arrowSideEdgePercentage}%)`;
+			
+			paddingDirection = "bottom";
 		}
 		else // juxtaposeTo bottom
 		{
 			clipPath = `polygon(0 ${marginPercentageOfHeight}%,
-						${arrowCentrePercentage - (marginPercentageOfWidth / 2) }% ${marginPercentageOfHeight}%,
+						${arrowCentrePercentage - halfArrowWidth }% ${marginPercentageOfHeight}%,
 						${arrowCentrePercentage}% 0,
-						${arrowCentrePercentage + (marginPercentageOfWidth / 2) }% ${marginPercentageOfHeight}%,
+						${arrowCentrePercentage + halfArrowWidth }% ${marginPercentageOfHeight}%,
 						100% ${marginPercentageOfHeight}%,
 						100% 100%,
 						0 100%)`;
 			
-			$tooltipContent.css("padding-top", `${tooltipPadding + tooltipMargin}px`);
+			paddingDirection = "top";
 		}
 	}
 	
-	$tooltipContent.css({ clipPath });
+	$tooltipContent.css(`padding-${paddingDirection}`, `${tooltipPadding + tooltipMargin}px`)
+		.css({ clipPath });
 }
