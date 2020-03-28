@@ -872,7 +872,7 @@ function bindActionButtonHoverEvents()
 					includeRelatedRoleRule
 				});
 			
-			positionTooltipRelativeToElement($btn, $tooltip, { arrowShape: true });
+			positionTooltipRelativeToElement($tooltip, $btn, { arrowShape: true });
 		})
 		.on("mouseleave", actionInfoSelector, function() { $("#eventTypeTooltip").remove() });
 }
@@ -941,6 +941,7 @@ function getEventIconHtml(eventType, { event } = {})
 	
 	return `<img	src='images/eventIcons/${fileName}.${fileExtension}'
 					alt='${name}'
+					id='${ event ? `icon${event.id}` : "" }'
 					${cssClasses ? `class='${cssClasses}'` : ""} />`;
 }
 
@@ -1006,7 +1007,11 @@ function getEventIconCssClasses(event)
 function bindEventIconHoverEvents($icon, event)
 {
 	$icon.off("mouseenter mouseleave")
-		.hover(function() { showEventIconDetails($icon, event) },
+		.hover(function()
+		{
+			if (!$icon.data("showingDetails"))
+				showEventIconDetails($icon, event);
+		},
 		function() { allowEventDetailsHovering($icon) });
 }
 
@@ -1016,39 +1021,11 @@ function showEventIconDetails($icon, event)
 		|| typeof event.getDetails !== "function")
 		return false;
 	
-	const $eventHistory = $("#eventHistory"),
-		$boardContainer = $("#boardContainer"),
-		$detailsContainer = $(`<div id='eventDetails' class='tooltip' data-eventType='${event.code}'>${event.getDetails()}</div>`).appendTo($boardContainer),
-		$arrow = $("<div id='eventDetailsArrow'></div>").appendTo($boardContainer);
-	
-	resizeInfectionCards($detailsContainer);
-
-	const containerHeight = $detailsContainer.height(),
-		halfContainerWidth = Math.ceil($detailsContainer.width() / 2),
-		iconOffset = $icon.offset(),
-		iconWidth = $icon.outerWidth(),
-		topAdjustment = -iconWidth * 0.6;
-	
-	let containerOffsetLeft = iconOffset.left - halfContainerWidth + iconWidth / 2;
-	if (containerOffsetLeft < 0)
-		containerOffsetLeft = 0;
-
-	$detailsContainer
-		.offset(
-		{
-			top: $eventHistory.offset().top - containerHeight + topAdjustment,
-			left: containerOffsetLeft
-		});
-	
-	enforceEventDetailsHeightLimit();
-	
-	iconOffset.top += topAdjustment;
-	$arrow.offset(iconOffset)
-		.width(iconWidth)
-		.height(iconWidth);
-	
-	if (event instanceof StartingHands)
-		event.positionPopulationRanks($detailsContainer);
+	const $detailsContainer = $(`<div id='eventDetails' class='tooltip' data-eventType='${event.code}'>
+								<div class='content'>
+									${event.getDetails()}
+								</div>
+							</div>`);
 	
 	bindEventDetailsInfoHoverEvents($detailsContainer);
 	bindRoleCardHoverEvents();
@@ -1056,6 +1033,13 @@ function showEventIconDetails($icon, event)
 	bindEpidemicCardHoverEvents($detailsContainer);
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
+
+	if (event instanceof StartingHands)
+		event.positionPopulationRanks($detailsContainer);
+
+	resizeInfectionCards($detailsContainer);
+	enforceEventDetailsHeightLimit();
+	positionTooltipRelativeToElement($detailsContainer, $icon, { juxtaposeTo: "top" });
 }
 
 function enforceEventDetailsHeightLimit($detailsContainer)
@@ -1128,35 +1112,42 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 {
 	const eventTypeInfoSelector = "#eventDetails .eventTypeInfo",
 		hoverInfoSelector = "#eventDetails .hoverInfo",
-		$eventDetails = $("#eventDetails"),
 		juxtaposeTo = "right";
 
 	$(document).off("mouseenter mouseleave", eventTypeInfoSelector)
 		.on("mouseenter", eventTypeInfoSelector,
 		function()
 		{
-			const $this = $(this),
+			const $this = $(this).attr("id", "hoveredInfoIcon"),
 				eventType = getEventType($eventDetailsContainer.attr("data-eventType")),
 				roleA = $this.find(".roleTag").first().html(),
 				roleB = eventType.name === "ShareKnowledge" ? $this.find(".roleTag").last().html() : false,
 				includeRelatedRoleRule = relatedRoleRuleApplies(eventType, { roleA, roleB }),
 				$tooltip = getEventTypeTooltip(eventType, { includeName: false, includeRelatedRoleRule });
 			
-			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo });
+			positionTooltipRelativeToElement($tooltip, $this, { juxtaposeTo });
 		})
-		.on("mouseleave", eventTypeInfoSelector, function() { $("#eventTypeTooltip").remove() });
+		.on("mouseleave", eventTypeInfoSelector, function()
+		{
+			$("#eventTypeTooltip").remove();
+			$(this).removeAttr("id");
+		});
 	
 	$(document).off("mouseenter mouseleave", hoverInfoSelector)
 		.on("mouseenter", hoverInfoSelector,
 		function()
 		{
-			const $this = $(this),
+			const $this = $(this).attr("id", "hoveredInfoIcon"),
 				eventType = getEventType($this.attr("data-eventType")),
 				$tooltip = getEventTypeTooltip(eventType, { isDispatchType: $this.parent().html().includes("Dispatch Type") });
 
-			positionTooltipRelativeToElement($eventDetails, $tooltip, { juxtaposeTo, $verticalAlignWith: $this });
+			positionTooltipRelativeToElement($tooltip, $this, { juxtaposeTo });
 		})
-		.on("mouseleave", hoverInfoSelector, function() { $("#eventTypeTooltip").remove() });
+		.on("mouseleave", hoverInfoSelector, function()
+		{
+			$("#eventTypeTooltip").remove();
+			$(this).removeAttr("id");
+		});
 }
 
 function hideEventIconDetails()
@@ -2913,7 +2904,7 @@ function bindDispatchTypeHoverEvents($container)
 			$this = $(this);
 			$tooltip = getEventTypeTooltip(getEventType($this.attr("data-eventType")), { includeName: true, isDispatchType: true });
 			
-			positionTooltipRelativeToElement($rightPanel, $tooltip, { $verticalAlignWith: $this });
+			positionTooltipRelativeToElement($tooltip, $rightPanel);
 		},
 		function()
 		{
@@ -7710,7 +7701,7 @@ async function setup()
 
 	await removeCurtain();
 
-	bindPlayerDeckHover();
+	bindPlayerDeckHoverEvents();
 	bindInfectionDeckHover();
 	enablePlayerDiscardHoverEvents();
 	bindEventCardHoverEvents(data);
@@ -7728,18 +7719,6 @@ async function setup()
 	}
 	else
 		proceed();
-}
-
-function bindPlayerDeckHover()
-{
-	$("#playerDeck").off("mouseenter")
-		.hover(function()
-		{
-			if (currentStepIs("setup"))
-				return;
-			
-			$(this).attr("title", `${data.numPlayerCardsRemaining} card${data.numPlayerCardsRemaining != 1 ? "s" : ""}`);
-		});
 }
 
 async function animateRoleDetermination()
@@ -8415,10 +8394,32 @@ function setPlayerDeckImgSize({ size, numCardsInDeck } = {})
 
 	size = size || calculatePlayerDeckImgSize(numCardsInDeck);
 	
-	if (size >= 0)
-		$deck.attr("src", `images/cards/playerDeck_${size}.png`);
-	else
+	if (size == 0)
 		$deck.addClass("hidden");
+	
+	bindPlayerDeckHoverEvents();
+}
+
+function bindPlayerDeckHoverEvents()
+{
+	$("#playerDeck").off("mouseenter mouseleave")
+		.hover(function()
+		{
+			if (typeof data.numPlayerCardsRemaining == "undefined"
+				||	$("#playerDeckTooltip").length)
+				return false;
+			
+			 const $this = $(this),
+				$tooltip = $(`<div id='playerDeckTooltip' class='tooltip'>
+									<div class='content'>
+										<p>Cards left in deck: ${data.numPlayerCardsRemaining}</p>
+										${strings.outOfCardsWarning}
+									</div>
+								</div>`);
+			
+			positionTooltipRelativeToElement($tooltip, $this, { juxtaposeTo: "top" });
+		},
+		function(){ $("#playerDeckTooltip").remove() });
 }
 
 function calculatePlayerDeckImgSize(numCardsInDeck)
@@ -8978,7 +8979,7 @@ $("#cubeSupplies").find("span.info").hover(function()
 					</div>`)
 			.width($supplyContainer.width());
 
-	positionTooltipRelativeToElement($supplyContainer, $tooltip, { juxtaposeTo: "bottom" });
+	positionTooltipRelativeToElement($tooltip, $supplyContainer, { juxtaposeTo: "bottom" });
 }, function() { $("#cubeSuppliesTooltip").remove() });
 
 function enableInfectionDiscardHoverEvents()
