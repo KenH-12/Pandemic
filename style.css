@@ -426,6 +426,7 @@ span.r {color: #ef282a; background: none}
 	z-index: 10;
 	font-size: 14px;
 	color: #fff;
+	width: 24%;
 }
 .tooltip > .content
 {
@@ -437,7 +438,6 @@ span.r {color: #ef282a; background: none}
 
 #eventTypeTooltip
 {
-	width: 24%;
 	pointer-events: none;
 }
 #eventTypeTooltip h3
@@ -472,9 +472,9 @@ span.r {color: #ef282a; background: none}
 #eventDetails
 {
 	font-size: 16px;
-	filter: drop-shadow(-4px -4px 6px #000);
+	background-color: transparent;
 }
-#eventDetails > .title
+#eventDetails .title
 {
 	font-family: 'Exo 2', sans-serif;
 	font-size: 20px;
@@ -484,14 +484,14 @@ span.r {color: #ef282a; background: none}
 	padding-bottom: 3px;
 	margin-bottom: 3px;
 }
-#eventDetails > .title > .eventTypeInfo
+#eventDetails  .title > .eventTypeInfo
 {
 	float: right;
 	font-size: 14px;
 	line-height: 20px;
 	margin-left: 5px;
 }
-#eventDetails > .title > .eventTypeInfo:hover,
+#eventDetails  .title > .eventTypeInfo:hover,
 #cubeSupplies .info:hover
 { text-shadow: 0px 0px 3px #fff }
 #eventDetails .playerCard { margin: 2px 0 }
@@ -504,13 +504,6 @@ span.r {color: #ef282a; background: none}
 	margin-bottom: 3px;
 }
 #eventDetails .cubes > * { vertical-align: middle }
-
-#eventDetailsArrow
-{
-	position: absolute;
-	background-color: #252525;
-	clip-path: polygon(50% 65%, 0 0, 100% 0);
-}
 #eventDetails .locatable:hover { text-decoration: underline }
 #eventDetails .infectionCard
 {
