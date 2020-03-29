@@ -34,7 +34,6 @@ tooltips
 check government grant station relocation functionality
 
 put strings in strings.js file
-	role card text
 
 indicate loading when waiting for a response from the server
 

@@ -95,7 +95,6 @@
 											rID,
 											name,
 											role,
-											roleCardText,
 											nextID AS 'nextTurnID',
 											location AS 'cityKey'
 									FROM vw_player

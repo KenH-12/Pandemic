@@ -4118,7 +4118,7 @@ function managePlayerPanelOcclusion(citiesToCheck)
 
 class Player
 {
-	constructor({ uID, pID, rID, nextTurnID, name, role, roleCardText, cityKey })
+	constructor({ uID, pID, rID, nextTurnID, name, role, cityKey })
 	{
 		this.uID = uID;
 		this.pID = pID;
@@ -4127,7 +4127,6 @@ class Player
 		this.name = name;
 		this.role = role;
 		this.camelCaseRole = toCamelCase(this.role);
-		this.roleCardBullets = roleCardText.split("&");
 
 		this.cityKey = cityKey;
 		
@@ -4140,7 +4139,6 @@ class Player
 				$panel,
 				camelCaseRole,
 				role,
-				roleCardBullets,
 				contingencyKey
 			} = this,
 			hoveredElementOffset = $hoveredElement.length ? $hoveredElement.offset() : false,
@@ -4151,15 +4149,9 @@ class Player
 							<img	class='rolePortrait'
 									src='images/cards/roles/${camelCaseRole}.jpg'
 									alt='${role} Role Card' />
-							<ul></ul>
-						</div>`),
-			$specialAbilities = $roleCard.children("ul"),
+							<ul>${strings[`${camelCaseRole}CardText`]}</ul>
+						</div>`).appendTo("#boardContainer"),
 			showFullContingencyCard = role === "Contingency Planner" && contingencyKey && !hoveredElementOffset;
-		
-		for (let bullet of roleCardBullets)
-			$specialAbilities.append(`<li><span>${bullet}</span></li>`);
-
-		$roleCard.appendTo("#boardContainer");
 		
 		if (hoveredElementOffset)
 		{
