@@ -6423,7 +6423,8 @@ async function infectionStep()
 		return skipInfectionStepForOneQuietNight();
 	
 	const $container = $("#infectCitiesContainer"),
-		$btn = $container.find(".button").html("INFECT CITY").addClass("hidden"),
+		$btn = $container.find(".button").addClass("hidden"),
+		{ infectionRate } = data,
 		{ infectCity } = eventTypes;
 	
 	let events,
@@ -6444,12 +6445,19 @@ async function infectionStep()
 	$container.removeClass("hidden");
 
 	// Prompt and perform infections until the infection rate is reached
-	while (infectionCount < data.infectionRate)
+	let eventCardsCanBePlayed;
+	while (infectionCount < infectionRate)
 	{
 		// Event cards cannot be played while resolving infection cards,
 		// but they can be played before, between, or after resolving infection cards.
-		if (anyPlayerHasAnyEventCard() || lastEventCanBeUndone())
+		eventCardsCanBePlayed = anyPlayerHasAnyEventCard();
+		if (eventCardsCanBePlayed || lastEventCanBeUndone())
 		{
+			if (eventCardsCanBePlayed || infectionRate - infectionCount < 2)
+				$btn.html("INFECT CITY");
+			else
+				$btn.html(`INFECT ${infectionRate - infectionCount} CITIES`);
+			
 			enableEventCards();
 			oscillateButtonBackgroundColor($btn.removeClass("hidden"));
 			await buttonClickPromise($btn);

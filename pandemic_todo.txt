@@ -13,8 +13,6 @@ some tooltips are offset slightly from where they should be
 
 TO DO
 -----
-if no event cards are held, the 'infect city' button should say 'infect n cities'
-
 tooltips
 	cured diseases container
 		cure vials
