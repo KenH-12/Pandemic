@@ -1033,7 +1033,14 @@ function showEventIconDetails($icon, event)
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
 
+	if (event instanceof ResilientPopulation)
+		log("PRE WIDTH", $detailsContainer.width());
+
 	resizeInfectionCards($detailsContainer);
+
+	if (event instanceof ResilientPopulation)
+		log("POST WIDTH", $detailsContainer.width());
+
 	enforceEventDetailsHeightLimit();
 	positionTooltipRelativeToElement($detailsContainer, $icon, { juxtaposeTo: "top" });
 	// The following must happen AFTER the tooltip is positioned.
@@ -3912,12 +3919,19 @@ function resizeInfectionCards($container)
 	if ($container.attr("id") === "eventDetails")
 	{
 		const cardWidth = data.boardWidth * 0.2,
-			newContainerWidth = cardWidth / .96;
+			newContainerWidth = cardWidth / .96,
+			checkWidth = !$container.width();
 		
 		$infectionCards.children(".infectionCardContents").width(cardWidth);
 		
+		if (checkWidth)
+			$container.appendTo("#boardContainer");
+
 		if ($container.width() < newContainerWidth)
 			$container.width(newContainerWidth);
+		
+		if (checkWidth)
+			$container.detach();
 	}
 }
 
