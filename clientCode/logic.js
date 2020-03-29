@@ -8424,15 +8424,17 @@ function setPlayerDeckImgSize({ size, numCardsInDeck } = {})
 
 function bindPlayerDeckHoverEvents()
 {
-	$("#playerDeck").off("mouseenter mouseleave")
+	const $playerDeckContainer = $("#playerDeck");
+
+	$playerDeckContainer.find(".info")
+		.off("mouseenter mouseleave")
 		.hover(function()
 		{
 			if (typeof data.numPlayerCardsRemaining == "undefined"
 				||	$("#playerDeckTooltip").length)
 				return false;
 			
-			 const $this = $(this),
-				 { numPlayerCardsRemaining, numEpidemics, epidemicCount } = data,
+			 const { numPlayerCardsRemaining, numEpidemics, epidemicCount } = data,
 				 { playerDeckInfo, discardRule, outOfCardsWarning } = strings,
 				$tooltip = $(`<div id='playerDeckTooltip' class='tooltip'>
 									<div class='content'>
@@ -8446,7 +8448,7 @@ function bindPlayerDeckHoverEvents()
 									</div>
 								</div>`);
 			
-			positionTooltipRelativeToElement($tooltip, $this, { juxtaposeTo: "top" });
+			positionTooltipRelativeToElement($tooltip, $playerDeckContainer, { juxtaposeTo: "top" });
 		},
 		function(){ $("#playerDeckTooltip").remove() });
 }

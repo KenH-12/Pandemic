@@ -169,7 +169,7 @@
 							</div>
 						</div>
 						<div id='playerDeck' class='bottomPanelDiv'>
-							<p class='title'>PLAYER DECK</p>
+							<p class='title'>PLAYER DECK <span class='info'>&#9432;</span></p>
 							<img id='imgPlayerDeck' src='images/cards/playerDeck_6.png' alt='Player Deck'/>
 						</div>
 						<div id='playerDiscard' class='bottomPanelDiv'>
