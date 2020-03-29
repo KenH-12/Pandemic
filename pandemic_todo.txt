@@ -15,8 +15,6 @@ TO DO
 -----
 if no event cards are held, the 'infect city' button should say 'infect n cities'
 
-when prompting government grant, make the research station glow transition more subtle
-
 tooltips
 	cured diseases container
 		cure vials

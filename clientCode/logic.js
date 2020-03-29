@@ -2571,19 +2571,19 @@ async function highlightResearchStationSupply($grantStation)
 	while ($grantStation.hasClass("glowing"))
 	{
 		if ($stationContainer.hasClass("bigGlow"))
-			$stationContainer.removeClass("bigGlow").addClass("smallGlow");
+			$stationContainer.removeClass("bigGlow").addClass("mediumGlow");
 		else
-			$stationContainer.removeClass("smallGlow").addClass("bigGlow");
+			$stationContainer.removeClass("mediumGlow").addClass("bigGlow");
 		
 		await sleep(500);
 	}
 	
-	$stationContainer.removeClass("bigGlow smallGlow");
+	$stationContainer.removeClass("bigGlow mediumGlow");
 }
 function turnOffResearchStationSupplyHighlight()
 {
 	$("#governmentGrantArrow").addClass("hidden");
-	$("#researchStationSupply").children(".researchStation").removeClass("bigGlow smallGlow");
+	$("#researchStationSupply").children(".researchStation").removeClass("bigGlow mediumGlow");
 	$(".grantStation").removeClass("glowing");
 }
 
