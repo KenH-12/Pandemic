@@ -53,6 +53,12 @@ import Event, {
 	PassActions
 } from "./event.js";
 import EventHistory from "./eventHistory.js";
+import {
+    showTravelPathArrow,
+    setTravelPathArrowColor,
+    animateInvalidTravelPath,
+    hideTravelPathArrow
+} from "./travelPathArrow.js";
 
 $(function(){
 const data =
@@ -744,7 +750,7 @@ function enablePawnEvents()
 	}
 
 	if (pawnsAreEnabled)
-		setTravelPathArrowColor({ airlifting });
+		setTravelPathArrowColor({ airlifting, activePlayer });
 }
 
 function getAllResearchStations()
@@ -1255,7 +1261,7 @@ function promptAction(actionProperties)
 	if (interfaceIsRequired)
 	{
 		if (actionProperties.destination)
-			showTravelPathArrow(actionProperties);
+			showTravelPathArrow(data, actionProperties);
 		
 		if (!eventTypeIsBeingPrompted(eventTypes.forecastPlacement)) // Forecast can't be cancelled once the cards are drawn.
 			enableBtnCancelAction();
@@ -1557,7 +1563,7 @@ const actionInterfacePopulator = {
 				movementAction(directFlight, getCity($clicked.data("key")));
 			})
 			.$actionInterface.find(".playerCard")
-				.hover(function() { showTravelPathArrow({ destination: getCity($(this).attr("data-key")) }) },
+				.hover(function() { showTravelPathArrow(data, { destination: getCity($(this).attr("data-key")) }) },
 				function() { hideTravelPathArrow() });
 		
 		return true;
@@ -2512,7 +2518,7 @@ function newGrantStation()
 	setTravelPathArrowColor();
 	$grantStation.draggable({
 			containment: $boardContainer,
-			drag: function() { showTravelPathArrow({ $researchStation: $(this) }) }
+			drag: function() { showTravelPathArrow(data, { $researchStation: $(this) }) }
 		})
 		.mousedown(function()
 		{
@@ -2538,7 +2544,7 @@ async function resetGrantStation($grantStation, { invalidPlacement } = {})
 	$grantStation.offset($("#researchStationSupply img").offset());
 
 	if (invalidPlacement)
-		await animateInvalidTravelPath();
+		await animateInvalidTravelPath(data);
 }
 
 function animateResearchStationBackToSupply($researchStation)
@@ -2688,12 +2694,12 @@ async function getGovernmentGrantTargetCity($researchStation)
 				$researchStation.addClass("mediumGlow");
 				
 				origin.clusterResearchStation(data);
-				showTravelPathArrow({ origin, destination: targetCity });
+				showTravelPathArrow(data, { origin, destination: targetCity });
 			}
 			else
 			{
 				data.promptedTravelPathProperties = { $researchStation, destination: targetCity };
-				showTravelPathArrow();
+				showTravelPathArrow(data, );
 				resetGrantStation($researchStation);
 				turnOffResearchStationSupplyHighlight();
 			}
@@ -2714,7 +2720,7 @@ async function getGovernmentGrantTargetCity($researchStation)
 		await resetGrantStation($researchStation, { invalidPlacement: true });
 
 		if (data.promptedTravelPathProperties)
-			showTravelPathArrow();
+			showTravelPathArrow(data, );
 		else
 		{
 			highlightResearchStationSupply($researchStation);
@@ -3219,7 +3225,7 @@ function promptResearchStationRelocation()
 
 			city.getResearchStation().addClass("mediumGlow");
 			setTravelPathArrowColor({ relocatingResearchStation: true });
-			showTravelPathArrow({
+			showTravelPathArrow(data, {
 				origin: city,
 				destination: getActivePlayer().getLocation()
 			});
@@ -3341,7 +3347,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	if (!movementTypeRequiresDiscard(eventType))
 	{
 		originCity.cluster(data);
-		showTravelPathArrow({ player, destination });
+		showTravelPathArrow(data, { player, destination });
 	}
 	
 	try
@@ -3382,7 +3388,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 async function invalidMovement(originCity)
 {
 	await Promise.all([
-		animateInvalidTravelPath(),
+		animateInvalidTravelPath(data),
 		originCity.cluster(data)
 	]);
 	enablePawnEvents();
@@ -4834,155 +4840,6 @@ function appendPawnToBoard(player)
 		.append(player.$pawnArrow);
 }
 
-function hideTravelPathArrow()
-{
-	$("#travelPathArrow").stop().addClass("hidden").removeAttr("style");
-}
-
-function showTravelPathArrow(actionProperties)
-{
-	hideTravelPathArrow();
-	
-	if (!actionProperties)
-	{
-		if (!data.promptedTravelPathProperties)
-			return false;
-		
-		actionProperties = data.promptedTravelPathProperties;
-	}
-	
-	let stemWidth = data.cityWidth * 1.2;
-	const { originOffset, destinationOffset } = getTravelPathVector(actionProperties),
-		baseOffset = getPointAtDistanceAlongLine(originOffset, destinationOffset, stemWidth),
-		tipOffset = getPointAtDistanceAlongLine(destinationOffset, originOffset, stemWidth),
-		arrowLength = distanceBetweenPoints(baseOffset, tipOffset),
-		containerWidth = data.boardWidth,
-		containerHeight = data.boardHeight;
-	
-	// Avoid weird clip-paths that could occur when the arrow is very short.
-	if (arrowLength < stemWidth * 4)
-		stemWidth = arrowLength / 4;
-	
-	const clipPath = getArrowClipPath({
-			stemWidth,
-			baseOffset,
-			tipOffset,
-			containerWidth,
-			containerHeight
-		});
-
-	$("#travelPathArrow").css(
-		{
-			width: containerWidth,
-			height: containerHeight,
-			clipPath
-		})
-		.removeClass("hidden");
-}
-
-function setTravelPathArrowColor({ airlifting, relocatingResearchStation } = {})
-{
-	let cssClass;
-	if (airlifting || eventTypeIsBeingPrompted(eventTypes.governmentGrant))
-		cssClass = "airlift";
-	else if (relocatingResearchStation)
-		cssClass = "researchStationBackground";
-	else
-		cssClass = getActivePlayer().camelCaseRole;
-	
-	const $arrow = $("#travelPathArrow");
-	
-	$arrow.attr("class", `${cssClass}${$arrow.hasClass("hidden") ? " hidden" : ""}`);
-}
-
-function getTravelPathVector(actionProperties)
-{
-	const {
-		origin,
-		$pawn,
-		$researchStation,
-		playerToAirlift,
-		playerToDispatch,
-		destination
-	} = actionProperties;
-	
-	let originOffset,
-		destinationOffset,
-		player;
-	
-	if (origin || typeof $researchStation != "undefined") // Research station relocation
-	{
-		if (typeof $researchStation == "undefined")
-		{
-			originOffset = origin.getOffset(data);
-			destinationOffset = destination.getOffset(data);
-		}
-		else
-		{
-			if (eventTypeIsBeingPrompted(eventTypes.governmentGrant))
-			{
-				const $supplyStation = $("#researchStationSupply").find(".researchStation");
-
-				originOffset = $supplyStation.offset();
-				originOffset.left += $supplyStation.width() / 2;
-				originOffset.top += $supplyStation.height() / 2;
-			}
-			else
-				originOffset = getCity($researchStation.attr("data-key")).getOffset(data);
-			
-			if (destination)
-				destinationOffset = destination.getOffset(data);
-			else
-			{
-				destinationOffset = $researchStation.offset();
-				destinationOffset.left += $researchStation.width() / 2;
-				destinationOffset.top += $researchStation.height() / 2;
-			}
-		}
-	}
-	else if (typeof $pawn == "undefined") // Determine player and destination directly from the actionProperties.
-	{
-		player = actionProperties.player || playerToAirlift || playerToDispatch || getActivePlayer();
-		destinationOffset = destination.getOffset(data);
-	}
-	else // The pawn itself is the temporary destination.
-	{
-		player = getPlayer($pawn.data("role"));
-		destinationOffset = $pawn.offset();
-		destinationOffset.left += data.pawnWidth * 0.5;
-		destinationOffset.top += data.pawnHeight * 0.8;
-	}
-
-	return {
-		originOffset: originOffset || player.getLocation().getOffset(data),
-		destinationOffset
-	};
-}
-
-function animateInvalidTravelPath()
-{
-	return new Promise(async resolve =>
-	{
-		const $arrow = $("#travelPathArrow"),
-			cssClasses = $arrow.attr("class");
-
-		await animatePromise({
-			$elements: $arrow.removeClass("hidden airlift"),
-			initialProperties: { background: "darkred", opacity: .8 },
-			desiredProperties: { opacity: 0 },
-			duration: 500,
-			easing: "easeInQuint"
-		});
-
-		$arrow.attr("class", cssClasses).addClass("hidden").removeAttr("style");
-		
-		if (data.promptedTravelPathProperties)
-			showTravelPathArrow();
-
-		resolve();
-	});
-}
-
 function bindPawnEvents()
 {
 	$(".pawn:not(#demoPawn, #placeholderPawn)")
@@ -4990,7 +4847,7 @@ function bindPawnEvents()
 		{
 			disabled: true, // pawn dragging is enabled and disabled according to the game state.
 			containment: $("#boardContainer"),
-			drag: function() { showTravelPathArrow({ $pawn: $(this) }) }
+			drag: function() { showTravelPathArrow(data, { $pawn: $(this) }) }
 		})
 		.mousedown(function()
 		{
@@ -7182,7 +7039,7 @@ function newCityButton(city)
 {
 	const $btn = $(`<div class='button actionPromptOption' data-key='${city.key}'>${city.name}</div>`);
 	
-	$btn.hover(function() { showTravelPathArrow({ destination: city }) },
+	$btn.hover(function() { showTravelPathArrow(data, { destination: city }) },
 	function() { hideTravelPathArrow() })
 	.click(function() { $(this).off("mousenter mouseleave") }); // Prevents the travel path arrow from being hidden.
 

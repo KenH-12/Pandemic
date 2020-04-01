@@ -1,5 +1,10 @@
 "use strict";
 
+import {
+    showTravelPathArrow,
+    setTravelPathArrowColor
+} from "./travelPathArrow.js";
+
 export default class City
 {
 	constructor({
@@ -122,12 +127,12 @@ export default class City
 			$rs = $("#boardContainer > .researchStation.grantStation");
 			stationInitialOffset = $rs.offset();
 
-			$rs.replaceWith(newResearchStationElement(this.key))
+			$rs.replaceWith(newResearchStationElement(this.key, gameData))
 				.removeAttr("style");
 			researchStationKeys.delete("grantStation");
 		}
 		else
-			$rs = newResearchStationElement(this.key);
+			$rs = newResearchStationElement(this.key, gameData);
 		
 		this.hasResearchStation = true;
 		researchStationKeys.add(this.key);
@@ -1237,7 +1242,7 @@ function getCity(key)
 }
 
 const researchStationKeys = new Set();
-function newResearchStationElement(cityKey)
+function newResearchStationElement(cityKey, gameData)
 {
 	const $rs = $(`<div class='researchStation' data-key='${cityKey}'>
 					<img src='images/pieces/researchStation.png' alt='Research Station' />
@@ -1253,7 +1258,7 @@ function newResearchStationElement(cityKey)
 			drag: function()
 			{
 				setTravelPathArrowColor({ relocatingResearchStation: true });
-				showTravelPathArrow({ $researchStation: $(this) });
+				showTravelPathArrow(gameData, { $researchStation: $(this) });
 			}
 		})
 		.mousedown(function()
