@@ -1273,15 +1273,12 @@ function newResearchStationElement(cityKey, gameData, promptAction)
 				return false;
 
 			turnOffResearchStationHighlights();
-			$this.stop().css("z-index", 6);
 			showPlaceholderStation($this);
 
 			$window.off("mouseup").mouseup(function()
 			{
 				$window.off("mouseup");
 				getGovernmentGrantTargetCity($this, gameData, promptAction);
-				hidePlaceholderStation($this);
-				$this.css("z-index", 3);
 			});
 		});
 	
@@ -1306,11 +1303,15 @@ function showPlaceholderStation($originalStation)
 		.offset($originalStation.offset())
 		.removeClass("hidden");
 	
-	$originalStation.css("opacity", 0.7);
+	$originalStation.css({
+		zIndex: 6,
+		opacity: 0.7
+	});
 }
 function hidePlaceholderStation($originalStation)
 {
-	$originalStation.css("opacity", 1);
+	removeStylePropertiesFrom($originalStation, ["z-index", "opacity"]);
+	
 	$("#placeholderStation").addClass("hidden");
 }
 
@@ -1360,6 +1361,8 @@ async function getGovernmentGrantTargetCity($researchStation, gameData, promptAc
 		if (!targetCity.hasResearchStation
 			&& distanceBetweenPoints(stationOffset, targetCity.getOffset(gameData)) < distanceThreshold)
 		{
+			hidePlaceholderStation($researchStation);
+
 			if (relocating)
 			{
 				const origin = getCity(relocationKey);
@@ -1379,6 +1382,7 @@ async function getGovernmentGrantTargetCity($researchStation, gameData, promptAc
 	}
 
 	await animateInvalidTravelPath(gameData);
+	hidePlaceholderStation($researchStation);
 	
 	if (relocating)
 	{
