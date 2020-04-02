@@ -232,6 +232,21 @@ function getLeadingNumber(string)
 	return Number(numberString);
 }
 
+function removeStylePropertiesFrom($element, propertyNames)
+{
+	if (!propertyNames)
+	{
+		$element.removeAttr("style");
+		return false;
+	}
+
+	const element = $element[0],
+		removalMethod = element.style.removeProperty ? "removeProperty" : "removeAttribute";
+
+	for (let propertyName of ensureIsArray(propertyNames))
+		element.style[removalMethod](propertyName);
+}
+
 // Sets the height of all matched elements to the first matched element's width.
 function makeElementsSquare(cssSelector)
 {
