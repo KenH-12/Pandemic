@@ -27,8 +27,6 @@ tooltips
 	infection rate track
 	outbreaks track
 
-check government grant station relocation functionality
-
 put strings in strings.js file
 
 indicate loading when waiting for a response from the server

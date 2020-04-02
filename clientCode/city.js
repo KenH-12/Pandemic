@@ -1,8 +1,12 @@
 "use strict";
 
+import { eventTypes } from "./event.js";
+
 import {
     showTravelPathArrow,
-    setTravelPathArrowColor
+	setTravelPathArrowColor,
+	hideTravelPathArrow,
+	animateInvalidTravelPath
 } from "./travelPathArrow.js";
 
 export default class City
@@ -118,7 +122,7 @@ export default class City
 	}
 	
 	// Puts a research station on this city.
-	buildResearchStation(gameData, { animate, isGovernmentGrant } = {})
+	buildResearchStation(gameData, promptAction, { animate, isGovernmentGrant } = {})
 	{
 		let $rs,
 			stationInitialOffset = false;
@@ -127,12 +131,12 @@ export default class City
 			$rs = $("#boardContainer > .researchStation.grantStation");
 			stationInitialOffset = $rs.offset();
 
-			$rs.replaceWith(newResearchStationElement(this.key, gameData))
+			$rs.replaceWith(newResearchStationElement(this.key, gameData, promptAction))
 				.removeAttr("style");
 			researchStationKeys.delete("grantStation");
 		}
 		else
-			$rs = newResearchStationElement(this.key, gameData);
+			$rs = newResearchStationElement(this.key, gameData, promptAction);
 		
 		this.hasResearchStation = true;
 		researchStationKeys.add(this.key);
@@ -1242,7 +1246,7 @@ function getCity(key)
 }
 
 const researchStationKeys = new Set();
-function newResearchStationElement(cityKey, gameData)
+function newResearchStationElement(cityKey, gameData, promptAction)
 {
 	const $rs = $(`<div class='researchStation' data-key='${cityKey}'>
 					<img src='images/pieces/researchStation.png' alt='Research Station' />
@@ -1275,7 +1279,7 @@ function newResearchStationElement(cityKey, gameData)
 			$window.off("mouseup").mouseup(function()
 			{
 				$window.off("mouseup");
-				getGovernmentGrantTargetCity($this);
+				getGovernmentGrantTargetCity($this, gameData, promptAction);
 				hidePlaceholderStation($this);
 				$this.css("z-index", 3);
 			});
@@ -1308,6 +1312,158 @@ function hidePlaceholderStation($originalStation)
 {
 	$originalStation.css("opacity", 1);
 	$("#placeholderStation").addClass("hidden");
+}
+
+async function highlightAllResearchStations()
+{
+	const $researchStations = $("#boardContainer").children(".researchStation").not("#placeholderStation");
+
+	if ($researchStations.first().hasClass("glowing"))
+		return false;
+
+	$researchStations.addClass("glowing");
+	
+	while ($researchStations.first().hasClass("glowing"))
+	{
+		if ($researchStations.first().hasClass("mediumGlow"))
+			$researchStations.removeClass("mediumGlow").addClass("smallGlow");
+		else
+			$researchStations.removeClass("smallGlow").addClass("mediumGlow");
+		
+		await sleep(500);
+	}
+}
+
+function turnOffResearchStationHighlights()
+{
+	$("#boardContainer").children(".researchStation")
+		.not("#placeholderStation")
+		.removeClass("mediumGlow smallGlow glowing");
+}
+
+async function getGovernmentGrantTargetCity($researchStation, gameData, promptAction)
+{
+	const stationOffset = $researchStation.offset(),
+		distanceThreshold = getDimension(gameData, "piecePlacementThreshold"),
+		relocating = !$researchStation.hasClass("grantStation"),
+		relocationKey = relocating ? $researchStation.attr("data-key") : false,
+		eventType = eventTypes.governmentGrant;
+
+	// Measure from the element's centre.
+	stationOffset.top += $researchStation.height() / 2;
+	stationOffset.left += $researchStation.width() / 2;
+
+	let targetCity;
+	for (let key in cities)
+	{
+		targetCity = getCity(key);
+		if (!targetCity.hasResearchStation
+			&& distanceBetweenPoints(stationOffset, targetCity.getOffset(gameData)) < distanceThreshold)
+		{
+			if (relocating)
+			{
+				const origin = getCity(relocationKey);
+				origin.clusterResearchStation(gameData);
+				gameData.promptedTravelPathProperties = { origin, destination: targetCity };
+			}
+			else
+			{
+				gameData.promptedTravelPathProperties = { $researchStation, destination: targetCity };
+				resetGrantStation($researchStation);
+				turnOffResearchStationSupplyHighlight();
+			}
+			showTravelPathArrow(gameData);
+			
+			return promptAction({ eventType, targetCity, relocationKey });
+		}
+	}
+
+	await animateInvalidTravelPath(gameData);
+	
+	if (relocating)
+	{
+		getCity(relocationKey).clusterResearchStation(gameData);
+		
+		if (!gameData.promptedTravelPathProperties)
+			highlightAllResearchStations();
+	}
+	else
+	{
+		await resetGrantStation($researchStation);
+
+		if (!gameData.promptedTravelPathProperties)
+		{
+			highlightResearchStationSupply($researchStation);
+			showGovernmentGrantArrow();
+		}
+
+	}
+	showTravelPathArrow(gameData);
+}
+
+async function highlightResearchStationSupply($grantStation)
+{
+	const $stationContainer = $("#researchStationSupply").children(".researchStation");
+
+	$grantStation.addClass("glowing");
+
+	while ($grantStation.hasClass("glowing"))
+	{
+		if ($stationContainer.hasClass("bigGlow"))
+			$stationContainer.removeClass("bigGlow").addClass("mediumGlow");
+		else
+			$stationContainer.removeClass("mediumGlow").addClass("bigGlow");
+		
+		await sleep(500);
+	}
+	
+	$stationContainer.removeClass("bigGlow mediumGlow");
+}
+
+function turnOffResearchStationSupplyHighlight()
+{
+	$("#governmentGrantArrow").addClass("hidden");
+	$("#researchStationSupply").children(".researchStation").removeClass("bigGlow mediumGlow");
+	$(".grantStation").removeClass("glowing");
+}
+
+async function showGovernmentGrantArrow()
+{
+	const $arrow = $("#governmentGrantArrow");
+
+	const initialOffset = positionGovernmentGrantArrow($arrow),
+		bobDistance = $arrow.height() * 0.75,
+		duration = 350;
+
+	while (!$arrow.hasClass("hidden"))
+		await bobUpAndDown($arrow, { initialOffset, bobDistance, duration });
+}
+
+function positionGovernmentGrantArrow($arrow)
+{
+	const $researchStationSupply = $("#researchStationSupply"),
+		offset = $researchStationSupply.offset();
+	
+	$arrow = $arrow || $("#governmentGrantArrow");
+	makeElementsSquare($arrow.removeClass("hidden"));
+	
+	offset.top -= $arrow.outerHeight();
+	offset.left += $researchStationSupply.outerWidth() / 2;
+	offset.left -= $arrow.outerWidth() / 2;
+
+	$arrow.offset(offset);
+
+	return offset;
+}
+
+async function resetGrantStation($grantStation)
+{
+	$grantStation = $grantStation || $("#boardContainer > .researchStation.grantStation");
+
+	if (!$grantStation.length)
+		return false;
+	
+	$grantStation.offset($("#researchStationSupply img").offset());
 }
 
 const diseaseCubeSupplies = {
@@ -1393,7 +1549,13 @@ export {
     getCity,
     researchStationKeys,
     updateResearchStationSupplyCount,
-    getResearchStationSupplyCount,
+	getResearchStationSupplyCount,
+	highlightAllResearchStations,
+	turnOffResearchStationHighlights,
+	highlightResearchStationSupply,
+	turnOffResearchStationSupplyHighlight,
+	showGovernmentGrantArrow,
+	getGovernmentGrantTargetCity,
     diseaseCubeSupplies,
     getPacificPath
 }

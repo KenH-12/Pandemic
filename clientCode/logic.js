@@ -8,7 +8,13 @@ import {
 	getCity,
 	researchStationKeys,
 	updateResearchStationSupplyCount,
-    getResearchStationSupplyCount,
+	getResearchStationSupplyCount,
+	highlightAllResearchStations,
+	turnOffResearchStationHighlights,
+	highlightResearchStationSupply,
+	turnOffResearchStationSupplyHighlight,
+	showGovernmentGrantArrow,
+	getGovernmentGrantTargetCity,
 	getPacificPath
 } from "./city.js";
 import Event, {
@@ -2515,7 +2521,7 @@ function newGrantStation()
 	researchStationKeys.add("grantStation");
 	$grantStation.offset($("#researchStationSupply img").offset());
 	
-	setTravelPathArrowColor();
+	setTravelPathArrowColor({ governmentGranting: true });
 	$grantStation.draggable({
 			containment: $boardContainer,
 			drag: function() { showTravelPathArrow(data, { $researchStation: $(this) }) }
@@ -2527,24 +2533,11 @@ function newGrantStation()
 			$(window).off("mouseup").mouseup(function()
 			{
 				$(window).off("mouseup");
-				getGovernmentGrantTargetCity($grantStation);
+				getGovernmentGrantTargetCity($grantStation, data, promptAction);
 			});
 		});
 	
 	return $grantStation;
-}
-
-async function resetGrantStation($grantStation, { invalidPlacement } = {})
-{
-	$grantStation = $grantStation || $("#boardContainer > .researchStation.grantStation");
-
-	if (!$grantStation.length)
-		return false;
-	
-	$grantStation.offset($("#researchStationSupply img").offset());
-
-	if (invalidPlacement)
-		await animateInvalidTravelPath(data);
 }
 
 function animateResearchStationBackToSupply($researchStation)
@@ -2575,59 +2568,6 @@ function animateResearchStationBackToSupply($researchStation)
 	});
 }
 
-async function highlightResearchStationSupply($grantStation)
-{
-	const $stationContainer = $("#researchStationSupply").children(".researchStation");
-
-	$grantStation.addClass("glowing");
-
-	while ($grantStation.hasClass("glowing"))
-	{
-		if ($stationContainer.hasClass("bigGlow"))
-			$stationContainer.removeClass("bigGlow").addClass("mediumGlow");
-		else
-			$stationContainer.removeClass("mediumGlow").addClass("bigGlow");
-		
-		await sleep(500);
-	}
-	
-	$stationContainer.removeClass("bigGlow mediumGlow");
-}
-function turnOffResearchStationSupplyHighlight()
-{
-	$("#governmentGrantArrow").addClass("hidden");
-	$("#researchStationSupply").children(".researchStation").removeClass("bigGlow mediumGlow");
-	$(".grantStation").removeClass("glowing");
-}
-
-async function showGovernmentGrantArrow()
-{
-	const $arrow = $("#governmentGrantArrow");
-
-	const initialOffset = positionGovernmentGrantArrow($arrow),
-		bobDistance = $arrow.height() * 0.75,
-		duration = 350;
-
-	while (!$arrow.hasClass("hidden"))
-		await bobUpAndDown($arrow, { initialOffset, bobDistance, duration });
-}
-function positionGovernmentGrantArrow($arrow)
-{
-	const $researchStationSupply = $("#researchStationSupply"),
-		offset = $researchStationSupply.offset();
-	
-	$arrow = $arrow || $("#governmentGrantArrow");
-	makeElementsSquare($arrow.removeClass("hidden"));
-	
-	offset.top -= $arrow.outerHeight();
-	offset.left += $researchStationSupply.outerWidth() / 2;
-	offset.left -= $arrow.outerWidth() / 2;
-
-	$arrow.offset(offset);
-
-	return offset;
-}
-
 function promptGovernmentGrantStationRelocation()
 {
 	actionInterfacePopulator.replaceInstructions(`<span class='r'>Research Station Supply is empty!</span>
@@ -2639,94 +2579,6 @@ function promptGovernmentGrantStationRelocation()
 	enableResearchStationDragging();
 
 	return true;
-}
-
-async function highlightAllResearchStations()
-{
-	const $researchStations = $("#boardContainer").children(".researchStation").not("#placeholderStation");
-
-	if ($researchStations.first().hasClass("glowing"))
-		return false;
-
-	$researchStations.addClass("glowing");
-	
-	while (eventTypeIsBeingPrompted(eventTypes.governmentGrant))
-	{
-		if ($researchStations.first().hasClass("mediumGlow"))
-			$researchStations.removeClass("mediumGlow").addClass("smallGlow");
-		else
-			$researchStations.removeClass("smallGlow").addClass("mediumGlow");
-		
-		await sleep(500);
-	}
-}
-function turnOffResearchStationHighlights()
-{
-	$("#boardContainer").children(".researchStation")
-		.not("#placeholderStation")
-		.removeClass("mediumGlow smallGlow glowing");
-	data.promptingEventType = false;
-}
-
-async function getGovernmentGrantTargetCity($researchStation)
-{
-	const stationOffset = $researchStation.offset(),
-		distanceThreshold = getDimension(data, "piecePlacementThreshold"),
-		relocating = !$researchStation.hasClass("grantStation"),
-		relocationKey = relocating ? $researchStation.attr("data-key") : false,
-		eventType = eventTypes.governmentGrant;
-
-	// Measure from the element's centre.
-	stationOffset.top += $researchStation.height() / 2;
-	stationOffset.left += $researchStation.width() / 2;
-
-	let targetCity;
-	for (let key in cities)
-	{
-		targetCity = getCity(key);
-		if (!targetCity.hasResearchStation
-			&& distanceBetweenPoints(stationOffset, targetCity.getOffset(data)) < distanceThreshold)
-		{
-			if (relocating)
-			{
-				const origin = getCity(relocationKey);
-
-				$researchStation.addClass("mediumGlow");
-				
-				origin.clusterResearchStation(data);
-				showTravelPathArrow(data, { origin, destination: targetCity });
-			}
-			else
-			{
-				data.promptedTravelPathProperties = { $researchStation, destination: targetCity };
-				showTravelPathArrow(data, );
-				resetGrantStation($researchStation);
-				turnOffResearchStationSupplyHighlight();
-			}
-			
-			return promptAction({ eventType, targetCity, relocationKey });
-		}
-	}
-
-	if (relocating)
-	{
-		getCity(relocationKey).clusterResearchStation(data);
-		data.promptingEventType = eventType;
-		highlightAllResearchStations();
-		hideTravelPathArrow();
-	}
-	else
-	{
-		await resetGrantStation($researchStation, { invalidPlacement: true });
-
-		if (data.promptedTravelPathProperties)
-			showTravelPathArrow(data, );
-		else
-		{
-			highlightResearchStationSupply($researchStation);
-			showGovernmentGrantArrow();
-		}
-	}
 }
 
 async function governmentGrant(targetCity, relocationKey)
@@ -2749,7 +2601,7 @@ async function governmentGrant(targetCity, relocationKey)
 		turnOffResearchStationHighlights();
 	}
 	else
-		await targetCity.buildResearchStation(data, { animate: true, isGovernmentGrant: true });
+		await targetCity.buildResearchStation(data, promptAction, { animate: true, isGovernmentGrant: true });
 	
 	hideTravelPathArrow();
 	appendEventHistoryIconOfType(eventType);
@@ -3280,7 +3132,7 @@ async function buildResearchStation(relocationKey)
 		hideTravelPathArrow();
 	}
 	else
-		await city.buildResearchStation(data, { animate: true });
+		await city.buildResearchStation(data, promptAction, { animate: true });
 	
 	appendEventHistoryIconOfType(eventType);
 	proceed();
@@ -4945,7 +4797,7 @@ function loadCityStates(cityInfoArray)
 		
 		// place the research station if it has one
 		if (cityInfo.researchStation == "1")
-			city.buildResearchStation(data);
+			city.buildResearchStation(data, promptAction);
 		
 		// place disease cubes on the city if it has any
 		for (let c = 0; c < colors.length; c++)
@@ -8381,7 +8233,7 @@ async function placeResearchStationInAtlanta()
 			$cdcBlurb = $("#setupContainer").children("h4");
 
 		pinpointCity(ATLANTA_KEY);
-		await cities[ATLANTA_KEY].buildResearchStation(data, { animate: true });
+		await cities[ATLANTA_KEY].buildResearchStation(data, promptAction, { animate: true });
 		await sleep(getDuration(data, "longInterval"));
 		
 		await animatePromise(
