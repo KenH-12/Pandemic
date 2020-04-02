@@ -84,9 +84,7 @@ function getTravelPathVector(actionProperties, gameData)
 		}
 		else
 		{
-			if (!$researchStation.hasClass("placeholderStation"))
-				originOffset = getCity($researchStation.attr("data-key")).getOffset(gameData);
-			else if (gameData.promptingEventType.code === eventTypes.governmentGrant.code)
+			if ($researchStation.hasClass("grantStation"))
 			{
 				const $supplyStation = $("#researchStationSupply").find(".researchStation");
 
@@ -94,6 +92,8 @@ function getTravelPathVector(actionProperties, gameData)
 				originOffset.left += $supplyStation.width() / 2;
 				originOffset.top += $supplyStation.height() / 2;
 			}
+			else
+				originOffset = getCity($researchStation.attr("data-key")).getOffset(gameData);
 			
 			if (destination)
 				destinationOffset = destination.getOffset(gameData);
