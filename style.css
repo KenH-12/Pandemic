@@ -340,7 +340,8 @@ span.r {color: #ef282a; background: none}
 .pawnArrow.airlift > div,
 .airlift:not(.pawnArrow),
 #resilientPopulationArrow > div,
-#governmentGrantArrow > div
+#governmentGrantArrow > div,
+.eventArrow
 {
 	background: linear-gradient(to bottom right, 
 		#fff,

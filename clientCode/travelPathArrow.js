@@ -7,12 +7,13 @@ const $travelPathArrow = $("#travelPathArrow");
 
 function showTravelPathArrow(gameData, actionProperties)
 {
-    hideTravelPathArrow();
-    
-	if (!actionProperties)
+    if (!actionProperties)
 	{
 		if (!gameData.promptedTravelPathProperties)
+		{
+			hideTravelPathArrow();
 			return false;
+		}
 		
 		actionProperties = gameData.promptedTravelPathProperties;
 	}
@@ -111,7 +112,7 @@ function getTravelPathVector(actionProperties, gameData)
 	}
 	else // The pawn itself is the temporary destination.
 	{
-		player = actionProperties.player || gameData.players[gameData.turn];
+		player = actionProperties.player;
         destinationOffset = $pawn.offset();
 		destinationOffset.left += gameData.pawnWidth * 0.5;
 		destinationOffset.top += gameData.pawnHeight * 0.8;

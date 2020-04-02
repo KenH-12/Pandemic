@@ -4847,7 +4847,11 @@ function bindPawnEvents()
 		{
 			disabled: true, // pawn dragging is enabled and disabled according to the game state.
 			containment: $("#boardContainer"),
-			drag: function() { showTravelPathArrow(data, { $pawn: $(this) }) }
+			drag: function()
+			{
+				const $this = $(this);
+				showTravelPathArrow(data, { $pawn: $this, player: getPlayer($this.attr("data-role")) });
+			}
 		})
 		.mousedown(function()
 		{
