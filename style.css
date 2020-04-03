@@ -107,6 +107,7 @@ body,
 	filter: drop-shadow(0px 0px 3px #fff);
 	pointer-events: none;
 }
+#travelPathArrow.invalid { background-color: darkred !important }
 #boardContainer > .pawn
 {
 	z-index: 4;

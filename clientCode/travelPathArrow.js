@@ -1,6 +1,5 @@
 "use strict";
 
-import { eventTypes } from "./event.js";
 import { getCity } from "./city.js";
 
 const $travelPathArrow = $("#travelPathArrow");
@@ -131,8 +130,8 @@ function animateInvalidTravelPath(gameData)
 		const cssClasses = $travelPathArrow.attr("class");
 
 		await animatePromise({
-			$elements: $travelPathArrow.removeClass("hidden eventArrow"),
-			initialProperties: { background: "darkred", opacity: .8 },
+			$elements: $travelPathArrow.removeAttr("class").addClass("invalid"),
+			initialProperties: { opacity: .8 },
 			desiredProperties: { opacity: 0 },
 			duration: 500,
 			easing: "easeInQuint"

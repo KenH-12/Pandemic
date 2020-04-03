@@ -5,7 +5,6 @@ import { eventTypes } from "./event.js";
 import {
     showTravelPathArrow,
 	setTravelPathArrowColor,
-	hideTravelPathArrow,
 	animateInvalidTravelPath
 } from "./travelPathArrow.js";
 
@@ -1245,6 +1244,11 @@ function getCity(key)
 	return cities[key] || false;
 }
 
+function isCityKey(cardKey)
+{
+	return cities.hasOwnProperty(cardKey);
+}
+
 const researchStationKeys = new Set();
 function newResearchStationElement(cityKey, gameData, promptAction)
 {
@@ -1310,8 +1314,7 @@ function showPlaceholderStation($originalStation)
 }
 function hidePlaceholderStation($originalStation)
 {
-	removeStylePropertiesFrom($originalStation, ["z-index", "opacity"]);
-	
+	removeStylePropertiesFrom($originalStation.removeClass("hidden"), ["z-index", "opacity"]);
 	$("#placeholderStation").addClass("hidden");
 }
 
@@ -1380,7 +1383,9 @@ async function getGovernmentGrantTargetCity($researchStation, gameData, promptAc
 			return promptAction({ eventType, targetCity, relocationKey });
 		}
 	}
-
+	
+	disableResearchStationDragging();
+	$researchStation.addClass("hidden");
 	await animateInvalidTravelPath(gameData);
 	hidePlaceholderStation($researchStation);
 	
@@ -1403,6 +1408,7 @@ async function getGovernmentGrantTargetCity($researchStation, gameData, promptAc
 
 	}
 	showTravelPathArrow(gameData);
+	enableResearchStationDragging();
 }
 
 async function highlightResearchStationSupply($grantStation)
@@ -1468,6 +1474,25 @@ async function resetGrantStation($grantStation)
 		return false;
 	
 	$grantStation.offset($("#researchStationSupply img").offset());
+}
+
+function getAllResearchStations()
+{
+	return [...researchStationKeys]
+		.filter(key => isCityKey(key))
+		.map(key => getCity(key).getResearchStation());
+}
+
+function enableResearchStationDragging()
+{
+	for (let $rs of getAllResearchStations())
+		$rs.draggable("enable").addClass("relocatable");
+}
+
+function disableResearchStationDragging()
+{
+	for (let $rs of getAllResearchStations())
+		$rs.draggable({ disabled: true }).removeClass("relocatable");
 }
 
 const diseaseCubeSupplies = {
@@ -1550,7 +1575,8 @@ function formatCubeOffsetsForPanelOcclusionCheck(diseaseCubeOffsets)
 
 export {
     cities,
-    getCity,
+	getCity,
+	isCityKey,
     researchStationKeys,
     updateResearchStationSupplyCount,
 	getResearchStationSupplyCount,
@@ -1558,6 +1584,8 @@ export {
 	turnOffResearchStationHighlights,
 	highlightResearchStationSupply,
 	turnOffResearchStationSupplyHighlight,
+	enableResearchStationDragging,
+	disableResearchStationDragging,
 	showGovernmentGrantArrow,
 	getGovernmentGrantTargetCity,
     diseaseCubeSupplies,

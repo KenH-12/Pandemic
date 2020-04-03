@@ -6,6 +6,7 @@ import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 import {
 	cities,
 	getCity,
+	isCityKey,
 	researchStationKeys,
 	updateResearchStationSupplyCount,
 	getResearchStationSupplyCount,
@@ -13,6 +14,8 @@ import {
 	turnOffResearchStationHighlights,
 	highlightResearchStationSupply,
 	turnOffResearchStationSupplyHighlight,
+	enableResearchStationDragging,
+	disableResearchStationDragging,
 	showGovernmentGrantArrow,
 	getGovernmentGrantTargetCity,
 	getPacificPath
@@ -757,27 +760,6 @@ function enablePawnEvents()
 
 	if (pawnsAreEnabled)
 		setTravelPathArrowColor({ airlifting, activePlayer });
-}
-
-function getAllResearchStations()
-{
-	return [...researchStationKeys]
-		.filter(key => isCityKey(key))
-		.map(key => getCity(key).getResearchStation());
-}
-
-function enableResearchStationDragging()
-{
-	for (let $rs of getAllResearchStations())
-		$rs.draggable("enable").addClass("relocatable");
-}
-
-function disableResearchStationDragging()
-{
-	log("disableResearchStationDragging()");
-
-	for (let $rs of getAllResearchStations())
-		$rs.draggable({ disabled: true }).removeClass("relocatable");
 }
 
 function enableAvailableActionButtons(player)
@@ -3239,6 +3221,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 
 async function invalidMovement(originCity)
 {
+	disablePawnEvents();
 	await Promise.all([
 		animateInvalidTravelPath(data),
 		originCity.cluster(data)
@@ -4707,6 +4690,9 @@ function bindPawnEvents()
 		})
 		.mousedown(function()
 		{
+			if ($(this).draggable("option", "disabled"))
+				return false;
+			
 			const $this = $(this),
 				pawnRole = $this.data("role"),
 				activeRole = getActivePlayer().role,
@@ -6091,10 +6077,6 @@ function isEventCardKey(cardKey)
 function isEpidemicKey(cardKey)
 {
 	return cardKey.substring(0,3) === "epi";
-}
-function isCityKey(cardKey)
-{
-	return cities.hasOwnProperty(cardKey);
 }
 
 function newInfectionCardTemplate()
