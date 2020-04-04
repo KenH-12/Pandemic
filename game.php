@@ -21,6 +21,7 @@
 				<script src='clientCode/jquery-ui.min.js'></script>
 				<script src='clientCode/jquery.easing.1.3.js'></script>
 				<script src='clientCode/utilities.js'></script>
+				<script src='clientCode/tooltipUtilities.js'></script>
 				<script src='clientCode/setup.js'></script>
 				<script type='module' src='clientCode/logic.js'></script>
 			</head>
