@@ -20,6 +20,7 @@
 				<script src='clientCode/jquery-1.11.2.min.js'></script>
 				<script src='clientCode/jquery-ui.min.js'></script>
 				<script src='clientCode/jquery.easing.1.3.js'></script>
+				<script src='clientCode/utilities/pandemicUtils.js'></script>
 				<script src='clientCode/utilities/miscUtils.js'></script>
 				<script src='clientCode/utilities/tooltipUtils.js'></script>
 				<script src='clientCode/utilities/geometryUtils.js'></script>
