@@ -20,8 +20,9 @@
 				<script src='clientCode/jquery-1.11.2.min.js'></script>
 				<script src='clientCode/jquery-ui.min.js'></script>
 				<script src='clientCode/jquery.easing.1.3.js'></script>
-				<script src='clientCode/utilities.js'></script>
-				<script src='clientCode/tooltipUtilities.js'></script>
+				<script src='clientCode/utilities/miscUtils.js'></script>
+				<script src='clientCode/utilities/tooltipUtils.js'></script>
+				<script src='clientCode/utilities/geometryUtils.js'></script>
 				<script src='clientCode/setup.js'></script>
 				<script type='module' src='clientCode/logic.js'></script>
 			</head>
