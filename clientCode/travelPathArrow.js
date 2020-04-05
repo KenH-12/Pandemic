@@ -129,7 +129,7 @@ function animateInvalidTravelPath(gameData)
 	{
 		const cssClasses = $travelPathArrow.attr("class");
 
-		await animatePromise({
+		await animationPromise({
 			$elements: $travelPathArrow.removeAttr("class").addClass("invalid"),
 			initialProperties: { opacity: .8 },
 			desiredProperties: { opacity: 0 },

@@ -43,7 +43,7 @@ export default class PlayerPanel
 
             $cards.slideUp(duration);
             
-            await animatePromise(
+            await animationPromise(
             {
                 $elements: $btnCollapseExpand,
                 initialProperties: { height: initialButtonHeight },
@@ -79,7 +79,7 @@ export default class PlayerPanel
 
             $cards.slideDown(duration, function() { $(this).removeAttr("style") });
             
-            await animatePromise(
+            await animationPromise(
             {
                 $elements: $btnCollapseExpand,
                 initialProperties: { height: initialButtonHeight },

@@ -25,6 +25,7 @@
 				<script src='clientCode/utilities/stringUtils.js'></script>
 				<script src='clientCode/utilities/tooltipUtils.js'></script>
 				<script src='clientCode/utilities/geometryUtils.js'></script>
+				<script src='clientCode/utilities/animationUtils.js'></script>
 				<script src='clientCode/setup.js'></script>
 				<script type='module' src='clientCode/logic.js'></script>
 			</head>

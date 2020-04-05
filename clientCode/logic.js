@@ -2152,7 +2152,7 @@ function dealForecastedCards($cardContainer, cardKeys)
 		const containerInitialHeight = $container.height(),
 			$veils = $cardContainer.find(".veil").addClass("hidden");
 
-		await animatePromise({
+		await animationPromise({
 			$elements: $container,
 			initialProperties: { height: 0 },
 			desiredProperties: { height: containerInitialHeight },
@@ -2224,12 +2224,12 @@ async function animateForecastPlacement($cardContainer)
 	
 	await Promise.all(
 	[
-		animatePromise({
+		animationPromise({
 			$elements: $elementsToFadeOut,
 			desiredProperties: { opacity: 0 },
 			duration
 		}),
-		animatePromise({
+		animationPromise({
 			$elements: $cardbacks,
 			desiredProperties: { opacity: 1 },
 			duration
@@ -2252,7 +2252,7 @@ async function animateForecastPlacement($cardContainer)
 		$card = $cardbacks.eq(i);
 		cardOffset = $card.offset();
 
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $card.appendTo("body"),
 			initialProperties: { ...cardOffset, ...{ width: cardbackInitialWidth, zIndex: 10 } },
@@ -2428,7 +2428,7 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 	$cardToRemove.appendTo("#boardContainer")
 		.offset(initialOffset);
 
-	await animatePromise(
+	await animationPromise(
 	{
 		$elements: $cardToRemove,
 		initialProperties:
@@ -3629,7 +3629,7 @@ async function revealPlayerCard(cardKey, $container)
 
 	const cardWidth = $card.width();
 
-	await animatePromise({
+	await animationPromise({
 		$elements: $card,
 		initialProperties: { width: 0 },
 		desiredProperties: { width: cardWidth },
@@ -4860,7 +4860,7 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 	
 	await Promise.all(
 	[
-		animatePromise(
+		animationPromise(
 		{
 			$elements: $rectA,
 			desiredProperties: {
@@ -4868,7 +4868,7 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 				top: cityOffset.top - cWidth
 			}, duration, easing
 		}),
-		animatePromise(
+		animationPromise(
 		{
 			$elements: $rectB,
 			desiredProperties: {
@@ -4880,7 +4880,7 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 
 	await sleep(750);
 
-	await animatePromise(
+	await animationPromise(
 	{
 		$elements: $rects,
 		desiredProperties: { opacity: 0 },
@@ -5112,7 +5112,7 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 				await highlightMarkerTrack("outbreaks");
 			}
 
-			await animatePromise(
+			await animationPromise(
 			{
 				$elements: $marker,
 				desiredProperties: {
@@ -5211,7 +5211,7 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove, sl
 	{
 		$cube = $cubesToRemove.last();
 
-		await animatePromise({
+		await animationPromise({
 			$elements: $cube,
 			desiredProperties,
 			duration,
@@ -5247,7 +5247,7 @@ function supplyCubeBounceEffect(diseaseColor)
 			expandedWidth = supplyCubeWidth * SIZE_INCREASE_FACTOR;
 
 		// Make the cube slightly bigger, then animate it back to its normal size with a bounce effect.
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $supplyCube.appendTo("body"),
 			initialProperties: { 
@@ -5412,7 +5412,7 @@ function revealEpidemicFull($epidemic)
 		$step = $epidemicSteps.eq(i);
 		stepHeight = $step.outerHeight();
 
-		promise = animatePromise({
+		promise = animationPromise({
 			$elements: $step,
 			initialProperties: { height: 0 },
 			desiredProperties: { height: stepHeight },
@@ -5443,7 +5443,7 @@ function specialEventAlert({ title, description, eventClass, visibleMs })
 		
 		$banner.offset({ left: -($(window).width()) });
 
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $banner,
 			initialProperties: { left: -($(window).width()) },
@@ -5454,7 +5454,7 @@ function specialEventAlert({ title, description, eventClass, visibleMs })
 		
 		await sleep(visibleMs || 2500);
 		
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $banner,
 			desiredProperties: { left: $(window).width() },
@@ -5618,7 +5618,7 @@ function finishIntensifyStep($epidemic)
 	{
 		// Collapse epidemic card
 		const $epidemicSteps = $epidemic.children().not("h2");
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $epidemicSteps,
 			desiredProperties: { height: 0 },
@@ -5647,7 +5647,7 @@ async function highlightMarkerTrack(trackName, { off } = {})
 {
 	const $highlighters = $("." + trackName + "Highlight");
 
-	await animatePromise(
+	await animationPromise(
 		{
 			$elements: $highlighters.removeClass("hidden"),
 			initialProperties: { opacity: (off ? 0.5 : 0) },
@@ -5683,7 +5683,7 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 			await highlightMarkerTrack(trackName);
 		}
 		
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $marker,
 			desiredProperties: {
@@ -5756,19 +5756,19 @@ async function animateEpidemicIntensify()
 	
 	await Promise.all(
 		[
-			animatePromise(
+			animationPromise(
 				{
 					$elements: $cardbacks,
 					desiredProperties: { opacity: 1 },
 					duration: duration
 				}),
-			animatePromise(
+			animationPromise(
 				{
 					$elements: $cards.children(".infectionCardContents"),
 					desiredProperties: { opacity: 0 },
 					duration: duration
 				}),
-			animatePromise(
+			animationPromise(
 				{
 					$elements: $veil,
 					initialProperties: {
@@ -5785,7 +5785,7 @@ async function animateEpidemicIntensify()
 	);
 	
 	$veil.addClass("hidden");
-	await animatePromise(
+	await animationPromise(
 		{
 			$elements: $cardbacks,
 			desiredProperties: { ...centerOfContainer, ...{ width: deckWidth } },
@@ -5806,7 +5806,7 @@ async function animateEpidemicIntensify()
 					easing: easing
 				});
 			
-			await animatePromise(
+			await animationPromise(
 				{
 					$elements: $cardbacks,
 					desiredProperties: centerOfContainer,
@@ -5825,7 +5825,7 @@ async function animateEpidemicIntensify()
 	for (let i = 0; i < $cardbacks.length; i++)
 	{
 		$card = $cardbacks.eq(i).appendTo("body");
-		await animatePromise(
+		await animationPromise(
 			{
 				$elements: $card,
 				initialProperties: { ...initialCardPosition, ...{ zIndex: 10 } },
@@ -5861,7 +5861,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 			maxDistance = containerHeight < containerWidth ? containerHeight / 2 : containerWidth / 2,
 			easing = "easeInOutQuad";
 		
-		await animatePromise(
+		await animationPromise(
 			{
 				$elements,
 				desiredProperties: centerOfContainer,
@@ -5882,7 +5882,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 					easing
 				});
 			
-			await animatePromise(
+			await animationPromise(
 				{
 					$elements,
 					desiredProperties: centerOfContainer,
@@ -6290,14 +6290,14 @@ async function medicAutoTreatAnimation()
 	
 	$cureMarker.on("load", function() { positionAutoTreatCircleComponents($circle, $cureMarker) });
 	
-	animatePromise(
+	animationPromise(
 	{
 		$elements: $cureMarker,
 		desiredProperties: { opacity: 0.8 },
 		duration: duration
 	});
 
-	await animatePromise(
+	await animationPromise(
 	{
 		$elements: $circle,
 		desiredProperties: { opacity: 0.5 },
@@ -6307,7 +6307,7 @@ async function medicAutoTreatAnimation()
 	await sleep(getDuration(data, "longInterval"));
 
 	const $elements = $circle.add($cureMarker)
-	await animatePromise(
+	await animationPromise(
 	{
 		$elements: $elements,
 		desiredProperties: { opacity: 0 },
@@ -6327,14 +6327,14 @@ function showMedicAutoTreatCircle({ color, fadeInMs } = {})
 	
 	$cureMarker.on("load", function() { positionAutoTreatCircleComponents($circle, $cureMarker) });
 	
-	animatePromise(
+	animationPromise(
 	{
 		$elements: $cureMarker,
 		desiredProperties: { opacity: 0.8 },
 		duration: fadeInMs || 500
 	});
 
-	return animatePromise(
+	return animationPromise(
 	{
 		$elements: $circle,
 		desiredProperties: { opacity: 0.5 },
@@ -6348,7 +6348,7 @@ function hideMedicAutoTreatCircle()
 	{
 		const $elements = $(".autoTreatCircle, .autoTreatCureMarker");
 
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $elements,
 			desiredProperties: { opacity: 0 },
@@ -6371,7 +6371,7 @@ async function quarantineAnimation()
 
 function showQuarantineArea(duration)
 {
-	return animatePromise(
+	return animationPromise(
 	{
 		$elements: $("#quarantineArea"),
 		initialProperties: {
@@ -6387,7 +6387,7 @@ function showQuarantineArea(duration)
 
 function hideQuarantineArea()
 {
-	return animatePromise(
+	return animationPromise(
 	{
 		$elements: $("#quarantineArea"),
 		desiredProperties: { opacity: 0 },
@@ -7044,7 +7044,7 @@ async function endGame()
 	$curtain.find(selectorToShow).removeClass(hidden)
 		.first().css("margin-top", data.boardHeight / 3);
 	
-	await animatePromise(
+	await animationPromise(
 	{
 		$elements: $curtain.removeAttr("style").removeClass("hidden"),
 		initialProperties: { opacity: 0 },
@@ -7091,7 +7091,7 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 			appendEventHistoryIconOfType(eradication);
 		}
 
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $cureMarker,
 			initialProperties: {
@@ -7716,13 +7716,13 @@ class RoleSlotMachine
 			.offset(roleOffset)
 			.addClass("role");
 
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: this.$slotMachine,
 			desiredProperties: { opacity: 0 }
 		});
 
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $role,
 			desiredProperties: { top: "-=" + (this.optionHeight * this.MIDDLE_OPTION_INDEX) },
@@ -7841,7 +7841,7 @@ async function beginGame()
 		sleep(getDuration(data, "longInterval"))
 	]);
 
-	await animatePromise(
+	await animationPromise(
 	{
 		$elements: $setupProcedureContainer,
 		desiredProperties: { height: 0 },
@@ -7885,7 +7885,7 @@ function animatePreparePlayerDeck()
 		await showEpidemicsToShuffle($container);
 		await dividePlayerDeckIntoEqualPiles($container);
 	
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $container.children("h4"),
 			desiredProperties: { opacity: 0 },
@@ -7927,7 +7927,7 @@ async function showEpidemicsToShuffle($container)
 	
 	$epidemics.addClass("hidden");
 
-	await animatePromise(
+	await animationPromise(
 	{
 		$elements: $cardbacks,
 		initialProperties: { opacity: 0 },
@@ -7937,7 +7937,7 @@ async function showEpidemicsToShuffle($container)
 	await sleep(getDuration(data, "mediumInterval"));
 	$cardbacks.remove();
 	
-	return animatePromise(
+	return animationPromise(
 	{
 		$elements: $epidemics.removeClass("hidden"),
 		initialProperties: { width: 0 },
@@ -7984,7 +7984,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 		desiredProps[divIdx].left += leftOffsetIncrement; // offset the next card to the right
 		$cardback = newFacedownPlayerCard();
 		
-		animatePromise(
+		animationPromise(
 		{
 			$elements: $cardback.appendTo($divs.eq(divIdx)),
 			initialProperties,
@@ -8036,7 +8036,7 @@ function shuffleEpidemicIntoPile($div)
 
 		$div.height($div.height());
 
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $epidemic,
 			desiredProperties: { width: 0 },
@@ -8047,7 +8047,7 @@ function shuffleEpidemicIntoPile($div)
 		const $epidemicCardback = newFacedownPlayerCard();
 		$epidemic.replaceWith($epidemicCardback);
 
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $epidemicCardback,
 			initialProperties: { ...{ position: "absolute"}, ...{ initialEpidemicOffset } },
@@ -8072,7 +8072,7 @@ function placePileOntoPlayerDeck($div, deckPropertes)
 		const $pile = $div.children("img"),
 			$deck = $("#imgPlayerDeck");
 
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $pile,
 			desiredProperties: deckPropertes,
@@ -8218,7 +8218,7 @@ async function placeResearchStationInAtlanta()
 		await cities[ATLANTA_KEY].buildResearchStation(data, promptAction, { animate: true });
 		await sleep(getDuration(data, "longInterval"));
 		
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $cdcBlurb,
 			desiredProperties: { opacity: 0 },
@@ -8245,7 +8245,7 @@ function placePawnsInAtlanta()
 			pawnOffsetInAtlanta,
 			initialOffset;
 		
-		await animatePromise(
+		await animationPromise(
 		{
 			$elements: $cdcBlurb.prependTo("#setupContainer"),
 			initialProperties: { opacity: 0 },
@@ -8275,7 +8275,7 @@ function placePawnsInAtlanta()
 			initialOffset.left += panelWidth / 2;
 			initialOffset.left -= data.pawnWidth / 2;
 	
-			await animatePromise(
+			await animationPromise(
 			{
 				$elements: $pawn,
 				initialProperties: initialOffset,
@@ -8358,7 +8358,7 @@ async function transformIntoPlayerPanel($roleContainer)
 		.siblings(".name")
 		.css("border-top", borderString);
 	
-	await animatePromise(
+	await animationPromise(
 	{
 		$elements: $roleContainer.appendTo($("#rightPanel")),
 		initialProperties,
@@ -8402,7 +8402,7 @@ function showTurnOrder()
 			$rank.appendTo($roleSetupContainer)
 				.offset(rankOffset);
 			
-			await animatePromise(
+			await animationPromise(
 			{
 				$elements: $rank,
 				initialProperties: { opacity: 0.1 },
@@ -8451,7 +8451,7 @@ function showStartingHandPopulations()
 	const expandedCardHeight = $aCard.height();
 	$aCard.height(initialCardHeight);
 
-	return animatePromise(
+	return animationPromise(
 	{
 		$elements: $cards,
 		desiredProperties: { height: expandedCardHeight },
@@ -8566,7 +8566,7 @@ function makeRoomForStartingHands(startingHandSize, $roleContainers)
 
 	$aRoleContainer.children(".playerCard").remove();
 	
-	return animatePromise(
+	return animationPromise(
 	{
 		$elements: $roleContainers,
 		initialProperties: { height: initialHeight },

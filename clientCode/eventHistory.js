@@ -37,13 +37,13 @@ export default class EventHistory
                 return false;
             }
 
-            animatePromise({
+            animationPromise({
                 $elements: $icon,
                 desiredProperties: { opacity: 0 },
                 duration: 100
             });
 
-            await animatePromise({
+            await animationPromise({
                 $elements: $iconContainer,
                 desiredProperties: { scrollLeft: newScrollLeft },
                 easing: "easeOutSine"
@@ -73,7 +73,7 @@ export default class EventHistory
             sleep(250)
         ]);
 
-        await animatePromise({
+        await animationPromise({
             $elements: $newIcon.removeClass("hidden"),
             desiredProperties: { marginLeft: 0 },
             easing: "easeOutQuad"
@@ -93,7 +93,7 @@ export default class EventHistory
             
             this.disableForwardButton();
                 
-            await animatePromise({
+            await animationPromise({
                 $elements: this.$iconContainer,
                 desiredProperties: { scrollLeft: overflow },
                 duration: this.scrollDuration,

@@ -934,7 +934,7 @@ class DiscoverACure extends UndoableEvent
 
 			const diseaseColor = this.discards[0].color,
 				$cureMarker = $(`#cureMarker${diseaseColor.toUpperCase()}`);
-			await animatePromise({
+			await animationPromise({
 				$elements: $cureMarker,
 				targetProperties: { opacity: 0 }
 			});
@@ -1257,7 +1257,7 @@ class ResilientPopulation extends UndoableEvent
 					scrollTarget = $neighborCard.position().top;
 	
 				// Scroll so that the placement position is clearly visible.
-				await animatePromise({
+				await animationPromise({
 					$elements: $discardPile,
 					desiredProperties: { scrollTop: scrollTarget },
 					duration: 600,
@@ -1276,7 +1276,7 @@ class ResilientPopulation extends UndoableEvent
 			else
 				desiredOffsetTop = $discardPileTitle.offset().top + $discardPileTitle.outerHeight();
 
-			await animatePromise({
+			await animationPromise({
 				$elements: $infectionCard,
 				desiredProperties: { top: desiredOffsetTop },
 				easing: "easeOutQuad"
