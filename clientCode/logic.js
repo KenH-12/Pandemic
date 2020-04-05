@@ -173,7 +173,7 @@ function parseEvents(events)
 			let parsedEvent;
 			for (let e of events)
 			{
-				console.log("parsing event: ", e);
+				//console.log("parsing event: ", e);
 				if (!e) continue;
 				
 				if (e.code === eventTypes.startingHands.code)

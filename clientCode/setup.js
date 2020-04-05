@@ -3,7 +3,6 @@ function retrieveGameData()
 	return new Promise((resolve, reject) => $.post("serverCode/selectPages/retrieveGameData.php",
 	function(response)
 	{
-		log(response);
 		const result = JSON.parse(response);
 		
 		if (result.failure)
