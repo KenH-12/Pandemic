@@ -260,27 +260,16 @@ export default class PlayerPanel
 
 	addOcclusion(city)
 	{
-        if (!this.occlusionKeys.has(city.key))
-            log("new occlusion: ", city.name);
-        
         this.occlusionKeys.add(city.key);
 		this.$panel.addClass("transparent");
 	}
 
 	removeOcclusion(city)
 	{
-        if (this.occlusionKeys.has(city.key))
-            log("removed occlusion:", city.name);
-        
         this.occlusionKeys.delete(city.key);
 
         if (this.occlusionKeys.size === 0)
-        {
-            if (this.$panel.hasClass("transparent"))
-                log("No occlusions remain!");
-            
             this.$panel.removeClass("transparent");
-        }
     }
 }
 

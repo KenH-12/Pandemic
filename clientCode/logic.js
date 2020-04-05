@@ -173,7 +173,7 @@ function parseEvents(events)
 			let parsedEvent;
 			for (let e of events)
 			{
-				log("parsing event: ", e);
+				console.log("parsing event: ", e);
 				if (!e) continue;
 				
 				if (e.code === eventTypes.startingHands.code)
@@ -388,7 +388,6 @@ class Step
 	{
 		if (++this.procedureIdx === this.procedure.length)
 		{
-			log("finished ", this.name);
 			this.procedureIdx = -1;
 			this.next();
 		}
@@ -403,7 +402,6 @@ class Step
 
 	next()
 	{
-		log("nextStep: ", data.nextStep);
 		setCurrentStep(data.nextStep).proceed();
 	}
 }
@@ -502,7 +500,6 @@ function highlightTurnProcedureStep(stepName)
 
 function resumeCurrentStep()
 {
-	log("resuming step: ", data.currentStep.name);
 	data.currentStep.resume();
 }
 
@@ -539,7 +536,6 @@ function indicateActionsLeft({ addend, zeroRemaining } = {})
 
 function disableActions()
 {
-	log("disableActions()");
 	const $actionsContainer = $("#actionsContainer");
 
 	$actionsContainer.find(".button").not("#btnCancelAction")
@@ -650,8 +646,6 @@ function anyPlayerHasResilientPopulation()
 
 function enableEventCards({ resilientPopulationOnly } = {})
 {
-	log("enableEventCards()");
-	
 	let $eventCards = $("#playerPanelContainer").find(".playerCard.eventCard").off("click");
 
 	if (resilientPopulationOnly)
@@ -715,7 +709,6 @@ function getEventCardEventType(cardKey)
 
 function disableEventCards()
 {
-	log("disableEventCards()");
 	$("#playerPanelContainer").find(".playerCard.eventCard")
 		.off("click")
 		.addClass("unavailable");
@@ -1027,14 +1020,7 @@ function showEventIconDetails($icon, event)
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
 
-	if (event instanceof ResilientPopulation)
-		log("PRE WIDTH", $detailsContainer.width());
-
 	resizeInfectionCards($detailsContainer);
-
-	if (event instanceof ResilientPopulation)
-		log("POST WIDTH", $detailsContainer.width());
-
 	enforceEventDetailsHeightLimit();
 	positionTooltipRelativeToElement($detailsContainer, $icon, { juxtaposeTo: "top" });
 	// The following must happen AFTER the tooltip is positioned.
@@ -2810,8 +2796,6 @@ class DiscardPrompt
 		this.updateCountIndicators();
 		bindEventCardHoverEvents(data, { $containingElement: this.$container });
 
-		log("DiscardPrompt cardKeys: ", this.cardKeys);
-
 		return this.$container;
 	}
 
@@ -2916,7 +2900,7 @@ function requestAction(eventType, dataToPost)
 	else
 		indicateActionsLeft({ zeroRemaining: true });
 	
-	log(`requestAction(${eventType.code})`);
+	console.log(`requestAction(${eventType.code})`);
 	return new Promise((resolve, reject) =>
 	{
 		$.post(`serverCode/actionPages/${eventType.actionPathName}.php`,
@@ -2930,7 +2914,7 @@ function requestAction(eventType, dataToPost)
 		},
 		function(response)
 		{
-			log(response);
+			console.log(response);
 			const {
 				events,
 				nextStep,
@@ -3483,7 +3467,7 @@ async function drawStep()
 	eventHistory.disableUndo();
 
 	const cardKeys = await performDrawStep()
-		.catch((reason) => log(reason));
+		.catch((reason) => console.log(reason));
 	if (!cardKeys) return false;
 
 	if (data.nextStep === "epIncrease")
@@ -3671,7 +3655,7 @@ async function animateCardsToHand($cards)
 
 function resizeAll()
 {
-	log("resizeAll()");
+	console.log("resizeAll()");
 	return new Promise(resolve =>
 	{
 		resizeBoard();
@@ -4596,7 +4580,6 @@ function operationsFlightWasUsedThisTurn()
 
 async function nextTurn()
 {
-	log("nextTurn()");
 	data.turn = getActivePlayer().nextTurnID;
 	data.turnNum++;
 
@@ -5927,7 +5910,6 @@ function bypassDiscardStep(nextStep)
 
 function discardStep()
 {
-	log("discardStep()");
 	const player = getPlayerWithTooManyCards(),
 		$discardPrompt = new DiscardPrompt(
 			{
@@ -5953,13 +5935,11 @@ function discardStep()
 // because two players never receive cards simultaneously.
 function getPlayerWithTooManyCards()
 {
-	log("getPlayerWithTooManyCards()");
 	let player;
 	for (let rID in data.players)
 	{
 		player = data.players[rID];
-		log(`checking ${player.role}...`);
-		log("cardKeys: ", player.cardKeys);
+		
 		if (player.cardKeys.length > data.HAND_LIMIT)
 			return player;
 	}
@@ -6482,8 +6462,6 @@ function loadInfCardsDrawnThisTurn()
 
 async function finishInfectionStep()
 {
-	log("finishInfectionStep()");
-	log("nextStep: ", data.nextStep);
 	const $container = getInfectionContainer();
 	
 	await sleep(getDuration(data, "longInterval"));
@@ -7011,7 +6989,6 @@ async function diseaseCubeDefeatAnimation(diseaseColor)
 
 async function outbreakDefeatAnimation()
 {
-	log("outbreakDefeatAnimation()");
 	await propertyStrobe($("#outbreaksTrackHighlight").removeClass("hidden"),
 	{
 		initialState: { opacity: 0 },
@@ -7026,7 +7003,6 @@ async function outbreakDefeatAnimation()
 
 async function endGame()
 {
-	log(`endGame(${data.gameEndCause})`);
 	const $curtain = $("#curtain"),
 		hidden = "hidden";
 
@@ -7130,7 +7106,6 @@ function getCureMarkerDesiredProperties(diseaseColor)
 
 function loadPlayerCards(playerCards)
 {
-	log("loadPlayerCards()");
 	const $discardsContainer = $("#playerDiscard"),
 		$discardPileTitle =  $discardsContainer.children(".title").first(),
 		$removedCardsTitle = $discardsContainer.children("#removedPlayerCards").children(".title").first();
@@ -8434,7 +8409,6 @@ function getPopulationRankOffsetAdjustments($exampleCard)
 
 function showStartingHandPopulations()
 {
-	log("showStartingHandPopulations");
 	const $containers = $(".roleContainer");
 	let $cards = $containers.children(".playerCard");
 	const $aCard = $cards.first(),

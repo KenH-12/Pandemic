@@ -644,7 +644,6 @@ class UndoableEvent extends Event
 			},
 			function(response)
 			{
-				log(response);
 				const result = JSON.parse(response);
 				
 				if (result.failure)

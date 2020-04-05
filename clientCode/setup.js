@@ -1,6 +1,5 @@
 function retrieveGameData()
 {
-	log("retrieveGameData()");
 	return new Promise((resolve, reject) => $.post("serverCode/selectPages/retrieveGameData.php",
 	function(response)
 	{
@@ -16,7 +15,6 @@ function retrieveGameData()
 
 function retrievePlayerCards()
 {
-	log("retrievePlayerCards()");
 	return new Promise((resolve, reject) =>
 		$.post("serverCode/selectPages/retrievePlayerCards.php",
 		function(response)
@@ -33,7 +31,6 @@ function retrievePlayerCards()
 
 function retrieveEventHistory()
 {
-	log("retrieveEventHistory()");
 	return new Promise((resolve, reject) => 
 		$.post("serverCode/selectPages/retrieveEventHistory.php",
 		(response) =>

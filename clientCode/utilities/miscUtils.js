@@ -1,9 +1,3 @@
-// Abbreviated console.log
-function log(...args)
-{
-	console.log(...args);
-}
-
 // Returns a Promise that resolves after ms milliseconds.
 function sleep(ms)
 {
@@ -26,7 +20,7 @@ const waitForFinalEvent = (function ()
 			uniqueId = "Don't call this twice without a uniqueId";
 		
 		if (timers[uniqueId])
-			clearTimeout (timers[uniqueId]);
+			clearTimeout(timers[uniqueId]);
 		
 		timers[uniqueId] = setTimeout(callback, ms);
 	};
