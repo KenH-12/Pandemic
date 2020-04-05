@@ -1,29 +1,37 @@
 "use strict";
 
+import { gameData } from "./gameData.js";
 import { getCity } from "./city.js";
 
 const $travelPathArrow = $("#travelPathArrow");
 
-function showTravelPathArrow(gameData, actionProperties)
+function showTravelPathArrow(actionProperties)
 {
-    if (!actionProperties)
+	const {
+		promptedTravelPathProperties,
+		cityWidth,
+		boardWidth,
+		boardHeight
+	} = gameData;
+	
+	if (!actionProperties)
 	{
-		if (!gameData.promptedTravelPathProperties)
+		if (!promptedTravelPathProperties)
 		{
 			hideTravelPathArrow();
 			return false;
 		}
 		
-		actionProperties = gameData.promptedTravelPathProperties;
+		actionProperties = promptedTravelPathProperties;
 	}
 	
-	let stemWidth = gameData.cityWidth * 1.2;
-	const { originOffset, destinationOffset } = getTravelPathVector(actionProperties, gameData),
+	let stemWidth = cityWidth * 1.2;
+	const { originOffset, destinationOffset } = getTravelPathVector(actionProperties),
 		baseOffset = getPointAtDistanceAlongLine(originOffset, destinationOffset, stemWidth),
 		tipOffset = getPointAtDistanceAlongLine(destinationOffset, originOffset, stemWidth),
 		arrowLength = distanceBetweenPoints(baseOffset, tipOffset),
-		containerWidth = gameData.boardWidth,
-		containerHeight = gameData.boardHeight;
+		containerWidth = boardWidth,
+		containerHeight = boardHeight;
 	
 	// Avoid weird clip-paths that could occur when the arrow is very short.
 	if (arrowLength < stemWidth * 4)
@@ -59,7 +67,7 @@ function setTravelPathArrowColor({ airlifting, governmentGranting, relocatingRes
 	$travelPathArrow.attr("class", `${cssClass}${$travelPathArrow.hasClass("hidden") ? " hidden" : ""}`);
 }
 
-function getTravelPathVector(actionProperties, gameData)
+function getTravelPathVector(actionProperties)
 {
 	const {
 		origin,
@@ -78,8 +86,8 @@ function getTravelPathVector(actionProperties, gameData)
 	{
 		if (typeof $researchStation == "undefined")
 		{
-			originOffset = origin.getOffset(gameData);
-			destinationOffset = destination.getOffset(gameData);
+			originOffset = origin.getOffset();
+			destinationOffset = destination.getOffset();
 		}
 		else
 		{
@@ -92,10 +100,10 @@ function getTravelPathVector(actionProperties, gameData)
 				originOffset.top += $supplyStation.height() / 2;
 			}
 			else
-				originOffset = getCity($researchStation.attr("data-key")).getOffset(gameData);
+				originOffset = getCity($researchStation.attr("data-key")).getOffset();
 			
 			if (destination)
-				destinationOffset = destination.getOffset(gameData);
+				destinationOffset = destination.getOffset();
 			else
 			{
 				destinationOffset = $researchStation.offset();
@@ -107,7 +115,7 @@ function getTravelPathVector(actionProperties, gameData)
 	else if (typeof $pawn == "undefined") // Determine player and destination directly from the actionProperties.
 	{
 		player = actionProperties.player || playerToAirlift || playerToDispatch || gameData.players[gameData.turn];
-		destinationOffset = destination.getOffset(gameData);
+		destinationOffset = destination.getOffset();
 	}
 	else // The pawn itself is the temporary destination.
 	{
@@ -118,12 +126,12 @@ function getTravelPathVector(actionProperties, gameData)
 	}
 
 	return {
-		originOffset: originOffset || player.getLocation().getOffset(gameData),
+		originOffset: originOffset || player.getLocation().getOffset(),
 		destinationOffset
 	};
 }
 
-function animateInvalidTravelPath(gameData)
+function animateInvalidTravelPath()
 {
 	return new Promise(async resolve =>
 	{
@@ -140,7 +148,7 @@ function animateInvalidTravelPath(gameData)
 		$travelPathArrow.attr("class", cssClasses).addClass("hidden").removeAttr("style");
 		
 		if (gameData.promptedTravelPathProperties)
-			showTravelPathArrow(gameData);
+			showTravelPathArrow();
 
 		resolve();
 	});

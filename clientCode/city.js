@@ -1,6 +1,7 @@
 "use strict";
 
 import { eventTypes } from "./event.js";
+import { gameData } from "./gameData.js";
 
 import {
     showTravelPathArrow,
@@ -121,7 +122,7 @@ export default class City
 	}
 	
 	// Puts a research station on this city.
-	buildResearchStation(gameData, promptAction, { animate, isGovernmentGrant } = {})
+	buildResearchStation(promptAction, { animate, isGovernmentGrant } = {})
 	{
 		let $rs,
 			stationInitialOffset = false;
@@ -130,12 +131,12 @@ export default class City
 			$rs = $("#boardContainer > .researchStation.grantStation");
 			stationInitialOffset = $rs.offset();
 
-			$rs.replaceWith(newResearchStationElement(this.key, gameData, promptAction))
+			$rs.replaceWith(newResearchStationElement(this.key, promptAction))
 				.removeAttr("style");
 			researchStationKeys.delete("grantStation");
 		}
 		else
-			$rs = newResearchStationElement(this.key, gameData, promptAction);
+			$rs = newResearchStationElement(this.key, promptAction);
 		
 		this.hasResearchStation = true;
 		researchStationKeys.add(this.key);
@@ -144,8 +145,7 @@ export default class City
 		if (animate)
 		{
 			stationInitialOffset = stationInitialOffset || $("#researchStationSupply .researchStation").offset();
-			return this.cluster(gameData,
-				{
+			return this.cluster({
 					stationInitialOffset,
 					animateResearchStation: true,
 					animatePawns: true,
@@ -154,7 +154,7 @@ export default class City
 		}
 	}
 
-	relocateResearchStationTo(gameData, city)
+	relocateResearchStationTo(city)
 	{
 		const $rs = this.getResearchStation(),
 			stationInitialOffset = $rs.offset();
@@ -169,8 +169,8 @@ export default class City
 		city.hasResearchStation = true;
 		researchStationKeys.add(city.key);
 
-		this.cluster(gameData, { animatePawns: true });
-		return city.cluster(gameData, { animateResearchStation: true, stationInitialOffset, animatePawns: true });
+		this.cluster({ animatePawns: true });
+		return city.cluster({ animateResearchStation: true, stationInitialOffset, animatePawns: true });
 	}
 	
 	setPawnIndices(activePlayer)
@@ -203,9 +203,7 @@ export default class City
 
 	// Positions any pawns and disease cubes on this city into a cluster.
 	// Returns a Promise with after the most relevant animation duration.
-	cluster(
-        gameData,
-        {
+	cluster({
             animatePawns,
 			$pawnToExclude,
 			animateCubes,
@@ -217,7 +215,7 @@ export default class City
 		const pawns = $(".pawn." + this.key).not($pawnToExclude)
 				.sort(function (a, b) { return $(a).data("pawnIndex") - $(b).data("pawnIndex") }),
 			pawnCount = pawns.length,
-            cityOffset = this.getOffset(gameData),
+            cityOffset = this.getOffset(),
             { pawnHeight, pawnWidth } = gameData,
 			coordsArray = [],
 			{ checksPanelOcclusion } = this;
@@ -233,13 +231,12 @@ export default class City
 		if (this.hasResearchStation && this.key !== stationKeyToExclude)
 		{
 			const $researchStation = this.getResearchStation(),
-				desiredStationOffset = this.getResearchStationOffset(gameData);
+				desiredStationOffset = this.getResearchStationOffset();
 			
 			if (checksPanelOcclusion && animateResearchStation)
 				movementResultsToCheckForOcclusion.push({ $piece: $researchStation, newOffset: desiredStationOffset });
 			
-			this.clusterResearchStation(gameData,
-				{
+			this.clusterResearchStation({
 					$researchStation,
 					animateResearchStation,
 					stationInitialOffset,
@@ -266,7 +263,7 @@ export default class City
 			pawnLeft += pawnWidth; // move over a pawn's width with each iteration
 		}
 
-		const pawnAnimationDuration = getDuration(gameData, "pawnAnimation");
+		const pawnAnimationDuration = getDuration("pawnAnimation");
 		let $this, newOffset;
 		i = 0;
 		pawns.each(function()
@@ -285,7 +282,7 @@ export default class City
 				if (checksPanelOcclusion)
 					movementResultsToCheckForOcclusion.push({ $piece: $this, newOffset });
 				
-				$this.animate(newOffset, pawnAnimationDuration, gameData.easings.pawnAnimation);
+				$this.animate(newOffset, pawnAnimationDuration, easings.pawnAnimation);
 			}
 			else
 				$this.offset(newOffset);
@@ -294,11 +291,11 @@ export default class City
 		});
 
 		// reset to default
-		setDuration(gameData, "pawnAnimation", 250);
+		setDuration("pawnAnimation", 250);
 
 		if (animateCubes || animatePawns)
 		{
-			const desiredDiseaseCubeOffsets = this.getDiseaseCubeOffsets(gameData);
+			const desiredDiseaseCubeOffsets = this.getDiseaseCubeOffsets();
 			
 			if (checksPanelOcclusion)
 			{
@@ -308,38 +305,37 @@ export default class City
 				];
 			}
 
-			this.clusterDiseaseCubes(gameData, { desiredDiseaseCubeOffsets, animate: true });
+			this.clusterDiseaseCubes({ desiredDiseaseCubeOffsets, animate: true });
 		}
 		else
-			this.clusterDiseaseCubes(gameData);
+			this.clusterDiseaseCubes();
 
 		if (checksPanelOcclusion)
-			checkMovementResultsForPanelOcclusion(this, movementResultsToCheckForOcclusion, gameData);
+			checkMovementResultsForPanelOcclusion(this, movementResultsToCheckForOcclusion);
 
 		// Return a Promise with the most relevant duration.
 		let ms = 0;
 		if (animateResearchStation) // Station animation takes the longest.
-			ms = getDuration(gameData, "stationPlacement");
+			ms = getDuration("stationPlacement");
 		else if (animateCubes) // Cube animation takes longer than pawn animation.
-			ms = getDuration(gameData, "cubePlacement");
+			ms = getDuration("cubePlacement");
 		else if (animatePawns)
 			ms = pawnAnimationDuration;
 
 		return sleep(ms);
 	}
 
-	clusterResearchStation(gameData,
-		{
+	clusterResearchStation({
 			animateResearchStation,
 			stationInitialOffset,
 			desiredStationOffset,
 			$researchStation
 		} = {})
 	{
-		const duration = getDuration(gameData, "stationPlacement");
+		const duration = getDuration("stationPlacement");
 		
 		$researchStation = $researchStation || this.getResearchStation();
-		desiredStationOffset = desiredStationOffset || this.getResearchStationOffset(gameData);
+		desiredStationOffset = desiredStationOffset || this.getResearchStationOffset();
 		
 		if (animateResearchStation)
 		{
@@ -350,7 +346,7 @@ export default class City
 			{
 				top: desiredStationOffset.top,
 				left: desiredStationOffset.left
-			}, duration, gameData.easings.stationPlacement);
+			}, duration, easings.stationPlacement);
 		}
 		else
 			$researchStation.offset(desiredStationOffset);
@@ -358,10 +354,10 @@ export default class City
 		return sleep(duration);
 	}
 
-	getResearchStationOffset(gameData)
+	getResearchStationOffset()
 	{
 		const { stationHeight, stationWidth } = gameData,
-			rsOffset = this.getOffset(gameData);
+			rsOffset = this.getOffset();
 		
 		rsOffset.top -= stationHeight * 0.85;
 		rsOffset.left -= stationWidth * 0.8;
@@ -369,20 +365,20 @@ export default class City
 		return rsOffset;
 	}
 
-	clusterDiseaseCubes(gameData, { animate, desiredDiseaseCubeOffsets } = {})
+	clusterDiseaseCubes({ animate, desiredDiseaseCubeOffsets } = {})
 	{
 		return new Promise(async resolve =>
 		{
 			const $cubes = $(`.diseaseCube.${this.key}`),
-				duration = animate ? getDuration(gameData, "cubePlacement") : 0,
-				easing = gameData.easings.cubePlacement;
+				duration = animate ? getDuration("cubePlacement") : 0,
+				easing = easings.cubePlacement;
 			
 			if (!$cubes.length)
 				return resolve();
 			
 			if (!desiredDiseaseCubeOffsets)
 			{
-				desiredDiseaseCubeOffsets = this.getDiseaseCubeOffsets(gameData, $cubes);
+				desiredDiseaseCubeOffsets = this.getDiseaseCubeOffsets($cubes);
 
 				if (this.checksPanelOcclusion)
 					checkMovementResultsForPanelOcclusion(this, formatCubeOffsetsForPanelOcclusionCheck(desiredDiseaseCubeOffsets), gameData);
@@ -398,21 +394,21 @@ export default class City
 					coords = desiredDiseaseCubeOffsets[color][i];
 
 					if (animate)
-						$cubesOfColor.eq(i).animate(coords, getDuration(gameData, duration), easing);
+						$cubesOfColor.eq(i).animate(coords, getDuration(duration), easing);
 					else
 						$cubesOfColor.eq(i).offset(coords);
 				}
 			}
 			
-			await sleep(getDuration(gameData, duration));
+			await sleep(getDuration(duration));
 			resolve();
 		});
 	}
 
-	getDiseaseCubeOffsets(gameData, $cubes)
+	getDiseaseCubeOffsets($cubes)
 	{
 		const colors = new Set(),
-			cityOffset = this.getOffset(gameData, "cube"),
+			cityOffset = this.getOffset("cube"),
 			{ players, cubeWidth } = gameData,
 			numPawnsInCity = this.getOccupants(players).length,
 			offsets = {};
@@ -1250,7 +1246,7 @@ function isCityKey(cardKey)
 }
 
 const researchStationKeys = new Set();
-function newResearchStationElement(cityKey, gameData, promptAction)
+function newResearchStationElement(cityKey, promptAction)
 {
 	const $rs = $(`<div class='researchStation' data-key='${cityKey}'>
 					<img src='images/pieces/researchStation.png' alt='Research Station' />
@@ -1266,7 +1262,7 @@ function newResearchStationElement(cityKey, gameData, promptAction)
 			drag: function()
 			{
 				setTravelPathArrowColor({ relocatingResearchStation: true });
-				showTravelPathArrow(gameData, { $researchStation: $(this) });
+				showTravelPathArrow({ $researchStation: $(this) });
 			}
 		})
 		.mousedown(function()
@@ -1282,7 +1278,7 @@ function newResearchStationElement(cityKey, gameData, promptAction)
 			$window.off("mouseup").mouseup(function()
 			{
 				$window.off("mouseup");
-				getGovernmentGrantTargetCity($this, gameData, promptAction);
+				getGovernmentGrantTargetCity($this, promptAction);
 			});
 		});
 	
@@ -1345,10 +1341,10 @@ function turnOffResearchStationHighlights()
 		.removeClass("mediumGlow smallGlow glowing");
 }
 
-async function getGovernmentGrantTargetCity($researchStation, gameData, promptAction)
+async function getGovernmentGrantTargetCity($researchStation, promptAction)
 {
 	const stationOffset = $researchStation.offset(),
-		distanceThreshold = getDimension(gameData, "piecePlacementThreshold"),
+		distanceThreshold = getDimension("piecePlacementThreshold"),
 		relocating = !$researchStation.hasClass("grantStation"),
 		relocationKey = relocating ? $researchStation.attr("data-key") : false,
 		eventType = eventTypes.governmentGrant;
@@ -1362,14 +1358,14 @@ async function getGovernmentGrantTargetCity($researchStation, gameData, promptAc
 	{
 		targetCity = getCity(key);
 		if (!targetCity.hasResearchStation
-			&& distanceBetweenPoints(stationOffset, targetCity.getOffset(gameData)) < distanceThreshold)
+			&& distanceBetweenPoints(stationOffset, targetCity.getOffset()) < distanceThreshold)
 		{
 			hidePlaceholderStation($researchStation);
 
 			if (relocating)
 			{
 				const origin = getCity(relocationKey);
-				origin.clusterResearchStation(gameData);
+				origin.clusterResearchStation();
 				gameData.promptedTravelPathProperties = { origin, destination: targetCity };
 			}
 			else
@@ -1378,7 +1374,7 @@ async function getGovernmentGrantTargetCity($researchStation, gameData, promptAc
 				resetGrantStation($researchStation);
 				turnOffResearchStationSupplyHighlight();
 			}
-			showTravelPathArrow(gameData);
+			showTravelPathArrow();
 			
 			return promptAction({ eventType, targetCity, relocationKey });
 		}
@@ -1386,12 +1382,12 @@ async function getGovernmentGrantTargetCity($researchStation, gameData, promptAc
 	
 	disableResearchStationDragging();
 	$researchStation.addClass("hidden");
-	await animateInvalidTravelPath(gameData);
+	await animateInvalidTravelPath();
 	hidePlaceholderStation($researchStation);
 	
 	if (relocating)
 	{
-		getCity(relocationKey).clusterResearchStation(gameData);
+		getCity(relocationKey).clusterResearchStation();
 		
 		if (!gameData.promptedTravelPathProperties)
 			highlightAllResearchStations();
@@ -1407,7 +1403,7 @@ async function getGovernmentGrantTargetCity($researchStation, gameData, promptAc
 		}
 
 	}
-	showTravelPathArrow(gameData);
+	showTravelPathArrow();
 	enableResearchStationDragging();
 }
 
@@ -1542,12 +1538,12 @@ function getPacificTraversalPoints({ direction })
 	}
 }
 
-function checkMovementResultsForPanelOcclusion(city, resultsToCheck, gameData)
+function checkMovementResultsForPanelOcclusion(city, resultsToCheck)
 {
 	const { players } = gameData;
 
 	for (let rID in players)
-		players[rID].panel.checkMovementResultsForOcclusion(city, resultsToCheck, gameData);
+		players[rID].panel.checkMovementResultsForOcclusion(city, resultsToCheck);
 }
 
 // Disease cube offsets are created as an object with a property for each color of disease cube the city contains.

@@ -1,5 +1,6 @@
 "use strict";
 
+import { gameData } from "./gameData.js";
 import { strings } from "./strings.js";
 import PlayerPanel from "./playerPanel.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
@@ -130,33 +131,10 @@ const data =
 		specialEventBannerReveal: "easeOutQuint",
 		cureMarkerAnimation: "easeInOutQuart"
 	},
-	players: {},
-	eventCards: {},
 	HAND_LIMIT: 7,
 	STARTING_HAND_CARD_HEIGHT: 24,
 	playerCardAnimationInterval: 0.4,
-	stationZindex: 3,
-	cures: {
-		remaining: 4,
-		y: false,
-		r: false,
-		u: false,
-		b: false
-	},
-	epidemicCount: 0,
-	outbreakCount: 0,
-	diseaseCubeSupplies: {
-		y: 24,
-		r: 24,
-		u: 24,
-		b: 24
-	},
-	pendingClusters: new Set(),
-	turn: -1,
-	currentStep: -1,
-	steps: {},
-	events: [],
-	eventHistoryQueue: []
+	stationZindex: 3
 },
 eventHistory = new EventHistory();
 
@@ -251,7 +229,7 @@ function parseEvents(events)
 				{
 					// The previously parsed Event is always the corresponding Forecast event which drew the top 6 infection cards.
 					// It can either be found in parsedEvents or data.events, but always at the end of whichever array.
-					const forecastEvent = parsedEvents.length ? parsedEvents[parsedEvents.length - 1] : data.events[data.events.length - 1],
+					const forecastEvent = parsedEvents.length ? parsedEvents[parsedEvents.length - 1] : gameData.events[gameData.events.length - 1],
 						placementEvent = new ForecastPlacement(e, cities, forecastEvent);
 					
 					parsedEvents.push(placementEvent);
@@ -278,11 +256,11 @@ function parseEvents(events)
 					parsedEvents.push(new Event(e, cities));
 			}
 
-			data.events = [...data.events, ...parsedEvents];
+			gameData.events = [...gameData.events, ...parsedEvents];
 
-			if (Object.keys(data.players).length)
+			if (Object.keys(gameData.players).length)
 			{
-				attachPlayersToEvents(data.players, getPlayer, parsedEvents);
+				attachPlayersToEvents(gameData.players, getPlayer, parsedEvents);
 				addToEventHistoryQueue(parsedEvents);
 			}
 			
@@ -294,15 +272,15 @@ function addToEventHistoryQueue(events)
 {
 	for (let event of events)
 		if (event.hasIcon())
-			data.eventHistoryQueue.push(event);
+			gameData.eventHistoryQueue.push(event);
 }
 
 function appendEventHistoryIcons()
 {
-	for (let event of data.eventHistoryQueue)
+	for (let event of gameData.eventHistoryQueue)
 		appendEventHistoryIcon(event);
 	
-	data.eventHistoryQueue.length = 0;
+	gameData.eventHistoryQueue.length = 0;
 	eventHistory.scrollToEnd();
 }
 
@@ -310,14 +288,14 @@ function appendEventHistoryIconOfType(targetEventType)
 {
 	let event,
 		oneOrMoreIconsWereAppended = false;
-	for (let i = 0; i < data.eventHistoryQueue.length; i++)
+	for (let i = 0; i < gameData.eventHistoryQueue.length; i++)
 	{
-		event = data.eventHistoryQueue[i];
+		event = gameData.eventHistoryQueue[i];
 		
 		if (event.isOfType(targetEventType))
 		{
 			appendEventHistoryIcon(event);
-			data.eventHistoryQueue.splice(i, 1);
+			gameData.eventHistoryQueue.splice(i, 1);
 			oneOrMoreIconsWereAppended = true;
 			break;
 		}
@@ -348,8 +326,7 @@ class Step
 	indicate()
 	{
 		const $container = $("#indicatorContainer"),
-			activePlayer = getActivePlayer(),
-			lastEvent = getLastEvent();
+			activePlayer = getActivePlayer();
 
 		if (typeof this.setDescription === "function")
 			this.setDescription();
@@ -371,7 +348,12 @@ class Step
 		if (lastEventCanBeUndone())
 			eventHistory.enableUndo(undoAction);
 		else
-			eventHistory.disableUndo({ undoIsIllegal: true, lastEventName: lastEvent.name });
+		{
+			const { events } = gameData,
+				lastEventName = events[events.length - 1].name;
+			
+			eventHistory.disableUndo({ undoIsIllegal: true, lastEventName });
+		}
 	}
 
 	resume()
@@ -402,14 +384,14 @@ class Step
 
 	next()
 	{
-		setCurrentStep(data.nextStep).proceed();
+		setCurrentStep(gameData.nextStep).proceed();
 	}
 }
 
 // instantiate steps
 (function()
 {
-	const steps = data.steps;
+	const steps = gameData.steps;
 
 	let stepName = "setup";
 	steps[stepName] = new Step(stepName, "Setup", [() => {}]);
@@ -500,24 +482,27 @@ function highlightTurnProcedureStep(stepName)
 
 function resumeCurrentStep()
 {
-	data.currentStep.resume();
+	gameData.currentStep.resume();
 }
 
 function proceed()
 {
-	data.currentStep.proceed();
+	gameData.currentStep.proceed();
 }
 
 function setCurrentStep(stepName)
 {
-	data.currentStep = data.steps[stepName];
-	data.currentStep.procedureIdx = -1;
-	return data.currentStep;
+	const { steps, currentStep } = gameData;
+
+	currentStep = steps[stepName];
+	currentStep.procedureIdx = -1;
+
+	return currentStep;
 }
 
 function currentStepIs(stepName)
 {
-	return data.currentStep.name === stepName;
+	return gameData.currentStep.name === stepName;
 }
 
 function indicateActionsLeft({ addend, zeroRemaining } = {})
@@ -614,7 +599,7 @@ function activePlayerCanTakeFromResearcher()
 
 function anyPlayerHasAnyEventCard()
 {
-	const { players } = data;
+	const { players } = gameData;
 	let player;
 
 	for (let rID in players)
@@ -629,7 +614,7 @@ function anyPlayerHasAnyEventCard()
 
 function anyPlayerHasResilientPopulation()
 {
-	const { players } = data,
+	const { players } = gameData,
 		resilientPopulationCardKey = eventTypes.resilientPopulation.cardKey;
 	
 	let player;
@@ -664,7 +649,7 @@ function enableEventCards({ resilientPopulationOnly } = {})
 			if (eventTypeIsBeingPrompted(eventType))
 				return false;
 			
-			resetActionPrompt({ actionCancelled: data.promptingEventType });
+			resetActionPrompt({ actionCancelled: gameData.promptingEventType });
 			indicatePromptingEventCard();
 			promptAction({ eventType });
 		});
@@ -716,30 +701,33 @@ function disableEventCards()
 
 function actionStepInProgress()
 {
-	if (typeof data.currentStep.name === "undefined")
+	if (typeof gameData.currentStep.name === "undefined")
 		return false;
 	
-	return data.currentStep.name.substring(0,6) === "action";
+	return gameData.currentStep.name.substring(0,6) === "action";
 }
 
 function disablePawnEvents()
 {
-	for (let rID in data.players)
-		data.players[rID].disablePawn();
+	const { players } = gameData;
+
+	for (let rID in players)
+		players[rID].disablePawn();
 }
 
 function enablePawnEvents()
 {
-	const actionStep = actionStepInProgress(),
+	const { players } = gameData,
+		actionStep = actionStepInProgress(),
 		activePlayer = getActivePlayer(),
 		airlifting = eventTypeIsBeingPrompted(eventTypes.airlift),
 		dispatcherIsActive = activePlayer.role === "Dispatcher";
 
 	let player,
 		pawnsAreEnabled = false;
-	for (let rID in data.players)
+	for (let rID in players)
 	{
-		player = data.players[rID];
+		player = players[rID];
 
 		if (airlifting
 			|| (actionStep && (dispatcherIsActive || rID === activePlayer.rID)))
@@ -956,7 +944,7 @@ function getEventIconFileName(eventType, event)
 	else if (event instanceof DiscoverACure)
 		fileName += `_${getCity(event.cardKeys[0]).color}`;
 	else if (event instanceof StartingHands)
-		fileName += `_${Object.keys(data.players).length}`;
+		fileName += `_${Object.keys(gameData.players).length}`;
 	
 	return fileName;
 }
@@ -979,8 +967,8 @@ function getEventIconCssClasses(event)
 {
 	if (!event) return "actionIcon";
 
-	if (event.role && data.players[event.role])
-		return `${data.players[event.role].camelCaseRole}Border`;
+	if (event.role && gameData.players[event.role])
+		return `${gameData.players[event.role].camelCaseRole}Border`;
 	else if (event instanceof InfectCity)
 		return `${getCity(event.cityKey).color}Border darkBlueBackground`;
 	else if (event instanceof EpidemicInfect)
@@ -1015,7 +1003,7 @@ function showEventIconDetails($icon, event)
 							</div>`);
 	
 	bindEventDetailsInfoHoverEvents($detailsContainer);
-	bindEventCardHoverEvents(data, { $containingElement: $detailsContainer });
+	bindEventCardHoverEvents({ $containingElement: $detailsContainer });
 	bindEpidemicCardHoverEvents($detailsContainer);
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
@@ -1037,7 +1025,7 @@ function enforceEventDetailsHeightLimit($detailsContainer)
 		return false;
 	
 	const offsetTop = $detailsContainer.offset().top,
-		minOffsetTop = data.topPanelHeight + 5;
+		minOffsetTop = gameData.topPanelHeight + 5;
 	
 	if (offsetTop >= minOffsetTop)
 	{
@@ -1162,7 +1150,8 @@ function enableBtnCancelAction()
 function resetActionPrompt({ actionCancelled } = {})
 {
 	const $actionInterface = $("#actionInterface"),
-		$actionPrompt = $actionInterface.parent();
+		$actionPrompt = $actionInterface.parent(),
+		{ promptingEventType, promptedTravelPathProperties } = gameData;
 	
 	$actionInterface.find(".button, .playerCard").off("click");
 
@@ -1180,7 +1169,7 @@ function resetActionPrompt({ actionCancelled } = {})
 		if (activePlayer.role === "Dispatcher" || eventTypeIsBeingPrompted(airlift))
 			clusterAll({ pawns: true });
 		else
-			activePlayer.getLocation().cluster(data, { animatePawns });
+			activePlayer.getLocation().cluster({ animatePawns });
 
 		if (eventTypeIsBeingPrompted(governmentGrant))
 		{
@@ -1200,8 +1189,8 @@ function resetActionPrompt({ actionCancelled } = {})
 		hideTravelPathArrow();
 	}
 
-	data.promptingEventType = false;
-	data.promptedTravelPathProperties = false;
+	promptingEventType = false;
+	promptedTravelPathProperties = false;
 
 	if (!actionStepInProgress())
 	{
@@ -1235,7 +1224,7 @@ function promptAction(actionProperties)
 	if (interfaceIsRequired)
 	{
 		if (actionProperties.destination)
-			showTravelPathArrow(data, actionProperties);
+			showTravelPathArrow(actionProperties);
 		
 		if (!eventTypeIsBeingPrompted(eventTypes.forecastPlacement)) // Forecast can't be cancelled once the cards are drawn.
 			enableBtnCancelAction();
@@ -1416,7 +1405,7 @@ const actionInterfacePopulator = {
 
 		$actionInterface.append($discardPrompt);
 
-		bindEventCardHoverEvents(data, { $containingElement: $discardPrompt });
+		bindEventCardHoverEvents({ $containingElement: $discardPrompt });
 		if (isContingencyCard)
 			bindRoleCardHoverEvents();
 
@@ -1488,16 +1477,17 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.charterFlight.name]({ destination, nthOption })
 	{
-		const charterFlight = eventTypes.charterFlight;
+		const { promptingEventType } = gameData,
+			charterFlight = eventTypes.charterFlight;
 	
 		if (!destination) // the user explicitly selected charter flight
 		{
 			// Remember the Charter Flight actionCode to avoid prompting Direct Flight when the pawn is dropped on a destination.
-			data.promptingEventType = charterFlight;
+			promptingEventType = charterFlight;
 			return true;
 		}
 		else
-			data.promptingEventType = false;
+			promptingEventType = false;
 		
 		const currentCity = getActivePlayer().getLocation();
 		
@@ -1537,7 +1527,7 @@ const actionInterfacePopulator = {
 				movementAction(directFlight, getCity($clicked.data("key")));
 			})
 			.$actionInterface.find(".playerCard")
-				.hover(function() { showTravelPathArrow(data, { destination: getCity($(this).attr("data-key")) }) },
+				.hover(function() { showTravelPathArrow({ destination: getCity($(this).attr("data-key")) }) },
 				function() { hideTravelPathArrow() });
 		
 		return true;
@@ -1654,7 +1644,7 @@ const actionInterfacePopulator = {
 						promptAction(
 							{
 								eventType: eventTypes.shareKnowledge,
-								shareKnowledgeParticipant: data.players[$(this).data("role")]
+								shareKnowledgeParticipant: gameData.players[$(this).data("role")]
 							});
 					});
 
@@ -1757,16 +1747,17 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.operationsFlight.name]({ destination })
 	{
-		const operationsFlight = eventTypes.operationsFlight;
+		const { promptingEventType } = gameData,
+			operationsFlight = eventTypes.operationsFlight;
 	
 		if (!destination) // the user explicitly selected operations flight
 		{
 			// Remember the Operations Flight actionCode to avoid prompting Direct or Charter Flight when the pawn is dropped on a destination.
-			data.promptingEventType = operationsFlight;
+			promptingEventType = operationsFlight;
 			return true;
 		}
 		else
-			data.promptingEventType = false;
+			promptingEventType = false;
 		
 		const player = getActivePlayer(),
 			useableCardKeys = player.cardKeys.filter(key => isCityKey(key));
@@ -1836,24 +1827,26 @@ const actionInterfacePopulator = {
 	{
 		const cardKeys = getContingencyOptionCardKeys();
 
-		data.promptingEventType = eventTypes.planContingency;
+		gameData.promptingEventType = eventTypes.planContingency;
 
 		actionInterfacePopulator.appendOptionButtons("playerCard", cardKeys, function($clicked)
 		{
 			planContingency($clicked.data("key"));
 		});
 
-		bindEventCardHoverEvents(data, actionInterfacePopulator.$actionInterface);
+		bindEventCardHoverEvents(actionInterfacePopulator.$actionInterface);
 		
 		return true;
 	},
 	[eventTypes.airlift.name]({ playerToAirlift, destination })
 	{	
+		const { promptingEventType, promptedTravelPathProperties } = gameData;
+
 		if (!destination)
 		{
 			clusterAll({ pawns: true });
-			data.promptingEventType = eventTypes.airlift;
-			data.promptedTravelPathProperties = false;
+			promptingEventType = eventTypes.airlift;
+			promptedTravelPathProperties = false;
 			hideTravelPathArrow();
 
 			enablePawnEvents();
@@ -1869,10 +1862,9 @@ const actionInterfacePopulator = {
 				onConfirm: function()
 				{
 					resetActionPrompt();
-					data.promptingEventType = false;
+					promptingEventType = false;
 					airlift(playerToAirlift, destination);
-				},
-				
+				}
 			});
 
 			bindRoleCardHoverEvents();
@@ -1886,7 +1878,7 @@ const actionInterfacePopulator = {
 		disablePawnEvents();
 		disableDiseaseCubeEvents();
 		
-		data.promptingEventType = eventTypes.governmentGrant;
+		gameData.promptingEventType = eventTypes.governmentGrant;
 		
 		if (targetCity)
 		{
@@ -1909,7 +1901,7 @@ const actionInterfacePopulator = {
 		if (getResearchStationSupplyCount() === 0)
 			return promptGovernmentGrantStationRelocation();
 		
-		if (!data.promptedTravelPathProperties)
+		if (!gameData.promptedTravelPathProperties)
 		{
 			hideTravelPathArrow();
 			highlightResearchStationSupply(newGrantStation());
@@ -1926,7 +1918,7 @@ const actionInterfacePopulator = {
 		
 		const eventType = eventTypes.resilientPopulation;
 		
-		data.promptingEventType = eventType;
+		gameData.promptingEventType = eventType;
 
 		if (cardKeyToRemove)
 		{
@@ -1975,7 +1967,7 @@ const actionInterfacePopulator = {
 		
 		const eventType = eventTypes.forecast;
 
-		data.promptingEventType = eventType;
+		gameData.promptingEventType = eventType;
 		actionInterfacePopulator.appendDiscardPrompt(
 		{
 			cardKeys: eventType.cardKey,
@@ -2007,7 +1999,7 @@ async function planContingency(cardKey)
 
 	await Promise.all([
 		requestAction(eventType, { cardKey }),
-		contingencyPlanner.panel.animateReceiveCard($eventCard, data, { isContingencyCard: true })
+		contingencyPlanner.panel.animateReceiveCard($eventCard, { isContingencyCard: true })
 	]);
 
 	contingencyPlanner.contingencyKey = cardKey;
@@ -2048,7 +2040,7 @@ function forecastInProgress()
 
 async function forecastDraw(forecastEventToLoad)
 {
-	data.promptingEventType = eventTypes.forecastPlacement;
+	gameData.promptingEventType = eventTypes.forecastPlacement;
 	
 	$("#btnCancelAction").off("click").addClass("hidden");
 	disableActions();
@@ -2098,7 +2090,7 @@ function animateForecastDraw(cardKeys)
 		for (let card of cards)
 			revealInfectionCard(card, { forecasting: true });
 		// ...but revealed simultaneously after the following duration:
-		await sleep(getDuration(data, "mediumInterval"));
+		await sleep(getDuration("mediumInterval"));
 	
 		enableForecastSorting($cardContainer);
 		$container.find(".concealed").removeClass("concealed");
@@ -2201,7 +2193,7 @@ async function animateForecastPlacement($cardContainer)
 							src='images/cards/infectionCardback.png'
 							alt='Infection Card' />`));
 	
-	const $cardbacks = $cardContainer.find(".forecastCardback").width(getDimension(data, "diseaseIcon")),
+	const $cardbacks = $cardContainer.find(".forecastCardback").width(getDimension("diseaseIcon")),
 		$elementsToFadeOut = $(".instructions")
 			.add($cardContainer.siblings("p")) // Top/Bottom labels
 			.add($cards.children(".infectionCardContents"));
@@ -2222,7 +2214,7 @@ async function animateForecastPlacement($cardContainer)
 		})
 	]);
 
-	await sleep(getDuration(data, "shortInterval"));
+	await sleep(getDuration("shortInterval"));
 
 	const cardbackInitialWidth = $cardbacks.first().width(),
 		$deck = $("#imgInfectionDeck"),
@@ -2345,7 +2337,7 @@ function positionResilientPopulationArrow($arrow)
 	$arrow = $arrow || $("#resilientPopulationArrow");
 	makeElementsSquare($arrow.removeClass("hidden"));
 	
-	offset.top += data.topPanelHeight + $arrow.outerHeight() * 0.8;
+	offset.top += gameData.topPanelHeight + $arrow.outerHeight() * 0.8;
 	offset.left += $infectionDiscardPile.outerWidth() / 2;
 	offset.left -= $arrow.outerWidth() / 2;
 
@@ -2431,7 +2423,7 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 		.add($removedCardsContainer)
 		.removeAttr("style");
 
-	await sleep(getDuration(data, "longInterval"));
+	await sleep(getDuration("longInterval"));
 	return collapseInfectionDiscardPile();
 }
 
@@ -2444,10 +2436,10 @@ async function tryAirlift(playerToAirlift)
 		return invalidMovement(playerToAirlift.getLocation());
 
 	const airliftDetails = { eventType: airlift, playerToAirlift, destination };
-	data.promptedTravelPathProperties = airliftDetails;
+	gameData.promptedTravelPathProperties = airliftDetails;
 	promptAction(airliftDetails);
 
-	await playerToAirlift.getLocation().cluster(data);
+	await playerToAirlift.getLocation().cluster();
 }
 
 async function airlift(playerToAirlift, destination)
@@ -2464,7 +2456,7 @@ async function airlift(playerToAirlift, destination)
 	
 	await discardOrRemoveEventCard(events.shift());
 
-	setDuration(data, "pawnAnimation", 1000);
+	setDuration("pawnAnimation", 1000);
 	await playerToAirlift.updateLocation(destination);
 	appendEventHistoryIconOfType(eventType);
 
@@ -2492,7 +2484,7 @@ function newGrantStation()
 	setTravelPathArrowColor({ governmentGranting: true });
 	$grantStation.draggable({
 			containment: $boardContainer,
-			drag: function() { showTravelPathArrow(data, { $researchStation: $(this) }) }
+			drag: function() { showTravelPathArrow({ $researchStation: $(this) }) }
 		})
 		.mousedown(function()
 		{
@@ -2501,7 +2493,7 @@ function newGrantStation()
 			$(window).off("mouseup").mouseup(function()
 			{
 				$(window).off("mouseup");
-				getGovernmentGrantTargetCity($grantStation, data, promptAction);
+				getGovernmentGrantTargetCity($grantStation, promptAction);
 			});
 		});
 	
@@ -2518,7 +2510,7 @@ function animateResearchStationBackToSupply($researchStation)
 		$researchStation
 			.draggable({ disabled: true })
 			.animate($("#researchStationSupply img").offset(),
-				getDuration(data, "stationPlacement"),
+				getDuration("stationPlacement"),
 				function()
 				{
 					researchStationKeys.delete(key);
@@ -2528,7 +2520,7 @@ function animateResearchStationBackToSupply($researchStation)
 					if (city)
 					{
 						city.hasResearchStation = false;
-						city.cluster(data, { animatePawns: true, animateCubes: true });
+						city.cluster({ animatePawns: true, animateCubes: true });
 					}
 
 					resolve();
@@ -2565,11 +2557,11 @@ async function governmentGrant(targetCity, relocationKey)
 
 	if (relocationKey)
 	{
-		await getCity(relocationKey).relocateResearchStationTo(data, targetCity);
+		await getCity(relocationKey).relocateResearchStationTo(targetCity);
 		turnOffResearchStationHighlights();
 	}
 	else
-		await targetCity.buildResearchStation(data, promptAction, { animate: true, isGovernmentGrant: true });
+		await targetCity.buildResearchStation(promptAction, { animate: true, isGovernmentGrant: true });
 	
 	hideTravelPathArrow();
 	appendEventHistoryIconOfType(eventType);
@@ -2578,7 +2570,9 @@ async function governmentGrant(targetCity, relocationKey)
 
 function eventTypeIsBeingPrompted(eventType)
 {
-	return data.promptingEventType && data.promptingEventType.code === eventType.code;
+	const { promptingEventType } = gameData;
+
+	return promptingEventType && promptingEventType.code === eventType.code;
 }
 
 function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyToExclude } = {})
@@ -2586,9 +2580,13 @@ function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyTo
 	const rIdToExclude = playerToExcludePawn ? playerToExcludePawn.rID : false;
 	
 	if (pawns)
-		for (let rID in data.players)
+	{
+		const { players } = gameData;
+
+		for (let rID in players)
 			if (rID !== rIdToExclude)
-				queueCluster(data.players[rID].cityKey);
+				queueCluster(players[rID].cityKey);
+	}
 
 	if (researchStations)
 	{
@@ -2614,7 +2612,7 @@ function discardOrRemoveEventCard(event)
 	{
 		const cardKey = event.eventCard.key,
 			$card = $("#playerPanelContainer").find(`.playerCard[data-key='${cardKey}']`),
-			player = data.players[event.role];
+			player = gameData.players[event.role];
 		
 		$card.removeClass("unavailable");
 
@@ -2643,8 +2641,8 @@ function animateContingencyCardRemoval()
 		disablePlayerDiscardHoverEvents();
 		await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
 		await animateDiscardPlayerCard($card, { removingContingencyCard: true });
-		getPlayer("Contingency Planner").panel.checkOcclusion(data);
-		await sleep(getDuration(data, "longInterval"));
+		getPlayer("Contingency Planner").panel.checkOcclusion();
+		await sleep(getDuration("longInterval"));
 		await collapsePlayerDiscardPile();
 		enablePlayerDiscardHoverEvents();
 
@@ -2674,10 +2672,10 @@ async function tryDispatchPawn(playerToDispatch)
 		
 		actionDetails.dispatchMethod = dispatcherMustChooseMethod ? eventTypes.chooseFlightType : method;
 		
-		data.promptedTravelPathProperties = actionDetails;
+		gameData.promptedTravelPathProperties = actionDetails;
 		promptAction(actionDetails);
 
-		await playerToDispatch.getLocation().cluster(data);
+		await playerToDispatch.getLocation().cluster();
 	}
 	else // The dispatch method can be executed immediately.
 		movementAction(method, destination, { playerToDispatch });
@@ -2794,7 +2792,7 @@ class DiscardPrompt
 		}
 
 		this.updateCountIndicators();
-		bindEventCardHoverEvents(data, { $containingElement: this.$container });
+		bindEventCardHoverEvents({ $containingElement: this.$container });
 
 		return this.$container;
 	}
@@ -2865,7 +2863,7 @@ class DiscardPrompt
 		if (this.eventTypeCode === eventTypes.discard.code)
 		{
 			this.$keepersContainer.find("span")
-				.html(`${this.keeperCount} / ${data.HAND_LIMIT} `)
+				.html(`${this.keeperCount} / ${gameData.HAND_LIMIT} `)
 				.css("color", textColor);
 		}
 			
@@ -2907,7 +2905,7 @@ function requestAction(eventType, dataToPost)
 		{
 			...{
 				actionCode: eventType.code,
-				currentStep: data.currentStep.name,
+				currentStep: gameData.currentStep.name,
 				role: getActivePlayer().rID
 			},
 			...dataToPost
@@ -2934,18 +2932,18 @@ function requestAction(eventType, dataToPost)
 			{
 				// Only some actions report back with the turn number and the next step.
 				if (turnNum)
-					data.turnNum = turnNum;
+					gameData.turnNum = turnNum;
 					
 				if (nextStep)
-					data.nextStep = nextStep;
+					gameData.nextStep = nextStep;
 				else if (proceedFromDiscardToStep)
 					bypassDiscardStep(proceedFromDiscardToStep);
 
 				if (numPlayerCardsRemaining)
-					data.numPlayerCardsRemaining = numPlayerCardsRemaining;
+					gameData.numPlayerCardsRemaining = numPlayerCardsRemaining;
 
 				if (gameEndCause)
-					data.gameEndCause = gameEndCause;
+					gameData.gameEndCause = gameEndCause;
 				
 				if (events)
 					resolve(parseEvents(events));
@@ -2970,7 +2968,7 @@ async function passActions()
 function getValidShareKnowledgeParticipants(player)
 {
 	// Begin by creating an array of all other players in the same city as the initiating player. 
-	const playersInSameCity = player.getLocation().getOccupants(data.players)
+	const playersInSameCity = player.getLocation().getOccupants(gameData.players)
 		.filter(p => p.rID !== player.rID);
 
 	// If the initiating player can give, then all players in the same city are valid participants.
@@ -3043,10 +3041,7 @@ function promptResearchStationRelocation()
 
 			city.getResearchStation().addClass("mediumGlow");
 			setTravelPathArrowColor({ relocatingResearchStation: true });
-			showTravelPathArrow(data, {
-				origin: city,
-				destination: getActivePlayer().getLocation()
-			});
+			showTravelPathArrow({ origin: city, destination: getActivePlayer().getLocation() });
 		},
 		function()
 		{
@@ -3094,11 +3089,11 @@ async function buildResearchStation(relocationKey)
 	if (relocationKey)
 	{
 		$("#boardContainer").children(".researchStation").not("#placeholderStation").removeClass("mediumGlow");
-		await getCity(relocationKey).relocateResearchStationTo(data, city);
+		await getCity(relocationKey).relocateResearchStationTo(city);
 		hideTravelPathArrow();
 	}
 	else
-		await city.buildResearchStation(data, promptAction, { animate: true });
+		await city.buildResearchStation(promptAction, { animate: true });
 	
 	appendEventHistoryIconOfType(eventType);
 	proceed();
@@ -3106,13 +3101,14 @@ async function buildResearchStation(relocationKey)
 
 async function movementAction(eventType, destination, { playerToDispatch, operationsFlightDiscardKey } = {})
 {
-	const player = playerToDispatch || getActivePlayer(),
+	const { promptingEventType } = gameData,
+		player = playerToDispatch || getActivePlayer(),
 		originCity = player.getLocation();
 
 	let movementDetails;
-	if (data.promptingEventType)
+	if (promptingEventType)
 	{
-		eventType = data.promptingEventType;
+		eventType = promptingEventType;
 		destination = getDestination(eventType);
 
 		if (destination)
@@ -3122,10 +3118,10 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 				destination: destination
 			};
 
-			data.promptedTravelPathProperties = movementDetails;
+			gameData.promptedTravelPathProperties = movementDetails;
 			promptAction(movementDetails);
 			
-			originCity.cluster(data);
+			originCity.cluster();
 			return false;
 		}
 
@@ -3140,10 +3136,10 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		{
 			if (movementDetails.waitingForConfirmation)
 			{
-				data.promptedTravelPathProperties = movementDetails;
+				gameData.promptedTravelPathProperties = movementDetails;
 				promptAction(movementDetails);
 				
-				originCity.cluster(data);
+				originCity.cluster();
 				return false;
 			}
 			
@@ -3164,8 +3160,8 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 
 	if (!movementTypeRequiresDiscard(eventType))
 	{
-		originCity.cluster(data);
-		showTravelPathArrow(data, { player, destination });
+		originCity.cluster();
+		showTravelPathArrow({ player, destination });
 	}
 	
 	try
@@ -3187,7 +3183,7 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		const events = await requestAction(eventType, dataToPost);
 		await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
-		setDuration(data, "pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
+		setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
 		await player.updateLocation(destination);
 		appendEventHistoryIconOfType(playerToDispatch || eventType.code === eventTypes.rendezvous.code ? eventTypes.dispatchPawn : eventType);
 
@@ -3207,8 +3203,8 @@ async function invalidMovement(originCity)
 {
 	disablePawnEvents();
 	await Promise.all([
-		animateInvalidTravelPath(data),
-		originCity.cluster(data)
+		animateInvalidTravelPath(),
+		originCity.cluster()
 	]);
 	enablePawnEvents();
 
@@ -3224,7 +3220,7 @@ function animateAutoTreatDiseaseEvents(events)
 			autoTreatEvents = events.filter(e => e instanceof AutoTreatDisease
 												|| e instanceof Eradication),
 			city = getPlayer("Medic").getLocation(),
-			interval = getDuration(data, "shortInterval");
+			interval = getDuration("shortInterval");
 
 		for (let e of autoTreatEvents)
 		{
@@ -3238,7 +3234,7 @@ function animateAutoTreatDiseaseEvents(events)
 					color: e.diseaseColor,
 					numToRemove: "all"
 				});
-				city.decrementCubeCount(data.diseaseCubeSupplies, e.diseaseColor, city.cubes[e.diseaseColor]);
+				city.decrementCubeCount(gameData.diseaseCubeSupplies, e.diseaseColor, city.cubes[e.diseaseColor]);
 
 				await sleep(interval);
 				await hideMedicAutoTreatCircle();
@@ -3310,7 +3306,7 @@ async function treatDisease($cube, diseaseColor)
 		color: diseaseColor,
 		numToRemove
 	});
-	city.decrementCubeCount(data.diseaseCubeSupplies, diseaseColor, numToRemove);
+	city.decrementCubeCount(gameData.diseaseCubeSupplies, diseaseColor, numToRemove);
 	appendEventHistoryIconOfType(eventType);
 
 	if (eradicated)
@@ -3325,7 +3321,7 @@ function eradicationEvent(diseaseColor)
 	{
 		flipCureMarkerToEradicated(diseaseColor);
 
-		data.cures[diseaseColor] = "eradicated";
+		gameData.cures[diseaseColor] = "eradicated";
 		
 		await specialEventAlert(
 		{
@@ -3359,7 +3355,7 @@ function finishActionStep()
 
 function abortMovementAction(player)
 {
-	player.getLocation().cluster(data);
+	player.getLocation().cluster();
 
 	// TODO: handle different types of failure
 	// such as the location or turn being incorrect,
@@ -3423,14 +3419,14 @@ function getDestination(eventType, { player, dispatching } = {})
 	
 	const validDestinationKeys = player[methodName]({ dispatching }),
 		pawnOffset = player.getPawnOffset(),
-		distanceThreshold = getDimension(data, "piecePlacementThreshold");
+		distanceThreshold = getDimension("piecePlacementThreshold");
 
 	// If the pawn was dropped close enough to a valid destination city, return that city
 	let city;
 	for (let key of validDestinationKeys)
 	{
 		city = getCity(key);
-		if (distanceBetweenPoints(pawnOffset, city.getOffset(data)) < distanceThreshold)
+		if (distanceBetweenPoints(pawnOffset, city.getOffset()) < distanceThreshold)
 			return city;
 	}
 	
@@ -3445,9 +3441,9 @@ async function drawStep()
 	getActivePlayer().disablePawn();
 	$container.find(".playerCard").remove();
 
-	if (data.numPlayerCardsRemaining == 0) // the players lose.
+	if (gameData.numPlayerCardsRemaining == 0) // the players lose.
 	{
-		data.gameEndCause = "cards";
+		gameData.gameEndCause = "cards";
 		return outOfPlayerCardsDefeatAnimation($container);
 	}
 
@@ -3470,18 +3466,18 @@ async function drawStep()
 		.catch((reason) => console.log(reason));
 	if (!cardKeys) return false;
 
-	if (data.nextStep === "epIncrease")
+	if (gameData.nextStep === "epIncrease")
 	{
 		let title;
 		
 		if (numEpidemicsToResolve() === 1)
 		{
-			data.epidemicCount++;
+			gameData.epidemicCount++;
 			title = "EPIDEMIC!"
 		}
 		else
 		{
-			data.epidemicCount += 2;
+			gameData.epidemicCount += 2;
 			title = "DOUBLE EPIDEMIC!!";
 		}
 
@@ -3499,7 +3495,8 @@ async function performDrawStep()
 	return new Promise(async (resolve, reject) =>
 	{
 		const $container = $("#cardDrawContainer"),
-			numCardsToDeal = data.numPlayerCardsRemaining >= 2 ? 2 : data.numPlayerCardsRemaining,
+			{ numPlayerCardsRemaining, gameEndCause } = gameData,
+			numCardsToDeal = numPlayerCardsRemaining >= 2 ? 2 : numPlayerCardsRemaining,
 			{ 0: events } = await Promise.all(
 			[
 				requestAction(eventTypes.cardDraw),
@@ -3519,17 +3516,17 @@ async function performDrawStep()
 				revealPlayerCard(key, $container);
 		}
 		
-		if (data.gameEndCause) // not enough player cards remain in the deck -- the players lose.
+		if (gameEndCause) // not enough player cards remain in the deck -- the players lose.
 		{
-			await sleep(getDuration(data, "longInterval"));
+			await sleep(getDuration("longInterval"));
 			reject("Out of player cards -- the players lose.");
 			return outOfPlayerCardsDefeatAnimation($container);
 		}
 
 		bindCityLocatorClickEvents();
-		bindEventCardHoverEvents(data, { $containingElement: $container });
+		bindEventCardHoverEvents({ $containingElement: $container });
 		
-		await sleep(getDuration(data, "mediumInterval"));
+		await sleep(getDuration("mediumInterval"));
 		resolve(cardDrawEvent.cardKeys);
 	});
 }
@@ -3550,7 +3547,7 @@ async function finishDrawStep(cardKeys)
 async function dealFaceDownPlayerCards($container, numCardsToDeal)
 {
 	const deckOffset = $("#imgPlayerDeck").offset();
-	let numCardsInDeck = data.numPlayerCardsRemaining - 1;
+	let numCardsInDeck = gameData.numPlayerCardsRemaining - 1;
 
 	for (let i = 0; i < numCardsToDeal; i++)
 	{
@@ -3561,9 +3558,9 @@ async function dealFaceDownPlayerCards($container, numCardsToDeal)
 		}
 
 		dealFaceDownPlayerCard($container, deckOffset);
-		await sleep(getDuration(data, "dealCard") * 0.5);
+		await sleep(getDuration("dealCard") * 0.5);
 	}
-	return sleep(getDuration(data, "longInterval"));
+	return sleep(getDuration("longInterval"));
 }
 
 function dealFaceDownPlayerCard($container, deckOffset, { finalCardbackWidth, zIndex } = {})
@@ -3590,7 +3587,7 @@ function dealFaceDownPlayerCard($container, deckOffset, { finalCardbackWidth, zI
 				top: containerOffset.top,
 				left: containerOffset.left
 			},
-			getDuration(data, "dealCard"),
+			getDuration("dealCard"),
 			data.easings.dealCard,
 			function() { $cardback.removeClass("template") });
 }
@@ -3603,7 +3600,7 @@ function newFacedownPlayerCard()
 async function revealPlayerCard(cardKey, $container)
 {
 	const $card = $(newPlayerCard(getCityOrEventCardObject(cardKey))),
-		duration = getDuration(data, "revealPlayerCard"),
+		duration = getDuration("revealPlayerCard"),
 		easing = data.easings.revealCard;
 
 	if ($container.hasClass("roleContainer"))
@@ -3638,7 +3635,7 @@ async function animateCardsToHand($cards)
 		lastCardTop += targetProperties.height + 2; // + 2 for slight separation
 	
 	// There will always be 2 cards to handle.
-	panel.animateReceiveCard($cards.last(), data,
+	panel.animateReceiveCard($cards.last(),
 	{
 		...targetProperties,
 		...{ top: lastCardTop }
@@ -3647,10 +3644,10 @@ async function animateCardsToHand($cards)
 	// If there are 0 epidemics, the cards are animated to the hand simultaneously.
 	// If $cards.first() is an epidemic, await the same duration to finish the draw animation before expanding the epidemic.
 	if ($cards.first().hasClass("epidemic"))
-		await sleep(getDuration(data, "dealCard"));
+		await sleep(getDuration("dealCard"));
 	// Returning the second Promise (instead of Promise.all) avoids an issue where the cards
 	// can swap positions after being inserted into the hand.
-	return panel.animateReceiveCard($cards.first(), data, targetProperties);
+	return panel.animateReceiveCard($cards.first(), targetProperties);
 }
 
 function resizeAll()
@@ -3667,7 +3664,7 @@ function resizeAll()
 		positionPawnArrows();
 		repositionSpecialEventBanner();
 
-		data.windowWidth = data.boardWidth + data.panelWidth;
+		gameData.windowWidth = gameData.boardWidth + gameData.panelWidth;
 
 		resolve();
 	});
@@ -3676,22 +3673,23 @@ $(window).resize(function(){ waitForFinalEvent(function(){resizeAll(true)}, 500,
 
 function resizeBoard()
 {
-	data.boardWidth = $("#boardImg").width();
-	data.boardHeight = $("#boardImg").height();
-	$("#boardContainer").height(data.boardHeight);
+	gameData.boardWidth = $("#boardImg").width();
+	gameData.boardHeight = $("#boardImg").height();
+	$("#boardContainer").height(gameData.boardHeight);
 
 	resetPinpointRectangles();
-	data.cityWidth = getDimension(data, "cityWidth");
+	gameData.cityWidth = getDimension("cityWidth");
 }
 
 function resetPinpointRectangles()
 {
-	const $pinpointers = $(".pinpointRect");
+	const $pinpointers = $(".pinpointRect"),
+		{ boardHeight, boardWidth } = gameData;
 
 	$pinpointers.stop()
 		.removeAttr("style")
-		.height(data.boardHeight)
-		.width(data.boardWidth)
+		.height(boardHeight)
+		.width(boardWidth)
 		.addClass("hidden");
 }
 
@@ -3701,17 +3699,17 @@ function resizeTopPanelElements()
 		$topPanelDivs = $topPanel.children("div");
 	
 	$topPanelDivs.css("height", "auto");
-	data.topPanelHeight = $("#topPanel").height();
-	$topPanelDivs.height(data.topPanelHeight);
+	gameData.topPanelHeight = $("#topPanel").height();
+	$topPanelDivs.height(gameData.topPanelHeight);
 	resizeCubeSupplies();
-	data.infectionDeckOffset = $("#imgInfectionDeck").offset();
+	gameData.infectionDeckOffset = $("#imgInfectionDeck").offset();
 
 	resizeInfectionDiscardElements();
 }
 
 function resizeCubeSupplies()
 {
-	$(".cubeSupply").css("margin-top", getDimension(data, "cubeSupplyMarginTop") + "px");
+	$(".cubeSupply").css("margin-top", getDimension("cubeSupplyMarginTop") + "px");
 	makeElementsSquare(".cubeSupply .diseaseCube");
 }
 
@@ -3737,13 +3735,13 @@ function resizeInfectionCards($container)
 	if (!$infectionCards.length)
 		return false;
 
-	$infectionCards.height(getDimension(data, "infDiscardHeight"))
+	$infectionCards.height(getDimension("infDiscardHeight"))
 		.find(".cityName")
 		.css(getInfectionCardTextStyle($container));
 	
 	if ($container.attr("id") === "eventDetails")
 	{
-		const cardWidth = data.boardWidth * 0.2,
+		const cardWidth = gameData.boardWidth * 0.2,
 			newContainerWidth = cardWidth / .96,
 			checkWidth = !$container.width();
 		
@@ -3770,11 +3768,12 @@ function positionRemovedInfectionCardsContainer()
 	const $discardPile = $removedCardsContainer.parent(),
 		$discards = $discardPile.children(".infectionCard"),
 		occupiedPanelHeight = $discardPile.children(".title").outerHeight()
-			+ (($discards.first().outerHeight() + 2) * $discards.length);
+			+ (($discards.first().outerHeight() + 2) * $discards.length),
+		{ topPanelHeight } = gameData;
 	
 	let mTop = 20;
-	if (occupiedPanelHeight < data.topPanelHeight)
-		mTop = (data.topPanelHeight - occupiedPanelHeight);
+	if (occupiedPanelHeight < topPanelHeight)
+		mTop = (topPanelHeight - occupiedPanelHeight);
 
 	$removedCardsContainer.css("margin-top", mTop + "px");
 }
@@ -3784,24 +3783,25 @@ function resizeBottomPanelElements()
 	hideEventIconDetails();
 	
 	const $eventHistoryContainer = $("#eventHistoryContainer"),
-		panelOffsetTop = data.boardHeight - data.topPanelHeight;
+		{ boardHeight, topPanelHeight } = gameData,
+		panelOffsetTop = boardHeight - topPanelHeight;
 	$(".bottomPanelDiv").not($eventHistoryContainer)
-		.height(data.topPanelHeight)
+		.height(topPanelHeight)
 		.offset({ top: panelOffsetTop });
 
-	$("#researchStationSupply").css("font-size", getDimension(data, "stationSupplyCountFont") + "px");
+	$("#researchStationSupply").css("font-size", getDimension("stationSupplyCountFont") + "px");
 
-	$("#playerCards, .playerPile").height(getDimension(data, "bottomPanelDivs"));
+	$("#playerCards, .playerPile").height(getDimension("bottomPanelDivs"));
 
 	const $cureMarkerContainer = $("#cureMarkerContainer"),
 		titleHeight = $cureMarkerContainer.children(".title").height() + 10;
 	$cureMarkerContainer
-		.height(data.topPanelHeight + titleHeight)
+		.height(topPanelHeight + titleHeight)
 		.offset({ top: panelOffsetTop - titleHeight });
 	
-	const ehContainerHeight = data.topPanelHeight * 0.42;
+	const ehContainerHeight = topPanelHeight * 0.42;
 	$eventHistoryContainer.height(ehContainerHeight)
-		.offset({ top: panelOffsetTop + data.topPanelHeight*0.58 })
+		.offset({ top: panelOffsetTop + topPanelHeight*0.58 })
 		.children().height(ehContainerHeight)
 		.css("line-height", ehContainerHeight*1.07 + "px");
 	
@@ -3811,8 +3811,8 @@ function resizeBottomPanelElements()
 function resizeRightPanelElements()
 {
 	const rightPanel = $("#rightPanel");
-	rightPanel.height(data.boardHeight);
-	data.panelWidth = rightPanel.width();
+	rightPanel.height(gameData.boardHeight);
+	gameData.panelWidth = rightPanel.width();
 	
 	if ($("#infectionsContainer, #initialInfectionsContainer").not(".hidden").length)
 	{
@@ -3831,13 +3831,13 @@ function resizeTreatDiseaseOptions()
 function repositionMarkers()
 {
 	moveInfectionRateMarker();
-	moveOutbreaksMarker(data.outbreakCount);
+	moveOutbreaksMarker(gameData.outbreakCount);
 	positionCureMarkers();
 }
 
 function positionCureMarkers()
 {
-	$(".cureMarker").css("margin-top", getDimension(data, "cureMarkerMarginTop"));
+	$(".cureMarker").css("margin-top", getDimension("cureMarkerMarginTop"));
 }
 
 function resizeAndRepositionPieces()
@@ -3847,14 +3847,14 @@ function resizeAndRepositionPieces()
 		calibratePieceDimensions("pawn");
 		calibratePieceDimensions("station");
 		
-		const cubeWidth = getDimension(data, "cubeWidth");
+		const cubeWidth = getDimension("cubeWidth");
 		$("#boardContainer > .diseaseCube").width(cubeWidth).height(cubeWidth);
-		data.cubeWidth = cubeWidth;
+		gameData.cubeWidth = cubeWidth;
 	
 		positionAutoTreatCircleComponents();
 		
 		// a slight delay is required for all pending clusters to resolve properly
-		if (data.pendingClusters.size)
+		if (gameData.pendingClusters.size)
 			return sleep(50);
 		else // cluster all cities containing pawns, disease cubes, or research stations
 		{
@@ -3863,7 +3863,7 @@ function resizeAndRepositionPieces()
 			{
 				city = getCity(key);
 				if (city.containsPieces())
-					city.cluster(data);
+					city.cluster();
 			}
 		}
 
@@ -3884,17 +3884,19 @@ function calibratePieceDimensions(pieceName)
 		return false;
 	
 	$demoElement.removeClass("hidden");
-	data[`${pieceName}Height`] = $demoElement.height();
-	data[`${pieceName}Width`] = $demoElement.width();
+	gameData[`${pieceName}Height`] = $demoElement.height();
+	gameData[`${pieceName}Width`] = $demoElement.width();
 	$demoElement.addClass("hidden");
 }
 
 function positionPawnArrows()
 {
+	const { players } = gameData;
 	let player;
-	for (let rID in data.players)
+
+	for (let rID in players)
 	{
-		player = data.players[rID];
+		player = players[rID];
 
 		if (player.hasOwnProperty("$pawnArrow") && !player.$pawnArrow.hasClass("hidden"))
 			player.animatePawnArrow();
@@ -3906,14 +3908,15 @@ function positionPawnArrows()
 function repositionSpecialEventBanner()
 {
 	const $banner = $("#specialEventBanner"),
-		bannerHeight = $banner.height();
+		bannerHeight = $banner.height(),
+		{ boardHeight } = gameData;
 	
-	$banner.offset({ top: data.boardHeight / 2 - bannerHeight });
+	$banner.offset({ top: boardHeight/2 - bannerHeight });
 
 	$(".specialEventImg").css(
 	{
-		top: data.boardHeight / 2 + bannerHeight / 4,
-		left: getDimension(data, "specialEventImgMarginLeft")
+		top: boardHeight/2 + bannerHeight/4,
+		left: getDimension("specialEventImgMarginLeft")
 	});
 }
 
@@ -3938,7 +3941,7 @@ function bindRoleCardHoverEvents()
 				$hoveredElement = $this;
 
 				if ($this.hasClass("roleTag") || $this.hasClass("specialAbilityTag"))
-					player = data.players[$this.attr("data-role")];
+					player = getPlayer($this.attr("data-role"));
 				else
 					player = getActivePlayer();
 			}
@@ -3951,8 +3954,10 @@ function bindRoleCardHoverEvents()
 
 function managePlayerPanelOcclusion(citiesToCheck)
 {
-	for (let rID in data.players)
-		data.players[rID].panel.checkOcclusion(data, citiesToCheck);
+	const { players } = gameData;
+
+	for (let rID in players)
+		players[rID].panel.checkOcclusion(citiesToCheck);
 }
 
 class Player
@@ -4007,7 +4012,7 @@ class Player
 				roleCardOffset.left = $eventDetails.offset().left + $eventDetails.outerWidth() + CARD_MARGIN;
 			}
 			else
-				roleCardOffset.left = data.boardWidth - ($roleCard.width() + CARD_MARGIN);
+				roleCardOffset.left = gameData.boardWidth - ($roleCard.width() + CARD_MARGIN);
 		}
 		else
 		{
@@ -4019,7 +4024,7 @@ class Player
 		ensureDivPositionIsWithinWindowHeight($roleCard);
 
 		if (showFullContingencyCard)
-			eventCards[contingencyKey].showFullCard(getContingencyCardElement(), data);
+			eventCards[contingencyKey].showFullCard(getContingencyCardElement());
 	}
 
 	newRoleTag()
@@ -4059,8 +4064,8 @@ class Player
 			$("#travelPathArrowContainer").css("z-index", 4);
 			await Promise.all(
 			[
-				destination.cluster(data, { animatePawns: true }),
-				origin.cluster(data, { animatePawns: true })
+				destination.cluster({ animatePawns: true }),
+				origin.cluster({ animatePawns: true })
 			]);
 
 			hideTravelPathArrow();
@@ -4077,10 +4082,11 @@ class Player
 
 	getPawnOffset()
 	{
-		const offset = this.$pawn.offset();
+		const offset = this.$pawn.offset(),
+			{ pawnWidth, pawnHeight } = gameData;
 
-		offset.left += data.pawnWidth / 2;
-		offset.top += data.pawnHeight;
+		offset.left += pawnWidth / 2;
+		offset.top += pawnHeight;
 
 		return offset;
 	}
@@ -4097,24 +4103,25 @@ class Player
 	async animatePawnArrow()
 	{
 		const $arrow = this.$pawnArrow,
-			initialOffset = this.getPawnOffset();
+			initialOffset = this.getPawnOffset(),
+			{ pawnHeight, boardWidth } = gameData;
 	
 		let arrowClass = "",
 			dropShadowBlurRadiusFactor = .003,
-			initialOffsetTopAdj = data.pawnHeight * 2;
+			initialOffsetTopAdj = pawnHeight * 2;
 		if (eventTypeIsBeingPrompted(eventTypes.airlift))
 			arrowClass = "airlift";
 		else if (getActivePlayer().role !== this.role)
 		{
 			arrowClass = "dispatch";
 			dropShadowBlurRadiusFactor = 0.002;
-			initialOffsetTopAdj -= data.pawnHeight / 3;
+			initialOffsetTopAdj -= pawnHeight / 3;
 		}
 
 		$arrow.stop()
 			.removeClass("airlift dispatch hidden")
 			.addClass(arrowClass)
-			.css("filter", `drop-shadow(0px 0px ${data.boardWidth*dropShadowBlurRadiusFactor}px #fff)`);
+			.css("filter", `drop-shadow(0px 0px ${boardWidth*dropShadowBlurRadiusFactor}px #fff)`);
 		
 		makeElementsSquare($arrow);	
 
@@ -4181,7 +4188,7 @@ class Player
 					}
 				})
 				.animate(desiredOffset,
-				getDuration(data, "dealCard"),
+				getDuration("dealCard"),
 				function()
 				{
 					$card.removeAttr("style").insertAfter($insertAfterMe);
@@ -4189,8 +4196,8 @@ class Player
 					giver.removeCardsFromHand(cardKey);
 					receiver.addCardKeysToHand(cardKey);
 
-					giver.panel.checkOcclusion(data);
-					receiver.panel.checkOcclusion(data);
+					giver.panel.checkOcclusion();
+					receiver.panel.checkOcclusion();
 
 					resolve();
 				});
@@ -4284,7 +4291,7 @@ class Player
 
 	canShareKnowledge()
 	{
-		const playersAtCurrentLocation = this.getLocation().getOccupants(data.players);
+		const playersAtCurrentLocation = this.getLocation().getOccupants(gameData.players);
 		
 		// Share Knowledge requires:
 		// - Another pawn at the current location.
@@ -4361,7 +4368,7 @@ class Player
 		for (let color in cardsByColor)
 		{
 			cardsOfColor = cardsByColor[color];
-			if (cardsOfColor.length >= NUM_CARDS_REQUIRED && !data.cures[color])
+			if (cardsOfColor.length >= NUM_CARDS_REQUIRED && !gameData.cures[color])
 				return cardsOfColor;
 		}
 		
@@ -4451,16 +4458,17 @@ class Player
 	{
 		// The Dispatcher can move any pawn to a city containing another pawn.
 		// This action is herein referred to as "rendezvous".
-		const destinationKeys = [];
+		const destinationKeys = [],
+			{ players } = gameData;
 
 		// Only allowed on the Dispatcher's turn.
 		if (getActivePlayer().role !== "Dispatcher")
 			return destinationKeys;
 
 		let player;
-		for (let rID in data.players)
+		for (let rID in players)
 		{
-			player = data.players[rID];
+			player = players[rID];
 
 			if (this.cityKey !== player.cityKey)
 				destinationKeys.push(player.cityKey);
@@ -4512,10 +4520,12 @@ class Player
 // Also accepts the camelcase form of the role name.
 function getPlayer(roleName)
 {
+	const { players } = gameData;
 	let player;
-	for (let rID in data.players)
+	
+	for (let rID in players)
 	{
-		player = data.players[rID];
+		player = players[rID];
 		if (player.role === roleName || player.camelCaseRole === roleName)
 			return player;
 	}
@@ -4564,10 +4574,12 @@ function getSpecialAbilityRule(eventType)
 
 function replaceRoleNamesWithRoleTags(string)
 {
+	const { players } = gameData;
 	let player;
-	for (let rID in data.players)
+
+	for (let rID in players)
 	{
-		player = data.players[rID];
+		player = players[rID];
 		string = string.replace(player.role, player.newRoleTag());
 	}
 	return string;
@@ -4580,8 +4592,8 @@ function operationsFlightWasUsedThisTurn()
 
 async function nextTurn()
 {
-	data.turn = getActivePlayer().nextTurnID;
-	data.turnNum++;
+	gameData.turn = getActivePlayer().nextTurnID;
+	gameData.turnNum++;
 
 	if (isOneQuietNight())
 		indicateOneQuietNightStep();
@@ -4589,7 +4601,7 @@ async function nextTurn()
 	const activePlayer = getActivePlayer();
 	await activePlayer.getLocation()
 		.setPawnIndices(activePlayer)
-		.cluster(data, { animatePawns: true });
+		.cluster({ animatePawns: true });
 
 	proceed();
 }
@@ -4602,29 +4614,31 @@ function instantiatePlayers(playerInfoArray)
 		return;
 	}
 
+	const { players, gameIsResuming } = gameData;
+
 	let player,
 		numPlayers = 0;
 	
 	for (let pInfo of playerInfoArray)
 	{
 		player = new Player(pInfo);
-		data.players[player.rID] = player;
+		players[player.rID] = player;
 		numPlayers++;
 	}
 
 	for (let rID of getTurnOrder())
 	{
-		player = data.players[rID];
+		player = players[rID];
 		player.panel = new PlayerPanel(player, numPlayers);
 
-		if (data.gameIsResuming)
+		if (gameIsResuming)
 		{
 			appendPawnToBoard(player);
 			queueCluster(player.cityKey);
 		}
 	}
 
-	if (data.gameIsResuming)
+	if (gameIsResuming)
 	{
 		bindPawnEvents();
 		$(".playerPanel").removeClass("hidden").removeAttr("style");
@@ -4634,7 +4648,7 @@ function instantiatePlayers(playerInfoArray)
 function getTurnOrder()
 {
 	const turnOrderCards = getDecidingTurnOrderCardPopulations(),
-		startingHandsEvent = data.events[0];
+		startingHandsEvent = gameData.events[0];
 	
 	startingHandsEvent.setPopulationRanks(turnOrderCards);
 	
@@ -4668,7 +4682,7 @@ function bindPawnEvents()
 			drag: function()
 			{
 				const $this = $(this);
-				showTravelPathArrow(data, { $pawn: $this, player: getPlayer($this.attr("data-role")) });
+				showTravelPathArrow({ $pawn: $this, player: getPlayer($this.attr("data-role")) });
 			}
 		})
 		.mousedown(function()
@@ -4731,7 +4745,7 @@ function hidePlaceholderPawn($originalPawn)
 
 function getActivePlayer()
 {
-	return data.players[data.turn];
+	return gameData.players[gameData.turn];
 }
 
 function getDiseaseColor(key)
@@ -4766,7 +4780,7 @@ function loadCityStates(cityInfoArray)
 		
 		// place the research station if it has one
 		if (cityInfo.researchStation == "1")
-			city.buildResearchStation(data, promptAction);
+			city.buildResearchStation(promptAction);
 		
 		// place disease cubes on the city if it has any
 		for (let c = 0; c < colors.length; c++)
@@ -4777,7 +4791,7 @@ function loadCityStates(cityInfoArray)
 			for (let n = 0; n < numCubes; n++)
 			{
 				appendNewCubeToBoard(color, city.key);
-				city.incrementCubeCount(data.diseaseCubeSupplies, color);
+				city.incrementCubeCount(gameData.diseaseCubeSupplies, color);
 				cubeSupplies[c]--;
 			}
 		}
@@ -4793,15 +4807,15 @@ function loadCityStates(cityInfoArray)
 // adds a city key to the cluster queue
 function queueCluster(cityKey)
 {
-	data.pendingClusters.add(cityKey);
+	gameData.pendingClusters.add(cityKey);
 }
 
 function executePendingClusters(details)
 {
-	for (let cityKey of data.pendingClusters)
-		getCity(cityKey).cluster(data, details);
+	for (let cityKey of gameData.pendingClusters)
+		getCity(cityKey).cluster(details);
 	
-	data.pendingClusters.clear();
+	gameData.pendingClusters.clear();
 }
 
 function pinpointCityFromCard($card)
@@ -4816,17 +4830,18 @@ function pinpointCityFromCard($card)
 // shows a city's location by animating 2 rectangles such that their points overlap on the specified city's position
 async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 {
-	if (data.skipping)
+	if (gameData.skipping)
 		return;
 	
 	const city = getCity(cityKey),
-		cityOffset = city.getOffset(data),
-		cWidth = data.cityWidth,
-		adj = data.boardWidth * 0.003, // slight adjustment needed for $rectB coords
+		cityOffset = city.getOffset(),
+		{ cityWidth, boardWidth, boardHeight } = gameData,
+		cWidth = cityWidth,
+		adj = boardWidth * 0.003, // slight adjustment needed for $rectB coords
 		$rects = $(".pinpointRect").stop(),
 		$rectA = $rects.first(),
 		$rectB = $rects.last(),
-		duration = getDuration(data, "pinpointCity"),
+		duration = getDuration("pinpointCity"),
 		easing = data.easings.pinpointCity;
 
 	$rects.attr("class", "pinpointRect hidden");
@@ -4855,8 +4870,8 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 		{
 			$elements: $rectB,
 			desiredProperties: {
-				left: (cityOffset.left + cWidth) - data.boardWidth - adj,
-				top: (cityOffset.top + cWidth) - data.boardHeight - adj
+				left: (cityOffset.left + cWidth) - boardWidth - adj,
+				top: (cityOffset.top + cWidth) - boardHeight - adj
 			}, duration, easing
 		})
 	]);
@@ -4884,7 +4899,7 @@ function locatePawnOnRoleTagClick($containingElement)
 {
 	$containingElement.find(".roleTag").not(".playerOption")
 		.off("click")
-		.click(function() { data.players[$(this).data("role")].pinpointLocation() });
+		.click(function() { gameData.players[$(this).data("role")].pinpointLocation() });
 }
 
 async function resolveOutbreaks(events)
@@ -4920,7 +4935,7 @@ async function resolveOutbreaks(events)
 			
 			updateCubeSupplyCount(color, { addend: -1 });
 			supplyCubeBounceEffect(color);
-			await originCity.clusterDiseaseCubes(data, { animate: true });
+			await originCity.clusterDiseaseCubes({ animate: true });
 		}
 		else
 			$triggerCube = $(`.diseaseCube.${color}.${originCity.key}`).last();
@@ -4981,7 +4996,7 @@ async function resolveOutbreaks(events)
 			else
 				cubesToDisperse.push(appendNewCubeToBoard(color, originCity.key, { outbreakDestinationKey: affectedCity.key, prepareAnimation: true }));
 			
-			affectedCity.incrementCubeCount(data.diseaseCubeSupplies, color);
+			affectedCity.incrementCubeCount(gameData.diseaseCubeSupplies, color);
 		}
 		// remove the handled events
 		events = events.filter(e => !(infections.includes(e) || Object.is(outbreakEvent, e)));
@@ -4991,8 +5006,8 @@ async function resolveOutbreaks(events)
 			updateCubeSupplyCount(color, { addend: -numInfected });
 			highlightOutbreakCubes(cubesToDisperse);
 			supplyCubeBounceEffect(color);
-			await originCity.cluster(data, { animateCubes: true });
-			await sleep(getDuration(data, "longInterval"));
+			await originCity.cluster({ animateCubes: true });
+			await sleep(getDuration("longInterval"));
 		}
 
 		if (preventionOccured)
@@ -5036,10 +5051,10 @@ async function resolveOutbreaks(events)
 		appendEventHistoryIconOfType(eventTypes.outbreak);
 
 		if (diseaseCubeLimitExceeded(color)) // defeat -- return early
-			return sleep(getDuration(data, "shortInterval"));
+			return sleep(getDuration("shortInterval"));
 	}
 
-	return sleep(getDuration(data, "shortInterval"));
+	return sleep(getDuration("shortInterval"));
 }
 
 function outbreakTriggerCubeFlash($triggerCube)
@@ -5073,7 +5088,7 @@ function tooManyOutbreaksOccured()
 {
 	const OUTBREAK_LIMIT = 8;
 
-	if (data.outbreakCount >= OUTBREAK_LIMIT)
+	if (gameData.outbreakCount >= OUTBREAK_LIMIT)
 		return true;
 	
 	return false;
@@ -5087,7 +5102,7 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 				leftDimension = outbreakCount % 2 === 0 ? "outbreaksMarkerLeft" : "outbreaksMarkerRight", // because the outbreaks track zig-zags
 				$marker = $("#outbreaksMarker");
 			
-			data.outbreakCount = outbreakCount;
+			gameData.outbreakCount = outbreakCount;
 		
 			if (animate)
 			{
@@ -5099,20 +5114,20 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 			{
 				$elements: $marker,
 				desiredProperties: {
-					top: (data.boardHeight * topPercentages[outbreakCount]),
-					left: getDimension(data, leftDimension)
+					top: (gameData.boardHeight * topPercentages[outbreakCount]),
+					left: getDimension(leftDimension)
 				},
-				duration: animate ? getDuration(data, "moveMarker") : 0,
+				duration: animate ? getDuration("moveMarker") : 0,
 				easing: data.easings.moveMarker
 			});
 
 			if (animate)
 			{
-				await sleep(getDuration(data, "mediumInterval"));
+				await sleep(getDuration("mediumInterval"));
 
 				if (tooManyOutbreaksOccured()) // defeat -- return early
 				{
-					data.gameEndCause = "outbreak";
+					gameData.gameEndCause = "outbreak";
 					return resolve();
 				}
 				await highlightMarkerTrack("outbreaks", { off: true });
@@ -5134,9 +5149,9 @@ function disperseOutbreakCubes(originCityKey, cubesToDisperse)
 			.addClass(destinationKey)
 			.removeAttr("data-destinationKey");
 		
-		getCity(destinationKey).clusterDiseaseCubes(data, { animate: true });
+		getCity(destinationKey).clusterDiseaseCubes({ animate: true });
 	}
-	return sleep(getDuration(data, "cubePlacement"));
+	return sleep(getDuration("cubePlacement"));
 }
 
 function appendNewCubeToBoard(color, cityKey, { prepareAnimation, outbreakDestinationKey } = {})
@@ -5184,7 +5199,7 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove, sl
 	const $supplyCube = $(`#${color}SupplyCube`),
 		desiredProperties = $supplyCube.offset(),
 		supplyCubeWidth = $supplyCube.width(),
-		duration = getDuration(data, "cubePlacement") * (slow ? 1.5 : 0.5);
+		duration = getDuration("cubePlacement") * (slow ? 1.5 : 0.5);
 
 	desiredProperties.width = supplyCubeWidth;
 	desiredProperties.height = supplyCubeWidth;
@@ -5209,7 +5224,7 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove, sl
 		supplyCubeBounceEffect(color);
 	}
 
-	return city.clusterDiseaseCubes(data, { animate: true });
+	return city.clusterDiseaseCubes({ animate: true });
 }
 
 function supplyCubeBounceEffect(diseaseColor)
@@ -5244,7 +5259,7 @@ function supplyCubeBounceEffect(diseaseColor)
 				...supplyCubeOffset,
 				...{ width: supplyCubeWidth, height: supplyCubeWidth }
 			},
-			duration: getDuration(data, 400),
+			duration: 400,
 			easing: "easeOutBounce"
 		});
 
@@ -5323,7 +5338,7 @@ function markTreatableDiseaseCubes($hoveredCube, { hoveredOverButton } = {})
 	const diseaseColor = getColorClass($hoveredCube);
 	
 	let $cubesToMark;
-	if (player.role === "Medic" || data.cures[diseaseColor] === "cured")
+	if (player.role === "Medic" || gameData.cures[diseaseColor] === "cured")
 		$cubesToMark = $(`.${player.cityKey}.diseaseCube.${diseaseColor}`);
 	else
 		$cubesToMark = $hoveredCube;
@@ -5413,7 +5428,7 @@ function specialEventAlert({ title, description, eventClass, visibleMs })
 	return new Promise(async resolve =>
 	{
 		const $banner = $("#specialEventBanner"),
-			duration = getDuration(data, "specialEventBannerReveal"),
+			duration = getDuration("specialEventBannerReveal"),
 			easing = data.easings.specialEventBannerReveal;
 		
 		$banner.removeAttr("class").addClass(eventClass)
@@ -5500,7 +5515,7 @@ async function epidemicInfect()
 
 	const { $epidemic } = await prepareEpidemicStep(),
 		eventType = eventTypes.epidemicInfect,
-		interval = getDuration(data, "longInterval");
+		interval = getDuration("longInterval");
 
 	await highlightEpidemicStep($epidemic, "infect");
 
@@ -5617,7 +5632,7 @@ function finishIntensifyStep($epidemic)
 	
 		getInfectionContainer().addClass("hidden");
 	
-		if (data.nextStep === "epIncrease")
+		if (gameData.nextStep === "epIncrease")
 			$epidemic.addClass("resolved");
 		else
 			$(".epidemicFull").removeClass("resolved");
@@ -5642,7 +5657,7 @@ async function highlightMarkerTrack(trackName, { off } = {})
 	if (off)
 		$highlighters.addClass("hidden");
 
-	return sleep(getDuration(data, "shortInterval"));
+	return sleep(getDuration("shortInterval"));
 }
 
 function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
@@ -5652,16 +5667,16 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 		const $marker = $("#infectionRateMarker"),
 			trackName = "infectionRate",
 			spaceLocations = [0.6396, 0.6763, 0.7132, 0.7502, 0.7868, 0.8238, 0.8606],
-			epidemicCount = newEpidemicCount || data.epidemicCount;
+			epidemicCount = newEpidemicCount || gameData.epidemicCount;
 
 		if (newEpidemicCount)
-			data.epidemicCount = newEpidemicCount;
+			gameData.epidemicCount = newEpidemicCount;
 		
 		updateInfectionRate(epidemicCount);
 		
 		if (animate)
 		{
-			$marker.offset({ left: (data.boardWidth * spaceLocations[epidemicCount - 1]) })
+			$marker.offset({ left: (gameData.boardWidth * spaceLocations[epidemicCount - 1]) })
 				.addClass("smallGlow");
 			await highlightMarkerTrack(trackName);
 		}
@@ -5670,15 +5685,15 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 		{
 			$elements: $marker,
 			desiredProperties: {
-				left: (data.boardWidth * spaceLocations[epidemicCount])
+				left: (gameData.boardWidth * spaceLocations[epidemicCount])
 			},
-			duration: animate ? getDuration(data, "moveMarker") : 0,
+			duration: animate ? getDuration("moveMarker") : 0,
 			easing: data.easings.moveMarker
 		});
 
 		if (animate)
 		{
-			await sleep(getDuration(data, "mediumInterval"));
+			await sleep(getDuration("mediumInterval"));
 			$marker.removeClass("smallGlow");
 			await highlightMarkerTrack(trackName, { off: true });
 		}
@@ -5691,9 +5706,9 @@ function updateInfectionRate(epidemicCount)
 {
 	const infRate = getInfectionRate(epidemicCount);
 	
-	data.infectionRate = infRate;
+	gameData.infectionRate = infRate;
 
-	data.steps["infect cities"].description = `Infect ${infRate} Cities`;
+	gameData.steps["infect cities"].description = `Infect ${infRate} Cities`;
 }
 
 async function animateEpidemicIntensify()
@@ -5701,7 +5716,7 @@ async function animateEpidemicIntensify()
 	const $container = $("#infectionDiscard"),
 		$title = $container.children(".title").first(),
 		$cards = $container.children(".infectionCard").addClass("template"), // template css class prevents the target cursor from appearing
-		delay = getDuration(data, "longInterval");
+		delay = getDuration("longInterval");
 	
 	disableInfectionDiscardHoverEvents();
 	await expandInfectionDiscardPile();
@@ -5760,7 +5775,7 @@ async function animateEpidemicIntensify()
 						left: $container.width()
 					},
 					desiredProperties: {
-						left: getDimension(data, "discardDiseaseIcon")
+						left: getDimension("discardDiseaseIcon")
 					},
 					duration: duration
 				})
@@ -5848,7 +5863,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 			{
 				$elements,
 				desiredProperties: centerOfContainer,
-				duration: getDuration(data, 500),
+				duration: getDuration(500),
 				easing: easing
 			});
 
@@ -5861,7 +5876,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 				{
 					minDistance,
 					maxDistance,
-					duration: getDuration(data, 100),
+					duration: getDuration(100),
 					easing
 				});
 			
@@ -5869,7 +5884,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 				{
 					$elements,
 					desiredProperties: centerOfContainer,
-					duration: getDuration(data, 100),
+					duration: getDuration(100),
 					easing
 				});
 		}
@@ -5916,7 +5931,7 @@ function discardStep()
 				eventTypeCode: eventTypes.discard.code,
 				buttonText: "CONFIRM",
 				cardKeys: player.cardKeys,
-				numDiscardsRequired: player.cardKeys.length - data.HAND_LIMIT,
+				numDiscardsRequired: player.cardKeys.length - gameData.HAND_LIMIT,
 				onConfirm: confirmDiscards
 			});
 	
@@ -5935,12 +5950,14 @@ function discardStep()
 // because two players never receive cards simultaneously.
 function getPlayerWithTooManyCards()
 {
+	const { players, HAND_LIMIT } = gameData;
 	let player;
-	for (let rID in data.players)
+	
+	for (let rID in players)
 	{
-		player = data.players[rID];
+		player = players[rID];
 		
-		if (player.cardKeys.length > data.HAND_LIMIT)
+		if (player.cardKeys.length > HAND_LIMIT)
 			return player;
 	}
 }
@@ -5987,10 +6004,10 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 		if (player)
 		{
 			await player.panel.expandIfCollapsed();
-			await sleep(getDuration(data, "shortInterval"));
+			await sleep(getDuration("shortInterval"));
 		}
 		
-		let completionInterval = getDuration(data, "discardPlayerCard");
+		let completionInterval = getDuration("discardPlayerCard");
 		if (player && Array.isArray(cardKeys))
 		{
 			for (let cardKey of cardKeys)
@@ -6007,7 +6024,7 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 		}
 
 		if (player)
-			player.panel.checkOcclusion(data);
+			player.panel.checkOcclusion();
 		
 		await sleep(completionInterval);
 		resolve();
@@ -6038,16 +6055,16 @@ function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 				left: guideOffset.left,
 				width: $container.width() * 0.98
 			},
-			getDuration(data, "discardPlayerCard"),
+			getDuration("discardPlayerCard"),
 			function()
 			{
 				$card.insertAfter($guide)
 					.removeAttr("style");
 				
-				bindEventCardHoverEvents(data, { $containingElement: $container });
+				bindEventCardHoverEvents({ $containingElement: $container });
 			});
 	
-	return sleep(getDuration(data, "discardPlayerCard") * data.playerCardAnimationInterval);
+	return sleep(getDuration("discardPlayerCard") * data.playerCardAnimationInterval);
 }
 
 function isEventCardKey(cardKey)
@@ -6061,8 +6078,8 @@ function isEpidemicKey(cardKey)
 
 function newInfectionCardTemplate()
 {
-	const fontSize = getDimension(data, "infCardFont"),
-		cityNameTop = getDimension(data, "infCardNameTop");
+	const fontSize = getDimension("infCardFont"),
+		cityNameTop = getDimension("infCardNameTop");
 	
 	return $(`<div class='infectionCard template'>
 				<div class='infectionCardContents'>
@@ -6113,7 +6130,7 @@ async function infectionStep()
 	
 	const $container = $("#infectCitiesContainer"),
 		$btn = $container.find(".button").addClass("hidden"),
-		{ infectionRate } = data,
+		{ infectionRate } = gameData,
 		{ infectCity } = eventTypes;
 	
 	let events,
@@ -6122,7 +6139,7 @@ async function infectionStep()
 	
 	$container.children(".infectionCard").remove();
 	// Create infection card template elements
-	for (let i = 0; i < data.infectionRate; i++)
+	for (let i = 0; i < infectionRate; i++)
 		$btn.before(newInfectionCardTemplate());
 		
 	positionInfectionPanelComponents();
@@ -6184,7 +6201,7 @@ async function infectionStep()
 		{
 			if (card.preventionCode === infectionPreventionCodes.notPrevented)
 			{
-				const interval = getDuration(data, "shortInterval");
+				const interval = getDuration("shortInterval");
 
 				await sleep(interval);
 				await placeDiseaseCubes(card);
@@ -6221,7 +6238,7 @@ async function infectionPreventionAnimation({ preventionCode, cityKey })
 
 function diseaseIsEradicated(diseaseColor)
 {
-	return data.cures[diseaseColor] === "eradicated";
+	return gameData.cures[diseaseColor] === "eradicated";
 }
 
 function newMedicAutoTreatCircle()
@@ -6238,9 +6255,9 @@ function positionAutoTreatCircleComponents($circle, $cureMarker)
 	if (!medic)
 		return false;
 	
-	const circleRadius = data.cityWidth * 3,
+	const circleRadius = gameData.cityWidth * 3,
 		circleDiameter = circleRadius * 2,
-		cityOffset = medic.getLocation().getOffset(data);
+		cityOffset = medic.getLocation().getOffset();
 	
 	$circle = $circle || $(".autoTreatCircle");
 	$cureMarker = $cureMarker || $(".autoTreatCureMarker");
@@ -6284,7 +6301,7 @@ async function medicAutoTreatAnimation()
 		duration: duration
 	});
 
-	await sleep(getDuration(data, "longInterval"));
+	await sleep(getDuration("longInterval"));
 
 	const $elements = $circle.add($cureMarker)
 	await animationPromise(
@@ -6355,8 +6372,8 @@ function showQuarantineArea(duration)
 	{
 		$elements: $("#quarantineArea"),
 		initialProperties: {
-			width: data.boardWidth,
-			height: data.boardHeight,
+			width: gameData.boardWidth,
+			height: gameData.boardHeight,
 			opacity: 0,
 			clipPath: getQuarantineAreaClipPath()
 		},
@@ -6464,7 +6481,7 @@ async function finishInfectionStep()
 {
 	const $container = getInfectionContainer();
 	
-	await sleep(getDuration(data, "longInterval"));
+	await sleep(getDuration("longInterval"));
 
 	let $cards = $container.find(".infectionCard");
 	while ($cards.length)
@@ -6477,7 +6494,7 @@ async function finishInfectionStep()
 	{
 		$(".drawnInfectionCard").remove(); // sometimes skipping setup leaves these unremoved.
 		$container.removeAttr("style").addClass("hidden");
-		return sleep(getDuration(data, 500));
+		return sleep(getDuration(500));
 	}
 
 	$container.fadeOut(450);
@@ -6508,8 +6525,8 @@ function getInfectionContainer()
 
 function getInfectionCardTextStyle($container)
 {
-	const fontSize = getDimension(data, "infDiscardFont") + "px",
-		top = getDimension(data, "infDiscardNameTop"),
+	const fontSize = getDimension("infDiscardFont") + "px",
+		top = getDimension("infDiscardNameTop"),
 		styleProperties = {
 			top,
 			fontSize,
@@ -6545,7 +6562,7 @@ function discardInfectionCard($card, duration)
 					left: $discardPile.offset().left,
 					top: $discardTitle.offset().top + $discardTitle.height()
 				},
-				getDuration(data, duration || 125),
+				getDuration(duration || 125),
 				function()
 				{
 					$card.insertAfter($discardTitle)
@@ -6555,7 +6572,7 @@ function discardInfectionCard($card, duration)
 						.children(".cityName")
 						.css(getInfectionCardTextStyle($discardPile));
 						
-					$card.height(getDimension(data, "infDiscardHeight"));
+					$card.height(getDimension("infDiscardHeight"));
 
 					resolve();
 				});
@@ -6567,15 +6584,15 @@ function positionInfectionPanelComponents()
 	const $container = getInfectionContainer().removeAttr("style"),
 		$cards = $container.find(".infectionCard"),
 		$veils = $container.find(".veil"),
-		cardHeight = getDimension(data, "infCardHeight"),
-		cardNameTop = getDimension(data, "infCardNameTop"),
-		cardFontSize = getDimension(data, "infCardFont");
+		cardHeight = getDimension("infCardHeight"),
+		cardNameTop = getDimension("infCardNameTop"),
+		cardFontSize = getDimension("infCardFont");
 	
 	if (currentStepIs("setup"))
 	{
 		$container.removeClass("hidden");
 		
-		$(".groupInfRate.hidden").css("margin-left", data.panelWidth);
+		$(".groupInfRate.hidden").css("margin-left", gameData.panelWidth);
 		makeElementsSquare(".groupInfRate > div");
 		$(".groupInfRate").not(".hidden")
 			.each(function()
@@ -6585,9 +6602,9 @@ function positionInfectionPanelComponents()
 		
 		// determine and evenly distribute the available height for .infGroup elements
 		const $infGroups = $(".infGroup"),
-			availableHeight = data.boardHeight - $("#setupProcedureContainer").height();
+			availableHeight = gameData.boardHeight - $("#setupProcedureContainer").height();
 			
-		$infGroups.height(availableHeight / $infGroups.length - getDimension(data, "infGroupAdj"));
+		$infGroups.height(availableHeight / $infGroups.length - getDimension("infGroupAdj"));
 	}
 	
 	$cards.height(cardHeight);
@@ -6598,7 +6615,7 @@ function positionInfectionPanelComponents()
 			"top": cardNameTop + "px"
 		});
 
-	const veilLeft = getDimension(data, "diseaseIcon");
+	const veilLeft = getDimension("diseaseIcon");
 	$veils.height(cardHeight)
 		.css("left", veilLeft);
 }
@@ -6640,7 +6657,7 @@ function dealInitialInfectionCards()
 	return new Promise(async (resolve) =>
 	{
 		// Filter initial infections and assign them indices
-		const initialInfections = data.events.filter(e => e instanceof InitialInfection)[0]
+		const initialInfections = gameData.events.filter(e => e instanceof InitialInfection)[0]
 			.infections.map((inf, i) => { return { ...inf, index: i } }),
 			GROUP_SIZE = 3; // 3 groups of 3 infection cards
 		let group;
@@ -6654,13 +6671,13 @@ function dealInitialInfectionCards()
 			
 			for (let card of group)
 			{
-				await sleep(getDuration(data, "shortInterval"));
+				await sleep(getDuration("shortInterval"));
 				await revealInfectionCard(card);
 				await placeDiseaseCubes(card);
 			}
 		}
 	
-		data.fastForwarding = false;
+		gameData.fastForwarding = false;
 		executePendingClusters();
 		resolve();
 	});
@@ -6668,7 +6685,7 @@ function dealInitialInfectionCards()
 
 function computeGroupInfRateMargin($groupInfRate)
 {
-	return (data.panelWidth - getDimension(data, "groupInfRateCubeWidth") * $groupInfRate.children().length) / 2;
+	return (gameData.panelWidth - getDimension("groupInfRateCubeWidth") * $groupInfRate.children().length) / 2;
 }
 
 function showNextGroupInfRate()
@@ -6686,7 +6703,7 @@ function showNextGroupInfRate()
 		{
 			marginLeft: computeGroupInfRateMargin($groupInfRate)
 		},
-		getDuration(data, "shortInterval"),
+		getDuration("shortInterval"),
 		data.easings.revealCard,
 		() => resolve());
 	});
@@ -6697,9 +6714,9 @@ async function dealFaceDownInfGroup(group)
 	for (let card of group)
 	{
 		dealFaceDownInfCard(card.index);
-		await sleep(getDuration(data, "dealCard") * 0.65);
+		await sleep(getDuration("dealCard") * 0.65);
 	}
-	return sleep(getDuration(data, "dealCard") * 0.35);
+	return sleep(getDuration("dealCard") * 0.35);
 }
 
 function dealFaceDownInfCard(elementIndex)
@@ -6712,7 +6729,8 @@ function dealFaceDownInfCard(elementIndex)
 		const containerTop = $container.offset().top,
 			$cardback = $(`<img class='drawnInfectionCard' data-index='${elementIndex}'
 								src='images/cards/infectionCardback.png'
-								alt='Infection Card' />`);
+								alt='Infection Card' />`),
+			{ infectionDeckOffset, boardWidth } = gameData;
 		
 		$cardback.appendTo("body");
 
@@ -6721,17 +6739,17 @@ function dealFaceDownInfCard(elementIndex)
 			.width($("#imgInfectionDeck").width())
 			.offset(
 			{
-				left: data.infectionDeckOffset.left,
-				top: data.infectionDeckOffset.top
+				left: infectionDeckOffset.left,
+				top: infectionDeckOffset.top
 			})
 			.attr("z-index", "1")
 			.animate(
 			{
-				width: getDimension(data, "diseaseIcon"),
-				left: data.boardWidth + 1,
+				width: getDimension("diseaseIcon"),
+				left: boardWidth + 1,
 				top: containerTop
 			},
-			getDuration(data, "dealCard"),
+			getDuration("dealCard"),
 			data.easings.dealCard,
 			function() { resolve() });
 	});
@@ -6744,8 +6762,8 @@ function positionFaceDownInfectionCards()
 	if (!$cardbacks.length)
 		return false;
 
-	const width = getDimension(data, "diseaseIcon"),
-		left = data.boardWidth + 1;
+	const width = getDimension("diseaseIcon"),
+		left = gameData.boardWidth + 1;
 	
 	let $this, $container;
 	$cardbacks.each(function()
@@ -6772,7 +6790,7 @@ async function revealInfectionCard({ city, cityKey, index }, { forecasting } = {
 			$cardback = forecasting ? $(".drawnInfectionCard").eq(index) : $(".drawnInfectionCard").first();
 		
 		// The first $cardback is removed if not forecasting because each one is removed after fading out.
-		$cardback.fadeOut(getDuration(data, "revealInfCard"), function() { $(this).remove() });
+		$cardback.fadeOut(getDuration("revealInfCard"), function() { $(this).remove() });
 		
 		$card.attr("data-key", cityKey)
 			.click(function() { pinpointCityFromCard($card) })
@@ -6783,15 +6801,15 @@ async function revealInfectionCard({ city, cityKey, index }, { forecasting } = {
 		
 		setInfectionCardTitleAttribute($card, city);
 		
-		$veil.animate({ left: "+=" + getDimension(data, "diseaseIcon", { compliment: true }) },
-			getDuration(data, "revealInfCard"),
+		$veil.animate({ left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
+			getDuration("revealInfCard"),
 			data.easings.revealCard,
 			() =>
 			{
 				$veil.remove();
 				$card.removeClass("template");
 
-				if (!data.fastForwarding && !diseaseColorIsEradicated && !forecasting)
+				if (!gameData.fastForwarding && !diseaseColorIsEradicated && !forecasting)
 					pinpointCity(cityKey, { pinpointClass: `${city.color}Border` });
 				
 				resolve();
@@ -6818,13 +6836,13 @@ function placeDiseaseCubes({ cityKey, numCubes = 1, diseaseColor })
 			updateCubeSupplyCount(color, { addend: -1 });
 			
 			placeDiseaseCube(city, color, cubeSupplyOffset);
-			await sleep(getDuration(data, "cubePlacement") * 0.45);
+			await sleep(getDuration("cubePlacement") * 0.45);
 		}
 		
 		// let the last cube animation finish completely before clustering the city
-		await sleep(getDuration(data, "cubePlacement") * 0.6);
+		await sleep(getDuration("cubePlacement") * 0.6);
 		
-		if (data.fastForwarding)
+		if (gameData.fastForwarding)
 			queueCluster(cityKey);
 		
 		resolve(false);
@@ -6838,12 +6856,12 @@ function placeDiseaseCube(city, diseaseColor, cubeSupplyOffset)
 		const $cube = appendNewCubeToBoard(diseaseColor, city.key, { prepareAnimation: true })
 			.offset(cubeSupplyOffset);
 		
-		city.incrementCubeCount(data.diseaseCubeSupplies);
+		city.incrementCubeCount(gameData.diseaseCubeSupplies);
 
-		if (!data.fastForwarding)
+		if (!gameData.fastForwarding)
 		{
 			supplyCubeBounceEffect(diseaseColor);
-			await city.clusterDiseaseCubes(data, { animate: true });
+			await city.clusterDiseaseCubes({ animate: true });
 			$cube.removeClass("infecting");
 		}
 		
@@ -6855,7 +6873,7 @@ function newCityButton(city)
 {
 	const $btn = $(`<div class='button actionPromptOption' data-key='${city.key}'>${city.name}</div>`);
 	
-	$btn.hover(function() { showTravelPathArrow(data, { destination: city }) },
+	$btn.hover(function() { showTravelPathArrow({ destination: city }) },
 	function() { hideTravelPathArrow() })
 	.click(function() { $(this).off("mousenter mouseleave") }); // Prevents the travel path arrow from being hidden.
 
@@ -6928,14 +6946,15 @@ async function discoverACure(cardKeys)
 	// 2. The only remaining cubes of the disease color on the board were removed by an auto-treat disease event.
 	//		(the eradication was triggered by the auto-treat event which was triggered by discovering the cure)
 	// Therefore if there are no auto-treat events, the cause is number 1.
-	const newDiseaseStatus = eradicationEvents.length && !autoTreatEvents.length ? "eradicated" : "cured";
+	const newDiseaseStatus = eradicationEvents.length && !autoTreatEvents.length ? "eradicated" : "cured",
+		{ cures, gameEndCause } = gameData;
 	
-	data.cures[diseaseColor] = newDiseaseStatus;
-	data.cures.remaining--;
+	cures[diseaseColor] = newDiseaseStatus;
+	cures.remaining--;
 	
 	await animateDiscoverCure(diseaseColor, newDiseaseStatus);
 
-	if (data.gameEndCause)
+	if (gameEndCause)
 		return endGame();
 
 	if (autoTreatEvents.length)
@@ -6965,7 +6984,7 @@ async function outOfPlayerCardsDefeatAnimation($cardDrawContainer)
 
 function diseaseCubeLimitExceeded(color)
 {
-	return data.gameEndCause === "cubes" && data.diseaseCubeSupplies[color] < 0;
+	return gameData.gameEndCause === "cubes" && gameData.diseaseCubeSupplies[color] < 0;
 }
 
 async function diseaseCubeDefeatAnimation(diseaseColor)
@@ -7004,21 +7023,22 @@ async function outbreakDefeatAnimation()
 async function endGame()
 {
 	const $curtain = $("#curtain"),
-		hidden = "hidden";
+		hidden = "hidden",
+		{ gameEndCause, boardHeight } = gameData;
 
 	$curtain.children("p").addClass(hidden);
 
 	let selectorToShow;
-	if (data.gameEndCause === "victory")
+	if (gameEndCause === "victory")
 		selectorToShow = "#victory";
 	else
 	{
-		selectorToShow = `#defeat, .${data.gameEndCause}Defeat`;
+		selectorToShow = `#defeat, .${gameEndCause}Defeat`;
 		$curtain.addClass("epidemic");
 	}
 
 	$curtain.find(selectorToShow).removeClass(hidden)
-		.first().css("margin-top", data.boardHeight / 3);
+		.first().css("margin-top", boardHeight / 3);
 	
 	await animationPromise(
 	{
@@ -7037,14 +7057,15 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 	return new Promise(async resolve =>
 	{
 		const $cureMarker = newCureMarker(diseaseColor, "cured", { isForReveal: true }),
+			{ cures } = gameData,
 			{ discoverACure, eradication } = eventTypes;
 
 		$cureMarker.css("opacity", 0.1)
-			.animate({ opacity: 1 }, getDuration(data, "specialEventBannerReveal") * 8, "easeOutQuad");
+			.animate({ opacity: 1 }, getDuration("specialEventBannerReveal") * 8, "easeOutQuad");
 
 		let description = "";
-		if (data.cures.remaining > 0)
-			description = `Discover ${data.cures.remaining} more to win the game.`;
+		if (cures.remaining > 0)
+			description = `Discover ${cures.remaining} more to win the game.`;
 
 		await specialEventAlert(
 		{
@@ -7075,7 +7096,7 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 				...{ width: $cureMarker.width() }
 			},
 			desiredProperties: getCureMarkerDesiredProperties(diseaseColor),
-			duration: getDuration(data, "cureMarkerAnimation"),
+			duration: getDuration("cureMarkerAnimation"),
 			easing: data.easings.cureMarkerAnimation
 		});
 
@@ -7108,7 +7129,8 @@ function loadPlayerCards(playerCards)
 {
 	const $discardsContainer = $("#playerDiscard"),
 		$discardPileTitle =  $discardsContainer.children(".title").first(),
-		$removedCardsTitle = $discardsContainer.children("#removedPlayerCards").children(".title").first();
+		$removedCardsTitle = $discardsContainer.children("#removedPlayerCards").children(".title").first(),
+		{ players, removedEventCardKeys } = gameData;
 	
 	let player,
 		$card;
@@ -7117,9 +7139,9 @@ function loadPlayerCards(playerCards)
 	{
 		$card = $(newPlayerCard(getCityOrEventCardObject(card.key)));
 
-		if (card.pileID in data.players)
+		if (card.pileID in players)
 		{
-			player = data.players[card.pileID];
+			player = players[card.pileID];
 			player.addCardKeysToHand(card.key);
 			player.panel.appendCard($card);
 		}
@@ -7127,7 +7149,7 @@ function loadPlayerCards(playerCards)
 			$card.insertAfter($discardPileTitle);
 		else if (card.pile === "removed")
 		{
-			data.removedEventCardKeys.push(card.key);
+			removedEventCardKeys.push(card.key);
 			$card.insertAfter($removedCardsTitle);
 		}
 		else if (card.pile === "contingency")
@@ -7151,41 +7173,43 @@ function loadPlayerCards(playerCards)
 // These arrays facilitate the efficient flagging of 'event card Events' which removed their associated event card from the game.
 function prepareToFlagRemovedEventCardEvents()
 {
-	data.eventCardEvents = [];
-	data.removedEventCardKeys = [];
+	gameData.eventCardEvents = [];
+	gameData.removedEventCardKeys = [];
 }
 function queueEventCardRemovalCheck(event)
 {
-	if (Array.isArray(data.eventCardEvents))
-		data.eventCardEvents.push(event);
+	if (Array.isArray(gameData.eventCardEvents))
+		gameData.eventCardEvents.push(event);
 }
 function flagRemovedEventCardEvents()
 {
+	const { eventCardEvents, removedEventCardKeys } = gameData;
+
 	// Only the Contingency Planner can cause event cards to be removed from the game.
-	if (data.eventCardEvents && getPlayer("Contingency Planner"))
+	if (eventCardEvents && getPlayer("Contingency Planner"))
 	{
 		let event, cardKey;
-		for (let i = data.eventCardEvents.length - 1; i >= 0; i--)
+		for (let i = eventCardEvents.length - 1; i >= 0; i--)
 		{
-			event = data.eventCardEvents[i];
+			event = eventCardEvents[i];
 			cardKey = event.eventCard.key;
 	
 			// Was the event card removed from the game?
-			if (data.removedEventCardKeys.includes(cardKey))
+			if (removedEventCardKeys.includes(cardKey))
 			{
 				event.cardWasRemoved = true;
-				data.removedEventCardKeys.splice(data.removedEventCardKeys.indexOf(cardKey), 1);
+				removedEventCardKeys.splice(removedEventCardKeys.indexOf(cardKey), 1);
 	
 				// Finished flagging events?
-				if (data.removedEventCardKeys.length === 0)
+				if (removedEventCardKeys.length === 0)
 					break;
 			}
 		}
 	}
 
 	// These are no longer needed after this function call.
-	delete data.removedEventCardKeys;
-	delete data.eventCardEvents;
+	delete gameData.removedEventCardKeys;
+	delete gameData.eventCardEvents;
 }
 
 function loadInfectionDiscards(cards)
@@ -7288,13 +7312,15 @@ function getNumActionsRemaining()
 // Accepts an array of desiredEventTypes, or a single event type.
 function getEventsOfTurn(desiredEventTypes, { turnNum } = {})
 {
-	const eventsOfTurn = [];
-	turnNum = turnNum || data.turnNum;
+	const { events } = gameData,
+		eventsOfTurn = [];
+	
+	turnNum = turnNum || gameData.turnNum;
 	desiredEventTypes = ensureIsArray(desiredEventTypes);
 	
-	for (let i = data.events.length - 1; i >= 0; i--)
+	for (let i = events.length - 1; i >= 0; i--)
 	{
-		event = data.events[i];
+		event = events[i];
 		
 		// Skip events queued for next turn.
 		if (event.turnNum > turnNum)
@@ -7323,11 +7349,11 @@ function loadGamestate(gamestate)
 	else // beginning a new game
 	{
 		setCurrentStep("setup");
-		data.nextStep = "action 1";
+		gameData.nextStep = "action 1";
 	}
 
 	delete gamestate.stepName;
-	Object.assign(data, gamestate);
+	Object.assign(gamestate);
 }
 
 function loadDiseaseStatuses(diseaseStatuses)
@@ -7342,8 +7368,8 @@ function loadDiseaseStatuses(diseaseStatuses)
 		
 		if (status !== "rampant")
 		{
-			data.cures[diseaseColor] = status;
-			data.cures.remaining--;
+			gameData.cures[diseaseColor] = status;
+			gameData.cures.remaining--;
 
 			newCureMarker(diseaseColor, status);
 		}
@@ -7380,12 +7406,12 @@ async function setup()
 	loadGamestate(gamestate);
 	loadCityStates(cities);
 
-	data.startingHandPopulations = startingHandPopulations;
+	gameData.startingHandPopulations = startingHandPopulations;
 	instantiatePlayers(players);
-	attachPlayersToEvents(data.players, getPlayer, data.events);
+	attachPlayersToEvents(gameData.players, getPlayer, gameData.events);
 	
-	addToEventHistoryQueue(data.events);
-	if (data.gameIsResuming)
+	addToEventHistoryQueue(gameData.events);
+	if (gameData.gameIsResuming)
 		appendEventHistoryIcons();
 	
 	loadDiseaseStatuses(diseaseStatuses);
@@ -7410,17 +7436,17 @@ async function setup()
 	bindPlayerDeckHoverEvents();
 	bindInfectionDeckHover();
 	enablePlayerDiscardHoverEvents();
-	bindEventCardHoverEvents(data);
+	bindEventCardHoverEvents();
 	bindActionButtonHoverEvents();
 	
 	if (forecastInProgress())
 	{
-		data.currentStep.indicate();
+		gameData.currentStep.indicate();
 		indicatePromptingEventCard();
 	}
 	else if (currentStepIs("setup"))
 	{
-		data.allRoles = allRoles;
+		gameData.allRoles = allRoles;
 		animateNewGameSetup();
 	}
 	else
@@ -7430,14 +7456,15 @@ async function setup()
 async function animateRoleDetermination()
 {
 	const $container = $("#roleSetupContainer"),
-		slotMachines = [];
+		slotMachines = [],
+		{ players } = gameData;
 
 	$container.parent().removeClass("hidden");
 
 	let player, $roleContainer;
-	for (let rID in data.players)
+	for (let rID in players)
 	{
-		player = data.players[rID];
+		player = players[rID];
 		$roleContainer = $("<div class='roleContainer'></div>").appendTo($container);
 
 		slotMachines.push(new RoleSlotMachine(player, $roleContainer));
@@ -7446,10 +7473,10 @@ async function animateRoleDetermination()
 	for (let slotMachine of slotMachines)
 	{
 		slotMachine.pull();
-		await sleep(getDuration(data, 400));
+		await sleep(getDuration(400));
 	}
 
-	const DOUBLE_SLOT_MACHINE_DURATION = getDuration(data, slotMachines[0].duration * 2);
+	const DOUBLE_SLOT_MACHINE_DURATION = getDuration(slotMachines[0].duration * 2);
 	await Promise.race([
 		sleep(DOUBLE_SLOT_MACHINE_DURATION),
 		detectSkipping(DOUBLE_SLOT_MACHINE_DURATION)
@@ -7475,7 +7502,7 @@ function detectSkipping(detectionWindowMs)
 	{
 		for (let i = 0; i < detectionWindowMs; i++)
 		{
-			if (data.skipping)
+			if (gameData.skipping)
 				return resolve();
 			
 			await sleep(1);
@@ -7504,7 +7531,7 @@ class RoleSlotMachine
 		this.NUM_VISIBLE_OPTIONS = 5;
 		this.MIDDLE_OPTION_INDEX = (this.NUM_VISIBLE_OPTIONS - 1) / 2;
 		
-		const roleOptions = this.randomizeRoleOrder([...data.allRoles], player.role);
+		const roleOptions = this.randomizeRoleOrder([...gameData.allRoles], player.role);
 		this.numOptions = roleOptions.length;
 		
 		let $optionGroup;
@@ -7701,7 +7728,7 @@ class RoleSlotMachine
 		{
 			$elements: $role,
 			desiredProperties: { top: "-=" + (this.optionHeight * this.MIDDLE_OPTION_INDEX) },
-			duration: getDuration(data, 600),
+			duration: getDuration(600),
 			easing: "easeOutBounce"
 		});
 
@@ -7734,7 +7761,7 @@ async function animateNewGameSetup()
 			placePawnsInAtlanta,
 			placeResearchStationInAtlanta
 		],
-		interval = getDuration(data, "shortInterval");
+		interval = getDuration("shortInterval");
 	
 	$("#skipSetupButtons").removeClass("hidden");
 	bindBtnSkipSetupStepClick();
@@ -7743,9 +7770,9 @@ async function animateNewGameSetup()
 	for (let step of setupSteps)
 	{
 		highlightNextSetupStep();
-		await sleep(getDuration(data, interval));
+		await sleep(getDuration(interval));
 		await step();
-		await sleep(getDuration(data, interval))
+		await sleep(getDuration(interval))
 	}
 	
 	beginGame();
@@ -7753,10 +7780,10 @@ async function animateNewGameSetup()
 
 function finishedSetupStep()
 {
-	if (data.skippingSetupStep)
+	if (gameData.skippingSetupStep)
 	{
-		data.skipping = false;
-		data.skippingSetupStep = false;
+		gameData.skipping = false;
+		gameData.skippingSetupStep = false;
 
 		bindBtnSkipSetupStepClick();
 	}
@@ -7776,8 +7803,8 @@ function bindBtnSkipSetupStepClick()
 
 function skipSetupStep()
 {
-	data.skipping = true;
-	data.skippingSetupStep = true;
+	gameData.skipping = true;
+	gameData.skippingSetupStep = true;
 }
 
 function bindBtnSkipSetupClick()
@@ -7793,9 +7820,9 @@ function bindBtnSkipSetupClick()
 
 function skipSetup()
 {
-	data.skipping = true;
-	data.skippingSetup = true;
-	data.skippingSetupStep = false; // not skipping an individual setup step, but the whole setup procedure.
+	gameData.skipping = true;
+	gameData.skippingSetup = true;
+	gameData.skippingSetupStep = false; // not skipping an individual setup step, but the whole setup procedure.
 
 	$("#curtain").removeClass("hidden")
 		.children("#skippingSetupMsg").html("Skipping setup...").removeClass("hidden");
@@ -7813,37 +7840,37 @@ async function beginGame()
 
 	await Promise.all([
 		clusterAll(),
-		sleep(getDuration(data, "longInterval"))
+		sleep(getDuration("longInterval"))
 	]);
 
 	await animationPromise(
 	{
 		$elements: $setupProcedureContainer,
 		desiredProperties: { height: 0 },
-		duration: getDuration(data, 400)
+		duration: getDuration(400)
 	});
 
 	$setupProcedureContainer.add("#setupContainer").remove();
 
 	const $containersToShow = $("#turnProcedureContainer, #indicatorContainer");
-	$containersToShow.slideDown(getDuration(data, 400), function()
+	$containersToShow.slideDown(getDuration(400), function()
 	{
 		$containersToShow.removeClass("hidden").removeAttr("style");
 		bindRoleCardHoverEvents();
 		bindPawnEvents();
-		data.currentStep.next();
-		$("#actionsContainer").slideDown(getDuration(data, 400), function()
+		gameData.currentStep.next();
+		$("#actionsContainer").slideDown(getDuration(400), function()
 		{
 			$(this).removeClass("hidden").removeAttr("style");
-			if (data.skippingSetup) doneSkippingSetup();
+			if (gameData.skippingSetup) doneSkippingSetup();
 		});
 	});
 }
 
 function doneSkippingSetup()
 {
-	data.skipping = false;
-	data.skippingSetup = false;
+	gameData.skipping = false;
+	gameData.skippingSetup = false;
 	$("#curtain").fadeOut(function()
 	{
 		$(this).addClass("hidden").removeAttr("style")
@@ -7864,7 +7891,7 @@ function animatePreparePlayerDeck()
 		{
 			$elements: $container.children("h4"),
 			desiredProperties: { opacity: 0 },
-			duration: getDuration(data, "longInterval")
+			duration: getDuration("longInterval")
 		});
 	
 		const $divs = $container.children("div"),
@@ -7883,12 +7910,14 @@ function animatePreparePlayerDeck()
 
 async function showEpidemicsToShuffle($container)
 {
+	const { numEpidemics } = gameData;
+
 	$container.children("h4").first()
 		.children(".difficulty").html(getDifficultyName())
-		.siblings(".numEpidemics").html(data.numEpidemics);
+		.siblings(".numEpidemics").html(numEpidemics);
 	
 	let $div;
-	for (let i = 0; i < data.numEpidemics; i++)
+	for (let i = 0; i < numEpidemics; i++)
 	{
 		$div = $("<div></div>").appendTo($container);
 		newFacedownPlayerCard().appendTo($div);
@@ -7907,9 +7936,9 @@ async function showEpidemicsToShuffle($container)
 		$elements: $cardbacks,
 		initialProperties: { opacity: 0 },
 		desiredProperties: { opacity: 1 },
-		duration: getDuration(data, "revealCard")
+		duration: getDuration("revealCard")
 	});
-	await sleep(getDuration(data, "mediumInterval"));
+	await sleep(getDuration("mediumInterval"));
 	$cardbacks.remove();
 	
 	return animationPromise(
@@ -7917,7 +7946,7 @@ async function showEpidemicsToShuffle($container)
 		$elements: $epidemics.removeClass("hidden"),
 		initialProperties: { width: 0 },
 		desiredProperties: { width: epidemicWidth },
-		duration: getDuration(data, "revealCard"),
+		duration: getDuration("revealCard"),
 		easing
 	});
 }
@@ -7964,17 +7993,17 @@ async function dividePlayerDeckIntoEqualPiles($container)
 			$elements: $cardback.appendTo($divs.eq(divIdx)),
 			initialProperties,
 			desiredProperties: desiredProps[divIdx],
-			duration: getDuration(data, "dealCard"),
+			duration: getDuration("dealCard"),
 			easing
 		});
 
 		if (i === numCardsToDeal - 1) // deck is empty
 		{
 			$("#imgPlayerDeck").addClass("hidden");
-			setPlayerDeckImgSize({ size: getMaxPlayerDeckImgSize() - data.numEpidemics });
+			setPlayerDeckImgSize({ size: getMaxPlayerDeckImgSize() - gameData.numEpidemics });
 		}
 
-		await sleep(getDuration(data, "dealCard") / 6);
+		await sleep(getDuration("dealCard") / 6);
 
 		if (++divIdx === $divs.length)
 			divIdx = 0;
@@ -7986,7 +8015,7 @@ function getInitialPlayerDeckSize({ includeEpidemics } = {})
 	let deckSize = Object.keys(cities).length + Object.keys(eventCards).length;
 
 	if (includeEpidemics)
-		deckSize += data.numEpidemics;
+		deckSize += gameData.numEpidemics;
 	
 	return deckSize;
 }
@@ -8015,7 +8044,7 @@ function shuffleEpidemicIntoPile($div)
 		{
 			$elements: $epidemic,
 			desiredProperties: { width: 0 },
-			duration: getDuration(data, "dealCard"),
+			duration: getDuration("dealCard"),
 			easing
 		});
 
@@ -8027,7 +8056,7 @@ function shuffleEpidemicIntoPile($div)
 			$elements: $epidemicCardback,
 			initialProperties: { ...{ position: "absolute"}, ...{ initialEpidemicOffset } },
 			desiredProperties: { top: $cardbacks.last().offset().top },
-			duration: getDuration(data, "dealCard") / 2,
+			duration: getDuration("dealCard") / 2,
 			easing
 		});
 
@@ -8051,7 +8080,7 @@ function placePileOntoPlayerDeck($div, deckPropertes)
 		{
 			$elements: $pile,
 			desiredProperties: deckPropertes,
-			duration: getDuration(data, "dealCard"), 
+			duration: getDuration("dealCard"), 
 			easing: data.easings.dealCard
 		});
 
@@ -8118,11 +8147,11 @@ function bindPlayerDeckHoverEvents()
 		.off("mouseenter mouseleave")
 		.hover(function()
 		{
-			if (typeof data.numPlayerCardsRemaining == "undefined"
+			if (typeof gameData.numPlayerCardsRemaining == "undefined"
 				||	$("#playerDeckTooltip").length)
 				return false;
 			
-			 const { numPlayerCardsRemaining, numEpidemics, epidemicCount } = data,
+			 const { numPlayerCardsRemaining, numEpidemics, epidemicCount } = gameData,
 				 { playerDeckInfo, discardRule, outOfCardsWarning } = strings,
 				$tooltip = $(`<div id='playerDeckTooltip' class='tooltip'>
 									<div class='content'>
@@ -8143,7 +8172,7 @@ function bindPlayerDeckHoverEvents()
 
 function calculatePlayerDeckImgSize(numCardsInDeck)
 {
-	const numCardsLeft = isNaN(numCardsInDeck) ? data.numPlayerCardsRemaining : numCardsInDeck,
+	const numCardsLeft = isNaN(numCardsInDeck) ? gameData.numPlayerCardsRemaining : numCardsInDeck,
 		ranges = [
 			{ maxCards: 0, deckSize: -1 },
 			{ maxCards: 1, deckSize: 0 },
@@ -8176,14 +8205,15 @@ function getMaxPlayerDeckImgSize() { return 6; }
 
 function getDifficultyName()
 {
-	if (data.numEpidemics == 4)
+	const { numEpidemics } = gameData;
+
+	if (numEpidemics == 4)
 		return "Introductory";
 	
-	if (data.numEpidemics == 5)
+	if (numEpidemics == 5)
 		return "Standard";
 	
-	if (data.numEpidemics == 6)
-		return "Heroic";
+	return "Heroic";
 }
 
 async function placeResearchStationInAtlanta()
@@ -8194,14 +8224,14 @@ async function placeResearchStationInAtlanta()
 			$cdcBlurb = $("#setupContainer").children("h4");
 
 		pinpointCity(ATLANTA_KEY);
-		await cities[ATLANTA_KEY].buildResearchStation(data, promptAction, { animate: true });
-		await sleep(getDuration(data, "longInterval"));
+		await cities[ATLANTA_KEY].buildResearchStation(promptAction, { animate: true });
+		await sleep(getDuration("longInterval"));
 		
 		await animationPromise(
 		{
 			$elements: $cdcBlurb,
 			desiredProperties: { opacity: 0 },
-			duration: getDuration(data, 400)
+			duration: getDuration(400)
 		});
 		$cdcBlurb.remove();
 
@@ -8216,7 +8246,8 @@ function placePawnsInAtlanta()
 	{
 		const ATLANTA_KEY = "atla",
 			panelWidth = $(".playerPanel").first().width(),
-			$cdcBlurb = $(`<h4>Atlanta is home to the CDC, the Center for Disease Control and Prevention.</h4>`);
+			$cdcBlurb = $(`<h4>Atlanta is home to the CDC, the Center for Disease Control and Prevention.</h4>`),
+			{ players, turnOrder, pawnHeight, pawnWidth } = gameData;
 		
 		let player,
 			$pawn,
@@ -8229,42 +8260,42 @@ function placePawnsInAtlanta()
 			$elements: $cdcBlurb.prependTo("#setupContainer"),
 			initialProperties: { opacity: 0 },
 			desiredProperties: { opacity: 1 },
-			duration: getDuration(data, 400)
+			duration: getDuration(400)
 		});
 		pinpointCity(ATLANTA_KEY);
 	
-		for (let rID in data.players)
+		for (let rID in players)
 		{
-			player = data.players[rID];
+			player = players[rID];
 			appendPawnToBoard(player);
 			queueCluster(player.cityKey);
 		}
 		executePendingClusters();
 		
-		for (let rID of data.turnOrder)
+		for (let rID of turnOrder)
 		{
-			player = data.players[rID];
+			player = players[rID];
 			$pawn = player.$pawn;
 			$panel = player.$panel;
 			
 			pawnOffsetInAtlanta = $pawn.removeClass("hidden").offset();
 	
 			initialOffset = $panel.offset();
-			initialOffset.top -= data.pawnHeight;
+			initialOffset.top -= pawnHeight;
 			initialOffset.left += panelWidth / 2;
-			initialOffset.left -= data.pawnWidth / 2;
+			initialOffset.left -= pawnWidth / 2;
 	
 			await animationPromise(
 			{
 				$elements: $pawn,
 				initialProperties: initialOffset,
 				desiredProperties: pawnOffsetInAtlanta,
-				duration: getDuration(data, 400),
+				duration: getDuration(400),
 				easing: "easeInQuart"
 			});
 		}
 	
-		await sleep(getDuration(data, 400));
+		await sleep(getDuration(400));
 		finishedSetupStep();
 		resolve();
 	});
@@ -8274,13 +8305,13 @@ function animateDetermineTurnOrder()
 {
 	return new Promise(async resolve =>
 	{
-		const interval = getDuration(data, "shortInterval");
+		const interval = getDuration("shortInterval");
 	
 		await showStartingHandPopulations();
-		await sleep(getDuration(data, interval));
-		data.turnOrder = await showTurnOrder();
+		await sleep(getDuration(interval));
+		gameData.turnOrder = await showTurnOrder();
 		appendEventHistoryIconOfType(eventTypes.startingHands);
-		await sleep(getDuration(data, interval));
+		await sleep(getDuration(interval));
 		await arrangePlayerPanels();
 	
 		$("#roleSetupContainer").addClass("hidden");
@@ -8295,10 +8326,10 @@ async function arrangePlayerPanels()
 
 	lockElements($roleContainers);
 
-	for (let rID of data.turnOrder)
+	for (let rID of gameData.turnOrder)
 		await transformIntoPlayerPanel($roleContainers.filter(`[data-role='${rID}']`));
 	
-	return sleep(getDuration(data, 500));
+	return sleep(getDuration(500));
 }
 
 async function transformIntoPlayerPanel($roleContainer)
@@ -8342,7 +8373,7 @@ async function transformIntoPlayerPanel($roleContainer)
 		$elements: $roleContainer.appendTo($("#rightPanel")),
 		initialProperties,
 		desiredProperties,
-		duration: getDuration(data, 500),
+		duration: getDuration(500),
 		easing: "easeInOutQuint"
 	});
 
@@ -8386,9 +8417,9 @@ function showTurnOrder()
 				$elements: $rank,
 				initialProperties: { opacity: 0.1 },
 				desiredProperties: { opacity: 1 },
-				duration: getDuration(data, 500)
+				duration: getDuration(500)
 			});
-			await sleep(getDuration(data, 500));
+			await sleep(getDuration(500));
 		}
 		resolve(turnOrder);
 	});
@@ -8415,7 +8446,7 @@ function showStartingHandPopulations()
 		initialCardHeight = $aCard.height();
 
 	let $card;
-	for (let { key, population } of data.startingHandPopulations)
+	for (let { key, population } of gameData.startingHandPopulations)
 	{
 		$card = $cards.filter(`[data-key='${key}']`);
 
@@ -8433,7 +8464,7 @@ function showStartingHandPopulations()
 	{
 		$elements: $cards,
 		desiredProperties: { height: expandedCardHeight },
-		duration: getDuration(data, 400),
+		duration: getDuration(400),
 		easing: "easeInOutQuad"
 	});
 }
@@ -8442,7 +8473,7 @@ function getDecidingTurnOrderCardPopulations()
 {
 	const turnOrderCards = [];
 
-	let startingHandPopulations = [...data.startingHandPopulations],
+	let startingHandPopulations = [...gameData.startingHandPopulations],
 		highestPop,
 		cardWithHighestPop,
 		city;
@@ -8478,10 +8509,10 @@ function animateInitialDeal()
 			$roleContainers = $("#roleSetupContainer").find(".roleContainer");
 			
 		await dealFaceDownStartingHands(startingHandsEvent, $roleContainers);
-		await sleep(getDuration(data, "mediumInterval"));
+		await sleep(getDuration("mediumInterval"));
 		await revealStartingHands(startingHandsEvent, $roleContainers);
 	
-		await sleep(getDuration(data, "longInterval"));
+		await sleep(getDuration("longInterval"));
 		finishedSetupStep();
 		resolve();
 	});
@@ -8494,7 +8525,7 @@ async function dealFaceDownStartingHands(startingHandsEvent, $roleContainers)
 		deckOffset = $("#imgPlayerDeck").offset(),
 		CARD_MARGIN_BOTTOM = 4,
 		finalCardbackWidth = data.STARTING_HAND_CARD_HEIGHT - CARD_MARGIN_BOTTOM,
-		interval = getDuration(data, "dealCard") * 0.4;
+		interval = getDuration("dealCard") * 0.4;
 	
 	await makeRoomForStartingHands(startingHandSize, $roleContainers);
 
@@ -8504,7 +8535,7 @@ async function dealFaceDownStartingHands(startingHandsEvent, $roleContainers)
 	while (cardsDealt < numCardsToDeal)
 	{
 		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), deckOffset, { finalCardbackWidth, zIndex });
-		await sleep(getDuration(data, interval));
+		await sleep(getDuration(interval));
 		
 		cardsDealt++;
 		if (roleIndex === $roleContainers.length - 1)
@@ -8549,7 +8580,7 @@ function makeRoomForStartingHands(startingHandSize, $roleContainers)
 		$elements: $roleContainers,
 		initialProperties: { height: initialHeight },
 		desiredProperties: { height: requiredHeight },
-		duration: getDuration(data, 400),
+		duration: getDuration(400),
 		easing: "easeOutQuad"
 	});
 }
@@ -8594,7 +8625,7 @@ function expandInfectionDiscardPile({ showRemovedCardsContainer } = {})
 		{
 			const $container = $("#infectionDiscard"),
 				panelHeight = $("#topPanel").height(),
-				maxHeight = data.boardHeight - panelHeight - 5;
+				maxHeight = gameData.boardHeight - panelHeight - 5;
 
 			$container.stop().css("height", "auto");
 			positionRemovedInfectionCardsContainer();
@@ -8637,7 +8668,7 @@ function expandInfectionDiscardPile({ showRemovedCardsContainer } = {})
 				$container
 					.css({ height: panelHeight })
 					.animate(desiredProperties,
-					getDuration(data, "discardPileExpand"),
+					getDuration("discardPileExpand"),
 					function() { resolve() });
 			}
 		});
@@ -8655,7 +8686,7 @@ function collapseInfectionDiscardPile()
 					scrollTop: 0,
 					height: $("#topPanel").height()
 				},
-				getDuration(data, "discardPileCollapse"),
+				getDuration("discardPileCollapse"),
 				function()
 				{
 					if (eventTypeIsBeingPrompted(eventTypes.resilientPopulation))
@@ -8727,25 +8758,25 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 	{
 		const $discardPile = $("#playerDiscard"),
 			$removedCardsContainer = $discardPile.children("#removedPlayerCards"),
-			panelHeight = data.topPanelHeight,
-			maxHeight = data.boardHeight - panelHeight;
+			{ topPanelHeight, boardHeight } = gameData,
+			maxHeight = boardHeight - topPanelHeight;
 		
 		$discardPile.stop().css("height", "auto");
 
 		let expandedPileHeight = $discardPile.height();
 		
 		if (showRemovedCardsContainer || $removedCardsContainer.children(".playerCard").length)
-			resizeRemovedPlayerCardsContainer($removedCardsContainer, panelHeight, expandedPileHeight);
+			resizeRemovedPlayerCardsContainer($removedCardsContainer, expandedPileHeight);
 		
 		expandedPileHeight = $discardPile.height();
 
-		if (expandedPileHeight < panelHeight)
+		if (expandedPileHeight < topPanelHeight)
 		{
 			if (!showRemovedCardsContainer)
 			{
 				$discardPile.css({
 					overflowY: "hidden",
-					height: panelHeight
+					height: topPanelHeight
 				});
 			}
 			
@@ -8761,31 +8792,32 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 			
 			$discardPile.css(
 				{
-					height: panelHeight,
+					height: topPanelHeight,
 					zIndex: 8 // The expanded container needs to cover .pawnArrows
 				})
 				.animate(
 				{
 					height: expandedPileHeight,
-					top: data.boardHeight - expandedPileHeight,
+					top: boardHeight - expandedPileHeight,
 					scrollTop: showRemovedCardsContainer ? document.getElementById("playerDiscard").scrollHeight : 0
 				},
-				getDuration(data, "discardPileExpand"),
+				getDuration("discardPileExpand"),
 				function() { resolve() });
 		}
 	});
 }
 
-function resizeRemovedPlayerCardsContainer($removedCardsContainer, panelHeight, expandedPileHeight)
+function resizeRemovedPlayerCardsContainer($removedCardsContainer, expandedPileHeight)
 {
 	const rccHeight = $removedCardsContainer.removeClass("hidden").height(),
-		rccExpandedProps = {};
+		rccExpandedProps = {},
+		{ topPanelHeight } = gameData,
 
-	if (expandedPileHeight < panelHeight)
-		rccExpandedProps.marginTop = panelHeight - expandedPileHeight;
+	if (expandedPileHeight < topPanelHeight)
+		rccExpandedProps.marginTop = topPanelHeight - expandedPileHeight;
 
-	if (rccHeight < panelHeight)
-		rccExpandedProps.height = panelHeight + 1;
+	if (rccHeight < topPanelHeight)
+		rccExpandedProps.height = topPanelHeight + 1;
 	
 	$removedCardsContainer.css(rccExpandedProps);
 }
@@ -8794,17 +8826,18 @@ function collapsePlayerDiscardPile()
 {
 	return new Promise(resolve =>
 	{
-		const $discardPile = $("#playerDiscard");
+		const $discardPile = $("#playerDiscard"),
+			{ topPanelHeight, boardHeight } = gameData;
 		
 		$discardPile.stop()
 			.css("overflow-y", "hidden")
 			.animate(
 			{
 				scrollTop: 0,
-				height: data.topPanelHeight,
-				top: data.boardHeight - data.topPanelHeight,
+				height: topPanelHeight,
+				top: boardHeight - topPanelHeight,
 				zIndex: 7
-			}, getDuration(data, "discardPileCollapse"),
+			}, getDuration("discardPileCollapse"),
 			function()
 			{
 				$discardPile.children("#removedPlayerCards")
@@ -8854,17 +8887,14 @@ function showFullEpidemicCard($epidemicCard)
 	ensureDivPositionIsWithinWindowHeight($fullEpidemicCard);
 }
 
-function getLastEvent()
-{
-	return data.events[data.events.length - 1];
-}
-
 function lastEventCanBeUndone()
 {
+	const { events } = gameData;
 	let event;
-	for (let i = data.events.length - 1; i >= 0; i--)
+	
+	for (let i = events.length - 1; i >= 0; i--)
 	{
-		event = data.events[i];
+		event = events[i];
 
 		if (event instanceof PermanentEvent)
 			return false;
@@ -8895,16 +8925,17 @@ async function undoAction()
 	else
 		resetActionPrompt({ actionCancelled: true });
 
-	const {
-		undoneEventIds,
-		wasContingencyCard,
-		prevStepName,
-		prevTurnNum,
-		prevTurnRoleID
-	} = await event.requestUndo(getActivePlayer(), data.currentStep.name);
+	const { currentStep, events } = gameData,
+		{
+			undoneEventIds,
+			wasContingencyCard,
+			prevStepName,
+			prevTurnNum,
+			prevTurnRoleID
+		} = await event.requestUndo(getActivePlayer(), currentStep.name);
 
 	await animateUndoEvents(undoneEventIds, wasContingencyCard);
-	data.events.length = eventIndex;
+	events.length = eventIndex;
 	
 	if (prevStepName)
 	{
@@ -8912,8 +8943,8 @@ async function undoAction()
 		// revert to the 'infect cities' step of the previous turn.
 		if (prevTurnNum && prevTurnRoleID)
 		{
-			data.turnNum = prevTurnNum;
-			data.turn = prevTurnRoleID;
+			gameData.turnNum = prevTurnNum;
+			gameData.turn = prevTurnRoleID;
 
 			$("#actionsContainer").slideUp();
 		}
@@ -8923,7 +8954,7 @@ async function undoAction()
 	}
 	else if (forecastInProgress())
 	{
-		data.currentStep.indicate();
+		currentStep.indicate();
 		indicatePromptingEventCard();
 	}
 	else
@@ -8932,10 +8963,12 @@ async function undoAction()
 
 function getLastUndoableEvent()
 {
+	const { events } = gameData;
 	let event, i;
-	for (i = data.events.length - 1; i >= 0; i--)
+
+	for (i = events.length - 1; i >= 0; i--)
 	{
-		event = data.events[i];
+		event = events[i];
 		
 		if (event.isUndoable)
 			return { event, eventIndex: i };
@@ -8954,12 +8987,14 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 		disableInfectionDiscardHoverEvents();
 		disablePlayerDiscardHoverEvents();
 		
+		const { events } = gameData;
 		let event;
+		
 		for (let id of undoneEventIds.reverse())
 		{
-			for (let i = data.events.length - 1; i >= 0; i--)
+			for (let i = events.length - 1; i >= 0; i--)
 			{
-				event = data.events[i];
+				event = events[i];
 				if (event.id == id)
 					break;
 			}
@@ -8967,7 +9002,7 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 			if (wasContingencyCard && !event.wasTriggered)
 			{
 				await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
-				await sleep(getDuration(data, "shortInterval"));
+				await sleep(getDuration("shortInterval"));
 			}
 
 			if (event instanceof MovementAction
@@ -8975,20 +9010,20 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 				|| event instanceof DiscoverACure
 				|| event instanceof Airlift
 				|| event instanceof OneQuietNight)
-				await event.animateUndo(data, wasContingencyCard);
+				await event.animateUndo(wasContingencyCard);
 			else if (event instanceof DiseaseCubeRemoval)
 				await event.animateUndo(placeDiseaseCubes);
 			else if (event instanceof ResearchStationPlacement)
-				await event.animateUndo(data, animateResearchStationBackToSupply, wasContingencyCard);
+				await event.animateUndo(animateResearchStationBackToSupply, wasContingencyCard);
 			else if (event instanceof PlanContingency)
-				await event.animateUndo(data, animateDiscardPlayerCard);
+				await event.animateUndo(animateDiscardPlayerCard);
 			else if (event instanceof OneQuietNight)
 			{
 				await event.animateUndo(wasContingencyCard);
 				indicateOneQuietNightStep({ off: true });
 			}
 			else if (event instanceof ResilientPopulation)
-				await event.animateUndo(data, wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
+				await event.animateUndo(wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
 			else if (typeof event.animateUndo === "function")
 				await event.animateUndo();
 			

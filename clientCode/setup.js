@@ -1,3 +1,5 @@
+"use strict";
+
 function retrieveGameData()
 {
 	return new Promise((resolve, reject) => $.post("serverCode/selectPages/retrieveGameData.php",
