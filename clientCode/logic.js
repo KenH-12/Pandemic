@@ -1,6 +1,7 @@
 "use strict";
 
 import { gameData } from "./gameData.js";
+import getDimension from "./dimensions.js";
 import { strings } from "./strings.js";
 import { easings } from "./easings.js";
 import PlayerPanel from "./playerPanel.js";
@@ -74,32 +75,6 @@ import {
 $(function(){
 const data =
 {
-	sizeRatios:
-	{
-		piecePlacementThreshold:["boardWidth", 0.023],
-		playerCardWidth:		["panelWidth", 0.98],
-		cubeSupplyMarginTop:	["topPanelHeight", 0.087],
-		bottomPanelDivs:		["boardHeight",	0.222],
-		cureMarkerMarginTop:	["boardHeight",	0.931],
-		cityWidth:				["boardWidth",	0.012],
-		autoTreatCircleWidth:	["boardWidth", 0.036],
-		cubeWidth:				["boardWidth", 0.016],
-		infGroupAdj:			["boardHeight", 0.025],
-		groupInfRateCubeWidth:	["panelWidth", 0.117],
-		infCardDiv:				["boardHeight",	0.047],
-		diseaseIcon:			["panelWidth",	0.1048],
-		discardDiseaseIcon:		["boardWidth",	0.023],
-		infCardHeight:			["panelWidth", 0.105],
-		infCardFont:			["panelWidth",	0.063],
-		infCardNameTop:			["panelWidth", 0.0205],
-		infDiscardHeight:		["boardWidth", 0.0192],
-		infDiscardFont:			["boardWidth",	0.0136],
-		infDiscardNameTop:		["boardWidth", 0.0038],
-		outbreaksMarkerLeft:	["boardWidth", 0.028],
-		outbreaksMarkerRight:	["boardWidth", 0.067],
-		stationSupplyCountFont: ["boardWidth", 0.0208],
-		specialEventImgMarginLeft: ["windowWidth", 0.47]
-	},
 	durations:
 	{
 		shortInterval: 500,

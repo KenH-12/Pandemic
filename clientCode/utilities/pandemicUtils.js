@@ -62,28 +62,6 @@ function newPlayerCard(relatedObject, { noTooltip } = {})
 	return `<div class='playerCard epidemic' data-key='epid'>EPIDEMIC</div>`;
 }
 
-// Facilitates responsiveness where simple css rules fail
-// Returns a dimension value calculated using gameData.sizeRatios
-function getDimension(gameData, dimension,
-	{
-		compliment,
-		getFactor,
-		format
-	} = {})
-{
-	const ratio = gameData.sizeRatios[dimension],
-		base = gameData[ratio[0]]; // some value that is updated on resize events
-	let factor = compliment ? 1 - ratio[1] : ratio[1]; // the ratio to the base value, or optionally the compliment of that ratio
-	
-	if (format == "percent")
-		factor *= 100;
-	
-	if (getFactor)
-		return factor;
-	
-	return Math.round(base * factor);
-}
-
 function getDuration({ skipping, durations }, durationNameOrMs)
 {
 	if (skipping)
