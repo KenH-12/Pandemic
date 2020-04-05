@@ -23,7 +23,10 @@ const gameData = {
 		u: 24,
 		b: 24
 	},
-	pendingClusters: new Set()
+	pendingClusters: new Set(),
+	fastForwarding: false,
+	HAND_LIMIT: 7,
+	playerCardAnimationInterval: 0.4
 }
 
 export { gameData };

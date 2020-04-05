@@ -3,6 +3,7 @@
 import { gameData } from "./gameData.js";
 import getDimension from "./dimensions.js";
 import { strings } from "./strings.js";
+import { getDuration, setDuration } from "./durations.js";
 import { easings } from "./easings.js";
 import PlayerPanel from "./playerPanel.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
@@ -73,34 +74,7 @@ import {
 } from "./travelPathArrow.js";
 
 $(function(){
-const data =
-{
-	durations:
-	{
-		shortInterval: 500,
-		mediumInterval: 750,
-		longInterval: 1250,
-		dealCard: 500,
-		revealInfCard: 800,
-		discardInfCard: 125,
-		cubePlacement: 600,
-		stationPlacement: 750,
-		revealPlayerCard: 400,
-		discardPlayerCard: 600,
-		discardPileExpand: 400,
-		discardPileCollapse: 200,
-		moveMarker: 700,
-		pawnAnimation: 250,
-		pinpointCity: 300,
-		specialEventBannerReveal: 250,
-		cureMarkerAnimation: 700
-	}, fastForwarding: false,
-	HAND_LIMIT: 7,
-	STARTING_HAND_CARD_HEIGHT: 24,
-	playerCardAnimationInterval: 0.4,
-	stationZindex: 3
-},
-eventHistory = new EventHistory();
+const eventHistory = new EventHistory();
 
 function parseEvents(events)
 {
@@ -5978,7 +5952,7 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 			for (let cardKey of cardKeys)
 				await animateDiscardPlayerCard(player.panel.getCard(cardKey));
 			
-			completionInterval *= (1 - data.playerCardAnimationInterval);
+			completionInterval *= (1 - gameData.playerCardAnimationInterval);
 		}
 		else if ($card.length === 1)
 		{
@@ -6029,7 +6003,7 @@ function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 				bindEventCardHoverEvents({ $containingElement: $container });
 			});
 	
-	return sleep(getDuration("discardPlayerCard") * data.playerCardAnimationInterval);
+	return sleep(getDuration("discardPlayerCard") * gameData.playerCardAnimationInterval);
 }
 
 function isEventCardKey(cardKey)
@@ -8487,7 +8461,7 @@ async function dealFaceDownStartingHands(startingHandsEvent, $roleContainers)
 		numCardsToDeal = startingHandsEvent.hands.length * startingHandSize,
 		deckOffset = $("#imgPlayerDeck").offset(),
 		CARD_MARGIN_BOTTOM = 4,
-		finalCardbackWidth = data.STARTING_HAND_CARD_HEIGHT - CARD_MARGIN_BOTTOM,
+		finalCardbackWidth = 20,
 		interval = getDuration("dealCard") * 0.4;
 	
 	await makeRoomForStartingHands(startingHandSize, $roleContainers);

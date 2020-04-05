@@ -61,19 +61,3 @@ function newPlayerCard(relatedObject, { noTooltip } = {})
 
 	return `<div class='playerCard epidemic' data-key='epid'>EPIDEMIC</div>`;
 }
-
-function getDuration({ skipping, durations }, durationNameOrMs)
-{
-	if (skipping)
-		return 0;
-	
-	if (isNaN(durationNameOrMs))
-		return durations[durationNameOrMs];
-	
-	return durationNameOrMs;
-}
-
-function setDuration({ durations }, durationName, ms)
-{
-	durations[durationName] = ms;
-}

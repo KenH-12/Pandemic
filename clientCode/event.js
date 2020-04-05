@@ -3,6 +3,7 @@
 import { strings } from "./strings.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 import { gameData } from "./gameData.js";
+import { setDuration } from "./durations.js";
 
 const dispatchDiscardRule = "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
 eventTypes = {

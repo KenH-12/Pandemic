@@ -2,6 +2,7 @@
 
 import { eventTypes } from "./event.js";
 import { gameData } from "./gameData.js";
+import { getDuration, setDuration } from "./durations.js";
 import { easings } from "./easings.js";
 import getDimension from "./dimensions.js";
 import {
