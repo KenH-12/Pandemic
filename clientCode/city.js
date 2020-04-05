@@ -2,6 +2,7 @@
 
 import { eventTypes } from "./event.js";
 import { gameData } from "./gameData.js";
+import { easings } from "./easings.js";
 
 import {
     showTravelPathArrow,

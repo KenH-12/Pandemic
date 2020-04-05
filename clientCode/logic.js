@@ -2,6 +2,7 @@
 
 import { gameData } from "./gameData.js";
 import { strings } from "./strings.js";
+import { easings } from "./easings.js";
 import PlayerPanel from "./playerPanel.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 import {
@@ -119,18 +120,6 @@ const data =
 		specialEventBannerReveal: 250,
 		cureMarkerAnimation: 700
 	}, fastForwarding: false,
-	easings:
-	{
-		dealCard: "easeInQuart",
-		revealCard: "easeOutQuint",
-		cubePlacement: "easeInSine",
-		stationPlacement: "easeInOutQuart",
-		pawnAnimation: "easeInOutQuart",
-		pinpointCity: "easeOutQuad",
-		moveMarker: "easeInOutQuad",
-		specialEventBannerReveal: "easeOutQuint",
-		cureMarkerAnimation: "easeInOutQuart"
-	},
 	HAND_LIMIT: 7,
 	STARTING_HAND_CARD_HEIGHT: 24,
 	playerCardAnimationInterval: 0.4,
@@ -2219,8 +2208,7 @@ async function animateForecastPlacement($cardContainer)
 	const cardbackInitialWidth = $cardbacks.first().width(),
 		$deck = $("#imgInfectionDeck"),
 		deckWidth = $deck.width(),
-		deckOffset = $deck.offset(),
-		easing = "easeOutSine";
+		deckOffset = $deck.offset();
 	
 	duration = 300;
 
@@ -2236,7 +2224,7 @@ async function animateForecastPlacement($cardContainer)
 			initialProperties: { ...cardOffset, ...{ width: cardbackInitialWidth, zIndex: 10 } },
 			desiredProperties: { ...deckOffset, ...{ width: deckWidth } }, 
 			duration,
-			easing
+			easing: "easeOutSine"
 		});
 
 		$card.remove();
@@ -2397,8 +2385,7 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 	const discardPileID = "infectionDiscard",
 		$discardPile = $(`#${discardPileID}`),
 		$removedCardsContainer = $discardPile.children("#removedInfectionCards").removeClass("hidden"),
-		$cardToRemove = $discardPile.children(`[data-key='${cardKeyToRemove}']`),
-		easing = "easeInOutQuad";
+		$cardToRemove = $discardPile.children(`[data-key='${cardKeyToRemove}']`);
 	
 	await expandInfectionDiscardPile({ showRemovedCardsContainer: true });
 
@@ -2416,7 +2403,7 @@ async function resilientPopulationAnimation(cardKeyToRemove)
 		},
 		desiredProperties: { top: $removedCardsContainer.offset().top + $removedCardsContainer.height() },
 		duration: 750,
-		easing
+		easing: "easeInOutQuad"
 	});
 
 	$cardToRemove.appendTo($removedCardsContainer)
@@ -3588,7 +3575,7 @@ function dealFaceDownPlayerCard($container, deckOffset, { finalCardbackWidth, zI
 				left: containerOffset.left
 			},
 			getDuration("dealCard"),
-			data.easings.dealCard,
+			easings.dealCard,
 			function() { $cardback.removeClass("template") });
 }
 
@@ -3600,8 +3587,7 @@ function newFacedownPlayerCard()
 async function revealPlayerCard(cardKey, $container)
 {
 	const $card = $(newPlayerCard(getCityOrEventCardObject(cardKey))),
-		duration = getDuration("revealPlayerCard"),
-		easing = data.easings.revealCard;
+		duration = getDuration("revealPlayerCard");
 
 	if ($container.hasClass("roleContainer"))
 		$card.appendTo($container);
@@ -3615,7 +3601,7 @@ async function revealPlayerCard(cardKey, $container)
 		initialProperties: { width: 0 },
 		desiredProperties: { width: cardWidth },
 		duration,
-		easing
+		easing: easings.revealCard
 	});
 
 	$card.removeAttr("style");
@@ -4842,7 +4828,7 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 		$rectA = $rects.first(),
 		$rectB = $rects.last(),
 		duration = getDuration("pinpointCity"),
-		easing = data.easings.pinpointCity;
+		easing = "easeOutQuad";
 
 	$rects.attr("class", "pinpointRect hidden");
 	resetPinpointRectangles();
@@ -4864,7 +4850,9 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 			desiredProperties: {
 				left: cityOffset.left - cWidth,
 				top: cityOffset.top - cWidth
-			}, duration, easing
+			},
+			duration, 
+			easing
 		}),
 		animationPromise(
 		{
@@ -4872,7 +4860,9 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 			desiredProperties: {
 				left: (cityOffset.left + cWidth) - boardWidth - adj,
 				top: (cityOffset.top + cWidth) - boardHeight - adj
-			}, duration, easing
+			},
+			duration,
+			easing
 		})
 	]);
 
@@ -5118,7 +5108,7 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 					left: getDimension(leftDimension)
 				},
 				duration: animate ? getDuration("moveMarker") : 0,
-				easing: data.easings.moveMarker
+				easing: easings.moveMarker
 			});
 
 			if (animate)
@@ -5213,7 +5203,7 @@ async function removeCubesFromBoard(city, { $clickedCube, color, numToRemove, sl
 			$elements: $cube,
 			desiredProperties,
 			duration,
-			easing: data.easings.cubePlacement
+			easing: easings.cubePlacement
 		});
 
 		$cube.remove();
@@ -5429,7 +5419,7 @@ function specialEventAlert({ title, description, eventClass, visibleMs })
 	{
 		const $banner = $("#specialEventBanner"),
 			duration = getDuration("specialEventBannerReveal"),
-			easing = data.easings.specialEventBannerReveal;
+			easing = "easeOutQuint";
 		
 		$banner.removeAttr("class").addClass(eventClass)
 			.children("#specialEventTitle").html(title)
@@ -5688,7 +5678,7 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 				left: (gameData.boardWidth * spaceLocations[epidemicCount])
 			},
 			duration: animate ? getDuration("moveMarker") : 0,
-			easing: data.easings.moveMarker
+			easing: easings.moveMarker
 		});
 
 		if (animate)
@@ -5787,8 +5777,8 @@ async function animateEpidemicIntensify()
 		{
 			$elements: $cardbacks,
 			desiredProperties: { ...centerOfContainer, ...{ width: deckWidth } },
-			duration: duration,
-			easing: easing
+			duration,
+			easing
 		});
 
 	if ($cardbacks.length > 1)
@@ -5800,16 +5790,16 @@ async function animateEpidemicIntensify()
 				{
 					minDistance: 10,
 					maxDistance: Math.floor(deckWidth * 0.5),
-					duration: duration,
-					easing: easing
+					duration,
+					easing
 				});
 			
 			await animationPromise(
 				{
 					$elements: $cardbacks,
 					desiredProperties: centerOfContainer,
-					duration: duration,
-					easing: easing
+					duration,
+					easing
 				});
 		}
 	}
@@ -5864,7 +5854,7 @@ function shuffleAnimation($container, $elements, { numShuffles } = {})
 				$elements,
 				desiredProperties: centerOfContainer,
 				duration: getDuration(500),
-				easing: easing
+				easing
 			});
 
 		if ($elements.length === 1)
@@ -6704,7 +6694,7 @@ function showNextGroupInfRate()
 			marginLeft: computeGroupInfRateMargin($groupInfRate)
 		},
 		getDuration("shortInterval"),
-		data.easings.revealCard,
+		easings.revealCard,
 		() => resolve());
 	});
 }
@@ -6750,7 +6740,7 @@ function dealFaceDownInfCard(elementIndex)
 				top: containerTop
 			},
 			getDuration("dealCard"),
-			data.easings.dealCard,
+			easings.dealCard,
 			function() { resolve() });
 	});
 }
@@ -6803,7 +6793,7 @@ async function revealInfectionCard({ city, cityKey, index }, { forecasting } = {
 		
 		$veil.animate({ left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
 			getDuration("revealInfCard"),
-			data.easings.revealCard,
+			easings.revealCard,
 			() =>
 			{
 				$veil.remove();
@@ -7097,7 +7087,7 @@ function animateDiscoverCure(diseaseColor, diseaseStatus)
 			},
 			desiredProperties: getCureMarkerDesiredProperties(diseaseColor),
 			duration: getDuration("cureMarkerAnimation"),
-			easing: data.easings.cureMarkerAnimation
+			easing: "easeInOutQuart"
 		});
 
 		$cureMarker.removeClass("specialEventImg").removeAttr("style")
@@ -7660,12 +7650,12 @@ class RoleSlotMachine
 		return new Promise(resolve =>
 		{
 			const self = this,
-				duration = this.msPerRevolution / this.numOptions,
-				easing = "linear";
+				duration = this.msPerRevolution / this.numOptions;
 
 			this.$optionGroups.first()
 				.animate({ marginTop: "+=" + self.optionHeight + "px" },
-					duration, easing,
+					duration,
+					"linear",
 					function()
 					{
 						if (!maintainSpeed)
@@ -7926,8 +7916,7 @@ async function showEpidemicsToShuffle($container)
 	
 	const $cardbacks = $container.find("img"),
 		$epidemics = $container.find(".epidemic"),
-		epidemicWidth = $epidemics.first().width(),
-		easing = data.easings.revealCard;
+		epidemicWidth = $epidemics.first().width();
 	
 	$epidemics.addClass("hidden");
 
@@ -7947,7 +7936,7 @@ async function showEpidemicsToShuffle($container)
 		initialProperties: { width: 0 },
 		desiredProperties: { width: epidemicWidth },
 		duration: getDuration("revealCard"),
-		easing
+		easing: easings.revealCard
 	});
 }
 
@@ -7957,7 +7946,6 @@ async function dividePlayerDeckIntoEqualPiles($container)
 		$divs = $container.children("div"),
 		$deck = $("#imgPlayerDeck"),
 		initialProperties = $deck.offset(),
-		easing = data.easings.dealCard,
 		desiredProps = [];
 
 	Object.assign(initialProperties,
@@ -7994,7 +7982,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 			initialProperties,
 			desiredProperties: desiredProps[divIdx],
 			duration: getDuration("dealCard"),
-			easing
+			easing: easings.dealCard
 		});
 
 		if (i === numCardsToDeal - 1) // deck is empty
@@ -8034,7 +8022,7 @@ function shuffleEpidemicIntoPile($div)
 	{
 		const $epidemic = $div.children(".epidemic"),
 			initialEpidemicOffset = $epidemic.offset(),
-			easing = data.easings.dealCard;
+			easing = easings.dealCard;
 		
 		let $cardbacks = $div.children("img");
 
@@ -8081,7 +8069,7 @@ function placePileOntoPlayerDeck($div, deckPropertes)
 			$elements: $pile,
 			desiredProperties: deckPropertes,
 			duration: getDuration("dealCard"), 
-			easing: data.easings.dealCard
+			easing: easings.dealCard
 		});
 
 		if (getPlayerDeckImgSize($deck) != getMaxPlayerDeckImgSize())
