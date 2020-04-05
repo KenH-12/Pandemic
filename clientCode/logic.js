@@ -364,7 +364,7 @@ class Step
 			.html(this.description);
 
 		bindRoleCardHoverEvents();
-		unhide($container);
+		$container.removeClass("hidden").removeAttr("style");
 
 		highlightTurnProcedureStep(this.name);
 		
@@ -568,7 +568,7 @@ function enableAvailableActions()
 	
 	useRoleColorForRelatedActionButtons(player.role);
 
-	unhide($actionsContainer);
+	$actionsContainer.removeClass("hidden").removeAttr("style");
 	enableAvailableActionButtons(player);
 	enableAvailableSpecialActionButtons($actionsContainer, player);
 	
@@ -1255,14 +1255,14 @@ function promptAction(actionProperties)
 			enableBtnCancelAction();
 		
 		$actionCategories.addClass("hidden");
-		unhide($actionPrompt);
+		$actionPrompt.removeClass("hidden").removeAttr("style");
 
 		// Event cards can be played during some non-action steps.
 		if (!actionStepInProgress())
 			$actionsContainer.siblings(".interface").addClass("hidden");
 	}
 
-	unhide($actionsContainer);
+	$actionsContainer.removeClass("hidden").removeAttr("style");
 	setRightPanelScrollability();
 }
 
@@ -3467,7 +3467,7 @@ async function drawStep()
 		return outOfPlayerCardsDefeatAnimation($container);
 	}
 
-	unhide($container, $btn);
+	$container.add($btn).removeClass("hidden").removeAttr("style");
 
 	// Event cards can be played before drawing.
 	enableEventCards();
@@ -4644,7 +4644,7 @@ function instantiatePlayers(playerInfoArray)
 	if (data.gameIsResuming)
 	{
 		bindPawnEvents();
-		unhide($(".playerPanel"));
+		$(".playerPanel").removeClass("hidden").removeAttr("style");
 	}
 }
 
@@ -5945,7 +5945,7 @@ function discardStep()
 	$container.siblings(".interface").addClass("hidden");
 
 	$container.append($discardPrompt)
-		.slideDown(function() { unhide($container) });
+		.slideDown(function() { $container.removeClass("hidden").removeAttr("style") });
 }
 
 // Returns the player who has more cards than the hand limit.
@@ -6971,7 +6971,7 @@ async function outOfPlayerCardsDefeatAnimation($cardDrawContainer)
 	const $playerDeckContainer = $("#playerDeck");
 	
 	$cardDrawContainer.append("<h2>Out of cards!</h2>");
-	unhide($cardDrawContainer);
+	$cardDrawContainer.removeClass("hidden").removeAttr("style");
 
 	await propertyStrobe($playerDeckContainer,
 	{
@@ -7853,13 +7853,13 @@ async function beginGame()
 	const $containersToShow = $("#turnProcedureContainer, #indicatorContainer");
 	$containersToShow.slideDown(getDuration(data, 400), function()
 	{
-		unhide($containersToShow);
+		$containersToShow.removeClass("hidden").removeAttr("style");
 		bindRoleCardHoverEvents();
 		bindPawnEvents();
 		data.currentStep.next();
 		$("#actionsContainer").slideDown(getDuration(data, 400), function()
 		{
-			unhide($(this));
+			$(this).removeClass("hidden").removeAttr("style");
 			if (data.skippingSetup) doneSkippingSetup();
 		});
 	});
@@ -8081,7 +8081,7 @@ function placePileOntoPlayerDeck($div, deckPropertes)
 		});
 
 		if (getPlayerDeckImgSize($deck) != getMaxPlayerDeckImgSize())
-			unhide($deck);
+			$deck.removeClass("hidden").removeAttr("style");
 		
 		increasePlayerDeckImgSize();
 		$pile.remove();
@@ -8095,10 +8095,14 @@ function getPlayerDeckProperties()
 	const $deck = $("#imgPlayerDeck"),
 		deckIsHidden = $deck.hasClass("hidden");
 	
-	if (deckIsHidden) unhide($deck);
+	if (deckIsHidden)
+		$deck.removeClass("hidden").removeAttr("style");
+	
 	const deckProperties = $deck.offset();
 	deckProperties.width = $deck.width() * 0.94;
-	if (deckIsHidden) $deck.addClass("hidden");
+	
+	if (deckIsHidden)
+		$deck.addClass("hidden");
 
 	return deckProperties;
 }
