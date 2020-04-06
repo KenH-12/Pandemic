@@ -145,3 +145,36 @@ function setTooltipPaddingAndReturnOffset($tooltip, { tooltipOffset, tooltipMarg
 	
 	return tooltipOffset;
 }
+
+function ensureDivPositionIsWithinWindowHeight($div, { margin = 5 } = {})
+{
+	const windowHeight = $(window).height(),
+		$images = $div.find("img");
+	
+	for (let i = 0; i < $images.length; i++)
+		$images.eq(i).on("load", () => ensureDivPositionIsWithinWindowHeight($div));
+	
+	const divHeight = $div.outerHeight() + margin;
+
+    if ($div.offset().top + divHeight > windowHeight)
+		$div.offset({ top: windowHeight - divHeight });
+	
+	if ($div.hasClass("tooltip"))
+		setTooltipArrowClipPath($div);
+}
+
+function ensureDivPositionIsWithinWindowWidth($div, { margin = 5 } = {})
+{
+	const windowWidth = $(window).width(),
+		divWidth = $div.outerWidth() + margin,
+		divLeft = $div.offset().left;
+	
+	if (divLeft < 0)
+	{
+		$div.offset({ left: margin });
+		return false;
+	}
+		
+	if (divLeft + divWidth > windowWidth)
+		$div.offset({ top: windowWidth - divWidth });
+}

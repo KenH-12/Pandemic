@@ -106,3 +106,64 @@ function randomNumberBetween(min, max)
 {
 	return Math.floor(Math.random() * max) + min;
 }
+
+function elementsOverlap(element1, element2)
+{
+	const rect1 = element1.getBoundingClientRect(),
+		rect2 = element2.getBoundingClientRect();
+	
+	return !(rect1.right < rect2.left || 
+		rect1.left > rect2.right || 
+		rect1.bottom < rect2.top || 
+		rect1.top > rect2.bottom);
+}
+
+function getHorizontalOverflow($element)
+{
+	const element = document.getElementById($element.attr("id"));
+	return element.scrollWidth - element.clientWidth;
+}
+
+function isOverflowingVertically($element)
+{
+	const element = document.getElementById($element.attr("id"));
+	return element.scrollHeight > element.clientHeight;
+}
+
+function removeStylePropertiesFrom($element, propertyNames)
+{
+	if (!propertyNames)
+	{
+		$element.removeAttr("style");
+		return false;
+	}
+
+	const element = $element[0],
+		removalMethod = element.style.removeProperty ? "removeProperty" : "removeAttribute";
+
+	for (let propertyName of ensureIsArray(propertyNames))
+		element.style[removalMethod](propertyName);
+}
+
+// Sets the height of all matched elements to the first matched element's width.
+function makeElementsSquare(cssSelector)
+{
+	const $elements = $(cssSelector);
+	$elements.height($elements.first().width());
+}
+
+function lockElements($elements)
+{
+	let $e, initialOffset, initialWidth;
+	
+	for (let i = $elements.length - 1; i >= 0; i--)
+	{
+		$e = $elements.eq(i);
+		initialOffset = $e.offset();
+		initialWidth = $e.width();
+
+		$e.css("position", "absolute")
+			.offset(initialOffset)
+			.width(initialWidth);
+	}
+}

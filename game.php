@@ -23,7 +23,6 @@
 				<script src='clientCode/utilities/pandemicUtils.js'></script>
 				<script src='clientCode/utilities/miscUtils.js'></script>
 				<script src='clientCode/utilities/stringUtils.js'></script>
-				<script src='clientCode/utilities/elementUtils.js'></script>
 				<script src='clientCode/utilities/tooltipUtils.js'></script>
 				<script src='clientCode/utilities/geometryUtils.js'></script>
 				<script src='clientCode/utilities/animationUtils.js'></script>
