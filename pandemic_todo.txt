@@ -6,9 +6,6 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
-the epidemic intensify button can be clicked during the resilient population animation
-	which interrupts the animation and effectively cancels the playing of the event card
-
 the cancel button should be hidden or disabled during forecast
 
 the outbreak tooltip gets cut off

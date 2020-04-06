@@ -5503,7 +5503,7 @@ async function epidemicIntensify()
 	{
 		enableEventCards({ resilientPopulationOnly: true });
 		
-		oscillateButtonBackgroundColor($btn.removeClass("hidden"));
+		oscillateButtonBackgroundColor($btn.removeClass("hidden btnDisabled"));
 		await buttonClickPromise($btn.html("INTENSIFY"));
 		$btn.addClass("hidden");
 	}
@@ -8834,6 +8834,8 @@ async function undoAction()
 
 	if (currentStepIs("draw"))
 		$("#cardDrawContainer").addClass("hidden").find(".button").off("click");
+	else if (currentStepIs("epIntensify"))
+		$("#epidemicContainer").find(".button").off("click").addClass("btnDisabled");
 	else if (currentStepIs("infect cities"))
 		$("#infectCitiesContainer").addClass("hidden").find(".button").off("click");
 	else if (currentStepIs("hand limit"))
