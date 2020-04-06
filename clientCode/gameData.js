@@ -31,15 +31,18 @@ const gameData = {
 
 // Given the name of a role, returns the corresponding Player object.
 // Also accepts the camelcase form of the role name.
-function getPlayer(roleName)
+function getPlayer(roleNameOrId)
 {
 	const { players } = gameData;
 	let player;
 	
+	if (players.hasOwnProperty(roleNameOrId))
+		return players[roleNameOrId];
+	
 	for (let rID in players)
 	{
 		player = players[rID];
-		if (player.role === roleName || player.camelCaseRole === roleName)
+		if (player.role === roleNameOrId || player.camelCaseRole === roleNameOrId)
 			return player;
 	}
 
