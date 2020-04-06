@@ -166,7 +166,7 @@ function parseEvents(events)
 				else if (e.code === eventTypes.forecastPlacement.code)
 				{
 					// The previously parsed Event is always the corresponding Forecast event which drew the top 6 infection cards.
-					// It can either be found in parsedEvents or data.events, but always at the end of whichever array.
+					// It can either be found in parsedEvents or gameData.events, but always at the end of whichever array.
 					const forecastEvent = parsedEvents.length ? parsedEvents[parsedEvents.length - 1] : gameData.events[gameData.events.length - 1],
 						placementEvent = new ForecastPlacement(e, cities, forecastEvent);
 					
@@ -6308,7 +6308,7 @@ function getQuarantineAreaClipPath()
 {
 	const { quarantineBoundaries } = getPlayer("Quarantine Specialist").getLocation(),
 		// clip-path points will be adjusted in the specified direction(s) from the boundary cities' centers as follows:
-		cityWidthAdj = data.sizeRatios.cityWidth[1] * 120,
+		cityWidthAdj = getDimension("cityWidth", { getFactor: true }) * 120,
 		cityHeightAdj = cityWidthAdj * 1.426;
 
 	let centeredX, centeredY,

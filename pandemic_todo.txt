@@ -6,6 +6,8 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page load
 
+epidemic hovering within event details is malfunctioning
+
 TO DO
 -----
 instead of importing gameData at the top of event.js, try dynamically importing only where it is needed
