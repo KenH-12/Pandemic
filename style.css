@@ -497,7 +497,11 @@ span.r {color: #ef282a; background: none}
 #topPanel .info:hover,
 .bottomPanelDiv .info:hover
 { text-shadow: 0px 0px 3px #fff }
-#eventDetails .playerCard { margin: 2px 0 }
+#eventDetails .playerCard
+{
+	margin: 2px 0;
+	width: 100%;
+}
 
 #eventDetails .cubes { white-space: nowrap }
 #eventDetails .diseaseCube
@@ -1657,10 +1661,16 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 }
 .slotMachine, .slotMachineShadow { height: 100px; }
 
-.roleContainer .playerCard
+.roleContainer .playerCard,
+.playerCard.drawing
 {
 	height: 20px;
 	line-height: 20px;
+	font-size: 14px;
+}
+.playerCard.drawing { transition: height, line-height, font-size 0.5s }
+.roleContainer .playerCard
+{
 	width: 92%;
 	margin-left: 4%;
 	margin-bottom: 4px;

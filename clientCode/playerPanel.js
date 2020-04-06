@@ -1,5 +1,6 @@
 "use strict";
 import { cities } from "./city.js";
+import { getDuration } from "./durations.js";
 
 // Only the northernmost cities which are directly under player panels need to be checked for occlusion.
 const cityKeysToCheckForOcclusion = ["sanf", "chic", "mont", "newy", "lond"];
@@ -149,7 +150,8 @@ export default class PlayerPanel
 				$insertAfterElement = this.$panel.children(".role, .playerCard").last();
 			
 			$card.appendTo("#rightPanel") // The animation is smoother if the $card is first appended to #rightPanel.
-				.css(
+                .addClass("drawing")
+                .css(
 				{
 					...{
 						position: "absolute",
@@ -158,12 +160,14 @@ export default class PlayerPanel
 					},
 					...initialOffset
 				})
-				.animate(targetProperties, 500,
+				.animate(targetProperties, getDuration("dealCard"),
 				function()
 				{
-                    $card.removeAttr("style").insertAfter($insertAfterElement);
+                    $card.removeAttr("style")
+                        .insertAfter($insertAfterElement)
+                        .removeClass("drawing");
+                    
                     panel.checkOcclusion();
-
 					resolve();
 				});
 		});
@@ -172,16 +176,14 @@ export default class PlayerPanel
     getCardTargetProperties({ isContingencyCard } = {})
 	{
 		const $guide = this.$panel.children().last(),
-			guideHeight = $guide.height(),
 			guideOffset = isContingencyCard ? this.$panel.children(".role").offset() : $guide.offset(),
 			$exampleCard = $("#playerPanelContainer").find(".playerCard").first(),
 			exampleCardHeight = $exampleCard ? $exampleCard.height() : false,
-			top = exampleCardHeight ? guideOffset.top + exampleCardHeight : guideOffset.top + guideHeight;
+			top = exampleCardHeight ? guideOffset.top + exampleCardHeight : guideOffset.top + $guide.height();
 		
 		const targetProperties = {
 			width: $guide.width(),
-			height: exampleCardHeight || guideHeight,
-			top: top,
+			top,
 			left: guideOffset.left
 		};
 		

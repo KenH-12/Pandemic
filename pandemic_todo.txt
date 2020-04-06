@@ -8,8 +8,29 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 epidemic hovering within event details is malfunctioning
 
+the epidemic intensify button can be clicked during the resilient population animation
+	which interrupts the animation and effectively cancels the playing of the event card
+
+the cancel button should be hidden or disabled during forecast
+
+disabled event card tooltips are malfunctioning
+
+the outbreak tooltip gets cut off
+	suspected cause is excessive line breaks
+
+though it appears that "cards left in player deck" are off by +1,
+the count is correct but the deck image disappears at 1 card remaining.
+additionally, the "out of cards" game end cause did not trigger properly until the page was refreshed
+	(observed when drawing 1/2 cards)
+
 TO DO
 -----
+fix the font and text-alignment of the "out of cards" message displayed in the card draw container
+
+disable player discard hover events (epidemics, event cards) while expanding or collapsing the container
+
+perhaps epidemic intensify events should be undoable until an infection has occured
+
 instead of importing gameData at the top of event.js, try dynamically importing only where it is needed
 
 tooltips
@@ -19,14 +40,18 @@ tooltips
 			cured
 			eradicated
 	number of cards in...
+		player deck when hovering the deck img (no other info in tooltip)
 		infection deck
 		infection discards
 		player discards
 	research station supply
 	infection rate track
+		infection rate info icon beside infection rate displayed during infect cities step
 	outbreaks track
+	forecast "top" and "bottom" headings
 
 put strings in strings.js file
+	game end cause descriptions
 
 indicate loading when waiting for a response from the server
 

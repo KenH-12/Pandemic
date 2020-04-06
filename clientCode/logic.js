@@ -3560,13 +3560,15 @@ async function animateCardsToHand($cards)
 	// and the first card should be offset from the second.
 	let lastCardTop = targetProperties.top;
 	if (!$cards.first().hasClass("epidemic"))
-		lastCardTop += targetProperties.height + 2; // + 2 for slight separation
+		lastCardTop += $cards.first().height();
 	
 	// There will always be 2 cards to handle.
 	panel.animateReceiveCard($cards.last(),
 	{
-		...targetProperties,
-		...{ top: lastCardTop }
+		targetProperties: {
+			...targetProperties,
+			...{ top: lastCardTop }
+		}
 	});
 	
 	// If there are 0 epidemics, the cards are animated to the hand simultaneously.
