@@ -2,7 +2,7 @@
 
 import { strings } from "./strings.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
-import { gameData } from "./gameData.js";
+import { gameData, getPlayer, getActivePlayer } from "./gameData.js";
 import { setDuration } from "./durations.js";
 
 const dispatchDiscardRule = "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
@@ -631,15 +631,15 @@ class InitialInfection extends PermanentEvent
 
 class UndoableEvent extends Event
 {
-	requestUndo(activePlayer, currentStepName, additionalDataToPost = {})
+	requestUndo(additionalDataToPost = {})
 	{
 		return new Promise((resolve, reject) =>
 		{
 			$.post(`serverCode/actionPages/${this.undoerFileName || `undo${toPascalCase(this.name)}`}.php`,
 			{
 				...{
-					activeRole: activePlayer.rID,
-					currentStep: currentStepName,
+					activeRole: getActivePlayer().rID,
+					currentStep: gameData.currentStep.name,
 					eventID: this.id
 				},
 				...additionalDataToPost
@@ -679,9 +679,9 @@ class MovementAction extends UndoableEvent
 		return details;
 	}
 
-	requestUndo(activePlayer, currentStepName)
+	requestUndo()
 	{
-		return super.requestUndo(activePlayer, currentStepName, { actionCode: this.code });
+		return super.requestUndo({ actionCode: this.code });
 	}
 	
 	animateUndo()
@@ -1193,11 +1193,11 @@ class ResilientPopulation extends UndoableEvent
 				${this.eventCard.getPlayerCard()}`;
 	}
 
-	requestUndo(activePlayer, currentStepName)
+	requestUndo()
 	{
 		return new Promise(async resolve =>
 		{
-			const result = await super.requestUndo(activePlayer, currentStepName);
+			const result = await super.requestUndo();
 	
 			this.neighborCardKey = result.neighborCardKey;
 			this.neighborWasDrawnBefore = result.neighborWasDrawnBefore;
@@ -1699,8 +1699,10 @@ function movementTypeRequiresDiscard(eventType)
 }
 
 // Because Events need to be instantiated before Players.
-function attachPlayersToEvents(players, getPlayer, events)
+function attachPlayersToEvents(events)
 {
+	const { players } = gameData;
+	
 	for (let event of events)
 	{
 		if (players.hasOwnProperty(event.role))

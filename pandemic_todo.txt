@@ -8,6 +8,8 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 TO DO
 -----
+instead of importing gameData at the top of event.js, try dynamically importing only where it is needed
+
 tooltips
 	cured diseases container
 		cure vials

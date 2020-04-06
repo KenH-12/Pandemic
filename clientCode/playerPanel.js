@@ -123,7 +123,7 @@ export default class PlayerPanel
         this.$panel.find(`.playerCard[data-key='${cardKey}']`).remove();
     }
     
-    animateReceiveCard($card, boardDimensions, { targetProperties, isContingencyCard } = {})
+    animateReceiveCard($card, { targetProperties, isContingencyCard } = {})
 	{
 		targetProperties = targetProperties || this.getCardTargetProperties({ isContingencyCard });
 		
@@ -162,7 +162,7 @@ export default class PlayerPanel
 				function()
 				{
                     $card.removeAttr("style").insertAfter($insertAfterElement);
-                    panel.checkOcclusion(boardDimensions);
+                    panel.checkOcclusion();
 
 					resolve();
 				});
@@ -194,7 +194,7 @@ export default class PlayerPanel
 			.html(`— ${cardCount} card${cardCount === 1 ? "" : "s"} in hand —`);
     }
     
-    checkMovementResultsForOcclusion(city, resultsToCheck, boardDimensions)
+    checkMovementResultsForOcclusion(city, resultsToCheck)
     {
         for (let result of resultsToCheck)
         {
@@ -202,13 +202,13 @@ export default class PlayerPanel
             result.$piece.offset(result.newOffset);
         }
         
-        this.checkOcclusion(boardDimensions, city);
+        this.checkOcclusion(city);
 
         for (let result of resultsToCheck)
             result.$piece.offset(result.currentOffset);
     }
     
-    checkOcclusion(boardDimensions, citiesToCheck)
+    checkOcclusion(citiesToCheck)
 	{
         const wasCollapsed = this.$panel.hasClass("collapsed");
         this.expandIfCollapsed({ duration: 0 });
@@ -216,28 +216,28 @@ export default class PlayerPanel
         if (citiesToCheck)
 		{
 			for (let city of ensureIsArray(citiesToCheck))
-				this.addOrRemoveOcclusion(city, boardDimensions);
+				this.addOrRemoveOcclusion(city);
 		}
 		else
 			for (let key of cityKeysToCheckForOcclusion)
-                this.addOrRemoveOcclusion(cities[key], boardDimensions);
+                this.addOrRemoveOcclusion(cities[key]);
         
         if (wasCollapsed)
             this.collapse({ duration: 0 });
 	}
 
-	addOrRemoveOcclusion(city, boardDimensions)
+	addOrRemoveOcclusion(city)
 	{
-        if (this.occludes(city, boardDimensions))
+        if (this.occludes(city))
 			this.addOcclusion(city);
 		else
 			this.removeOcclusion(city);
 	}
 
-	occludes(city, boardDimensions)
+	occludes(city)
 	{
         const panel = this.$panel[0],
-			$cityArea = city.getAreaDiv(boardDimensions);
+			$cityArea = city.getAreaDiv();
 
 		if (elementsOverlap(panel, $cityArea[0]))
 		{

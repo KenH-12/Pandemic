@@ -1,4 +1,5 @@
 import { eventTypes } from "./event.js";
+import { gameData } from "./gameData.js";
 
 const data = {
     MARGIN: 5
@@ -34,18 +35,18 @@ export default class EventCard
         return $fullCard;
     }
     
-    showFullCard($eventCard, { boardWidth, promptingEventType })
+    showFullCard($eventCard)
     {
         const $fullCard = this.getFullCard($eventCard.hasClass("contingency")),
             $cardImg = $fullCard.children("img");
         
         $fullCard.appendTo("#boardContainer")
-            .offset(getFullCardOffset($eventCard, $fullCard, boardWidth));
+            .offset(getFullCardOffset($eventCard, $fullCard));
 
         $cardImg.on("load", function() { ensureDivPositionIsWithinWindowHeight($fullCard) });
 
         if ($eventCard.hasClass("unavailable"))
-            showDisabledEventCardTooltip($fullCard, promptingEventType);
+            showDisabledEventCardTooltip($fullCard);
     }
 
     getRules()
@@ -74,7 +75,7 @@ const eventCards = {};
 		eventCards[card[0]] = new EventCard(card[0], card[1]);
 })();
 
-function bindEventCardHoverEvents(boardDimensions, { $containingElement } = {})
+function bindEventCardHoverEvents({ $containingElement } = {})
 {
     const eventCardSelector = ".playerCard.eventCard",
         $eventCards = $containingElement ? $containingElement.find(eventCardSelector) : $(eventCardSelector);
@@ -85,12 +86,12 @@ function bindEventCardHoverEvents(boardDimensions, { $containingElement } = {})
         .hover(function()
         {
             $this = $(this);
-            eventCards[$this.data("key")].showFullCard($this, boardDimensions);
+            eventCards[$this.data("key")].showFullCard($this);
         },
         function() { $("#boardContainer").children("#contingencyWrapper, .eventCardFull, #disabledEventCard.tooltip").remove() });
 }
 
-function getFullCardOffset($eventCard, $fullCard, boardWidth)
+function getFullCardOffset($eventCard, $fullCard)
 {
     const fullCardOffset = $eventCard.offset(),
         eventCardWidth = $eventCard.outerWidth(),
@@ -111,26 +112,19 @@ function getFullCardOffset($eventCard, $fullCard, boardWidth)
     else if ($eventCard.closest("#playerDiscard").length)
         fullCardOffset.left -= fullCardWidth + data.MARGIN;
     else if ($eventCard.closest("#rightPanel").length)
-        fullCardOffset.left = boardWidth - fullCardWidth - data.MARGIN;
+        fullCardOffset.left = gameData.boardWidth - fullCardWidth - data.MARGIN;
     
     return fullCardOffset;
 }
 
-function ensureFullCardIsOnScreen($fullCard, boardHeight)
-{
-    const fullCardHeight = $fullCard.outerHeight() + data.MARGIN;
-
-    if ($fullCard.offset().top + fullCardHeight > boardHeight)
-        $fullCard.offset({ top: boardHeight - fullCardHeight });
-}
-
-function showDisabledEventCardTooltip($fullEventCard, promptingEventType)
+function showDisabledEventCardTooltip($fullEventCard)
 {
     const $tooltip = $(`<div class='tooltip' id='disabledEventCard'>
                         <p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
                         <p>However, when 2 Epidemic cards are drawn together, event cards can be played after resolving the first epidemic.</p>
                     </div>`).appendTo("#boardContainer"),
-        tooltipOffset = $fullEventCard.offset();
+        tooltipOffset = $fullEventCard.offset(),
+        { promptingEventType } = gameData;
     
     if (promptingEventType && promptingEventType.code === eventTypes.forecastPlacement.code)
         $tooltip.prepend("<p>* You must complete the Forecast event before doing anything else.</p>");

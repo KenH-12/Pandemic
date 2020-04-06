@@ -1,7 +1,7 @@
 "use strict";
 
 import { eventTypes } from "./event.js";
-import { gameData } from "./gameData.js";
+import { gameData, getActivePlayer } from "./gameData.js";
 import { getDuration, setDuration } from "./durations.js";
 import { easings } from "./easings.js";
 import getDimension from "./dimensions.js";
@@ -79,8 +79,16 @@ export default class City
 
 	// Returns the left and top offsets values of the city on the board (responsive).
 	// Optionally adjusts to center a piece on the city ("cube" or "pawn")
-	getOffset({ boardHeight, boardWidth, cubeWidth, pawnHeight, pawnWidth }, pieceToCenter)
+	getOffset(pieceToCenter)
 	{
+		const {
+			boardWidth,
+			boardHeight,
+			cubeWidth,
+			pawnHeight,
+			pawnWidth
+		} = gameData;
+		
 		let x = boardWidth * this.percentFromLeft,
 			y = boardHeight * this.percentFromTop;
 		
@@ -101,11 +109,11 @@ export default class City
 		return { left: x, top: y };
 	}
 
-	getAreaDiv(boardDimensions)
+	getAreaDiv()
 	{
 		const $areaDiv = $(`<div class='areaDiv ${this.key}'></div>`),
-			offset = this.getOffset(boardDimensions),
-			{ cityWidth } = boardDimensions,
+			offset = this.getOffset(),
+			{ cityWidth } = gameData,
 			halfCityWidth = cityWidth / 2;
 
 		offset.top -= halfCityWidth;
@@ -175,9 +183,10 @@ export default class City
 		return city.cluster({ animateResearchStation: true, stationInitialOffset, animatePawns: true });
 	}
 	
-	setPawnIndices(activePlayer)
+	setPawnIndices()
 	{
-		const activePawn = activePlayer.$pawn;
+		const activePlayer = getActivePlayer(),
+			activePawn = activePlayer.$pawn;
 		
 		if (activePlayer.cityKey == this.key && $(`.${this.key}.pawn`).length > 2)
 		{

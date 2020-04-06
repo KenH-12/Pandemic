@@ -1,6 +1,6 @@
 "use strict";
 
-import { gameData } from "./gameData.js";
+import { gameData, getPlayer, getActivePlayer } from "./gameData.js";
 import getDimension from "./dimensions.js";
 import { strings } from "./strings.js";
 import { getDuration, setDuration } from "./durations.js";
@@ -198,7 +198,7 @@ function parseEvents(events)
 
 			if (Object.keys(gameData.players).length)
 			{
-				attachPlayersToEvents(gameData.players, getPlayer, parsedEvents);
+				attachPlayersToEvents(parsedEvents);
 				addToEventHistoryQueue(parsedEvents);
 			}
 			
@@ -430,12 +430,10 @@ function proceed()
 
 function setCurrentStep(stepName)
 {
-	const { steps, currentStep } = gameData;
+	gameData.currentStep = gameData.steps[stepName];
+	gameData.currentStep.procedureIdx = -1;
 
-	currentStep = steps[stepName];
-	currentStep.procedureIdx = -1;
-
-	return currentStep;
+	return gameData.currentStep;
 }
 
 function currentStepIs(stepName)
@@ -678,7 +676,7 @@ function enablePawnEvents()
 	}
 
 	if (pawnsAreEnabled)
-		setTravelPathArrowColor({ airlifting, activePlayer });
+		setTravelPathArrowColor({ airlifting });
 }
 
 function enableAvailableActionButtons(player)
@@ -1088,8 +1086,7 @@ function enableBtnCancelAction()
 function resetActionPrompt({ actionCancelled } = {})
 {
 	const $actionInterface = $("#actionInterface"),
-		$actionPrompt = $actionInterface.parent(),
-		{ promptingEventType, promptedTravelPathProperties } = gameData;
+		$actionPrompt = $actionInterface.parent();
 	
 	$actionInterface.find(".button, .playerCard").off("click");
 
@@ -1127,8 +1124,8 @@ function resetActionPrompt({ actionCancelled } = {})
 		hideTravelPathArrow();
 	}
 
-	promptingEventType = false;
-	promptedTravelPathProperties = false;
+	gameData.promptingEventType = false;
+	gameData.promptedTravelPathProperties = false;
 
 	if (!actionStepInProgress())
 	{
@@ -1415,17 +1412,16 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.charterFlight.name]({ destination, nthOption })
 	{
-		const { promptingEventType } = gameData,
-			charterFlight = eventTypes.charterFlight;
+		const charterFlight = eventTypes.charterFlight;
 	
 		if (!destination) // the user explicitly selected charter flight
 		{
 			// Remember the Charter Flight actionCode to avoid prompting Direct Flight when the pawn is dropped on a destination.
-			promptingEventType = charterFlight;
+			gameData.promptingEventType = charterFlight;
 			return true;
 		}
 		else
-			promptingEventType = false;
+			gameData.promptingEventType = false;
 		
 		const currentCity = getActivePlayer().getLocation();
 		
@@ -1582,7 +1578,7 @@ const actionInterfacePopulator = {
 						promptAction(
 							{
 								eventType: eventTypes.shareKnowledge,
-								shareKnowledgeParticipant: gameData.players[$(this).data("role")]
+								shareKnowledgeParticipant: getPlayer($(this).data("role"))
 							});
 					});
 
@@ -1685,17 +1681,16 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.operationsFlight.name]({ destination })
 	{
-		const { promptingEventType } = gameData,
-			operationsFlight = eventTypes.operationsFlight;
+		const operationsFlight = eventTypes.operationsFlight;
 	
 		if (!destination) // the user explicitly selected operations flight
 		{
 			// Remember the Operations Flight actionCode to avoid prompting Direct or Charter Flight when the pawn is dropped on a destination.
-			promptingEventType = operationsFlight;
+			gameData.promptingEventType = operationsFlight;
 			return true;
 		}
 		else
-			promptingEventType = false;
+			gameData.promptingEventType = false;
 		
 		const player = getActivePlayer(),
 			useableCardKeys = player.cardKeys.filter(key => isCityKey(key));
@@ -1778,13 +1773,11 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.airlift.name]({ playerToAirlift, destination })
 	{	
-		const { promptingEventType, promptedTravelPathProperties } = gameData;
-
 		if (!destination)
 		{
 			clusterAll({ pawns: true });
-			promptingEventType = eventTypes.airlift;
-			promptedTravelPathProperties = false;
+			gameData.promptingEventType = eventTypes.airlift;
+			gameData.promptedTravelPathProperties = false;
 			hideTravelPathArrow();
 
 			enablePawnEvents();
@@ -1800,7 +1793,7 @@ const actionInterfacePopulator = {
 				onConfirm: function()
 				{
 					resetActionPrompt();
-					promptingEventType = false;
+					gameData.promptingEventType = false;
 					airlift(playerToAirlift, destination);
 				}
 			});
@@ -3992,7 +3985,7 @@ class Player
 			const origin = this.getLocation();
 			
 			this.$pawn.removeClass(this.cityKey).addClass(destination.key);
-			destination.setPawnIndices(getActivePlayer);
+			destination.setPawnIndices();
 			
 			this.cityKey = destination.key;
 	
@@ -4451,23 +4444,6 @@ class Player
 	}
 }
 
-// Given the name of a role, returns the corresponding Player object.
-// Also accepts the camelcase form of the role name.
-function getPlayer(roleName)
-{
-	const { players } = gameData;
-	let player;
-	
-	for (let rID in players)
-	{
-		player = players[rID];
-		if (player.role === roleName || player.camelCaseRole === roleName)
-			return player;
-	}
-
-	return false;
-}
-
 function getSpecialAbilityDescriptionFromRole(role)
 {
 	let description = "";
@@ -4527,15 +4503,17 @@ function operationsFlightWasUsedThisTurn()
 
 async function nextTurn()
 {
-	gameData.turn = getActivePlayer().nextTurnID;
+	const activePlayer = getActivePlayer();
+	
+	gameData.turn = activePlayer.nextTurnID;
 	gameData.turnNum++;
 
 	if (isOneQuietNight())
 		indicateOneQuietNightStep();
 
-	const activePlayer = getActivePlayer();
+	
 	await activePlayer.getLocation()
-		.setPawnIndices(activePlayer)
+		.setPawnIndices()
 		.cluster({ animatePawns: true });
 
 	proceed();
@@ -4676,11 +4654,6 @@ function hidePlaceholderPawn($originalPawn)
 {
 	$originalPawn.css("opacity", 1);
 	$("#placeholderPawn").addClass("hidden");
-}
-
-function getActivePlayer()
-{
-	return gameData.players[gameData.turn];
 }
 
 function getDiseaseColor(key)
@@ -4838,7 +4811,7 @@ function locatePawnOnRoleTagClick($containingElement)
 {
 	$containingElement.find(".roleTag").not(".playerOption")
 		.off("click")
-		.click(function() { gameData.players[$(this).data("role")].pinpointLocation() });
+		.click(function() { getPlayer($(this).data("role")).pinpointLocation() });
 }
 
 async function resolveOutbreaks(events)
@@ -7292,7 +7265,7 @@ function loadGamestate(gamestate)
 	}
 
 	delete gamestate.stepName;
-	Object.assign(gamestate);
+	Object.assign(gameData, gamestate);
 }
 
 function loadDiseaseStatuses(diseaseStatuses)
@@ -7347,7 +7320,7 @@ async function setup()
 
 	gameData.startingHandPopulations = startingHandPopulations;
 	instantiatePlayers(players);
-	attachPlayersToEvents(gameData.players, getPlayer, gameData.events);
+	attachPlayersToEvents(gameData.events);
 	
 	addToEventHistoryQueue(gameData.events);
 	if (gameData.gameIsResuming)
@@ -7357,8 +7330,7 @@ async function setup()
 	loadInfectionDiscards(infectionDiscards);
 	loadPlayerCards(playerCards);
 
-	const activePlayer = getActivePlayer()
-	activePlayer.getLocation().setPawnIndices(activePlayer);
+	getActivePlayer().getLocation().setPawnIndices();
 	await resizeAll();
 
 	// Delay clustering to ensure cluster accuracy.
@@ -8748,7 +8720,7 @@ function resizeRemovedPlayerCardsContainer($removedCardsContainer, expandedPileH
 {
 	const rccHeight = $removedCardsContainer.removeClass("hidden").height(),
 		rccExpandedProps = {},
-		{ topPanelHeight } = gameData,
+		{ topPanelHeight } = gameData;
 
 	if (expandedPileHeight < topPanelHeight)
 		rccExpandedProps.marginTop = topPanelHeight - expandedPileHeight;
@@ -8869,7 +8841,7 @@ async function undoAction()
 			prevStepName,
 			prevTurnNum,
 			prevTurnRoleID
-		} = await event.requestUndo(getActivePlayer(), currentStep.name);
+		} = await event.requestUndo();
 
 	await animateUndoEvents(undoneEventIds, wasContingencyCard);
 	events.length = eventIndex;

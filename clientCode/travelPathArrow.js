@@ -1,6 +1,6 @@
 "use strict";
 
-import { gameData } from "./gameData.js";
+import { gameData, getActivePlayer } from "./gameData.js";
 import { getCity } from "./city.js";
 
 const $travelPathArrow = $("#travelPathArrow");
@@ -54,7 +54,7 @@ function showTravelPathArrow(actionProperties)
 		.removeClass("hidden");
 }
 
-function setTravelPathArrowColor({ airlifting, governmentGranting, relocatingResearchStation, activePlayer } = {})
+function setTravelPathArrowColor({ airlifting, governmentGranting, relocatingResearchStation } = {})
 {
 	let cssClass;
 	if (airlifting || governmentGranting)
@@ -62,7 +62,7 @@ function setTravelPathArrowColor({ airlifting, governmentGranting, relocatingRes
 	else if (relocatingResearchStation)
 		cssClass = "researchStationBackground";
 	else
-		cssClass = activePlayer.camelCaseRole;
+		cssClass = getActivePlayer().camelCaseRole;
 	
 	$travelPathArrow.attr("class", `${cssClass}${$travelPathArrow.hasClass("hidden") ? " hidden" : ""}`);
 }
@@ -114,7 +114,7 @@ function getTravelPathVector(actionProperties)
 	}
 	else if (typeof $pawn == "undefined") // Determine player and destination directly from the actionProperties.
 	{
-		player = actionProperties.player || playerToAirlift || playerToDispatch || gameData.players[gameData.turn];
+		player = actionProperties.player || playerToAirlift || playerToDispatch || getActivePlayer();
 		destinationOffset = destination.getOffset();
 	}
 	else // The pawn itself is the temporary destination.

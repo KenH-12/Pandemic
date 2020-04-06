@@ -29,4 +29,26 @@ const gameData = {
 	playerCardAnimationInterval: 0.4
 }
 
-export { gameData };
+// Given the name of a role, returns the corresponding Player object.
+// Also accepts the camelcase form of the role name.
+function getPlayer(roleName)
+{
+	const { players } = gameData;
+	let player;
+	
+	for (let rID in players)
+	{
+		player = players[rID];
+		if (player.role === roleName || player.camelCaseRole === roleName)
+			return player;
+	}
+
+	return false;
+}
+
+function getActivePlayer()
+{
+	return gameData.players[gameData.turn];
+}
+
+export { gameData, getPlayer, getActivePlayer };
