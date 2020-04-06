@@ -8764,16 +8764,17 @@ function bindEpidemicCardHoverEvents($container)
 {
 	$container.find(".playerCard.epidemic")
 		.off("mouseenter mouseleave")
-		.hover(function() { showFullEpidemicCard($(this)) },
-			function() { $("#boardContainer").children(".epidemicFull").remove() });
+		.hover(function() { showFullEpidemicCard($(this).attr("id", "epidemicFullAnchor")) },
+			function()
+			{
+				$(this).removeAttr("id");
+				$("#boardContainer").children(".epidemicFull").remove();
+			});
 }
 
 function showFullEpidemicCard($epidemicCard)
 {
-	const offset = $epidemicCard.offset(),
-		margin = 5,
-		parentID = $epidemicCard.parent().attr("id"),
-		$fullEpidemicCard = $(`<div class='epidemicFull'>
+	const $fullEpidemicCard = $(`<div class='epidemicFull'>
 									<h2>EPIDEMIC</h2>
 									<div class='increase'>
 										<h3>1 — INCREASE</h3>
@@ -8787,15 +8788,19 @@ function showFullEpidemicCard($epidemicCard)
 										<h3>3 — INTENSIFY</h3>
 										<p>SHUFFLE THE CARDS IN THE INFECTION DISCARD PILE AND PUT THEM ON TOP OF THE INFECTION DECK.</p>
 									</div>
-								</div>`).appendTo("#boardContainer");
+								</div>`),
+		eventDetails = "#eventDetails";
 	
-	if (parentID === "playerDiscard" || parentID === "removedPlayerCards")
-		offset.left -= $fullEpidemicCard.outerWidth() + margin;
-	else if (parentID === "eventDetails")
-		offset.left += $("#eventDetails").width() + margin;
+	let $relativeTo = $epidemicCard,
+		juxtaposeTo = "left";
+	
+	if ($epidemicCard.closest(eventDetails).length)
+	{
+		$relativeTo = $(eventDetails);
+		juxtaposeTo = "right";
+	}
 
-	$fullEpidemicCard.offset(offset);
-	ensureDivPositionIsWithinWindowHeight($fullEpidemicCard);
+	positionTooltipRelativeToElement($fullEpidemicCard, $relativeTo, { juxtaposeTo });
 }
 
 function lastEventCanBeUndone()

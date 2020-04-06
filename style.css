@@ -881,7 +881,11 @@ span.r {color: #ef282a; background: none}
 	width: 98%;
 	overflow: hidden;
 }
-#boardContainer > .epidemicFull { width: 250px }
+#boardContainer > .epidemicFull
+{
+	width: 250px;
+	pointer-events: none;
+}
 #boardContainer > .epidemicFull > div
 { background: transparent }
 .epidemicFull h2
