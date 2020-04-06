@@ -13,8 +13,6 @@ the epidemic intensify button can be clicked during the resilient population ani
 
 the cancel button should be hidden or disabled during forecast
 
-disabled event card tooltips are malfunctioning
-
 the outbreak tooltip gets cut off
 	suspected cause is excessive line breaks
 

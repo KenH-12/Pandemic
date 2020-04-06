@@ -1,10 +1,6 @@
 import { eventTypes } from "./event.js";
 import { gameData } from "./gameData.js";
 
-const data = {
-    MARGIN: 5
-}
-
 export default class EventCard
 {
     constructor(key, name)
@@ -26,6 +22,8 @@ export default class EventCard
                                 <img src='images/cards/event/${toCamelCase(this.name)}.jpg' alt='${this.name}' />
                                 ${this.getRules()}
                             </div>`);
+        
+        $fullCard.children("img").next().attr("id", `eventCardFullTooltipAnchor`);
         
         if (isContingencyCard)
             return $(`<div id='contingencyWrapper'>
@@ -88,49 +86,51 @@ function bindEventCardHoverEvents({ $containingElement } = {})
             $this = $(this);
             eventCards[$this.data("key")].showFullCard($this);
         },
-        function() { $("#boardContainer").children("#contingencyWrapper, .eventCardFull, #disabledEventCard.tooltip").remove() });
+        function() { $("#boardContainer").children("#contingencyWrapper, .eventCardFull, #disabledEventCardTooltip").remove() });
 }
 
 function getFullCardOffset($eventCard, $fullCard)
 {
     const fullCardOffset = $eventCard.offset(),
         eventCardWidth = $eventCard.outerWidth(),
-        fullCardWidth = $fullCard.outerWidth();
+        fullCardWidth = $fullCard.outerWidth(),
+        MARGIN = 5;
     
     if ($eventCard.closest(".playerPanel").length
         || $eventCard.closest("#eventDetails").length)
     {
-        fullCardOffset.left += eventCardWidth + data.MARGIN;
+        fullCardOffset.left += eventCardWidth + MARGIN;
 
         if ($eventCard.hasClass("contingency"))
         {
             const $roleCard = $(".roleCard");
-            fullCardOffset.left += $roleCard.width() + data.MARGIN;
+            fullCardOffset.left += $roleCard.width() + MARGIN;
             fullCardOffset.top = $roleCard.offset().top;
         }
     }
     else if ($eventCard.closest("#playerDiscard").length)
-        fullCardOffset.left -= fullCardWidth + data.MARGIN;
+        fullCardOffset.left -= fullCardWidth + MARGIN;
     else if ($eventCard.closest("#rightPanel").length)
-        fullCardOffset.left = gameData.boardWidth - fullCardWidth - data.MARGIN;
+        fullCardOffset.left = gameData.boardWidth - fullCardWidth - MARGIN;
     
     return fullCardOffset;
 }
 
 function showDisabledEventCardTooltip($fullEventCard)
 {
-    const $tooltip = $(`<div class='tooltip' id='disabledEventCard'>
-                        <p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
-                        <p>However, when 2 Epidemic cards are drawn together, event cards can be played after resolving the first epidemic.</p>
-                    </div>`).appendTo("#boardContainer"),
-        tooltipOffset = $fullEventCard.offset(),
+    const $tooltip = $(`<div class='tooltip' id='disabledEventCardTooltip'>
+                        <div class='content'>
+                            <p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
+                            <p>However, when 2 Epidemic cards are drawn together, event cards can be played after resolving the first epidemic.</p>
+                        </div>
+                    </div>`),
         { promptingEventType } = gameData;
     
     if (promptingEventType && promptingEventType.code === eventTypes.forecastPlacement.code)
         $tooltip.prepend("<p>* You must complete the Forecast event before doing anything else.</p>");
 
-    tooltipOffset.left += $fullEventCard.outerWidth() + data.MARGIN;
-    $tooltip.offset(tooltipOffset);
+    positionTooltipRelativeToElement($tooltip, $fullEventCard.find("#eventCardFullTooltipAnchor"),
+        { juxtaposeTo: "right" });
 }
 
 export {

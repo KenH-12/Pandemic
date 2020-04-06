@@ -320,7 +320,7 @@ span.r {color: #ef282a; background: none}
 	padding: 0;
 	margin-bottom: 3px;
 }
-#disabledEventCard.tooltip { width: 300px }
+#disabledEventCardTooltip { width: 300px }
 #contingencyWrapper
 {
 	padding: 8px;

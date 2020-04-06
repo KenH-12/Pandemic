@@ -3879,7 +3879,7 @@ function bindRoleCardHoverEvents()
 			if (player)
 				player.showRoleCard($hoveredElement);
 		},
-		function() { $(".roleCard, #contingencyWrapper, #disabledEventCard").remove() });
+		function() { $(".roleCard, #contingencyWrapper, #disabledEventCardTooltip").remove() });
 }
 
 function managePlayerPanelOcclusion(citiesToCheck)
