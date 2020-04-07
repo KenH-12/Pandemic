@@ -219,7 +219,9 @@ body,
 .diseaseCube.w * { background-color: #fff }
 .diseaseCube.w .cubeBackground { background-color: #000 }
 
-.hidden{display:none;}
+.hidden,
+#btnCancelAction.hidden
+{ display: none }
 .y:not(.diseaseCube)
 {
 	background: linear-gradient(to right,

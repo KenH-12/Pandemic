@@ -4,9 +4,7 @@ sometimes the city card populations aren't shown when animating the 'determine t
 	find a way to make sure it happens
 
 the right panel scrollbar does not appear when the action buttons exceed the page height
-	or does it...? perhaps just not on page load
-
-the cancel button should be hidden or disabled during forecast
+	or does it...? perhaps just not on page loading
 
 the outbreak tooltip gets cut off
 	suspected cause is excessive line breaks
@@ -18,6 +16,8 @@ additionally, the "out of cards" game end cause did not trigger properly until t
 
 TO DO
 -----
+wait for event card image to load before positioning the disabled tooltip
+
 fix the font and text-alignment of the "out of cards" message displayed in the card draw container
 
 disable player discard hover events (epidemics, event cards) while expanding or collapsing the container
