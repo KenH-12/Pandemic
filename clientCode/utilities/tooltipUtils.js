@@ -137,9 +137,10 @@ function setTooltipPaddingAndReturnOffset($tooltip, { tooltipOffset, tooltipMarg
 	$tooltipContent.css(`padding-${paddingDirection}`, `${tooltipPadding}px`);
 
 	// Horizontally juxtaposed tooltips sometimes require a slight offset adjustment.
-	if (["left", "right"].includes(juxtaposeTo) && $tooltip.height() !== initialTooltipHeight)
+	const tooltipHeight = $tooltip.height();
+	if (["left", "right"].includes(juxtaposeTo) && tooltipHeight !== initialTooltipHeight)
 	{
-		tooltipOffset.top -= tooltipMargin;
+		tooltipOffset.top -= Math.max(tooltipMargin, tooltipHeight - initialTooltipHeight);
 		$tooltip.offset(tooltipOffset);
 	}
 	

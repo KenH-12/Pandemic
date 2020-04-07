@@ -6,13 +6,13 @@ sometimes the city card populations aren't shown when animating the 'determine t
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page loading
 
-the outbreak tooltip gets cut off
-	suspected cause is excessive line breaks
-
 though it appears that "cards left in player deck" are off by +1,
 the count is correct but the deck image disappears at 1 card remaining.
 additionally, the "out of cards" game end cause did not trigger properly until the page was refreshed
 	(observed when drawing 1/2 cards)
+
+forecast event details seem quite slow to appear/disappear
+	(observed after doing forecast twice consecutively, which is not normally possible without a contingency event in the middle)
 
 TO DO
 -----
