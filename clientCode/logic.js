@@ -6882,20 +6882,35 @@ async function discoverACure(cardKeys)
 
 async function outOfPlayerCardsDefeatAnimation($cardDrawContainer)
 {
-	const $playerDeckContainer = $("#playerDeck");
+	const $playerDeckContainer = $("#playerDeck"),
+		$outOfCardsMsg = $("<h2>Out of cards!</h2>"),
+		numFlashes = 10,
+		flashIntervalMs = 150,
+		endOnStrobeState = true;
 	
-	$cardDrawContainer.append("<h2>Out of cards!</h2>");
-	$cardDrawContainer.removeClass("hidden").removeAttr("style");
+	$cardDrawContainer.append($outOfCardsMsg)
+		.removeClass("hidden")
+		.removeAttr("style");
 
-	await propertyStrobe($playerDeckContainer,
-	{
-		initialState: { backgroundColor: $playerDeckContainer.css("background-color") },
-		strobeState: { backgroundColor: "#8a181a" },
-		numFlashes: 10,
-		flashIntervalMs: 125,
-		endOnStrobeState: true
-	});
-
+	await Promise.all([
+		propertyStrobe($playerDeckContainer,
+		{
+			initialState: { backgroundColor: $playerDeckContainer.css("background-color") },
+			strobeState: { backgroundColor: "#8a181a" },
+			numFlashes,
+			flashIntervalMs,
+			endOnStrobeState
+		}),
+		propertyStrobe($outOfCardsMsg,
+		{
+			initialState: { color: "#8a181a" },
+			strobeState: { color: "#fff" },
+			numFlashes,
+			flashIntervalMs,
+			endOnStrobeState
+		})
+	]);
+	
 	endGame();
 }
 

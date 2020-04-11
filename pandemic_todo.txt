@@ -16,8 +16,6 @@ add victory condition to discover a cure tooltip
 
 wait for event card image to load before positioning the disabled tooltip
 
-fix the font and text-alignment of the "out of cards" message displayed in the card draw container
-
 disable player discard hover events (epidemics, event cards) while expanding or collapsing the container
 
 perhaps epidemic intensify events should be undoable until an infection has occured

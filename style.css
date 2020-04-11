@@ -1065,6 +1065,12 @@ span.r {color: #ef282a; background: none}
 	border-top-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 }
+#cardDrawContainer > h2
+{
+	font-family: 'Oswald', 'Electrolize', sans-serif;
+	font-size: 28px;
+	text-align: center;
+}
 .discardPrompt { padding: 0 5% 5px 5% }
 .cardsToKeep > .instructions
 {
