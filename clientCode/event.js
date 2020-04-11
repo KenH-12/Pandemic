@@ -113,7 +113,9 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "dc",
 		rules: [
 			`At any research station, discard 5 city cards of the same color from your hand to cure the disease of that color.`,
-			`If no cubes of this color are on the board, the disease becomes eradicated.`
+			`If no cubes of this color are on the board, the disease becomes eradicated.`,
+			"<br/>",
+			strings.victoryCondition
 		],
 		actionPathName: "discoverCure",
 		propertyNames: ["cardKeys"],

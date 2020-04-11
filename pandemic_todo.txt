@@ -11,9 +11,6 @@ the eradication tooltip in infection prevention details appears behind the event
 
 TO DO
 -----
-add victory condition to discover a cure tooltip
-	victory condition should have some icon (like a trophy or something) because defeat conditions have the warning icon
-
 wait for event card image to load before positioning the disabled tooltip
 
 disable player discard hover events (epidemics, event cards) while expanding or collapsing the container
