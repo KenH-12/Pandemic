@@ -73,10 +73,10 @@ const eventCards = {};
 		eventCards[card[0]] = new EventCard(card[0], card[1]);
 })();
 
-function bindEventCardHoverEvents({ $containingElement } = {})
+function bindEventCardHoverEvents($container)
 {
     const eventCardSelector = ".playerCard.eventCard",
-        $eventCards = $containingElement ? $containingElement.find(eventCardSelector) : $(eventCardSelector);
+        $eventCards = $container ? $container.find(eventCardSelector) : $(eventCardSelector);
     
     let $this;
     $eventCards.not(".contingency")
@@ -87,6 +87,15 @@ function bindEventCardHoverEvents({ $containingElement } = {})
             eventCards[$this.data("key")].showFullCard($this);
         },
         function() { $("#boardContainer").children("#contingencyWrapper, .eventCardFull, #disabledEventCardTooltip").remove() });
+}
+
+function unbindEventCardHoverEvents($container)
+{
+    const eventCardSelector = ".playerCard.eventCard",
+        $eventCards = $container ? $container.find(eventCardSelector) : $(eventCardSelector);
+    
+    $eventCards.not(".contingency")
+        .off("mouseenter mouseleave");
 }
 
 function getFullCardOffset($eventCard, $fullCard)
@@ -135,5 +144,6 @@ function showDisabledEventCardTooltip($fullEventCard)
 
 export {
     eventCards,
-    bindEventCardHoverEvents
+    bindEventCardHoverEvents,
+    unbindEventCardHoverEvents
 }

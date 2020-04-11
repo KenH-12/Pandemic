@@ -13,8 +13,6 @@ TO DO
 -----
 wait for event card image to load before positioning the disabled tooltip
 
-disable player discard hover events (epidemics, event cards) while expanding or collapsing the container
-
 perhaps epidemic intensify events should be undoable until an infection has occured
 
 instead of importing gameData at the top of event.js, try dynamically importing only where it is needed

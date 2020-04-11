@@ -7,7 +7,7 @@ import { getDuration, setDuration } from "./durations.js";
 import { easings } from "./easings.js";
 import PlayerPanel from "./playerPanel.js";
 import DeckImageManager from "./deckImageManager.js";
-import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
+import { eventCards, bindEventCardHoverEvents, unbindEventCardHoverEvents } from "./eventCard.js";
 import {
 	cities,
 	getCity,
@@ -946,7 +946,7 @@ function showEventIconDetails($icon, event)
 							</div>`);
 	
 	bindEventDetailsInfoHoverEvents($detailsContainer);
-	bindEventCardHoverEvents({ $containingElement: $detailsContainer });
+	bindEventCardHoverEvents($detailsContainer);
 	bindEpidemicCardHoverEvents($detailsContainer);
 	locatePawnOnRoleTagClick($detailsContainer);
 	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
@@ -1347,7 +1347,7 @@ const actionInterfacePopulator = {
 
 		$actionInterface.append($discardPrompt);
 
-		bindEventCardHoverEvents({ $containingElement: $discardPrompt });
+		bindEventCardHoverEvents($discardPrompt);
 		if (isContingencyCard)
 			bindRoleCardHoverEvents();
 
@@ -2728,7 +2728,7 @@ class DiscardPrompt
 		}
 
 		this.updateCountIndicators();
-		bindEventCardHoverEvents({ $containingElement: this.$container });
+		bindEventCardHoverEvents(this.$container);
 
 		return this.$container;
 	}
@@ -3460,7 +3460,7 @@ async function performDrawStep()
 		}
 
 		bindCityLocatorClickEvents();
-		bindEventCardHoverEvents({ $containingElement: $container });
+		bindEventCardHoverEvents($container);
 		
 		await sleep(getDuration("mediumInterval"));
 		resolve(cardDrawEvent.cardKeys);
@@ -5978,7 +5978,7 @@ function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 				$card.insertAfter($guide)
 					.removeAttr("style");
 				
-				bindEventCardHoverEvents({ $containingElement: $container });
+				bindEventCardHoverEvents($container);
 			});
 	
 	return sleep(getDuration("discardPlayerCard") * gameData.playerCardAnimationInterval);
@@ -8613,6 +8613,9 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 			{ topPanelHeight, boardHeight } = gameData,
 			maxHeight = boardHeight - topPanelHeight;
 		
+		unbindEventCardHoverEvents($discardPile);
+		unbindEpidemicCardHoverEvents($discardPile);
+		
 		$discardPile.stop().css("height", "auto");
 
 		let expandedPileHeight = $discardPile.height();
@@ -8632,6 +8635,8 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 				});
 			}
 			
+			bindEventCardHoverEvents($discardPile);
+			bindEpidemicCardHoverEvents($discardPile);
 			resolve();
 		}
 		else
@@ -8654,7 +8659,13 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 					scrollTop: showRemovedCardsContainer ? document.getElementById("playerDiscard").scrollHeight : 0
 				},
 				getDuration("discardPileExpand"),
-				function() { resolve() });
+				function()
+				{
+					bindEventCardHoverEvents($discardPile);
+					bindEpidemicCardHoverEvents($discardPile);
+
+					resolve();
+				});
 		}
 	});
 }
@@ -8681,6 +8692,9 @@ function collapsePlayerDiscardPile()
 		const $discardPile = $("#playerDiscard"),
 			{ topPanelHeight, boardHeight } = gameData;
 		
+		unbindEventCardHoverEvents($discardPile);
+		unbindEpidemicCardHoverEvents($discardPile);
+		
 		$discardPile.stop()
 			.css("overflow-y", "hidden")
 			.animate(
@@ -8695,6 +8709,9 @@ function collapsePlayerDiscardPile()
 				$discardPile.children("#removedPlayerCards")
 					.removeAttr("style")
 					.addClass("hidden");
+				
+				bindEventCardHoverEvents($discardPile);
+				bindEpidemicCardHoverEvents($discardPile);
 				
 				resolve();
 			});
@@ -8711,6 +8728,12 @@ function bindEpidemicCardHoverEvents($container)
 				$(this).removeAttr("id");
 				$("#boardContainer").children(".epidemicFull").remove();
 			});
+}
+
+function unbindEpidemicCardHoverEvents($container)
+{
+	$container.find(".playerCard.epidemic")
+		.off("mouseenter mouseleave");
 }
 
 function showFullEpidemicCard($epidemicCard)
