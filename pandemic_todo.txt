@@ -3,11 +3,6 @@ BUGS
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page loading
 
-though it appears that "cards left in player deck" are off by +1,
-the count is correct but the deck image disappears at 1 card remaining.
-additionally, the "out of cards" game end cause did not trigger properly until the page was refreshed
-	(observed when drawing 1/2 cards)
-
 forecast event details seem quite slow to appear/disappear
 	(observed after doing forecast twice consecutively, which is not normally possible without a contingency event in the middle)
 
@@ -16,12 +11,6 @@ the eradication tooltip in infection prevention details appears behind the event
 
 TO DO
 -----
-test DeckImageManager class for the following:
-	card draw
-	game end conditions
-		final 2 cards, then 0
-		final 3 cards, then 1
-
 add victory condition to discover a cure tooltip
 	victory condition should have some icon (like a trophy or something) because defeat conditions have the warning icon
 

@@ -59,23 +59,23 @@ export default class DeckImageManager
     // You can also pass false to hide the image.
     setImage(imageNumber)
     {
-        const { $deck } = this;
-
         if (imageNumber === false)
-        {
-            $deck.addClass("hidden");
-            return false;
-        }
+            return this.hideImage();
         
         imageNumber = imageNumber || this.calculateImageNumber();
         
-        if (imageNumber < 1)
-            return false;
+        if (imageNumber == 0)
+            return this.hideImage();
         
         this.currentImageNumber = imageNumber;
         
-        $deck.attr("src", this.getUrlForImageNumber(imageNumber))
+        this.$deck.attr("src", this.getUrlForImageNumber(imageNumber))
             .removeClass("hidden");
+    }
+
+    hideImage()
+    {
+        this.$deck.addClass("hidden");
     }
 
     // Returns an imageNumber that's calculated based on the percentage of cards that remain in the deck.
@@ -127,7 +127,7 @@ export default class DeckImageManager
         deckProperties.width = $deck.width() * 0.94;
         
         if (deckIsHidden)
-            $deck.addClass("hidden");
+            this.hideImage();
 
         return deckProperties;
     }

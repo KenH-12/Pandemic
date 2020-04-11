@@ -3431,7 +3431,7 @@ async function performDrawStep()
 	return new Promise(async (resolve, reject) =>
 	{
 		const $container = $("#cardDrawContainer"),
-			{ numPlayerCardsRemaining, gameEndCause } = gameData,
+			{ numPlayerCardsRemaining } = gameData,
 			numCardsToDeal = numPlayerCardsRemaining >= 2 ? 2 : numPlayerCardsRemaining,
 			{ 0: events } = await Promise.all(
 			[
@@ -3452,7 +3452,7 @@ async function performDrawStep()
 				revealPlayerCard(key, $container);
 		}
 		
-		if (gameEndCause) // not enough player cards remain in the deck -- the players lose.
+		if (gameData.gameEndCause) // not enough player cards remain in the deck -- the players lose.
 		{
 			await sleep(getDuration("longInterval"));
 			reject("Out of player cards -- the players lose.");
@@ -3486,10 +3486,11 @@ async function dealFaceDownPlayerCards($container, numCardsToDeal)
 
 	for (let i = 0; i < numCardsToDeal; i++)
 	{
+		dealFaceDownPlayerCard($container, deckProperties);
+		
 		if (!currentStepIs("setup"))
 			playerDeckImgManager.decrementCardCount().setImage();
-
-		dealFaceDownPlayerCard($container, deckProperties);
+		
 		await sleep(getDuration("dealCard") * 0.5);
 	}
 	return sleep(getDuration("longInterval"));
