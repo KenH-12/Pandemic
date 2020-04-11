@@ -7933,10 +7933,10 @@ async function dividePlayerDeckIntoEqualPiles($container)
 
 function getInitialPlayerDeckSize({ includeEpidemics } = {})
 {
-	let deckSize = Object.keys(cities).length + Object.keys(eventCards).length;
+	let deckSize = parseInt(Object.keys(cities).length) + parseInt(Object.keys(eventCards).length);
 
 	if (includeEpidemics)
-		deckSize += gameData.numEpidemics;
+		deckSize += parseInt(gameData.numEpidemics);
 	
 	return deckSize;
 }
