@@ -16,6 +16,12 @@ the eradication tooltip in infection prevention details appears behind the event
 
 TO DO
 -----
+test DeckImageManager class for the following:
+	card draw
+	game end conditions
+		final 2 cards, then 0
+		final 3 cards, then 1
+
 add victory condition to discover a cure tooltip
 	victory condition should have some icon (like a trophy or something) because defeat conditions have the warning icon
 

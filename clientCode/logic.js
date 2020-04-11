@@ -83,8 +83,6 @@ const eventHistory = new EventHistory(),
 		maxCardCount: false // to be set once gameData is retrieved
 	});
 
-console.log(playerDeckImgManager);
-
 function parseEvents(events)
 {
 	return new Promise(resolve =>
@@ -7924,7 +7922,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 		});
 
 		if (i === numCardsToDeal - 1) // deck is empty
-			playerDeckImgManager.$deck.addClass("hidden");
+			playerDeckImgManager.setImage(false);
 
 		await sleep(getDuration("dealCard") / 6);
 

@@ -56,18 +56,23 @@ export default class DeckImageManager
 
     // Set the image to a specific imageNumber,
     // or omit the imageNumber to let the imageNumber be calculated based on the percentage of cards that remain in the deck.
-    setImage(imageNumber = false)
+    // You can also pass false to hide the image.
+    setImage(imageNumber)
     {
         const { $deck } = this;
-
-        imageNumber = imageNumber || this.calculateImageNumber();
-        this.currentImageNumber = imageNumber;
 
         if (imageNumber === false)
         {
             $deck.addClass("hidden");
             return false;
         }
+        
+        imageNumber = imageNumber || this.calculateImageNumber();
+        
+        if (imageNumber < 1)
+            return false;
+        
+        this.currentImageNumber = imageNumber;
         
         $deck.attr("src", this.getUrlForImageNumber(imageNumber))
             .removeClass("hidden");
