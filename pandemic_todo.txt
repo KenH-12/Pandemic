@@ -1,8 +1,5 @@
 BUGS
 ----
-sometimes the city card populations aren't shown when animating the 'determine turn order' setup step
-	find a way to make sure it happens
-
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page loading
 
@@ -14,8 +11,14 @@ additionally, the "out of cards" game end cause did not trigger properly until t
 forecast event details seem quite slow to appear/disappear
 	(observed after doing forecast twice consecutively, which is not normally possible without a contingency event in the middle)
 
+the eradication tooltip in infection prevention details appears behind the event details
+	secondary tooltips should have a higher z-index
+
 TO DO
 -----
+add victory condition to discover a cure tooltip
+	victory condition should have some icon (like a trophy or something) because defeat conditions have the warning icon
+
 wait for event card image to load before positioning the disabled tooltip
 
 fix the font and text-alignment of the "out of cards" message displayed in the card draw container

@@ -6,6 +6,7 @@ import { strings } from "./strings.js";
 import { getDuration, setDuration } from "./durations.js";
 import { easings } from "./easings.js";
 import PlayerPanel from "./playerPanel.js";
+import DeckImageManager from "./deckImageManager.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 import {
 	cities,
@@ -74,7 +75,15 @@ import {
 } from "./travelPathArrow.js";
 
 $(function(){
-const eventHistory = new EventHistory();
+const eventHistory = new EventHistory(),
+	playerDeckImgManager = new DeckImageManager({
+		$deck: $("#imgPlayerDeck"),
+		imageUrlWithoutNumber: "images/cards/playerDeck_.png",
+		numImages: 7,
+		maxCardCount: false // to be set once gameData is retrieved
+	});
+
+console.log(playerDeckImgManager);
 
 function parseEvents(events)
 {
@@ -3475,27 +3484,22 @@ async function finishDrawStep(cardKeys)
 
 async function dealFaceDownPlayerCards($container, numCardsToDeal)
 {
-	const deckOffset = $("#imgPlayerDeck").offset();
-	let numCardsInDeck = gameData.numPlayerCardsRemaining - 1;
+	const deckProperties = playerDeckImgManager.getProperties();
 
 	for (let i = 0; i < numCardsToDeal; i++)
 	{
 		if (!currentStepIs("setup"))
-		{
-			setPlayerDeckImgSize({ numCardsInDeck });
-			numCardsInDeck--;
-		}
+			playerDeckImgManager.decrementCardCount().setImage();
 
-		dealFaceDownPlayerCard($container, deckOffset);
+		dealFaceDownPlayerCard($container, deckProperties);
 		await sleep(getDuration("dealCard") * 0.5);
 	}
 	return sleep(getDuration("longInterval"));
 }
 
-function dealFaceDownPlayerCard($container, deckOffset, { finalCardbackWidth, zIndex } = {})
+function dealFaceDownPlayerCard($container, deckProperties, { finalCardbackWidth, zIndex } = {})
 {
-	const $deck = $("#imgPlayerDeck"),
-		$playerCard = $("<div class='playerCard template'></div>").appendTo($container),
+	const $playerCard = $("<div class='playerCard template'></div>").appendTo($container),
 		containerOffset = $playerCard.offset(),
 		$cardback = newFacedownPlayerCard().addClass("drawnPlayerCard");
 	
@@ -3504,11 +3508,11 @@ function dealFaceDownPlayerCard($container, deckOffset, { finalCardbackWidth, zI
 
 	$cardback
 		.appendTo("body")
-		.width($deck.width())
+		.width(deckProperties.width)
 		.offset(
 			{
-				top: deckOffset.top,
-				left: deckOffset.left
+				top: deckProperties.top,
+				left: deckProperties.left
 			})
 		.animate(
 			{
@@ -7044,8 +7048,15 @@ function loadPlayerCards(playerCards)
 	const $discardsContainer = $("#playerDiscard"),
 		$discardPileTitle =  $discardsContainer.children(".title").first(),
 		$removedCardsTitle = $discardsContainer.children("#removedPlayerCards").children(".title").first(),
-		{ players, removedEventCardKeys } = gameData;
+		{ players, removedEventCardKeys, gameIsResuming } = gameData;
 	
+	playerDeckImgManager.setMaxCardCount(getInitialPlayerDeckSize({ includeEpidemics: true }));
+
+	if (gameIsResuming)
+		playerDeckImgManager.decrementCardCount(playerCards.length);
+	
+	playerDeckImgManager.setImage();
+
 	let player,
 		$card;
 
@@ -7077,7 +7088,6 @@ function loadPlayerCards(playerCards)
 	
 	bindCityLocatorClickEvents();
 	bindEpidemicCardHoverEvents($discardsContainer);
-	setPlayerDeckImgSize();
 	flagRemovedEventCardEvents();
 }
 
@@ -7808,12 +7818,17 @@ function animatePreparePlayerDeck()
 		});
 	
 		const $divs = $container.children("div"),
-			deckProperties = getPlayerDeckProperties();
+			pileSize = Math.ceil(playerDeckImgManager.maxCardCount / gameData.numEpidemics),
+			deckProperties = playerDeckImgManager.getProperties();
 	
 		await shuffleEpidemicsIntoPiles($divs);
 	
+		playerDeckImgManager.setCardCount(0);
 		for (let i = $divs.length - 1; i >= 0; i--)
+		{
 			await placePileOntoPlayerDeck($divs.eq(i), deckProperties);
+			playerDeckImgManager.incrementCardCount(pileSize).setImage();
+		}
 	
 		$container.addClass("hidden");
 		finishedSetupStep();
@@ -7909,10 +7924,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 		});
 
 		if (i === numCardsToDeal - 1) // deck is empty
-		{
-			$("#imgPlayerDeck").addClass("hidden");
-			setPlayerDeckImgSize({ size: getMaxPlayerDeckImgSize() - gameData.numEpidemics });
-		}
+			playerDeckImgManager.$deck.addClass("hidden");
 
 		await sleep(getDuration("dealCard") / 6);
 
@@ -7980,74 +7992,23 @@ function shuffleEpidemicIntoPile($div)
 	});
 }
 
-function placePileOntoPlayerDeck($div, deckPropertes)
+function placePileOntoPlayerDeck($pileContainer, deckProperties)
 {
 	return new Promise(async resolve =>
 	{
-		const $pile = $div.children("img"),
-			$deck = $("#imgPlayerDeck");
+		const $pile = $pileContainer.children("img");
 
 		await animationPromise(
 		{
 			$elements: $pile,
-			desiredProperties: deckPropertes,
+			desiredProperties: deckProperties,
 			duration: getDuration("dealCard"), 
 			easing: easings.dealCard
 		});
 
-		if (getPlayerDeckImgSize($deck) != getMaxPlayerDeckImgSize())
-			$deck.removeClass("hidden").removeAttr("style");
-		
-		increasePlayerDeckImgSize();
 		$pile.remove();
-
 		resolve();
 	});
-}
-
-function getPlayerDeckProperties()
-{
-	const $deck = $("#imgPlayerDeck"),
-		deckIsHidden = $deck.hasClass("hidden");
-	
-	if (deckIsHidden)
-		$deck.removeClass("hidden").removeAttr("style");
-	
-	const deckProperties = $deck.offset();
-	deckProperties.width = $deck.width() * 0.94;
-	
-	if (deckIsHidden)
-		$deck.addClass("hidden");
-
-	return deckProperties;
-}
-
-function increasePlayerDeckImgSize()
-{
-	const $deck = $("#imgPlayerDeck"),
-		currentSize = $deck.hasClass("hidden") ? -1 : getPlayerDeckImgSize($deck),
-		MAX_SIZE = getMaxPlayerDeckImgSize();
-
-	if (currentSize == MAX_SIZE)
-		return;
-	
-	$deck.attr("src", `images/cards/playerDeck_${Number(currentSize) + 1}.png`)
-		.removeClass("hidden");
-}
-
-function setPlayerDeckImgSize({ size, numCardsInDeck } = {})
-{
-	const $deck = $("#imgPlayerDeck");
-	
-	if (!size && $deck.hasClass("hidden"))
-		return;
-
-	size = size || calculatePlayerDeckImgSize(numCardsInDeck);
-	
-	if (size == 0)
-		$deck.addClass("hidden");
-	
-	bindPlayerDeckHoverEvents();
 }
 
 function bindPlayerDeckHoverEvents()
@@ -8080,39 +8041,6 @@ function bindPlayerDeckHoverEvents()
 		},
 		function(){ $("#playerDeckTooltip").remove() });
 }
-
-function calculatePlayerDeckImgSize(numCardsInDeck)
-{
-	const numCardsLeft = isNaN(numCardsInDeck) ? gameData.numPlayerCardsRemaining : numCardsInDeck,
-		ranges = [
-			{ maxCards: 0, deckSize: -1 },
-			{ maxCards: 1, deckSize: 0 },
-			{ maxCards: 9, deckSize: 1 },
-			{ maxCards: 17, deckSize: 2 },
-			{ maxCards: 25, deckSize: 3 },
-			{ maxCards: 33, deckSize: 4 },
-			{ maxCards: 41, deckSize: 5 },
-			{ maxCards: 51, deckSize: 6 }
-		];
-	
-	for (let range of ranges)
-		if (numCardsLeft <= range.maxCards)
-			return range.deckSize;
-}
-
-function getPlayerDeckImgSize($imgDeck)
-{
-	const deckSrc = $imgDeck.attr("src"),
-		dotIdx = deckSrc.indexOf("."),
-		currentSize = deckSrc.substring(dotIdx - 1, dotIdx);
-	
-	if (isNaN(currentSize))
-		return 0;
-	
-	return currentSize;
-}
-
-function getMaxPlayerDeckImgSize() { return 6; }
 
 function getDifficultyName()
 {
@@ -8433,8 +8361,7 @@ async function dealFaceDownStartingHands(startingHandsEvent, $roleContainers)
 {
 	const startingHandSize = startingHandsEvent.hands[0].cards.length,
 		numCardsToDeal = startingHandsEvent.hands.length * startingHandSize,
-		deckOffset = $("#imgPlayerDeck").offset(),
-		CARD_MARGIN_BOTTOM = 4,
+		deckProperties = playerDeckImgManager.getProperties(),
 		finalCardbackWidth = 20,
 		interval = getDuration("dealCard") * 0.4;
 	
@@ -8445,7 +8372,7 @@ async function dealFaceDownStartingHands(startingHandsEvent, $roleContainers)
 		zIndex = 10 + numCardsToDeal;
 	while (cardsDealt < numCardsToDeal)
 	{
-		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), deckOffset, { finalCardbackWidth, zIndex });
+		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), deckProperties, { finalCardbackWidth, zIndex });
 		await sleep(getDuration(interval));
 		
 		cardsDealt++;
