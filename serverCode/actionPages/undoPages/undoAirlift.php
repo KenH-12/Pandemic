@@ -2,8 +2,8 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
+        require "../../connect.php";
+        include "../../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -21,28 +21,40 @@
         $currentStep = $_POST["currentStep"];
         $activeRole = $_POST["activeRole"];
         $eventID = $_POST["eventID"];
+        
+        $AIRLIFT_CARDKEY = "airl";
 
         $event = getEventById($mysqli, $game, $eventID);
         validateEventCanBeUndone($mysqli, $game, $event);
 
         $role = $event["role"];
-        $eventType = $event["eventType"];
         $eventDetails = explode(",", $event["details"]);
-        $cardKey = $eventDetails[0];
-        $giverRole = $eventDetails[1];
-        $receiverRole = $eventDetails[2];
+        $airliftedRole = $eventDetails[0];
+        $originKey = $eventDetails[1];
+		$destinationKey = $eventDetails[2];
 
         $mysqli->autocommit(FALSE);
-
-        moveCardsToPile($mysqli, $game, "player", $receiverRole, $giverRole, $cardKey);
         
+        updateRoleLocation($mysqli, $game, $airliftedRole, $destinationKey, $originKey);
+        $response["wasContingencyCard"] = moveEventCardToPrevPile($mysqli, $game, $AIRLIFT_CARDKEY, $event);
+
         $response["undoneEventIds"] = array($eventID);
-        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
+        // If the medic moved as a result of the airlift, undo any resulting auto-treat disease and eradication events.
+        if (getRoleName($mysqli, $airliftedRole) === "Medic"
+            && $triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
+            $response["undoneEventIds"] = array_merge($response["undoneEventIds"], $triggeredEventIds);
+
         deleteEvent($mysqli, $game, $eventID);
+
+        if (roleHasTooManyCards($mysqli, $game, $role))
+        {
+            $prevStep = getPreviousDiscardStepName($mysqli, $game);
+            $response["prevStepName"] = updateStep($mysqli, $game, $currentStep, $prevStep, $activeRole);
+        }
     }
     catch(Exception $e)
     {
-        $response["failure"] = "Failed to undo Share Knowledge: " . $e->getMessage();
+        $response["failure"] = "Failed to undo Airlift: " . $e->getMessage();
     }
     finally
     {

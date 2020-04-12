@@ -637,7 +637,7 @@ class UndoableEvent extends Event
 	{
 		return new Promise((resolve, reject) =>
 		{
-			$.post(`serverCode/actionPages/${this.undoerFileName || `undo${toPascalCase(this.name)}`}.php`,
+			$.post(`serverCode/actionPages/undoPages/${this.undoerFileName || `undo${toPascalCase(this.name)}`}.php`,
 			{
 				...{
 					activeRole: getActivePlayer().rID,

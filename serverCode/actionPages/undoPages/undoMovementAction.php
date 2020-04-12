@@ -2,8 +2,8 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
+        require "../../connect.php";
+        include "../../utilities.php";
 
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");

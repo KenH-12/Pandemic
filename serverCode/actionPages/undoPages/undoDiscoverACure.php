@@ -2,8 +2,8 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
+        require "../../connect.php";
+        include "../../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -21,40 +21,33 @@
         $currentStep = $_POST["currentStep"];
         $activeRole = $_POST["activeRole"];
         $eventID = $_POST["eventID"];
-        
-        $AIRLIFT_CARDKEY = "airl";
 
         $event = getEventById($mysqli, $game, $eventID);
         validateEventCanBeUndone($mysqli, $game, $event);
 
         $role = $event["role"];
-        $eventDetails = explode(",", $event["details"]);
-        $airliftedRole = $eventDetails[0];
-        $originKey = $eventDetails[1];
-		$destinationKey = $eventDetails[2];
+        $eventType = $event["eventType"];
+        $cardKeys = explode(",", $event["details"]);
 
         $mysqli->autocommit(FALSE);
-        
-        updateRoleLocation($mysqli, $game, $airliftedRole, $destinationKey, $originKey);
-        $response["wasContingencyCard"] = moveEventCardToPrevPile($mysqli, $game, $AIRLIFT_CARDKEY, $event);
+
+        moveCardsToPile($mysqli, $game, "player", "discard", $role, $cardKeys);
 
         $response["undoneEventIds"] = array($eventID);
-        // If the medic moved as a result of the airlift, undo any resulting auto-treat disease and eradication events.
-        if (getRoleName($mysqli, $airliftedRole) === "Medic"
-            && $triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
+        // Undo any auto-treat disease and eradication events that were triggered by discovering a cure.
+        if ($triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
             $response["undoneEventIds"] = array_merge($response["undoneEventIds"], $triggeredEventIds);
-
+        
+        $diseaseColor = getCityColor($mysqli, $cardKeys[0]);
+        $diseaseStatus = "rampant";
+        setDiseaseStatus($mysqli, $game, $diseaseColor, $diseaseStatus);
+       
+        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
         deleteEvent($mysqli, $game, $eventID);
-
-        if (roleHasTooManyCards($mysqli, $game, $role))
-        {
-            $prevStep = getPreviousDiscardStepName($mysqli, $game);
-            $response["prevStepName"] = updateStep($mysqli, $game, $currentStep, $prevStep, $activeRole);
-        }
     }
     catch(Exception $e)
     {
-        $response["failure"] = "Failed to undo Airlift: " . $e->getMessage();
+        $response["failure"] = "Failed to undo Discover A Cure: " . $e->getMessage();
     }
     finally
     {

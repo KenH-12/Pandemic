@@ -2,8 +2,8 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
+        require "../../connect.php";
+        include "../../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
@@ -25,29 +25,15 @@
         $event = getEventById($mysqli, $game, $eventID);
         validateEventCanBeUndone($mysqli, $game, $event);
 
-        $role = $event["role"];
-        $eventType = $event["eventType"];
-        $cardKeys = explode(",", $event["details"]);
-
         $mysqli->autocommit(FALSE);
-
-        moveCardsToPile($mysqli, $game, "player", "discard", $role, $cardKeys);
-
-        $response["undoneEventIds"] = array($eventID);
-        // Undo any auto-treat disease and eradication events that were triggered by discovering a cure.
-        if ($triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
-            $response["undoneEventIds"] = array_merge($response["undoneEventIds"], $triggeredEventIds);
-        
-        $diseaseColor = getCityColor($mysqli, $cardKeys[0]);
-        $diseaseStatus = "rampant";
-        setDiseaseStatus($mysqli, $game, $diseaseColor, $diseaseStatus);
        
-        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
+        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep, $event);
+        $response["undoneEventIds"] = array($eventID);
         deleteEvent($mysqli, $game, $eventID);
     }
     catch(Exception $e)
     {
-        $response["failure"] = "Failed to undo Discover A Cure: " . $e->getMessage();
+        $response["failure"] = "Failed to undo Pass Actions: " . $e->getMessage();
     }
     finally
     {
