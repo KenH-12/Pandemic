@@ -41,10 +41,13 @@ export default class EventCard
         $fullCard.appendTo("#boardContainer")
             .offset(getFullCardOffset($eventCard, $fullCard));
 
-        $cardImg.on("load", function() { ensureDivPositionIsWithinWindowHeight($fullCard) });
+        $cardImg.on("load", function()
+        {
+            ensureDivPositionIsWithinWindowHeight($fullCard);
 
-        if ($eventCard.hasClass("unavailable"))
-            showDisabledEventCardTooltip($fullCard);
+            if ($eventCard.hasClass("unavailable"))
+                showDisabledEventCardTooltip($fullCard);
+        });
     }
 
     getRules()

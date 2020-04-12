@@ -11,8 +11,6 @@ the eradication tooltip in infection prevention details appears behind the event
 
 TO DO
 -----
-wait for event card image to load before positioning the disabled tooltip
-
 perhaps epidemic intensify events should be undoable until an infection has occured
 
 instead of importing gameData at the top of event.js, try dynamically importing only where it is needed
