@@ -1,4 +1,4 @@
-function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeTo = "left", tooltipMargin } = {})
+async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeTo = "left", tooltipMargin } = {})
 {
 	tooltipMargin = tooltipMargin || 15;
 	
@@ -30,6 +30,8 @@ function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeTo = "l
 	}
 
 	$tooltip.offset(tooltipOffset);
+	
+	await loadAllImagesPromise($tooltip.find("img"));
 	
 	ensureDivPositionIsWithinWindowWidth($tooltip, { margin: 2 });
 	ensureDivPositionIsWithinWindowHeight($tooltip);
@@ -147,15 +149,10 @@ function setTooltipPaddingAndReturnOffset($tooltip, { tooltipOffset, tooltipMarg
 	return tooltipOffset;
 }
 
-function ensureDivPositionIsWithinWindowHeight($div, { margin = 5 } = {})
+async function ensureDivPositionIsWithinWindowHeight($div, { margin = 5 } = {})
 {
 	const windowHeight = $(window).height(),
-		$images = $div.find("img");
-	
-	for (let i = 0; i < $images.length; i++)
-		$images.eq(i).on("load", () => ensureDivPositionIsWithinWindowHeight($div));
-	
-	const divHeight = $div.outerHeight() + margin;
+		divHeight = $div.outerHeight() + margin;
 
     if ($div.offset().top + divHeight > windowHeight)
 		$div.offset({ top: windowHeight - divHeight });

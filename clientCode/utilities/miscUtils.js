@@ -167,3 +167,21 @@ function lockElements($elements)
 			.width(initialWidth);
 	}
 }
+
+function loadAllImagesPromise($images)
+{
+	const promises = [];
+	let promise;
+	
+	for (let i = 0; i < $images.length; i++)
+	{
+		promise = new Promise(resolve =>
+		{
+			$images.eq(i).on("load", () => resolve());
+		});
+		
+		promises.push(promise);
+	}
+		
+	return Promise.all(promises);
+}

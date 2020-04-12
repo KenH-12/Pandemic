@@ -3,9 +3,6 @@ BUGS
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page loading
 
-forecast event details seem quite slow to appear/disappear
-	(observed after doing forecast twice consecutively, which is not normally possible without a contingency event in the middle)
-
 the eradication tooltip in infection prevention details appears behind the event details
 	secondary tooltips should have a higher z-index
 
