@@ -161,7 +161,9 @@
 						
 						<div id='cureMarkerContainer' class='bottomPanelDiv'>
 							<p class='title'>
-								<span class='info'>&#9432;</span>
+								<span class='infoContainer'>
+									<span class='info' id='curedDiseasesInfo'>&#9432;</span>
+								</span>
 								<span class='lightGreen'>—</span> CURED DISEASES <span class='lightGreen'>—</span>
 							</p>
 						</div>

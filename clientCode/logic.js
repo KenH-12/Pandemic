@@ -3773,6 +3773,28 @@ function positionCureMarkers()
 	$(".cureMarker").css("margin-top", getDimension("cureMarkerMarginTop"));
 }
 
+function bindCuredDiseaseInfoHoverEvents()
+{
+	$("#cureMarkerContainer").find(".info")
+		.hover(function()
+		{
+			const { additionalDiscoverACureInfo, victoryCondition } = strings,
+				$tooltip = $(`<div id='curedDiseasesTooltip' class='tooltip'>
+								<div class='content'>
+									${additionalDiscoverACureInfo}
+									<br/>
+									${victoryCondition}
+									<br/>
+									<br/>
+									<span class='largeText'>Cures Discovered: ${4 - gameData.cures.remaining}</span>
+								</div>
+							</div>`);
+			
+			positionTooltipRelativeToElement($tooltip, $(this), { juxtaposeTo: "top" });
+		},
+		function() { $("#curedDiseasesTooltip").remove() });
+}
+
 function resizeAndRepositionPieces()
 {
 	return new Promise(async resolve =>
@@ -7370,6 +7392,7 @@ async function setup()
 
 	await removeCurtain();
 
+	bindCuredDiseaseInfoHoverEvents();
 	bindPlayerDeckHoverEvents();
 	bindInfectionDeckHover();
 	enablePlayerDiscardHoverEvents();

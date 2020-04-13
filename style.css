@@ -560,11 +560,15 @@ span.r {color: #ef282a; background: none}
 	font-size: 20px;
 	border-bottom: 1px solid #00a94f;
 }
-#cureMarkerContainer .info
+#cureMarkerContainer .infoContainer
 {
 	display: block;
+	margin-bottom: -3px;
+}
+#cureMarkerContainer .info
+{
 	font-size: 14px;
-	margin-bottom: -2px;
+	vertical-align: text-bottom;
 }
 .cureMarker
 {
