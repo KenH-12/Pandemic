@@ -556,7 +556,15 @@ span.r {color: #ef282a; background: none}
 }
 #cureMarkerContainer .title
 {
+	font-family: 'Oswald', sans-serif;
+	font-size: 20px;
 	border-bottom: 1px solid #00a94f;
+}
+#cureMarkerContainer .info
+{
+	display: block;
+	font-size: 14px;
+	margin-bottom: -2px;
 }
 .cureMarker
 {

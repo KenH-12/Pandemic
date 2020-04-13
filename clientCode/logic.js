@@ -3727,7 +3727,7 @@ function resizeBottomPanelElements()
 	$("#playerCards, .playerPile").height(getDimension("bottomPanelDivs"));
 
 	const $cureMarkerContainer = $("#cureMarkerContainer"),
-		titleHeight = $cureMarkerContainer.children(".title").height() + 10;
+		titleHeight = $cureMarkerContainer.children(".title").outerHeight() + 4;
 	$cureMarkerContainer
 		.height(topPanelHeight + titleHeight)
 		.offset({ top: panelOffsetTop - titleHeight });
