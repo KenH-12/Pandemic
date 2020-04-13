@@ -21,7 +21,14 @@ async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeT
 	}
 	else // juxtaposeTo top or bottom
 	{
-		tooltipOffset.left -= Math.abs($element.width() - $tooltip.width()) / 2;
+		const elementWidth = $element.width(),
+			tooltipWidth = $tooltip.width(),
+			halfDeltaWidth = Math.abs(elementWidth - tooltipWidth) / 2;
+		
+		if (tooltipWidth > elementWidth)
+			tooltipOffset.left -= halfDeltaWidth;
+		else
+			tooltipOffset.left += halfDeltaWidth;
 
 		if (juxtaposeTo === "top")
 			tooltipOffset.top -= $tooltip.outerHeight() + tooltipMargin;

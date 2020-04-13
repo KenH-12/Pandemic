@@ -424,7 +424,7 @@ span.r {color: #ef282a; background: none}
 	border-radius: 20%;
 }
 
-.tooltip:not(#eventDetails)
+.tooltip:not(#eventDetails):not(#playerCardsLeftTooltip)
 {
 	position: absolute;
 	z-index: 10;

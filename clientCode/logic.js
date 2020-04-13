@@ -8054,6 +8054,20 @@ function bindPlayerDeckHoverEvents()
 			positionTooltipRelativeToElement($tooltip, $playerDeckContainer, { juxtaposeTo: "top" });
 		},
 		function(){ $("#playerDeckTooltip").remove() });
+	
+	$playerDeckContainer.find("img")
+		.off("mousenter mouseleave")
+		.hover(function()
+		{
+			const $tooltip = $(`<div id='playerCardsLeftTooltip' class='tooltip'>
+									<div class='content'>
+										<p class='largeText'>${gameData.numPlayerCardsRemaining} cards left<p>
+									</div>
+								</div>`);
+						
+			positionTooltipRelativeToElement($tooltip, $playerDeckContainer, { juxtaposeTo: "top" });
+		},
+		function(){ $("#playerCardsLeftTooltip").remove() });
 }
 
 function getDifficultyName()
