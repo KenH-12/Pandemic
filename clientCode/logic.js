@@ -7391,6 +7391,7 @@ async function setup()
 
 	await removeCurtain();
 
+	bindCubeSuppliesInfoHoverEvents();
 	bindCuredDiseaseInfoHoverEvents();
 	bindPlayerDeckHoverEvents();
 	bindInfectionDeckHover();
@@ -8597,19 +8598,16 @@ function bindInfectionDeckHover()
 	});
 }
 
-$("#cubeSupplies").find("span.info").hover(function()
+function bindCubeSuppliesInfoHoverEvents()
 {
-	const $supplyContainer = $(this).closest("#cubeSupplies"),
-		$tooltip = $(`<div id='cubeSuppliesTooltip' class='tooltip'>
-						<div class='content'>
-							${strings.diseaseCubeSupplyInfo}
-							<p>${strings.insufficientCubesWarning}</p>
-						</div>
-					</div>`)
-			.width($supplyContainer.width());
-
-	positionTooltipRelativeToElement($tooltip, $supplyContainer, { juxtaposeTo: "bottom" });
-}, function() { $("#cubeSuppliesTooltip").remove() });
+	new Tooltip({
+		content: `${strings.diseaseCubeSupplyInfo}<p>${strings.insufficientCubesWarning}</p>`,
+		hoverElementSelector: "#cubeSupplies .info",
+		positionRelativeToSelector: "#cubeSupplies",
+		juxtaposeTo: "bottom",
+		containerSelector: "#boardContainer"
+	}).bindHoverEvents();
+}
 
 function enableInfectionDiscardHoverEvents()
 {
