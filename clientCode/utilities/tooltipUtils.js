@@ -163,9 +163,6 @@ async function ensureDivPositionIsWithinWindowHeight($div, { margin = 5 } = {})
 
     if ($div.offset().top + divHeight > windowHeight)
 		$div.offset({ top: windowHeight - divHeight });
-	
-	if ($div.hasClass("tooltip"))
-		setTooltipArrowClipPath($div);
 }
 
 function ensureDivPositionIsWithinWindowWidth($div, { margin = 5 } = {})

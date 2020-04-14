@@ -73,6 +73,7 @@ import {
     animateInvalidTravelPath,
     hideTravelPathArrow
 } from "./travelPathArrow.js";
+import Tooltip from "./tooltip.js";
 
 $(function(){
 const eventHistory = new EventHistory(),
@@ -3775,25 +3776,33 @@ function positionCureMarkers()
 
 function bindCuredDiseaseInfoHoverEvents()
 {
-	$("#cureMarkerContainer").find(".info")
-		.hover(function()
+	const getContent = function()
 		{
-			const { additionalDiscoverACureInfo, victoryCondition } = strings,
-				$tooltip = $(`<div id='curedDiseasesTooltip' class='tooltip'>
-								<div class='content'>
-									${additionalDiscoverACureInfo}
-									<br/>
-									${victoryCondition}
-									<br/>
-									<br/>
-									<span class='largeText'>Cures Discovered: ${4 - gameData.cures.remaining}</span>
-								</div>
-							</div>`);
-			
-			positionTooltipRelativeToElement($tooltip, $(this), { juxtaposeTo: "top" });
-		},
-		function() { $("#curedDiseasesTooltip").remove() });
+			return `${strings.additionalDiscoverACureInfo}
+					<br/>
+					${strings.victoryCondition}
+					<br/>
+					<br/>
+					<span class='largeText'>Cures Discovered: ${4 - gameData.cures.remaining}</span>`;
+		};
+	
+	new Tooltip({
+			getContent,
+			hoverElementSelector: "#cureMarkerContainer .info",
+			juxtaposeTo: "top",
+			containerId: "boardContainer"
+		}).bindHoverEvents();
 }
+
+$("#imgInfectionDeck").click(function()
+{
+	const tooltip = tooltips.curedDiseaseContainer;
+
+	if (tooltip.hoverEventsAreBound)
+		tooltip.unbindHoverEvents();
+	else
+		tooltip.bindHoverEvents();
+});
 
 function resizeAndRepositionPieces()
 {
