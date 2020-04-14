@@ -23,6 +23,8 @@ tooltips
 	outbreaks track
 	forecast "top" and "bottom" headings
 
+when a button is disabled, change the cursor or something
+
 put strings in strings.js file
 	game end cause descriptions
 

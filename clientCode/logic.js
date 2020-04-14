@@ -3790,19 +3790,9 @@ function bindCuredDiseaseInfoHoverEvents()
 			getContent,
 			hoverElementSelector: "#cureMarkerContainer .info",
 			juxtaposeTo: "top",
-			containerId: "boardContainer"
+			containerSelector: "#boardContainer"
 		}).bindHoverEvents();
 }
-
-$("#imgInfectionDeck").click(function()
-{
-	const tooltip = tooltips.curedDiseaseContainer;
-
-	if (tooltip.hoverEventsAreBound)
-		tooltip.unbindHoverEvents();
-	else
-		tooltip.bindHoverEvents();
-});
 
 function resizeAndRepositionPieces()
 {
@@ -8059,47 +8049,39 @@ function placePileOntoPlayerDeck($pileContainer, deckProperties)
 
 function bindPlayerDeckHoverEvents()
 {
-	const $playerDeckContainer = $("#playerDeck");
+	const positionRelativeToSelector = "#playerDeck",
+		juxtaposeTo = "top",
+		containerSelector = "#boardContainer",
+		getPlayerDeckInfo = function()
+		{
+			const { numPlayerCardsRemaining, numEpidemics, epidemicCount } = gameData,
+				{ playerDeckInfo, discardRule, outOfCardsWarning } = strings;
 
-	$playerDeckContainer.find(".info")
-		.off("mouseenter mouseleave")
-		.hover(function()
-		{
-			if (typeof gameData.numPlayerCardsRemaining == "undefined"
-				||	$("#playerDeckTooltip").length)
-				return false;
-			
-			 const { numPlayerCardsRemaining, numEpidemics, epidemicCount } = gameData,
-				 { playerDeckInfo, discardRule, outOfCardsWarning } = strings,
-				$tooltip = $(`<div id='playerDeckTooltip' class='tooltip'>
-									<div class='content'>
-										<p>Cards left in deck: ${numPlayerCardsRemaining}</p>
-										<br/>
-										<p>Difficulty: ${getDifficultyName()}<br/><span class='indent-1'>-> ${numEpidemics} Epidemics</span><br/>Epidemic cards left in deck: ${numEpidemics - epidemicCount}</p>
-										<br/>
-										<p>${playerDeckInfo}</p>
-										<p>${discardRule}</p>
-										<p>${outOfCardsWarning}</p>
-									</div>
-								</div>`);
-			
-			positionTooltipRelativeToElement($tooltip, $playerDeckContainer, { juxtaposeTo: "top" });
-		},
-		function(){ $("#playerDeckTooltip").remove() });
+			return `<p>Cards left in deck: ${numPlayerCardsRemaining}</p>
+				<br/>
+				<p>Difficulty: ${getDifficultyName()}<br/><span class='indent-1'>-> ${numEpidemics} Epidemics</span><br/>Epidemic cards left in deck: ${numEpidemics - epidemicCount}</p>
+				<br/>
+				<p>${playerDeckInfo}</p>
+				<p>${discardRule}</p>
+				<p>${outOfCardsWarning}</p>`;
+		};
 	
-	$playerDeckContainer.find("img")
-		.off("mousenter mouseleave")
-		.hover(function()
-		{
-			const $tooltip = $(`<div id='playerCardsLeftTooltip' class='tooltip'>
-									<div class='content'>
-										<p class='largeText'>${gameData.numPlayerCardsRemaining} cards left<p>
-									</div>
-								</div>`);
-						
-			positionTooltipRelativeToElement($tooltip, $playerDeckContainer, { juxtaposeTo: "top" });
-		},
-		function(){ $("#playerCardsLeftTooltip").remove() });
+	new Tooltip({
+		getContent: getPlayerDeckInfo,
+		hoverElementSelector: `${positionRelativeToSelector} .info`,
+		positionRelativeToSelector,
+		juxtaposeTo,
+		containerSelector
+	}).bindHoverEvents();
+
+	new Tooltip({
+		getContent: () => `<p class='largeText'>${gameData.numPlayerCardsRemaining} cards left<p>`,
+		hoverElementSelector: `${positionRelativeToSelector} img`,
+		positionRelativeToSelector,
+		juxtaposeTo,
+		containerSelector,
+		tooltipId: "playerCardsLeftTooltip"
+	}).bindHoverEvents();
 }
 
 function getDifficultyName()

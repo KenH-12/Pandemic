@@ -10,7 +10,7 @@ export default class Tooltip
             juxtaposeTo = "left",
             tooltipArrowMargin = 15,
             tooltipMargin = 5,
-            containerId,
+            containerSelector,
             tooltipId
         } = {})
     {
@@ -24,7 +24,7 @@ export default class Tooltip
         this.tooltipArrowMargin = tooltipArrowMargin;
         this.tooltipMargin = tooltipMargin;
 
-        this.containerId = containerId;
+        this.containerSelector = containerSelector || "body";
         this.tooltipId = tooltipId;
 
         this.$tooltip = false;
@@ -56,7 +56,7 @@ export default class Tooltip
         const {
                 $tooltip,
                 positionRelativeToSelector,
-                containerId,
+                containerSelector,
                 juxtaposeTo,
                 tooltipArrowMargin,
                 tooltipMargin
@@ -65,7 +65,7 @@ export default class Tooltip
             elementOffset = $element.offset(),
             tooltipOffset = elementOffset;
         
-        $tooltip.appendTo(containerId ? `#${this.containerId}` : "body");
+        $tooltip.appendTo(containerSelector);
         
         if (["left", "right"].includes(juxtaposeTo))
         {
