@@ -42,7 +42,7 @@ export default class Tooltip
         let tooltipContent = content;
 
         if (!tooltipContent && typeof this.getContent === "function")
-            tooltipContent = this.getContent();
+            tooltipContent = this.getContent(this);
         
         $tooltip.append(`<div class='content'>${tooltipContent}</div>`);
         

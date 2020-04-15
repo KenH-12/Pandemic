@@ -774,25 +774,26 @@ function bindActionButtonHoverEvents()
 {
 	const $actionButtons = $("#rightPanel").find(".actionButton"),
 		containerSelector = "#boardContainer",
-		tooltipId = "eventTypeTooltip";
+		tooltipId = "eventTypeTooltip",
+		getContent = function(tooltip)
+			{
+				const $btn = $(tooltip.positionRelativeToSelector),
+					eventType = eventTypes[toCamelCase($btn.attr("id").substring(3))];
 	
+				return getEventTypeTooltipContent(eventType,
+					{
+						actionNotPossible: $btn.hasClass("btnDisabled"),
+						includeRelatedRoleRule: relatedRoleRuleApplies(eventType)
+					});
+			};
+	
+	let buttonSelector;
 	for (let i = 0; i < $actionButtons.length; i++)
 	{
-		// buttonSelector must be declared within the scope of the for loop.
-		const buttonSelector = `#${$actionButtons.eq(i).attr("id")}`;
+		buttonSelector = `#${$actionButtons.eq(i).attr("id")}`;
 		
 		new Tooltip({
-			getContent: function()
-				{
-					const $btn = $(buttonSelector),
-						eventType = eventTypes[toCamelCase($btn.attr("id").substring(3))];
-		
-					return getEventTypeTooltipContent(eventType,
-						{
-							actionNotPossible: $btn.hasClass("btnDisabled"),
-							includeRelatedRoleRule: relatedRoleRuleApplies(eventType)
-						});
-				},
+			getContent,
 			hoverElementSelector: `${buttonSelector} .actionInfo`,
 			positionRelativeToSelector: buttonSelector,
 			containerSelector,
