@@ -28,6 +28,7 @@ import {
 import Event, {
 	eventTypes,
 	getEventType,
+	getEventTypeTooltipContent,
 	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
 	PermanentEvent,
@@ -771,60 +772,33 @@ function enableActionButton(buttonID)
 
 function bindActionButtonHoverEvents()
 {
-	const actionInfoSelector = ".actionInfo";
-
-	let $btn,
-		eventType,
-		includeRelatedRoleRule,
-		$tooltip;
+	const $actionButtons = $("#rightPanel").find(".actionButton"),
+		containerSelector = "#boardContainer",
+		tooltipId = "eventTypeTooltip";
 	
-	$(document).on("mouseenter", actionInfoSelector, function()
-		{
-			$btn = $(this).closest(".actionButton");
-			eventType = eventTypes[toCamelCase($btn.attr("id").substring(3))];
-			
-			includeRelatedRoleRule = relatedRoleRuleApplies(eventType);
-
-			$tooltip = getEventTypeTooltip(eventType,
+	for (let i = 0; i < $actionButtons.length; i++)
+	{
+		// buttonSelector must be declared within the scope of the for loop.
+		const buttonSelector = `#${$actionButtons.eq(i).attr("id")}`;
+		
+		new Tooltip({
+			getContent: function()
 				{
-					actionNotPossible: $btn.hasClass("btnDisabled"),
-					includeRelatedRoleRule
-				});
-			
-			positionTooltipRelativeToElement($tooltip, $btn, { arrowShape: true });
-		})
-		.on("mouseleave", actionInfoSelector, function() { $("#eventTypeTooltip").remove() });
-}
-
-function getEventTypeTooltip(eventType, { includeName = true, actionNotPossible, includeRelatedRoleRule, isDispatchType } = {})
-{
-	let $tooltip = $("#eventTypeTooltip");
-
-	if ($tooltip.length)
-		$tooltip.children(".content").empty();
-	else
-		$tooltip = $(`<div id='eventTypeTooltip' class='tooltip'>
-						<div class='content'></div>
-					</div>`);
-	
-	const $tooltipContent = $tooltip.children(".content");
-	
-	// The "DISPATCH PAWN VIA" part of a title pertains to the Dispatcher's first special ability.
-	// Rendezvous is a special ability in its own right, so its tooltip doesn't require the prefix.
-	if (includeName)
-		$tooltipContent.append(`<h3>${ isDispatchType && eventType.code !== eventTypes.rendezvous.code ? "DISPATCH PAWN VIA<br/> " : "" }${eventType.name.toUpperCase()}</h3>`);
-
-	if (actionNotPossible)
-		$tooltipContent.append("<p class='actionNotPossible'>This action is not currently possible.</p>");
-
-	
-	for (let rule of (isDispatchType ? eventTypes.dispatchPawn[toCamelCase(eventType.name.replace("/","")) + "Rules"] : eventType.rules))
-			$tooltipContent.append(`<p>${rule}</p>`);
-	
-	if (includeRelatedRoleRule)
-		$tooltipContent.append(`<p class='specialAbilityRule'>${replaceRoleNamesWithRoleTags(eventType.relatedRoleRule)}</p>`);
-	
-	return $tooltip;
+					const $btn = $(buttonSelector),
+						eventType = eventTypes[toCamelCase($btn.attr("id").substring(3))];
+		
+					return getEventTypeTooltipContent(eventType,
+						{
+							actionNotPossible: $btn.hasClass("btnDisabled"),
+							includeRelatedRoleRule: relatedRoleRuleApplies(eventType)
+						});
+				},
+			hoverElementSelector: `${buttonSelector} .actionInfo`,
+			positionRelativeToSelector: buttonSelector,
+			containerSelector,
+			tooltipId
+		}).bindHoverEvents();
+	}
 }
 
 function relatedRoleRuleApplies(eventType, { roleA, roleB } = {})
@@ -1042,7 +1016,7 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 				roleA = $this.find(".roleTag").first().html(),
 				roleB = eventType.name === "ShareKnowledge" ? $this.find(".roleTag").last().html() : false,
 				includeRelatedRoleRule = relatedRoleRuleApplies(eventType, { roleA, roleB }),
-				$tooltip = getEventTypeTooltip(eventType, { includeName: false, includeRelatedRoleRule });
+				$tooltip = getEventTypeTooltipContent(eventType, { includeName: false, includeRelatedRoleRule });
 			
 			positionTooltipRelativeToElement($tooltip, $this, { juxtaposeTo });
 		})
@@ -1058,7 +1032,7 @@ function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
 		{
 			const $this = $(this).attr("id", "hoveredInfoIcon"),
 				eventType = getEventType($this.attr("data-eventType")),
-				$tooltip = getEventTypeTooltip(eventType, { isDispatchType: $this.parent().html().includes("Dispatch Type") });
+				$tooltip = getEventTypeTooltipContent(eventType, { isDispatchType: $this.parent().html().includes("Dispatch Type") });
 
 			positionTooltipRelativeToElement($tooltip, $this, { juxtaposeTo });
 		})
@@ -2670,7 +2644,7 @@ function bindDispatchTypeHoverEvents($container)
 	$elements.hover(function()
 		{
 			$this = $(this);
-			$tooltip = getEventTypeTooltip(getEventType($this.attr("data-eventType")), { includeName: true, isDispatchType: true });
+			$tooltip = getEventTypeTooltipContent(getEventType($this.attr("data-eventType")), { includeName: true, isDispatchType: true });
 			
 			positionTooltipRelativeToElement($tooltip, $rightPanel);
 		},
@@ -4507,19 +4481,6 @@ function getSpecialAbilityRule(eventType)
 	const { relatedRoleName, relatedRoleRule } = eventType;
 
 	return relatedRoleRule.replace(relatedRoleName, getPlayer(relatedRoleName).newRoleTag());
-}
-
-function replaceRoleNamesWithRoleTags(string)
-{
-	const { players } = gameData;
-	let player;
-
-	for (let rID in players)
-	{
-		player = players[rID];
-		string = string.replace(player.role, player.newRoleTag());
-	}
-	return string;
 }
 
 function operationsFlightWasUsedThisTurn()

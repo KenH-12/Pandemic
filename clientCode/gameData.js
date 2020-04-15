@@ -54,4 +54,22 @@ function getActivePlayer()
 	return gameData.players[gameData.turn];
 }
 
-export { gameData, getPlayer, getActivePlayer };
+function replaceRoleNamesWithRoleTags(string)
+{
+	const { players } = gameData;
+	let player;
+
+	for (let rID in players)
+	{
+		player = players[rID];
+		string = string.replace(player.role, player.newRoleTag());
+	}
+	return string;
+}
+
+export {
+	gameData,
+	getPlayer,
+	getActivePlayer,
+	replaceRoleNamesWithRoleTags
+};

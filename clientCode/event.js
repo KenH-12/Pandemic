@@ -2,7 +2,12 @@
 
 import { strings } from "./strings.js";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
-import { gameData, getPlayer, getActivePlayer } from "./gameData.js";
+import {
+	gameData,
+	getPlayer,
+	getActivePlayer,
+	replaceRoleNamesWithRoleTags
+} from "./gameData.js";
 import { setDuration } from "./durations.js";
 
 const dispatchDiscardRule = "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
@@ -1691,6 +1696,31 @@ function getEventType(eventCode)
 	return eventTypes[eventCodes[eventCode]];
 }
 
+function getEventTypeTooltipContent(eventType, { includeName = true, actionNotPossible, includeRelatedRoleRule, isDispatchType } = {})
+{
+	let content = "";
+
+	// The "DISPATCH PAWN VIA" part of a title pertains to the Dispatcher's first special ability.
+	// Rendezvous is a special ability in its own right, so its tooltip doesn't require the prefix.	
+	if (includeName)
+	{
+		const dispatchPrefix = isDispatchType && eventType.code !== eventTypes.rendezvous.code ? "DISPATCH PAWN VIA<br/> " : "";
+		content += `<h3>${dispatchPrefix}${eventType.name.toUpperCase()}</h3>`;
+	}
+
+	if (actionNotPossible)
+		content += "<p class='actionNotPossible'>This action is not currently possible.</p>";
+	
+	const rules = isDispatchType ? eventTypes.dispatchPawn[toCamelCase(eventType.name.replace("/","")) + "Rules"] : eventType.rules;
+	for (let rule of rules)
+		content += `<p>${rule}</p>`;
+	
+	if (includeRelatedRoleRule)
+		content += `<p class='specialAbilityRule'>${replaceRoleNamesWithRoleTags(eventType.relatedRoleRule)}</p>`;
+	
+	return content;
+}
+
 function movementTypeRequiresDiscard(eventType)
 {
 	const { directFlight, charterFlight, operationsFlight } = eventTypes;
@@ -1764,6 +1794,7 @@ function getLocatableCityName(city)
 export {
 	eventTypes,
 	getEventType,
+	getEventTypeTooltipContent,
 	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
 	PermanentEvent,
