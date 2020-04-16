@@ -6,9 +6,15 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 the eradication tooltip in infection prevention details appears behind the event details
 	secondary tooltips should have a higher z-index
 
+tooltips which have their offset adjusted after the load event of a contained image appear to jump sideways
+	try positioning within the window once before awaiting the load events
+
 TO DO
 -----
 tooltips
+	use Tooltip class for...
+		event details
+		disabled event cards
 	cured diseases container
 		cure vials
 			cured
@@ -22,6 +28,11 @@ tooltips
 		infection rate info icon beside infection rate displayed during infect cities step
 	outbreaks track
 	forecast "top" and "bottom" headings
+	play steps
+
+when a cube supply gets low, its count should glow red
+	same for the player deck
+		show warnings when getting low on cards?
 
 when a button is disabled, change the cursor or something
 

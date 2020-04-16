@@ -921,7 +921,6 @@ function showEventIconDetails($icon, event)
 								</div>
 							</div>`);
 	
-	bindEventDetailsInfoHoverEvents($detailsContainer);
 	bindEventCardHoverEvents($detailsContainer);
 	bindEpidemicCardHoverEvents($detailsContainer);
 	locatePawnOnRoleTagClick($detailsContainer);
@@ -1002,46 +1001,43 @@ function checkEventIconHovering()
 		$hovered.trigger("mouseenter");
 }
 
-function bindEventDetailsInfoHoverEvents($eventDetailsContainer)
+function bindEventDetailsInfoHoverEvents()
 {
 	const eventTypeInfoSelector = "#eventDetails .eventTypeInfo",
 		hoverInfoSelector = "#eventDetails .hoverInfo",
+		containerSelector = "#boardContainer",
 		juxtaposeTo = "right";
 
-	$(document).off("mouseenter mouseleave", eventTypeInfoSelector)
-		.on("mouseenter", eventTypeInfoSelector,
-		function()
-		{
-			const $this = $(this).attr("id", "hoveredInfoIcon"),
-				eventType = getEventType($eventDetailsContainer.attr("data-eventType")),
-				roleA = $this.find(".roleTag").first().html(),
-				roleB = eventType.name === "ShareKnowledge" ? $this.find(".roleTag").last().html() : false,
-				includeRelatedRoleRule = relatedRoleRuleApplies(eventType, { roleA, roleB }),
-				$tooltip = getEventTypeTooltipContent(eventType, { includeName: false, includeRelatedRoleRule });
-			
-			positionTooltipRelativeToElement($tooltip, $this, { juxtaposeTo });
-		})
-		.on("mouseleave", eventTypeInfoSelector, function()
-		{
-			$("#eventTypeTooltip").remove();
-			$(this).removeAttr("id");
-		});
+	new Tooltip({
+		hoverElementSelector: eventTypeInfoSelector,
+		getContent: function({ hoverElementSelector })
+			{
+				const $eventDetailsContainer = $(hoverElementSelector).closest("#eventDetails"),
+					eventType = getEventType($eventDetailsContainer.attr("data-eventType")),
+					roleA = $eventDetailsContainer.find(".roleTag").first().html(),
+					roleB = eventType.name === "ShareKnowledge" ? $eventDetailsContainer.find(".roleTag").last().html() : false,
+					includeRelatedRoleRule = relatedRoleRuleApplies(eventType, { roleA, roleB });
+				
+				return getEventTypeTooltipContent(eventType, { includeName: false, includeRelatedRoleRule });
+			},
+		containerSelector,
+		juxtaposeTo
+	}).bindHoverEvents();
 	
-	$(document).off("mouseenter mouseleave", hoverInfoSelector)
-		.on("mouseenter", hoverInfoSelector,
-		function()
-		{
-			const $this = $(this).attr("id", "hoveredInfoIcon"),
-				eventType = getEventType($this.attr("data-eventType")),
-				$tooltip = getEventTypeTooltipContent(eventType, { isDispatchType: $this.parent().html().includes("Dispatch Type") });
+	new Tooltip({
+		hoverElementSelector: hoverInfoSelector,
+		getContent: function({ hoverElementSelector })
+			{
+				const $this = $(hoverElementSelector),
+					eventType = getEventType($this.attr("data-eventType")),
+					isDispatchType = $this.parent().html().includes("Dispatch Type");
 
-			positionTooltipRelativeToElement($tooltip, $this, { juxtaposeTo });
-		})
-		.on("mouseleave", hoverInfoSelector, function()
-		{
-			$("#eventTypeTooltip").remove();
-			$(this).removeAttr("id");
-		});
+				return getEventTypeTooltipContent(eventType, { isDispatchType });
+			},
+		containerSelector,
+		juxtaposeTo,
+		tooltipId: "eventTypeTooltip"
+	}).bindHoverEvents();
 }
 
 function hideEventIconDetails()
@@ -7360,6 +7356,7 @@ async function setup()
 	enablePlayerDiscardHoverEvents();
 	bindEventCardHoverEvents();
 	bindActionButtonHoverEvents();
+	bindEventDetailsInfoHoverEvents();
 	
 	if (forecastInProgress())
 	{
