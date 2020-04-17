@@ -9,6 +9,10 @@ the eradication tooltip in infection prevention details appears behind the event
 tooltips which have their offset adjusted after the load event of a contained image appear to jump sideways
 	try positioning within the window once before awaiting the load events
 
+if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
+
+if an event details tooltip is visible when the related icon is removed, the tooltip remains
+
 TO DO
 -----
 tooltips

@@ -215,11 +215,20 @@ function parseEvents(events)
 		});
 }
 
-function addToEventHistoryQueue(events)
+function addToEventHistoryQueue(newEvents)
 {
-	for (let event of events)
+	let eventIdx = gameData.events.length - newEvents.length;
+	
+	for (let event of newEvents)
+	{
 		if (event.hasIcon())
+		{
+			event.index = eventIdx;
 			gameData.eventHistoryQueue.push(event);
+		}
+
+		eventIdx++;
+	}
 }
 
 function appendEventHistoryIcons()
@@ -255,7 +264,8 @@ function appendEventHistoryIconOfType(targetEventType)
 function appendEventHistoryIcon(event)
 {
 	const $icon = $(getEventIconHtml(getEventType(event.code), { event }));
-	bindEventIconHoverEvents($icon, event);
+	
+	$icon.attr("data-index", event.index);
 	eventHistory.appendIcon($icon);
 }
 
@@ -831,12 +841,18 @@ function getEventIconHtml(eventType, { event } = {})
 	const { name } = eventType,
 		fileName = getEventIconFileName(eventType, event),
 		fileExtension = getEventIconFileExtension(eventType, event),
-		cssClasses = getEventIconCssClasses(event);
+		classAttribute = `class='${getEventIconCssClasses(event)}'`;
 	
-	return `<img	src='images/eventIcons/${fileName}.${fileExtension}'
-					alt='${name}'
-					id='${ event ? `icon${event.id}` : "" }'
-					${cssClasses ? `class='${cssClasses}'` : ""} />`;
+	let iconHtml = event ? `<div id='icon${event.id}' ${classAttribute}>` : "";
+
+	iconHtml += `<img	src='images/eventIcons/${fileName}.${fileExtension}'
+						alt='${name}'
+						${ !event ? classAttribute : ""} />`;
+	
+	if (event)
+		iconHtml += "</div>";
+
+	return iconHtml;
 }
 
 function getEventIconFileName(eventType, event)
@@ -898,15 +914,51 @@ function getEventIconCssClasses(event)
 	return "darkGreenBorder";
 }
 
-function bindEventIconHoverEvents($icon, event)
+function bindEventHistoryIconHoverEvents()
 {
-	$icon.off("mouseenter mouseleave")
-		.hover(function()
+	const getContent = function(tooltip)
 		{
-			if (!$icon.data("showingDetails"))
-				showEventIconDetails($icon, event);
+			const eventIndex = $(tooltip.$hoveredElement).attr("data-index");
+			return gameData.events[eventIndex].getDetails();
 		},
-		function() { allowEventDetailsHovering($icon) });
+		beforeShow = function(tooltip)
+		{
+			const { $hoveredElement, $tooltip } = tooltip,
+				eventIndex = $($hoveredElement).attr("data-index"),
+				event = gameData.events[eventIndex];
+
+			$tooltip.attr("data-eventType", event.code);
+
+			bindEventCardHoverEvents($tooltip);
+			bindEpidemicCardHoverEvents($tooltip);
+			locatePawnOnRoleTagClick($tooltip);
+			bindCityLocatorClickEvents({ $containingElement: $tooltip });
+
+			resizeInfectionCards($tooltip);
+			enforceEventDetailsHeightLimit();
+		},
+		afterShow = function(tooltip)
+		{
+			const { $hoveredElement, $tooltip } = tooltip,
+				eventIndex = $($hoveredElement).attr("data-index"),
+				event = gameData.events[eventIndex];
+			
+			bindRoleCardHoverEvents();
+			if (event instanceof StartingHands)
+				event.positionPopulationRanks($tooltip);
+		};
+	
+	new Tooltip({
+		getContent,
+		hoverElementSelector: "#eventHistory > div",
+		containerSelector: "#boardContainer",
+		juxtaposeTo: "top",
+		tooltipId: "eventDetails",
+		allowTooltipHovering: true,
+		tooltipHoveringForgiveness: { top: 2, left: 2, right: 3, bottom: 1 },
+		beforeShow,
+		afterShow
+	}).bindHoverEvents();
 }
 
 function showEventIconDetails($icon, event)
@@ -959,49 +1011,7 @@ function enforceEventDetailsHeightLimit($detailsContainer)
 		.offset({ top: minOffsetTop });
 }
 
-function allowEventDetailsHovering($icon)
-{
-	const $eventDetails = $("#eventDetails"),
-		detailsOffset = $eventDetails.offset(),
-		iconOffset = $icon.offset(),
-		hoverBox = {
-			top: detailsOffset.top,
-			left: detailsOffset.left,
-			right: detailsOffset.left + $eventDetails.width(),
-			bottom: iconOffset.top
-		},
-		$document = $(document);
-	
-	$document.off("mousemove")
-		.mousemove(function(e)
-		{
-			// The hoverbox is imperfect, so the -3's and +7 allow a bit of forgiveness.
-			if (e.pageY < hoverBox.top - 3
-				|| e.pageX < hoverBox.left - 3
-				|| e.pageX > hoverBox.right + 7
-				|| e.pageY > hoverBox.bottom
-				&& !$icon.is(":hover"))
-			{
-				$document.off("mousemove");
-				hideEventIconDetails();
-
-				checkEventIconHovering();
-			}
-		});
-}
-
-// Due to the additional functionality provided by allowEventDetailsHovering,
-// moving the mouse from one event history icon to another will not cause the second icon's mouseenter event to fire.
-// This check will manually fire the hovered element's mouseenter event if the element is contained within #eventHistory.
-function checkEventIconHovering()
-{
-	const $hovered = $(":hover");
-
-	if ($hovered.closest("#eventHistory").length)
-		$hovered.trigger("mouseenter");
-}
-
-function bindEventDetailsInfoHoverEvents()
+function bindEventDetailsHoverEvents()
 {
 	const eventTypeInfoSelector = "#eventDetails .eventTypeInfo",
 		hoverInfoSelector = "#eventDetails .hoverInfo",
@@ -2033,7 +2043,7 @@ function dealForecastedCards($cardContainer, cardKeys)
 		{
 			cityKey = cardKeys[i];
 			$cardContainer.append(newInfectionCardTemplate());
-			cards.push({ city: getCity(cityKey), cityKey, index: i });
+			cards.push({ city: getCity(cityKey), cityKey, infectionIndex: i });
 		}
 		positionInfectionPanelComponents();
 
@@ -3704,12 +3714,13 @@ function resizeBottomPanelElements()
 		.height(topPanelHeight + titleHeight)
 		.offset({ top: panelOffsetTop - titleHeight });
 	
-	const ehContainerHeight = topPanelHeight * 0.42;
+	const ehContainerHeight = topPanelHeight * 0.4;
 	$eventHistoryContainer.height(ehContainerHeight)
-		.offset({ top: panelOffsetTop + topPanelHeight*0.58 })
+		.offset({ top: boardHeight - ehContainerHeight })
 		.children().height(ehContainerHeight)
 		.css("line-height", ehContainerHeight*1.07 + "px");
 	
+	ensureDivPositionIsWithinWindowHeight($eventHistoryContainer, { margin: 0 });
 	eventHistory.scrollToEnd();
 }
 
@@ -5428,12 +5439,12 @@ async function epidemicInfect()
 			city: getCity(cityKey),
 			numCubes: $MAX_NUM_CUBES - prevCubeCount,
 			preventionCode: preventionCode,
-			index: 0
+			infectionIndex: 0
 		};
 
 	getInfectionContainer().append(newInfectionCardTemplate());
 	positionInfectionPanelComponents();
-	await dealFaceDownInfCard(card.index);
+	await dealFaceDownInfCard(card);
 	await revealInfectionCard(card);
 
 	const { color } = card.city;
@@ -6075,9 +6086,9 @@ async function infectionStep()
 		events = await requestAction(infectCity);
 		
 		card = events.shift();
-		card.index = infectionCount;
+		card.infectionIndex = infectionCount;
 		
-		await dealFaceDownInfCard(card.index);
+		await dealFaceDownInfCard(card);
 		await revealInfectionCard(card);
 		
 		const { color } = card.city;
@@ -6554,7 +6565,7 @@ function dealInitialInfectionCards()
 	{
 		// Filter initial infections and assign them indices
 		const initialInfections = gameData.events.filter(e => e instanceof InitialInfection)[0]
-			.infections.map((inf, i) => { return { ...inf, index: i } }),
+			.infections.map((inf, i) => { return { ...inf, infectionIndex: i } }),
 			GROUP_SIZE = 3; // 3 groups of 3 infection cards
 		let group;
 
@@ -6609,21 +6620,21 @@ async function dealFaceDownInfGroup(group)
 {
 	for (let card of group)
 	{
-		dealFaceDownInfCard(card.index);
+		dealFaceDownInfCard(card);
 		await sleep(getDuration("dealCard") * 0.65);
 	}
 	return sleep(getDuration("dealCard") * 0.35);
 }
 
-function dealFaceDownInfCard(elementIndex)
+function dealFaceDownInfCard({ infectionIndex })
 {
 	return new Promise(resolve =>
 	{
-		const $container = getInfectionContainer().find(".infectionCard").eq(elementIndex)
+		const $container = getInfectionContainer().find(".infectionCard").eq(infectionIndex)
 			.children(".infectionCardContents").first();
 		
 		const containerTop = $container.offset().top,
-			$cardback = $(`<img class='drawnInfectionCard' data-index='${elementIndex}'
+			$cardback = $(`<img class='drawnInfectionCard' data-index='${infectionIndex}'
 								src='images/cards/infectionCardback.png'
 								alt='Infection Card' />`),
 			{ infectionDeckOffset, boardWidth } = gameData;
@@ -6676,14 +6687,14 @@ function positionFaceDownInfectionCards()
 	makeElementsSquare($cardbacks);
 }
 
-async function revealInfectionCard({ city, cityKey, index }, { forecasting } = {})
+async function revealInfectionCard({ city, cityKey, infectionIndex }, { forecasting } = {})
 {
 	return new Promise(resolve =>
 	{
-		const $card = getInfectionContainer().find(".infectionCard").eq(index),
+		const $card = getInfectionContainer().find(".infectionCard").eq(infectionIndex),
 			diseaseColorIsEradicated = diseaseIsEradicated(city.color),
 			$veil = $card.find(".veil"),
-			$cardback = forecasting ? $(".drawnInfectionCard").eq(index) : $(".drawnInfectionCard").first();
+			$cardback = forecasting ? $(".drawnInfectionCard").eq(infectionIndex) : $(".drawnInfectionCard").first();
 		
 		// The first $cardback is removed if not forecasting because each one is removed after fading out.
 		$cardback.fadeOut(getDuration("revealInfCard"), function() { $(this).remove() });
@@ -7356,7 +7367,8 @@ async function setup()
 	enablePlayerDiscardHoverEvents();
 	bindEventCardHoverEvents();
 	bindActionButtonHoverEvents();
-	bindEventDetailsInfoHoverEvents();
+	bindEventHistoryIconHoverEvents();
+	bindEventDetailsHoverEvents();
 	
 	if (forecastInProgress())
 	{
