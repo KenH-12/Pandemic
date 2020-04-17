@@ -26,10 +26,10 @@ export default class EventHistory
 
             const { $iconContainer } = this,
                 scrollLeft = $iconContainer.scrollLeft(),
-                $icon = $iconContainer.children("img").last(),
+                $icon = $iconContainer.children().last(),
                 iconWidth = $icon.outerWidth() + 1,
                 newScrollLeft = scrollLeft - iconWidth,
-                alt = $icon.attr("alt");
+                alt = $icon.children().first().attr("alt");
 
             if (alt !== event.name)
             {
@@ -62,7 +62,7 @@ export default class EventHistory
 
     async slideInNewIcon()
     {
-        const $icons = this.$iconContainer.children("img"),
+        const $icons = this.$iconContainer.children(),
             $newIcon = $icons.last().addClass("hidden"),
             freeSpace = this.$iconContainer.width() - ($icons.length - 1) * $newIcon.width();
         
