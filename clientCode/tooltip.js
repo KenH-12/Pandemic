@@ -11,14 +11,18 @@ export default class Tooltip
             tooltipArrowMargin = 15,
             tooltipMargin = 5,
             containerSelector,
-            tooltipId
+            tooltipId,
+            allowTooltipHovering,
+            tooltipHoveringForgiveness,
+            beforeShow,
+            afterShow
         } = {})
     {
         this.content = content || "";
         this.getContent = getContent;
         
         this.hoverElementSelector = hoverElementSelector;
-        this.positionRelativeToSelector = positionRelativeToSelector || this.hoverElementSelector;
+        this.positionRelativeToSelector = positionRelativeToSelector || hoverElementSelector;
         this.juxtaposeTo = juxtaposeTo;
 
         this.tooltipArrowMargin = tooltipArrowMargin;
@@ -26,6 +30,12 @@ export default class Tooltip
 
         this.containerSelector = containerSelector || "body";
         this.tooltipId = tooltipId;
+
+        this.allowTooltipHovering = allowTooltipHovering;
+        this.tooltipHoveringForgiveness = tooltipHoveringForgiveness;
+
+        this.beforeShow = beforeShow;
+        this.afterShow = afterShow;
 
         this.$tooltip = false;
         this.hoverEventsAreBound = false;
@@ -47,25 +57,19 @@ export default class Tooltip
         $tooltip.append(`<div class='content'>${tooltipContent}</div>`);
         
         this.$tooltip = $tooltip;
-
-        return this;
     }
 
     async positionRelativeToElement()
     {
         const {
                 $tooltip,
-                positionRelativeToSelector,
-                containerSelector,
                 juxtaposeTo,
                 tooltipArrowMargin,
                 tooltipMargin
             } = this,
-            $element = $(positionRelativeToSelector),
+            $element = this.getRelativeElement(),
             elementOffset = $element.offset(),
             tooltipOffset = elementOffset;
-        
-        $tooltip.appendTo(containerSelector);
         
         if (["left", "right"].includes(juxtaposeTo))
         {
@@ -103,20 +107,28 @@ export default class Tooltip
         this.setClipPath();
     }
 
+    getRelativeElement()
+    {
+        if (this.hoverElementSelector === this.positionRelativeToSelector
+            && this.$hoveredElement.length)
+            return this.$hoveredElement;
+        
+        return $(this.positionRelativeToSelector);
+    }
+
     setClipPath()
     {
         const {
                 $tooltip,
                 tooltipArrowMargin,
-                juxtaposeTo,
-                positionRelativeToSelector
+                juxtaposeTo
             } = this,
             tooltipOffset = this.setPaddingAndReturnOffset(),
             tooltipWidth = $tooltip.width(),
             marginPercentageOfWidth = (tooltipArrowMargin / tooltipWidth)*100,
             tooltipHeight = $tooltip.height(),
             marginPercentageOfHeight = (tooltipArrowMargin / tooltipHeight)*100,
-            $element = $(positionRelativeToSelector),
+            $element = this.getRelativeElement(),
             elementOffset = $element.offset();
         
         let actualArrowCentre,
@@ -227,22 +239,105 @@ export default class Tooltip
             return false;
         
         const {
-                hoverElementSelector    
+                hoverElementSelector,
+                containerSelector
             } = this,
             self = this;
 
         $(document).on("mouseenter", hoverElementSelector, function()
 		{
-            self.create()
-                .positionRelativeToElement();
+            if (self.isExtendingHoverBox)
+                return false;
+            
+            console.log("mousentered!");
+            self.$hoveredElement = $(this);
+
+            self.create();
+
+            if (typeof self.beforeShow === "function")
+                self.beforeShow(self);
+            
+            self.$tooltip.appendTo(containerSelector);
+            self.positionRelativeToElement();
+
+            if (typeof self.afterShow === "function")
+                self.afterShow(self);
 		})
         .on("mouseleave", hoverElementSelector, function()
         {
-            self.$tooltip.remove();
-            self.$tooltip = false;
+            if (self.allowTooltipHovering)
+                return self.extendHoverBox($(this));
+            
+            self.hide();
         });
 
         this.hoverEventsAreBound = true;
+    }
+
+    // NOTE: extendHoverBox and getTooltipHoverBox are only coded for tooltips with juxtaposeTo = "top".
+    // Code could be added for the other juxtapositions, but the need wasn't there when the methods were written.
+    extendHoverBox($hoveredElement)
+    {
+        if (this.juxtaposeTo !== "top")
+        {
+            console.error(`Tooltip.extendHoverBox method does not support the "${this.juxtaposeTo}" tooltip juxtaposition.`);
+            return this.hide();
+        }
+        
+        this.isExtendingHoverBox = true;
+        
+        const $document = $(document),
+            tooltipHoverBox = this.getTooltipHoverBox(),
+            self = this;
+    
+        console.log("tooltipHoverBox", tooltipHoverBox);
+        $document.off("mousemove")
+            .mousemove(function(e)
+            {
+                if (e.pageY < tooltipHoverBox.top
+                    || e.pageX < tooltipHoverBox.left
+                    || e.pageX > tooltipHoverBox.right
+                    || e.pageY > tooltipHoverBox.bottom
+                    && !$hoveredElement.is(":hover"))
+                {
+                    $document.off("mousemove");
+                    self.hide();
+                    self.isExtendingHoverBox = false;
+                    // Since the hover box was extended, we should check whether a different element with the same selector is now hovered.
+                    const $hoveredElement = $(":hover").filter(self.hoverElementSelector);
+                    if ($hoveredElement.length)
+                        $hoveredElement.trigger("mouseenter");
+                }
+            });
+    }
+
+    // NOTE: extendHoverBox and getTooltipHoverBox are only coded for tooltips with juxtaposeTo = "top".
+    // Code could be added for the other juxtapositions, but the need wasn't there when the methods were written.
+    getTooltipHoverBox()
+    {
+        if (this.juxtaposeTo !== "top")
+        {
+            console.error(`Tooltip.getTooltipHoverBox method does not support the "${this.juxtaposeTo}" tooltip juxtaposition.`);
+            return false;
+        }
+        
+        const { $tooltip, tooltipHoveringForgiveness: forgiveness } = this,
+            tooltipOffset = $tooltip.offset(),
+            hoverBox = tooltipOffset;
+        
+        hoverBox.top -= forgiveness.top;
+        hoverBox.left -= forgiveness.left;
+        hoverBox.right = tooltipOffset.left + $tooltip.width() + forgiveness.right;
+        hoverBox.bottom = tooltipOffset.top + $tooltip.height() + forgiveness.bottom;
+
+        return hoverBox;
+    }
+
+    hide()
+    {
+        this.$hoveredElement = false;
+        this.$tooltip.remove();
+        this.$tooltip = false;
     }
 
     unbindHoverEvents()
