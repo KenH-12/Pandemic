@@ -16,9 +16,6 @@ if an event details tooltip is visible when the related icon is removed, the too
 TO DO
 -----
 tooltips
-	use Tooltip class for...
-		event details
-		disabled event cards
 	cured diseases container
 		cure vials
 			cured
@@ -33,6 +30,11 @@ tooltips
 	outbreaks track
 	forecast "top" and "bottom" headings
 	play steps
+	event history buttons
+
+bottom panel elements should be positioned in way that's similar to the event history container
+	consider using position: fixed
+	pieces should appear behind the bottom panel elements
 
 when a cube supply gets low, its count should glow red
 	same for the player deck

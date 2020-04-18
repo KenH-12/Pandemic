@@ -1,5 +1,6 @@
 import { eventTypes } from "./event.js";
-import { gameData } from "./gameData.js";
+import { gameData, eventTypeIsBeingPrompted } from "./gameData.js";
+import Tooltip from "./tooltip.js";
 
 export default class EventCard
 {
@@ -35,19 +36,10 @@ export default class EventCard
     
     showFullCard($eventCard)
     {
-        const $fullCard = this.getFullCard($eventCard.hasClass("contingency")),
-            $cardImg = $fullCard.children("img");
+        const $fullCard = this.getFullCard($eventCard.hasClass("contingency"));
         
         $fullCard.appendTo("#boardContainer")
             .offset(getFullCardOffset($eventCard, $fullCard));
-
-        $cardImg.on("load", function()
-        {
-            ensureDivPositionIsWithinWindowHeight($fullCard);
-
-            if ($eventCard.hasClass("unavailable"))
-                showDisabledEventCardTooltip($fullCard);
-        });
     }
 
     getRules()
@@ -90,6 +82,8 @@ function bindEventCardHoverEvents($container)
             eventCards[$this.data("key")].showFullCard($this);
         },
         function() { $("#boardContainer").children("#contingencyWrapper, .eventCardFull, #disabledEventCardTooltip").remove() });
+    
+    bindDisabledEventCardHoverEvents();
 }
 
 function unbindEventCardHoverEvents($container)
@@ -99,6 +93,9 @@ function unbindEventCardHoverEvents($container)
     
     $eventCards.not(".contingency")
         .off("mouseenter mouseleave");
+    
+    if (disabledEventCardTooltip instanceof Tooltip)
+        disabledEventCardTooltip.unbindEventCardHoverEvents();
 }
 
 function getFullCardOffset($eventCard, $fullCard)
@@ -128,21 +125,30 @@ function getFullCardOffset($eventCard, $fullCard)
     return fullCardOffset;
 }
 
-function showDisabledEventCardTooltip($fullEventCard)
+let disabledEventCardTooltip;
+function bindDisabledEventCardHoverEvents()
 {
-    const $tooltip = $(`<div class='tooltip' id='disabledEventCardTooltip'>
-                        <div class='content'>
-                            <p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
-                            <p>However, when 2 Epidemic cards are drawn together, event cards can be played after resolving the first epidemic.</p>
-                        </div>
-                    </div>`),
-        { promptingEventType } = gameData;
+    if (disabledEventCardTooltip instanceof Tooltip)
+        return disabledEventCardTooltip.bindHoverEvents();
     
-    if (promptingEventType && promptingEventType.code === eventTypes.forecastPlacement.code)
-        $tooltip.prepend("<p>* You must complete the Forecast event before doing anything else.</p>");
-
-    positionTooltipRelativeToElement($tooltip, $fullEventCard.find("#eventCardFullTooltipAnchor"),
-        { juxtaposeTo: "right" });
+    const getContent = function()
+    {
+        const forecastPriorityMsg = eventTypeIsBeingPrompted(eventTypes.forecastPlacement) ?
+            "<p class='r'>* You must resolve the Forecast event before doing anything else.</p>" : "";
+        
+        return `${forecastPriorityMsg}<p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
+            <p>However, when 2 Epidemic cards are drawn together, event cards can be played after resolving the first epidemic.</p>`;
+    }
+    
+    disabledEventCardTooltip = new Tooltip({
+        getContent,
+        beforeShow: () => resolvePromiseOnLoad($(".eventCardFull").find("img")),
+        hoverElementSelector: ".eventCard.unavailable",
+        positionRelativeToSelector: "#eventCardFullTooltipAnchor",
+        juxtaposeTo: "right",
+        containerSelector: "#boardContainer",
+        tooltipId: "disabledEventCardTooltip",
+    }).bindHoverEvents();
 }
 
 export {
