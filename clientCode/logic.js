@@ -1,6 +1,11 @@
 "use strict";
 
-import { gameData, getPlayer, getActivePlayer } from "./gameData.js";
+import {
+	gameData, 
+	getPlayer,
+	getActivePlayer,
+	eventTypeIsBeingPrompted
+} from "./gameData.js";
 import getDimension from "./dimensions.js";
 import { strings } from "./strings.js";
 import { getDuration, setDuration } from "./durations.js";
@@ -2484,13 +2489,6 @@ async function governmentGrant(targetCity, relocationKey)
 	hideTravelPathArrow();
 	appendEventHistoryIconOfType(eventType);
 	resumeCurrentStep();
-}
-
-function eventTypeIsBeingPrompted(eventType)
-{
-	const { promptingEventType } = gameData;
-
-	return promptingEventType && promptingEventType.code === eventType.code;
 }
 
 function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyToExclude } = {})

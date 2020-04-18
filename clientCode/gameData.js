@@ -67,9 +67,17 @@ function replaceRoleNamesWithRoleTags(string)
 	return string;
 }
 
+function eventTypeIsBeingPrompted(eventType)
+{
+	const { promptingEventType } = gameData;
+
+	return promptingEventType && promptingEventType.code === eventType.code;
+}
+
 export {
 	gameData,
 	getPlayer,
 	getActivePlayer,
-	replaceRoleNamesWithRoleTags
+	replaceRoleNamesWithRoleTags,
+	eventTypeIsBeingPrompted
 };
