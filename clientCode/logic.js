@@ -2552,12 +2552,16 @@ function animateContingencyCardRemoval()
 {
 	return new Promise(async resolve =>
 	{
-		const $card = getContingencyCardElement().removeClass("contingency").addClass("removed");
+		const $card = getContingencyCardElement().removeClass("contingency").addClass("removed"),
+			contingencyPlanner = getPlayer("Contingency Planner");
+
+		contingencyPlanner.panel.$panel.find(".role")
+			.removeClass("storingEventCard");
 
 		disablePlayerDiscardHoverEvents();
 		await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
 		await animateDiscardPlayerCard($card, { removingContingencyCard: true });
-		getPlayer("Contingency Planner").panel.checkOcclusion();
+		contingencyPlanner.panel.checkOcclusion();
 		await sleep(getDuration("longInterval"));
 		await collapsePlayerDiscardPile();
 		enablePlayerDiscardHoverEvents();
@@ -3718,7 +3722,7 @@ function resizeBottomPanelElements()
 		.children().height(ehContainerHeight)
 		.css("line-height", ehContainerHeight*1.07 + "px");
 	
-	ensureDivPositionIsWithinWindowHeight($eventHistoryContainer, { margin: 0 });
+	ensureDivPositionIsWithinWindowHeight($eventHistoryContainer, { windowPadding: 0 });
 	eventHistory.scrollToEnd();
 }
 
@@ -7081,10 +7085,12 @@ function loadPlayerCards(playerCards)
 		}
 		else if (card.pile === "contingency")
 		{
-			$card.appendTo($("#contingencyPlanner").find(".role"))
-				.addClass("contingency");
+			player = getPlayer("Contingency Planner");
+
+			$card.addClass("contingency")
+				.appendTo(player.panel.$panel.find(".role").addClass("storingEventCard"));
 			
-			getPlayer("Contingency Planner").contingencyKey = card.key;
+			player.contingencyKey = card.key;
 		}
 	}
 	

@@ -8,8 +8,8 @@ export default class Tooltip
             hoverElementSelector,
             positionRelativeToSelector,
             juxtaposeTo = "left",
-            tooltipArrowMargin = 15,
-            tooltipMargin = 5,
+            arrowBasePx = 15,
+            windowPadding = 5,
             containerSelector,
             tooltipId,
             allowTooltipHovering,
@@ -25,8 +25,8 @@ export default class Tooltip
         this.positionRelativeToSelector = positionRelativeToSelector || hoverElementSelector;
         this.juxtaposeTo = juxtaposeTo;
 
-        this.tooltipArrowMargin = tooltipArrowMargin;
-        this.tooltipMargin = tooltipMargin;
+        this.arrowBasePx = arrowBasePx;
+        this.windowPadding = windowPadding;
 
         this.containerSelector = containerSelector || "body";
         this.tooltipId = tooltipId;
@@ -64,8 +64,8 @@ export default class Tooltip
         const {
                 $tooltip,
                 juxtaposeTo,
-                tooltipArrowMargin,
-                tooltipMargin
+                arrowBasePx,
+                windowPadding
             } = this,
             $element = this.getRelativeElement(),
             elementOffset = $element.offset(),
@@ -92,7 +92,7 @@ export default class Tooltip
                 tooltipOffset.left += halfDeltaWidth;
 
             if (juxtaposeTo === "top")
-                tooltipOffset.top -= $tooltip.outerHeight() + tooltipArrowMargin;
+                tooltipOffset.top -= $tooltip.outerHeight() + arrowBasePx;
             else // juxtaposeTo bottom
                 tooltipOffset.top += $element.outerHeight();
         }
@@ -101,7 +101,7 @@ export default class Tooltip
         
         await loadAllImagesPromise($tooltip.find("img"));
         
-        ensureDivPositionIsWithinWindowWidth($tooltip, { margin: tooltipMargin });
+        ensureDivPositionIsWithinWindowWidth($tooltip, { windowPadding });
         ensureDivPositionIsWithinWindowHeight($tooltip);
 
         this.setClipPath();
@@ -120,14 +120,14 @@ export default class Tooltip
     {
         const {
                 $tooltip,
-                tooltipArrowMargin,
+                arrowBasePx,
                 juxtaposeTo
             } = this,
             tooltipOffset = this.setPaddingAndReturnOffset(),
             tooltipWidth = $tooltip.width(),
-            marginPercentageOfWidth = (tooltipArrowMargin / tooltipWidth)*100,
+            marginPercentageOfWidth = (arrowBasePx / tooltipWidth)*100,
             tooltipHeight = $tooltip.height(),
-            marginPercentageOfHeight = (tooltipArrowMargin / tooltipHeight)*100,
+            marginPercentageOfHeight = (arrowBasePx / tooltipHeight)*100,
             $element = this.getRelativeElement(),
             elementOffset = $element.offset();
         
@@ -205,12 +205,12 @@ export default class Tooltip
     {
         const {
                 $tooltip,
-                tooltipArrowMargin,
+                arrowBasePx,
                 juxtaposeTo
             } = this,
             initialTooltipHeight = $tooltip.height(),
             $tooltipContent = $tooltip.children(".content"),
-            tooltipPadding = getLeadingNumber($tooltipContent.css("padding")) + tooltipArrowMargin,
+            tooltipPadding = getLeadingNumber($tooltipContent.css("padding")) + arrowBasePx,
             tooltipOffset = $tooltip.offset(),
             paddingDirections = {
                 left: "right",
@@ -226,7 +226,7 @@ export default class Tooltip
         const tooltipHeight = $tooltip.height();
         if (["left", "right"].includes(juxtaposeTo) && tooltipHeight !== initialTooltipHeight)
         {
-            tooltipOffset.top -= Math.max(tooltipArrowMargin, tooltipHeight - initialTooltipHeight);
+            tooltipOffset.top -= Math.max(arrowBasePx, tooltipHeight - initialTooltipHeight);
             $tooltip.offset(tooltipOffset);
         }
         
@@ -244,32 +244,32 @@ export default class Tooltip
             } = this,
             self = this;
 
-        $(document).on("mouseenter", hoverElementSelector, async function()
-		{
-            if (self.isExtendingHoverBox)
-                return false;
-            
-            console.log("mousentered!");
-            self.$hoveredElement = $(this);
+        $(document).off("mouseenter mouseleave", hoverElementSelector)
+            .on("mouseenter", hoverElementSelector, async function()
+            {
+                if (self.isExtendingHoverBox)
+                    return false;
+                
+                self.$hoveredElement = $(this);
 
-            self.create();
+                self.create();
 
-            if (typeof self.beforeShow === "function")
-                await self.beforeShow(self);
-            
-            self.$tooltip.appendTo(containerSelector);
-            self.positionRelativeToElement();
+                if (typeof self.beforeShow === "function")
+                    await self.beforeShow(self);
+                
+                self.$tooltip.appendTo(containerSelector);
+                self.positionRelativeToElement();
 
-            if (typeof self.afterShow === "function")
-                self.afterShow(self);
-		})
-        .on("mouseleave", hoverElementSelector, function()
-        {
-            if (self.allowTooltipHovering)
-                return self.extendHoverBox($(this));
-            
-            self.hide();
-        });
+                if (typeof self.afterShow === "function")
+                    self.afterShow(self);
+            })
+            .on("mouseleave", hoverElementSelector, function()
+            {
+                if (self.allowTooltipHovering)
+                    return self.extendHoverBox($(this));
+                
+                self.hide();
+            });
 
         this.hoverEventsAreBound = true;
     }
@@ -290,7 +290,6 @@ export default class Tooltip
             tooltipHoverBox = this.getTooltipHoverBox(),
             self = this;
     
-        console.log("tooltipHoverBox", tooltipHoverBox);
         $document.off("mousemove")
             .mousemove(function(e)
             {

@@ -40,7 +40,7 @@ async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeT
 	
 	await loadAllImagesPromise($tooltip.find("img"));
 	
-	ensureDivPositionIsWithinWindowWidth($tooltip, { margin: 2 });
+	ensureDivPositionIsWithinWindowWidth($tooltip, { windowPadding: 2 });
 	ensureDivPositionIsWithinWindowHeight($tooltip);
 }
 
@@ -156,24 +156,24 @@ function setTooltipPaddingAndReturnOffset($tooltip, { tooltipOffset, tooltipMarg
 	return tooltipOffset;
 }
 
-async function ensureDivPositionIsWithinWindowHeight($div, { margin = 5 } = {})
+async function ensureDivPositionIsWithinWindowHeight($div, { windowPadding = 5 } = {})
 {
 	const windowHeight = $(window).height(),
-		divHeight = $div.outerHeight() + margin;
+		divHeight = $div.outerHeight() + windowPadding;
 
     if ($div.offset().top + divHeight > windowHeight)
 		$div.offset({ top: windowHeight - divHeight });
 }
 
-function ensureDivPositionIsWithinWindowWidth($div, { margin = 5 } = {})
+function ensureDivPositionIsWithinWindowWidth($div, { windowPadding = 5 } = {})
 {
 	const windowWidth = $(window).width(),
-		divWidth = $div.outerWidth() + margin,
+		divWidth = $div.outerWidth() + windowPadding,
 		divLeft = $div.offset().left;
 	
 	if (divLeft < 0)
 	{
-		$div.offset({ left: margin });
+		$div.offset({ left: windowPadding });
 		return false;
 	}
 		

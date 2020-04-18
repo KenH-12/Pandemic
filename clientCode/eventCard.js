@@ -1,5 +1,5 @@
 import { eventTypes } from "./event.js";
-import { gameData, eventTypeIsBeingPrompted } from "./gameData.js";
+import { gameData, eventTypeIsBeingPrompted, getPlayer } from "./gameData.js";
 import Tooltip from "./tooltip.js";
 
 export default class EventCard
@@ -34,12 +34,15 @@ export default class EventCard
         return $fullCard;
     }
     
-    showFullCard($eventCard)
+    async showFullCard($eventCard)
     {
         const $fullCard = this.getFullCard($eventCard.hasClass("contingency"));
         
         $fullCard.appendTo("#boardContainer")
             .offset(getFullCardOffset($eventCard, $fullCard));
+        
+        await loadAllImagesPromise($fullCard.find("img"));
+        ensureDivPositionIsWithinWindowHeight($fullCard);
     }
 
     getRules()
@@ -139,15 +142,20 @@ function bindDisabledEventCardHoverEvents()
         return `${forecastPriorityMsg}<p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
             <p>However, when 2 Epidemic cards are drawn together, event cards can be played after resolving the first epidemic.</p>`;
     }
+
+    let hoverElementSelector = ".eventCard.unavailable";
+    if (getPlayer("Contingency Planner"))
+        hoverElementSelector += ":not(.contingency), .contingencyPlanner.storingEventCard:has(.contingency.unavailable)";
     
     disabledEventCardTooltip = new Tooltip({
         getContent,
-        beforeShow: () => resolvePromiseOnLoad($(".eventCardFull").find("img")),
-        hoverElementSelector: ".eventCard.unavailable",
+        beforeShow: () => loadAllImagesPromise($(".eventCardFull").find("img")),
+        hoverElementSelector,
         positionRelativeToSelector: "#eventCardFullTooltipAnchor",
         juxtaposeTo: "right",
+        arrowBasePx: 20,
         containerSelector: "#boardContainer",
-        tooltipId: "disabledEventCardTooltip",
+        tooltipId: "disabledEventCardTooltip"
     }).bindHoverEvents();
 }
 

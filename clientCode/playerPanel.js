@@ -141,10 +141,14 @@ export default class PlayerPanel
 			let $insertAfterElement;
 			if (isContingencyCard) // Contingency cards are placed within the .role div
 			{
-				$card.off("mouseenter mouseleave")
+                const $role = this.$panel.children(".role");
+                $role.addClass("storingEventCard");
+                
+                $card.off("mouseenter mouseleave")
 					.removeClass("removed")
-					.addClass("contingency");
-				$insertAfterElement = this.$panel.children(".role").children().first();
+                    .addClass("contingency");
+                
+				$insertAfterElement = $role.children().first();
 			}
 			else
 				$insertAfterElement = this.$panel.children(".role, .playerCard").last();
