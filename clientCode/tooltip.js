@@ -244,7 +244,7 @@ export default class Tooltip
             } = this,
             self = this;
 
-        $(document).on("mouseenter", hoverElementSelector, function()
+        $(document).on("mouseenter", hoverElementSelector, async function()
 		{
             if (self.isExtendingHoverBox)
                 return false;
@@ -255,7 +255,7 @@ export default class Tooltip
             self.create();
 
             if (typeof self.beforeShow === "function")
-                self.beforeShow(self);
+                await self.beforeShow(self);
             
             self.$tooltip.appendTo(containerSelector);
             self.positionRelativeToElement();
