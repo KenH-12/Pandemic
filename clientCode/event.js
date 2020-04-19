@@ -133,12 +133,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		hasIcon: true,
 		code: "er",
 		propertyNames: ["diseaseColor"],
-		rules: [
-			"If no cubes of a cured disease are left on the board, the disease is <i>eradicated</i>.",
-			"When cities of an eradicated disease are infected, no new disease cubes are placed there.",
-			"Removing the last cube of a disease that is not cured has no effect.",
-			"Eradicating a disease is not needed to win; once all diseases are cured, the game ends and your team wins!"
-		]
+		rules: [strings.eradicationRules]
 	},
 	planContingency: {
 		name: "Plan Contingency",

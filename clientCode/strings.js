@@ -11,6 +11,10 @@ strings = {
     
     victoryCondition: "<span class='warning'>🏆</span>Discover cures to all 4 diseases and your team wins immediately, no matter how many cubes are on the board.",
 
+    eradicationRules: `<p>If no cubes of a <i>cured</i> disease are left on the board, the disease is <i>eradicated</i>.</p>
+        <p>When cities of an eradicated disease are infected, no new disease cubes are placed there.</p>
+        <p>Eradicating a disease is not needed to win; once all diseases are cured, the game ends and your team wins!</p>`,
+
     contingencyPlannerCardText: `<li><span>As an action, take any discarded Event card and store it.</span></li><li><span>When you play the stored Event card, remove it from the game.</span></li><li><span>Limit: 1 stored Event card at a time, which is not part of your hand.</span></li>`,
     dispatcherCardText: `<li><span>Move another role's pawn as if it were yours.</span></li><li><span>As an action, move any pawn to a city with another pawn.</span></li>`,
     medicCardText: `<li><span>Remove all cubes of one color when doing Treat Disease.</span></li><li><span>Automatically remove cubes of cured diseases from the city you are in (and prevent them from being placed there).</span></li>`,
