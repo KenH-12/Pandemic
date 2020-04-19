@@ -3768,14 +3768,31 @@ function bindCuredDiseaseInfoHoverEvents()
 					<br/>
 					<br/>
 					<span class='largeText'>Cures Discovered: ${4 - gameData.cures.remaining}</span>`;
-		};
+		},
+		juxtaposeTo = "top",
+		containerSelector = "#boardContainer";
 	
 	new Tooltip({
 			getContent,
 			hoverElementSelector: "#cureMarkerContainer .info",
-			juxtaposeTo: "top",
-			containerSelector: "#boardContainer"
+			juxtaposeTo,
+			containerSelector
 		}).bindHoverEvents();
+	
+	new Tooltip({
+		content: `<p class='largeText'>Disease Cured</p>`,
+		hoverElementSelector: ".cureMarker:not([src$='eradicated.png'])",
+		juxtaposeTo,
+		containerSelector,
+		cssClasses: "curedTooltip"
+	}).bindHoverEvents();
+
+	new Tooltip({
+		content: `<p class='largeText'>Disease Eradicated</p>${strings.eradicationRules}`,
+		hoverElementSelector: ".cureMarker[src$='eradicated.png']",
+		juxtaposeTo,
+		containerSelector
+	}).bindHoverEvents();
 }
 
 function resizeAndRepositionPieces()

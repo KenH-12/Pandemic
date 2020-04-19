@@ -431,13 +431,9 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 100%;
 	height: 100%;
 }
-
-.tooltip:not(#eventDetails):not(#playerCardsLeftTooltip)
+.tooltip:not(#eventDetails):not(#playerCardsLeftTooltip):not(.curedTooltip)
 {
-	position: absolute;
-	z-index: 10;
 	font-size: 14px;
-	color: #fff;
 	width: 24%;
 }
 .tooltip > .content
