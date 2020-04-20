@@ -120,7 +120,7 @@ function getFullCardOffset($eventCard, $fullCard)
             fullCardOffset.top = $roleCard.offset().top;
         }
     }
-    else if ($eventCard.closest("#playerDiscard").length)
+    else if ($eventCard.closest("#playerDiscardContainer").length)
         fullCardOffset.left -= fullCardWidth + MARGIN;
     else if ($eventCard.closest("#rightPanel").length)
         fullCardOffset.left = gameData.boardWidth - fullCardWidth - MARGIN;

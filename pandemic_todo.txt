@@ -17,11 +17,6 @@ TO DO
 -----
 keep track of the number of cards in the infection deck rather than calculating it every time
 
-tooltips with a set width should get that width from a specific class
-	tooltips should have width: auto by default
-
-rename container ids
-
 tooltips
 	research station supply
 	infection rate track
@@ -31,6 +26,8 @@ tooltips
 	play steps
 	event history buttons
 	full cards
+
+special action button tooltips should have role names replaced by role tags
 
 bottom panel elements should be positioned in way that's similar to the event history container
 	consider using position: fixed

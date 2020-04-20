@@ -122,7 +122,7 @@
 							</div>
 
 						</div>
-						<div id='infectionDiscard'>
+						<div id='infectionDiscardContainer'>
 							<div id='infDiscardVeil' class='hidden'></div>
 							<p class='title'>INFECTION DISCARDS</p>
 							<div id='removedInfectionCards' class='hidden'>
@@ -176,11 +176,11 @@
 								<img src='images/pieces/researchStation.png' id='imgResearchStationSupply' alt='Research Station' />
 							</div>
 						</div>
-						<div id='playerDeck' class='bottomPanelDiv'>
+						<div id='playerDeckContainer' class='bottomPanelDiv'>
 							<p class='title'>PLAYER DECK <span class='info'>&#9432;</span></p>
 							<img id='imgPlayerDeck' src='images/cards/playerDeck_6.png' alt='Player Deck'/>
 						</div>
-						<div id='playerDiscard' class='bottomPanelDiv'>
+						<div id='playerDiscardContainer' class='bottomPanelDiv'>
 							<p class='title'>PLAYER DISCARDS</p>
 							<div id='removedPlayerCards' class='hidden'>
 								<p class='title'>REMOVED FROM GAME:</p>

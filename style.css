@@ -615,17 +615,17 @@ span.r, p.r {color: #ef282a; background: none !important }
 	color: #fff;
 	margin-left: 31.5%;
 }
-#playerDeck
+#playerDeckContainer
 {
 	width: 14%;
 	left: 68%;
 }
-#playerDeck img
+#playerDeckContainer img
 {
 	width: 40%;
 	margin: 5px 30% 0 30%;
 }
-#playerDiscard
+#playerDiscardContainer
 {
 	width: 18%;
 	left: 82%;
@@ -648,7 +648,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border-bottom: 1px solid #fff;
 	border-left: 1px solid #fff;
 }
-#topPanel .title, #infectionDiscard .title, .bottomPanelDiv .title
+#topPanel .title, #infectionDiscardContainer .title, .bottomPanelDiv .title
 {
 	font-size: 16px;
 	text-align: center;
@@ -691,7 +691,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border-radius: 100%;
 	margin: 1.5% 32% 0.5% 32%;
 }
-#infectionDiscard
+#infectionDiscardContainer
 {
 	position: absolute;
 	left: 80%;
@@ -878,14 +878,14 @@ span.r, p.r {color: #ef282a; background: none !important }
 	left: 10.48%;
 	z-index: 5;
 }
-#infectionDiscard .infectionCard
+#infectionDiscardContainer .infectionCard
 {
 	display: block;
 	padding-left: 1%;
 	width: 100%;
 	margin-top: 2px;
 }
-#infectionDiscard .infectionCardContents { width: 100% }
+#infectionDiscardContainer .infectionCardContents { width: 100% }
 #epidemicContainer .btnDisabled { cursor: progress }
 #epidemicContainer > .epidemicFull
 {

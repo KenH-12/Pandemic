@@ -84,7 +84,7 @@ import Tooltip from "./tooltip.js";
 $(function(){
 const eventHistory = new EventHistory(),
 	playerDeckImgManager = new DeckImageManager({
-		$deck: $("#imgPlayerDeck"),
+		$deck: $("#playerDeckContainer img"),
 		imageUrlWithoutNumber: "images/cards/playerDeck_.png",
 		numImages: 7,
 		maxCardCount: false // to be set once gameData is retrieved
@@ -1879,7 +1879,7 @@ const actionInterfacePopulator = {
 function getContingencyOptionCardKeys()
 {
 	const cardKeys = [];
-	$("#playerDiscard").children(".playerCard.eventCard").each(function()
+	$("#playerDiscardContainer").children(".playerCard.eventCard").each(function()
 	{
 		cardKeys.push($(this).data("key"));
 	});
@@ -1894,7 +1894,7 @@ async function planContingency(cardKey)
 	
 	const contingencyPlanner = getActivePlayer(),
 		eventType = eventTypes.planContingency,
-		$eventCard = $("#playerDiscard").find(`.playerCard[data-key='${cardKey}']`).off("mouseenter mouseleave");
+		$eventCard = $("#playerDiscardContainer").find(`.playerCard[data-key='${cardKey}']`).off("mouseenter mouseleave");
 
 	await Promise.all([
 		requestAction(eventType, { cardKey }),
@@ -2188,7 +2188,7 @@ async function animateOneQuietNight()
 
 function enableResilientPopulationSelection()
 {
-	const $infectionDiscards = $("#infectionDiscard").children(".infectionCard");
+	const $infectionDiscards = $("#infectionDiscardContainer").children(".infectionCard");
 
 	if ($infectionDiscards.length)
 	{
@@ -2229,7 +2229,7 @@ async function showResilientPopulationArrow()
 }
 function positionResilientPopulationArrow($arrow)
 {
-	const $infectionDiscardPile = $("#infectionDiscard"),
+	const $infectionDiscardPile = $("#infectionDiscardContainer"),
 		offset = $infectionDiscardPile.offset();
 	
 	$arrow = $arrow || $("#resilientPopulationArrow");
@@ -2277,7 +2277,7 @@ async function resilientPopulation(cardKeyToRemove)
 function resetInfectionDiscardClicksAndTooltips()
 {
 	let $this, city;
-	$("#infectionDiscard").children(".infectionCard")
+	$("#infectionDiscardContainer").children(".infectionCard")
 		.off("click")
 		.click(function() { pinpointCityFromCard($(this)) })
 		.each(function()
@@ -2292,7 +2292,7 @@ function resetInfectionDiscardClicksAndTooltips()
 
 async function resilientPopulationAnimation(cardKeyToRemove)
 {
-	const discardPileID = "infectionDiscard",
+	const discardPileID = "infectionDiscardContainer",
 		$discardPile = $(`#${discardPileID}`),
 		$removedCardsContainer = $discardPile.children("#removedInfectionCards").removeClass("hidden"),
 		$cardToRemove = $discardPile.children(`[data-key='${cardKeyToRemove}']`);
@@ -3606,7 +3606,7 @@ function resizeCubeSupplies()
 
 function resizeInfectionDiscardElements()
 {
-	const $infDiscard = $("#infectionDiscard"),
+	const $infDiscard = $("#infectionDiscardContainer"),
 		panelHeight = $("#topPanel").height();
 
 	positionRemovedInfectionCardsContainer("collapse");
@@ -5530,7 +5530,7 @@ function finishIntensifyStep($epidemic)
 		const $card = $(newPlayerCard("epidemic"));
 		$epidemic.addClass("hidden").before($card);
 		await movePlayerCardsToDiscards({ $card });
-		bindEpidemicCardHoverEvents($("#playerDiscard"));
+		bindEpidemicCardHoverEvents($("#playerDiscardContainer"));
 	
 		getInfectionContainer().addClass("hidden");
 	
@@ -5615,7 +5615,7 @@ function updateInfectionRate(epidemicCount)
 
 async function animateEpidemicIntensify()
 {
-	const $container = $("#infectionDiscard"),
+	const $container = $("#infectionDiscardContainer"),
 		$title = $container.children(".title").first(),
 		$cards = $container.children(".infectionCard").addClass("template"), // template css class prevents the target cursor from appearing
 		delay = getDuration("longInterval");
@@ -5935,7 +5935,7 @@ function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})
 
 function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 {
-	const $container = removingContingencyCard ? $("#removedPlayerCards") : $("#playerDiscard"),
+	const $container = removingContingencyCard ? $("#removedPlayerCards") : $("#playerDiscardContainer"),
 		$guide = $container.children(".title").first(),
 		guideOffset = $guide.offset(),
 		initialOffset = $card.offset(),
@@ -6445,7 +6445,7 @@ function getInfectionCardTextStyle($container)
 
 function discardInfectionCard($card, duration)
 {
-	const $discardPile = $("#infectionDiscard"),
+	const $discardPile = $("#infectionDiscardContainer"),
 		$discardTitle = $discardPile.children(".title").first();
 
 	return new Promise(resolve =>
@@ -6867,7 +6867,7 @@ async function discoverACure(cardKeys)
 
 async function outOfPlayerCardsDefeatAnimation($cardDrawContainer)
 {
-	const $playerDeckContainer = $("#playerDeck"),
+	const $playerDeckContainer = $("#playerDeckContainer"),
 		$outOfCardsMsg = $("<h2>Out of cards!</h2>"),
 		numFlashes = 10,
 		flashIntervalMs = 150,
@@ -7044,7 +7044,7 @@ function getCureMarkerDesiredProperties(diseaseColor)
 
 function loadPlayerCards(playerCards)
 {
-	const $discardsContainer = $("#playerDiscard"),
+	const $discardsContainer = $("#playerDiscardContainer"),
 		$discardPileTitle =  $discardsContainer.children(".title").first(),
 		$removedCardsTitle = $discardsContainer.children("#removedPlayerCards").children(".title").first(),
 		{ players, removedEventCardKeys, gameIsResuming } = gameData;
@@ -7142,7 +7142,7 @@ function loadInfectionDiscards(cards)
 	if (typeof cards == "undefined")
 		return false;
 	
-	const $discardPile = $("#infectionDiscard"),
+	const $discardPile = $("#infectionDiscardContainer"),
 		$discardPileTitle = $discardPile.children(".title").first(),
 		$removedCardsContainer = $discardPile.children("#removedInfectionCards"),
 		infectionKeysDrawnThisTurn = getInfectCityEventsOfTurn().map(event => event.cityKey);
@@ -7887,7 +7887,7 @@ async function dividePlayerDeckIntoEqualPiles($container)
 {
 	const numCardsToDeal = getInitialPlayerDeckSize(),
 		$divs = $container.children("div"),
-		$deck = $("#imgPlayerDeck"),
+		$deck = $("#playerDeckContainer img"),
 		initialProperties = $deck.offset(),
 		desiredProps = [];
 
@@ -8018,7 +8018,7 @@ function placePileOntoPlayerDeck($pileContainer, deckProperties)
 
 function bindPlayerDeckHoverEvents()
 {
-	const positionRelativeToSelector = "#playerDeck",
+	const positionRelativeToSelector = "#playerDeckContainer",
 		juxtaposeTo = "top",
 		containerSelector = "#boardContainer",
 		getPlayerDeckInfo = function()
@@ -8472,7 +8472,7 @@ function expandInfectionDiscardPile({ showRemovedCardsContainer } = {})
 {
 	return new Promise(resolve =>
 		{
-			const $container = $("#infectionDiscard"),
+			const $container = $("#infectionDiscardContainer"),
 				panelHeight = $("#topPanel").height(),
 				maxHeight = gameData.boardHeight - panelHeight - 5;
 
@@ -8528,7 +8528,7 @@ function collapseInfectionDiscardPile()
 		{
 			positionRemovedInfectionCardsContainer();
 			
-			$("#infectionDiscard")
+			$("#infectionDiscardContainer")
 				.stop()
 				.css({ overflowY: "hidden" })
 				.animate({
@@ -8551,7 +8551,7 @@ function bindInfectionDeckHoverEvents()
 	const getContent = function()
 		{
 			const MAX_CARDS_IN_DECK = 48;
-			let numCardsInDeck = MAX_CARDS_IN_DECK - $("#infectionDiscard").find(".infectionCard").length;
+			let numCardsInDeck = MAX_CARDS_IN_DECK - $("#infectionDiscardContainer").find(".infectionCard").length;
 			
 			if (currentStepIs("infect cities"))
 				numCardsInDeck -= $("#infectCitiesContainer").find(".infectionCard").length;
@@ -8585,30 +8585,30 @@ function bindCubeSuppliesInfoHoverEvents()
 
 function enableInfectionDiscardHoverEvents()
 {
-	$("#infectionDiscard")
+	$("#infectionDiscardContainer")
 		.unbind("mouseenter mouseleave")
 		.hover(function() { expandInfectionDiscardPile() },
 		function() { collapseInfectionDiscardPile() });
 }
 enableInfectionDiscardHoverEvents();
-function disableInfectionDiscardHoverEvents() { $("#infectionDiscard").unbind("mouseenter mouseleave") }
+function disableInfectionDiscardHoverEvents() { $("#infectionDiscardContainer").unbind("mouseenter mouseleave") }
 
 function enablePlayerDiscardHoverEvents()
 {
-	$("#playerDiscard").off("mouseenter mouseleave")
+	$("#playerDiscardContainer").off("mouseenter mouseleave")
 		.hover(function() { expandPlayerDiscardPile() }, function() { collapsePlayerDiscardPile() });
 }
 
 function disablePlayerDiscardHoverEvents()
 {
-	$("#playerDiscard").off("mouseenter mouseleave");
+	$("#playerDiscardContainer").off("mouseenter mouseleave");
 }
 
 function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 {
 	return new Promise(resolve =>
 	{
-		const $discardPile = $("#playerDiscard"),
+		const $discardPile = $("#playerDiscardContainer"),
 			$removedCardsContainer = $discardPile.children("#removedPlayerCards"),
 			{ topPanelHeight, boardHeight } = gameData,
 			maxHeight = boardHeight - topPanelHeight;
@@ -8656,7 +8656,7 @@ function expandPlayerDiscardPile({ showRemovedCardsContainer } = {})
 				{
 					height: expandedPileHeight,
 					top: boardHeight - expandedPileHeight,
-					scrollTop: showRemovedCardsContainer ? document.getElementById("playerDiscard").scrollHeight : 0
+					scrollTop: showRemovedCardsContainer ? document.getElementById("playerDiscardContainer").scrollHeight : 0
 				},
 				getDuration("discardPileExpand"),
 				function()
@@ -8689,7 +8689,7 @@ function collapsePlayerDiscardPile()
 {
 	return new Promise(resolve =>
 	{
-		const $discardPile = $("#playerDiscard"),
+		const $discardPile = $("#playerDiscardContainer"),
 			{ topPanelHeight, boardHeight } = gameData;
 		
 		unbindEventCardHoverEvents($discardPile);
