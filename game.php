@@ -116,9 +116,9 @@
 								</div>
 							</div>
 							
-							<div id='infectionDeck'>
+							<div id='infectionDeckContainer'>
 								<p class='title'>INFECTION DECK</p>
-								<img id='imgInfectionDeck' src='images/cards/infectionCardback.png' alt='Infection Deck' />
+								<img src='images/cards/infectionCardback.png' alt='Infection Deck' />
 							</div>
 
 						</div>

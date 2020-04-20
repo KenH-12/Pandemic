@@ -2142,7 +2142,7 @@ async function animateForecastPlacement($cardContainer)
 	await sleep(getDuration("shortInterval"));
 
 	const cardbackInitialWidth = $cardbacks.first().width(),
-		$deck = $("#imgInfectionDeck"),
+		$deck = $("#infectionDeckContainer img"),
 		deckWidth = $deck.width(),
 		deckOffset = $deck.offset();
 	
@@ -3619,7 +3619,7 @@ function resizeTopPanelElements()
 	gameData.topPanelHeight = $("#topPanel").height();
 	$topPanelDivs.height(gameData.topPanelHeight);
 	resizeCubeSupplies();
-	gameData.infectionDeckOffset = $("#imgInfectionDeck").offset();
+	gameData.infectionDeckOffset = $("#infectionDeckContainer img").offset();
 
 	resizeInfectionDiscardElements();
 }
@@ -5660,7 +5660,7 @@ async function animateEpidemicIntensify()
 	}
 
 	const $veil = $container.children("#infDiscardVeil"),
-		$deck = $("#imgInfectionDeck"),
+		$deck = $("#infectionDeckContainer img"),
 		deckWidth = $deck.width(),
 		centerOfContainer = {
 			top: ($container.height() - $title.outerHeight()) / 2 - (deckWidth / 2),
@@ -6662,7 +6662,7 @@ function dealFaceDownInfCard({ infectionIndex })
 
 		// align the drawn card with the deck, and animate it to where it will be revealed
 		$cardback
-			.width($("#imgInfectionDeck").width())
+			.width($("#infectionDeckContainer img").width())
 			.offset(
 			{
 				left: infectionDeckOffset.left,
@@ -8572,22 +8572,27 @@ function collapseInfectionDiscardPile()
 
 function bindInfectionDeckHover()
 {
-	$("#infectionDeck").hover(function()
-	{
-		if (currentStepIs("setup"))
-			return;
-		
-		const MAX_CARDS_IN_DECK = 48;
-		let numCardsInDeck = MAX_CARDS_IN_DECK - $("#infectionDiscard").find(".infectionCard").length;
-		
-		if (currentStepIs("infect cities"))
-			numCardsInDeck -= $("#infectCitiesContainer").find(".playerCard").length;
-		
-		if (currentStepIs("epInfect"))
-			numCardsInDeck -= $("#epidemicContainer").find(".playerCard").length;
-		
-		$(this).attr("title", `${numCardsInDeck} cards`);
-	});
+	const getContent = function()
+		{
+			const MAX_CARDS_IN_DECK = 48;
+			let numCardsInDeck = MAX_CARDS_IN_DECK - $("#infectionDiscard").find(".infectionCard").length;
+			
+			if (currentStepIs("infect cities"))
+				numCardsInDeck -= $("#infectCitiesContainer").find(".infectionCard").length;
+			
+			if (currentStepIs("epInfect"))
+				numCardsInDeck -= $("#epidemicContainer").find(".infectionCard").length;
+			
+			return `<p class='largeText'>${numCardsInDeck} cards</p>`;
+		},
+		positionRelativeToSelector = "#infectionDeckContainer";
+	
+	new Tooltip({
+		getContent,
+		hoverElementSelector: `${positionRelativeToSelector} img`,
+		positionRelativeToSelector,
+		juxtaposeTo: "bottom"
+	}).bindHoverEvents();
 }
 
 function bindCubeSuppliesInfoHoverEvents()

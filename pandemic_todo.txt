@@ -15,15 +15,14 @@ if an event details tooltip is visible when the related icon is removed, the too
 
 TO DO
 -----
+keep track of the number of cards in the infection deck rather than calculating it every time
+
+tooltips with a set width should get that width from a specific class
+	tooltips should have width: auto by default
+
+rename container ids
+
 tooltips
-	cured diseases container
-		cure vials
-			cured
-			eradicated
-	number of cards in...
-		infection deck
-		infection discards
-		player discards
 	research station supply
 	infection rate track
 		infection rate info icon beside infection rate displayed during infect cities step

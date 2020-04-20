@@ -687,9 +687,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 64%;
 	margin: 0 18%;
 }
-#infectionDeck
+#infectionDeckContainer { width: 44% }
+#infectionDeckContainer img
 {
-	width: 44%;
+	z-index: 4;
+	width: 36%;
+	border-radius: 100%;
+	margin: 1.5% 32% 0.5% 32%;
 }
 #infectionDiscard
 {
@@ -714,13 +718,6 @@ span.r, p.r {color: #ef282a; background: none !important }
 	position: absolute;
 	width: 10.6%;
 	opacity: 0.1;
-}
-#imgInfectionDeck
-{
-	z-index: 4;
-	width: 36%;
-	border-radius: 100%;
-	margin: 1.5% 32% 0.5% 32%;
 }
 .drawnInfectionCard, .drawnPlayerCard {position: absolute;z-index: 10;}
 .marker { position: absolute }
