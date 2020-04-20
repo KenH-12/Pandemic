@@ -109,7 +109,7 @@ function getFullCardOffset($eventCard, $fullCard)
         MARGIN = 5;
     
     if ($eventCard.closest(".playerPanel").length
-        || $eventCard.closest("#eventDetails").length)
+        || $eventCard.closest(".eventDetails").length)
     {
         fullCardOffset.left += eventCardWidth + MARGIN;
 

@@ -431,11 +431,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 100%;
 	height: 100%;
 }
-.tooltip:not(#eventDetails):not(#playerCardsLeftTooltip):not(.curedTooltip)
-{
-	font-size: 14px;
-	width: 24%;
-}
+.wideTooltip { width: 24% }
 .tooltip > .content
 {
 	background-color: #252525;
@@ -444,16 +440,16 @@ span.r, p.r {color: #ef282a; background: none !important }
 .tooltip  p { margin: 3px 0 }
 .tooltip .warning { font-size: 25px; vertical-align: super; }
 
-#eventTypeTooltip
+.eventTypeTooltip
 {
 	pointer-events: none;
 }
-#eventTypeTooltip h3
+.eventTypeTooltip h3
 {
 	font-family: 'Exo 2', sans-serif;
 	font-size: 20px;
 }
-#eventTypeTooltip .actionNotPossible
+.eventTypeTooltip .actionNotPossible
 {
 	color: #666;
 	text-align: center;
@@ -461,28 +457,28 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border-bottom: 1px solid #666;
 	padding: 2px 0;
 }
-#eventTypeTooltip p
+.eventTypeTooltip p
 {
 	margin-top: 3px;
 	line-height: 16px;
 }
-#eventTypeTooltip h3 + p
+.eventTypeTooltip h3 + p
 {
 	border-top: 1px solid #fff;
 	padding-top: 5px;
 }
-#eventTypeTooltip .specialAbilityRule
+.eventTypeTooltip .specialAbilityRule
 {
 	margin-top: 10px;
 	border-top: 1px dashed #fff;
 	padding-top: 5px;
 }
-#eventDetails
+.eventDetails
 {
 	font-size: 16px;
 	background-color: transparent;
 }
-#eventDetails .title
+.eventDetails .title
 {
 	font-family: 'Exo 2', sans-serif;
 	font-size: 20px;
@@ -492,25 +488,25 @@ span.r, p.r {color: #ef282a; background: none !important }
 	padding-bottom: 3px;
 	margin-bottom: 3px;
 }
-#eventDetails  .title > .eventTypeInfo
+.eventDetails  .title > .eventTypeInfo
 {
 	float: right;
 	font-size: 14px;
 	line-height: 20px;
 	margin-left: 5px;
 }
-#eventDetails  .title > .eventTypeInfo:hover,
+.eventDetails  .title > .eventTypeInfo:hover,
 #topPanel .info:hover,
 .bottomPanelDiv .info:hover
 { text-shadow: 0px 0px 3px #fff }
-#eventDetails .playerCard
+.eventDetails .playerCard
 {
 	margin: 2px 0;
 	width: 100%;
 }
 
-#eventDetails .cubes { white-space: nowrap }
-#eventDetails .diseaseCube
+.eventDetails .cubes { white-space: nowrap }
+.eventDetails .diseaseCube
 {
 	display: inline-block;
 	width: 16px;
@@ -518,37 +514,37 @@ span.r, p.r {color: #ef282a; background: none !important }
 	margin-right: 3px;
 	margin-bottom: 3px;
 }
-#eventDetails .cubes > * { vertical-align: middle }
-#eventDetails .locatable:hover { text-decoration: underline }
-#eventDetails .infectionCard
+.eventDetails .cubes > * { vertical-align: middle }
+.eventDetails .locatable:hover { text-decoration: underline }
+.eventDetails .infectionCard
 {
 	font-size: 14px;
 	margin-bottom: 8px;
 }
-#eventDetails .infectionCard .cityName
+.eventDetails .infectionCard .cityName
 {
 	top: 3px;
 	white-space: nowrap;
 	margin-left: 18%
 }
 
-#eventDetails .column
+.eventDetails .column
 {
 	display: inline-block;
 	vertical-align: top;
 }
-#eventDetails .column:first-of-type p:first-of-type { margin-top: 18px; }
-#eventDetails .column:last-of-type { padding-left: 2px }
-#eventDetails .column:last-of-type p:first-of-type { border-bottom: 1px solid #fff }
-#eventDetails .hand { padding: 5px 0 }
-#eventDetails .populationRank
+.eventDetails .column:first-of-type p:first-of-type { margin-top: 18px; }
+.eventDetails .column:last-of-type { padding-left: 2px }
+.eventDetails .column:last-of-type p:first-of-type { border-bottom: 1px solid #fff }
+.eventDetails .hand { padding: 5px 0 }
+.eventDetails .populationRank
 {
 	font-size: 22px;
 	position: absolute;
 }
 
 .indent-1,
-#eventTypeTooltip li 
+.eventTypeTooltip li 
 { margin-left: 12px }
 .indent-2 { margin-left: 30px }
 
@@ -1050,14 +1046,14 @@ span.r, p.r {color: #ef282a; background: none !important }
 .roleTag
 { cursor: url("images/target_black.png"), auto }
 .playerCard.b,
-#eventDetails .locatable { cursor: url("images/target_white.png"), auto }
+.eventDetails .locatable { cursor: url("images/target_white.png"), auto }
 .playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template):hover,
 .infectionCard:not(.template):hover .cityName,
 .playerPanel .role *:not(.eventCard):hover,
 #roleIndicator:hover,
 .roleTag:not(.playerOption):hover,
 .playerCard.b:hover,
-#eventDetails .locatable:hover
+.eventDetails .locatable:hover
 { text-decoration: underline; }
 .playerCard * { pointer-events: none }
 .playerPanel > .playerCard:first-of-type { margin-top: 4px }
@@ -1194,6 +1190,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	position: absolute;
 	z-index: 12;
 	filter: drop-shadow(0px 0px 6px #000);
+	font-size: 14px;
 }
 .roleCard,
 .eventCardFull { font-size: 14px }

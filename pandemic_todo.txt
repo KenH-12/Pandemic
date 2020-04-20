@@ -30,6 +30,7 @@ tooltips
 	forecast "top" and "bottom" headings
 	play steps
 	event history buttons
+	full cards
 
 bottom panel elements should be positioned in way that's similar to the event history container
 	consider using position: fixed

@@ -11,8 +11,7 @@ export default class Tooltip
             arrowBasePx = 15,
             windowPadding = 5,
             containerSelector,
-            tooltipId,
-            cssClasses,
+            cssClassString,
             allowTooltipHovering,
             tooltipHoveringForgiveness,
             beforeShow,
@@ -30,8 +29,7 @@ export default class Tooltip
         this.windowPadding = windowPadding;
 
         this.containerSelector = containerSelector || "body";
-        this.tooltipId = tooltipId;
-        this.cssClasses = cssClasses || "";
+        this.cssClassString = cssClassString || "";
 
         this.allowTooltipHovering = allowTooltipHovering;
         this.tooltipHoveringForgiveness = tooltipHoveringForgiveness;
@@ -47,11 +45,9 @@ export default class Tooltip
     {
         const {
                 content,
-                tooltipId,
-                cssClasses
+                cssClassString
             } = this,
-            idAttr = tooltipId ? ` id='${tooltipId}'` : "",
-            $tooltip = $(`<div${idAttr} class='tooltip ${cssClasses}'></div>`);
+            $tooltip = $(`<div class='tooltip ${cssClassString}'></div>`);
         
         let tooltipContent = content;
 

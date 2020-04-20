@@ -780,7 +780,7 @@ function enableActionButton(buttonID)
 		.removeClass("btnDisabled hidden")
 		.click(function()
 		{
-			$("#eventTypeTooltip").remove();
+			$(".eventTypeTooltip").remove();
 			promptAction({ eventType: eventTypes[actionName] });
 		});
 }
@@ -789,7 +789,6 @@ function bindActionButtonHoverEvents()
 {
 	const $actionButtons = $("#rightPanel").find(".actionButton"),
 		containerSelector = "#boardContainer",
-		tooltipId = "eventTypeTooltip",
 		getContent = function(tooltip)
 			{
 				const $btn = $(tooltip.positionRelativeToSelector),
@@ -812,7 +811,7 @@ function bindActionButtonHoverEvents()
 			hoverElementSelector: `${buttonSelector} .actionInfo`,
 			positionRelativeToSelector: buttonSelector,
 			containerSelector,
-			tooltipId
+			cssClassString: "eventTypeTooltip wideTooltip"
 		}).bindHoverEvents();
 	}
 }
@@ -958,7 +957,7 @@ function bindEventHistoryIconHoverEvents()
 		hoverElementSelector: "#eventHistory > div",
 		containerSelector: "#boardContainer",
 		juxtaposeTo: "top",
-		tooltipId: "eventDetails",
+		cssClassString: "eventDetails",
 		allowTooltipHovering: true,
 		tooltipHoveringForgiveness: { top: 2, left: 2, right: 3, bottom: 1 },
 		beforeShow,
@@ -966,35 +965,9 @@ function bindEventHistoryIconHoverEvents()
 	}).bindHoverEvents();
 }
 
-function showEventIconDetails($icon, event)
-{
-	if ($("#eventDetails").length // prevent duplication
-		|| typeof event.getDetails !== "function")
-		return false;
-	
-	const $detailsContainer = $(`<div id='eventDetails' class='tooltip' data-eventType='${event.code}'>
-								<div class='content'>
-									${event.getDetails()}
-								</div>
-							</div>`);
-	
-	bindEventCardHoverEvents($detailsContainer);
-	bindEpidemicCardHoverEvents($detailsContainer);
-	locatePawnOnRoleTagClick($detailsContainer);
-	bindCityLocatorClickEvents({ $containingElement: $detailsContainer });
-
-	resizeInfectionCards($detailsContainer);
-	enforceEventDetailsHeightLimit();
-	positionTooltipRelativeToElement($detailsContainer, $icon, { juxtaposeTo: "top" });
-	// The following must happen AFTER the tooltip is positioned.
-	bindRoleCardHoverEvents();
-	if (event instanceof StartingHands)
-		event.positionPopulationRanks($detailsContainer);
-}
-
 function enforceEventDetailsHeightLimit($detailsContainer)
 {
-	$detailsContainer = $detailsContainer || $("#eventDetails");
+	$detailsContainer = $detailsContainer || $(".eventDetails");
 
 	if (!$detailsContainer.length)
 		return false;
@@ -1018,16 +991,17 @@ function enforceEventDetailsHeightLimit($detailsContainer)
 
 function bindEventDetailsHoverEvents()
 {
-	const eventTypeInfoSelector = "#eventDetails .eventTypeInfo",
-		hoverInfoSelector = "#eventDetails .hoverInfo",
+	const eventTypeInfoSelector = ".eventDetails .eventTypeInfo",
+		hoverInfoSelector = ".eventDetails .hoverInfo",
 		containerSelector = "#boardContainer",
-		juxtaposeTo = "right";
+		juxtaposeTo = "right",
+		cssClassString = "eventTypeTooltip wideTooltip";
 
 	new Tooltip({
 		hoverElementSelector: eventTypeInfoSelector,
 		getContent: function({ hoverElementSelector })
 			{
-				const $eventDetailsContainer = $(hoverElementSelector).closest("#eventDetails"),
+				const $eventDetailsContainer = $(hoverElementSelector).closest(".eventDetails"),
 					eventType = getEventType($eventDetailsContainer.attr("data-eventType")),
 					roleA = $eventDetailsContainer.find(".roleTag").first().html(),
 					roleB = eventType.name === "ShareKnowledge" ? $eventDetailsContainer.find(".roleTag").last().html() : false,
@@ -1036,7 +1010,8 @@ function bindEventDetailsHoverEvents()
 				return getEventTypeTooltipContent(eventType, { includeName: false, includeRelatedRoleRule });
 			},
 		containerSelector,
-		juxtaposeTo
+		juxtaposeTo,
+		cssClassString
 	}).bindHoverEvents();
 	
 	new Tooltip({
@@ -1051,15 +1026,14 @@ function bindEventDetailsHoverEvents()
 			},
 		containerSelector,
 		juxtaposeTo,
-		tooltipId: "eventTypeTooltip"
+		cssClassString
 	}).bindHoverEvents();
 }
 
 function hideEventIconDetails()
 {
-	$("#eventDetails")
-		.add("#eventDetailsArrow")
-		.add("#eventTypeTooltip")
+	$(".eventDetails")
+		.add(".eventTypeTooltip")
 		.add(".roleCard")
 		.add("#boardContainer > .epidemicFull")
 		.add("#boardContainer > .eventCardFull")
@@ -2659,7 +2633,7 @@ function bindDispatchTypeHoverEvents($container)
 		},
 		function()
 		{
-			$("#eventTypeTooltip").remove();
+			$(".eventTypeTooltip").remove();
 		});
 }
 
@@ -3656,7 +3630,7 @@ function resizeInfectionCards($container)
 		.find(".cityName")
 		.css(getInfectionCardTextStyle($container));
 	
-	if ($container.attr("id") === "eventDetails")
+	if ($container.hasClass("eventDetails"))
 	{
 		const cardWidth = gameData.boardWidth * 0.2,
 			newContainerWidth = cardWidth / .96,
@@ -3776,7 +3750,8 @@ function bindCuredDiseaseInfoHoverEvents()
 			getContent,
 			hoverElementSelector: "#cureMarkerContainer .info",
 			juxtaposeTo,
-			containerSelector
+			containerSelector,
+			cssClassString: "wideTooltip"
 		}).bindHoverEvents();
 	
 	new Tooltip({
@@ -3784,14 +3759,15 @@ function bindCuredDiseaseInfoHoverEvents()
 		hoverElementSelector: ".cureMarker:not([src$='eradicated.png'])",
 		juxtaposeTo,
 		containerSelector,
-		cssClasses: "curedTooltip"
+		cssClassString: "curedTooltip"
 	}).bindHoverEvents();
 
 	new Tooltip({
 		content: `<p class='largeText'>Disease Eradicated</p>${strings.eradicationRules}`,
 		hoverElementSelector: ".cureMarker[src$='eradicated.png']",
 		juxtaposeTo,
-		containerSelector
+		containerSelector,
+		cssClassString: "wideTooltip"
 	}).bindHoverEvents();
 }
 
@@ -3961,9 +3937,9 @@ class Player
 			await sleep(10);
 			$roleCard.removeClass("hidden");
 			
-			if ($hoveredElement.closest("#eventDetails").length)
+			if ($hoveredElement.closest(".eventDetails").length)
 			{
-				const $eventDetails = $("#eventDetails");
+				const $eventDetails = $(".eventDetails");
 				roleCardOffset.left = $eventDetails.offset().left + $eventDetails.outerWidth() + CARD_MARGIN;
 			}
 			else
@@ -6458,7 +6434,7 @@ function getInfectionCardTextStyle($container)
 			fontSize,
 		};
 	
-	if ($container.attr("id") === "eventDetails")
+	if ($container.hasClass("eventDetails"))
 	{
 		styleProperties.top -= 1;
 		styleProperties.lineHeight = fontSize;
@@ -7384,7 +7360,7 @@ async function setup()
 	bindCubeSuppliesInfoHoverEvents();
 	bindCuredDiseaseInfoHoverEvents();
 	bindPlayerDeckHoverEvents();
-	bindInfectionDeckHover();
+	bindInfectionDeckHoverEvents();
 	enablePlayerDiscardHoverEvents();
 	bindEventCardHoverEvents();
 	bindActionButtonHoverEvents();
@@ -8064,7 +8040,8 @@ function bindPlayerDeckHoverEvents()
 		hoverElementSelector: `${positionRelativeToSelector} .info`,
 		positionRelativeToSelector,
 		juxtaposeTo,
-		containerSelector
+		containerSelector,
+		cssClassString: "wideTooltip"
 	}).bindHoverEvents();
 
 	new Tooltip({
@@ -8072,8 +8049,7 @@ function bindPlayerDeckHoverEvents()
 		hoverElementSelector: `${positionRelativeToSelector} img`,
 		positionRelativeToSelector,
 		juxtaposeTo,
-		containerSelector,
-		tooltipId: "playerCardsLeftTooltip"
+		containerSelector
 	}).bindHoverEvents();
 }
 
@@ -8570,7 +8546,7 @@ function collapseInfectionDiscardPile()
 		});
 }
 
-function bindInfectionDeckHover()
+function bindInfectionDeckHoverEvents()
 {
 	const getContent = function()
 		{
@@ -8602,7 +8578,8 @@ function bindCubeSuppliesInfoHoverEvents()
 		hoverElementSelector: "#cubeSupplies .info",
 		positionRelativeToSelector: "#cubeSupplies",
 		juxtaposeTo: "bottom",
-		containerSelector: "#boardContainer"
+		containerSelector: "#boardContainer",
+		cssClassString: "wideTooltip"
 	}).bindHoverEvents();
 }
 
@@ -8776,7 +8753,7 @@ function showFullEpidemicCard($epidemicCard)
 										<p>SHUFFLE THE CARDS IN THE INFECTION DISCARD PILE AND PUT THEM ON TOP OF THE INFECTION DECK.</p>
 									</div>
 								</div>`),
-		eventDetails = "#eventDetails";
+		eventDetails = ".eventDetails";
 	
 	let $relativeTo = $epidemicCard,
 		juxtaposeTo = "left";
