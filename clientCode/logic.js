@@ -4998,6 +4998,39 @@ function tooManyOutbreaksOccured()
 	return false;
 }
 
+function bindOutbreakMarkerHoverEvents()
+{
+	const getContent = function()
+		{
+			const { outbreakCount } = gameData,
+				plural = parseInt(outbreakCount) !== 1;
+
+			return `<p class='largeText'>${outbreakCount} <span class='hoverInfo' data-eventType='${eventTypes.outbreak.code}'>outbreak${ plural ? "s" : "" }</span><br/>${ plural ? "have" : "has" } occured.</p>`;
+		},
+		juxtaposition = "right",
+		obMarkerTooltipClassName = "outbreaksMarkerTooltip",
+		containerSelector = "#boardContainer";
+	
+	new Tooltip({
+		getContent,
+		hoverElementSelector: "#outbreaksMarker img",
+		juxtaposition,
+		containerSelector,
+		cssClassString: obMarkerTooltipClassName,
+		allowTooltipHovering: true,
+		tooltipHoveringForgiveness: { left: 10, right: 10, bottom: 1 }
+	}).bindHoverEvents();
+
+	new Tooltip({
+		getContent: ({ $hoveredElement }) => getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType"))),
+		hoverElementSelector: `.${obMarkerTooltipClassName} .hoverInfo`,
+		positionRelativeToSelector: `.${obMarkerTooltipClassName}`,
+		juxtaposition,
+		containerSelector,
+		cssClassString: "wideTooltip eventTypeTooltip"
+	}).bindHoverEvents();
+}
+
 function moveOutbreaksMarker(outbreakCount, { animate } = {})
 {
 	return new Promise(async resolve =>
@@ -7357,6 +7390,7 @@ async function setup()
 	bindCubeSuppliesInfoHoverEvents();
 	bindInfectionDeckHoverEvents();
 	bindInfectionRateInfoHoverEvents();
+	bindOutbreakMarkerHoverEvents();
 	bindCuredDiseaseInfoHoverEvents();
 	bindResearchStationInfoHoverEvents();
 	bindPlayerDeckHoverEvents();
