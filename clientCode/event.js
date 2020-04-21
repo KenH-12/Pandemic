@@ -258,12 +258,13 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	infectCity: {
 		name: "Infect City",
+		pluralName: "Infect Cities",
 		hasIcon: true,
 		code: "ic",
 		actionPathName: "infectCity",
 		propertyNames: ["cityKey", "preventionCode"],
 		rules: [
-			"During the Infect Cities step, infection cards are flipped over one at a time. The number of infection cards flipped over at the end of a turn is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
+			"During the Infect Cities step, infection cards are flipped over one at a time from the top of the infection deck. The number of infection cards flipped over is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
 			"Each time an infection card is flipped over, a disease cube of the matching color is placed on the named city.",
 			"If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in that city.",
 			"<br/>",
@@ -1692,7 +1693,7 @@ function getEventType(eventCode)
 	return eventTypes[eventCodes[eventCode]];
 }
 
-function getEventTypeTooltipContent(eventType, { includeName = true, actionNotPossible, includeRelatedRoleRule, isDispatchType } = {})
+function getEventTypeTooltipContent(eventType, { includeName = true, pluralNameForm, actionNotPossible, includeRelatedRoleRule, isDispatchType } = {})
 {
 	let content = "";
 
@@ -1700,8 +1701,10 @@ function getEventTypeTooltipContent(eventType, { includeName = true, actionNotPo
 	// Rendezvous is a special ability in its own right, so its tooltip doesn't require the prefix.	
 	if (includeName)
 	{
-		const dispatchPrefix = isDispatchType && eventType.code !== eventTypes.rendezvous.code ? "DISPATCH PAWN VIA<br/> " : "";
-		content += `<h3>${dispatchPrefix}${eventType.name.toUpperCase()}</h3>`;
+		const dispatchPrefix = isDispatchType && eventType.code !== eventTypes.rendezvous.code ? "DISPATCH PAWN VIA<br/> " : "",
+			eventTypeName = eventType[ pluralNameForm ? "pluralName" : "name" ].toUpperCase();
+		
+		content += `<h3>${dispatchPrefix}${eventTypeName}</h3>`;
 	}
 
 	if (actionNotPossible)
