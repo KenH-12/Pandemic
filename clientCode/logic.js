@@ -278,10 +278,10 @@ function appendEventHistoryIcon(event)
 
 class Step
 {
-	constructor(name, description, procedure)
+	constructor(name, procedure, description)
 	{
 		this.name = name;
-		this.description = description;
+		this.description = typeof description === "string" ? description : "";
 		this.procedure = procedure;
 
 		this.procedureIdx = -1;
@@ -358,7 +358,7 @@ class Step
 	const steps = gameData.steps;
 
 	let stepName = "setup";
-	steps[stepName] = new Step(stepName, "Setup", [() => {}]);
+	steps[stepName] = new Step(stepName, [() => {}], "Setup");
 	steps[stepName].indicate = function() { $("#indicatorContainer").addClass("hidden") }
 
 	let actionsRemaining = 4;
@@ -366,18 +366,14 @@ class Step
 	for (let i = 1; i <= 4; i++)
 	{
 		stepName = `action ${i}`;
-		steps[stepName] = new Step(stepName, `${actionsRemaining} Action${actionsRemaining > 1 ? "s" : ""} Remaining`,
-			[
-				enableAvailableActions,
-				finishActionStep
-			]);
-		actionsRemaining--;
+		steps[stepName] = new Step(stepName, [enableAvailableActions, finishActionStep],
+			`${actionsRemaining} Action${--actionsRemaining > 1 ? "s" : ""} Remaining`);
 	}
 
 	// If the hand limit is violated as a result of the Share Knowledge action,
 	// the player with 8 cards will be prompted to discard.
 	stepName = "hand limit";
-	steps[stepName] = new Step(stepName, "Discard to 7 Cards", [discardStep]);
+	steps[stepName] = new Step(stepName, [discardStep], "Discard to 7 Cards");
 	steps[stepName].setDescription = function()
 	{
 		const playerWithTooManyCards = getPlayerWithTooManyCards(),
@@ -404,22 +400,26 @@ Hand Limit Exceeded!<br/>`;
 	}
 
 	stepName = "draw";
-	steps[stepName] = new Step(stepName, "", [drawStep]);
+	steps[stepName] = new Step(stepName, [drawStep]);
 
 	stepName = "epIncrease";
-	steps[stepName] = new Step(stepName, "", [epidemicIncrease]);
+	steps[stepName] = new Step(stepName, [epidemicIncrease]);
 
 	stepName = "epInfect";
-	steps[stepName] = new Step(stepName, "", [epidemicInfect]);
+	steps[stepName] = new Step(stepName, [epidemicInfect]);
 	
 	stepName = "epIntensify";
-	steps[stepName] = new Step(stepName, "", [epidemicIntensify]);
+	steps[stepName] = new Step(stepName, [epidemicIntensify]);
 
 	stepName = "discard";
-	steps[stepName] = new Step(stepName, "Discard to 7 Cards", [discardStep]);
+	steps[stepName] = new Step(stepName, [discardStep], "Discard to 7 Cards");
 	
 	stepName = "infect cities";
-	steps[stepName] = new Step(stepName, "Infect 2 Cities", [infectionStep]);
+	steps[stepName] = new Step(stepName, [infectionStep])
+	steps[stepName].setDescription = function()
+	{
+		this.description = `<span class='info'>&#9432;</span><span>Infection Rate: ${gameData.infectionRate}</span>`
+	};
 })();
 
 function highlightTurnProcedureStep(stepName)
@@ -5576,7 +5576,7 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 		if (newEpidemicCount)
 			gameData.epidemicCount = newEpidemicCount;
 		
-		updateInfectionRate(epidemicCount);
+		gameData.infectionRate = getInfectionRate(epidemicCount);
 		
 		if (animate)
 		{
@@ -5604,15 +5604,6 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 		
 		resolve();
 	});
-}
-
-function updateInfectionRate(epidemicCount)
-{
-	const infRate = getInfectionRate(epidemicCount);
-	
-	gameData.infectionRate = infRate;
-
-	gameData.steps["infect cities"].description = `Infect ${infRate} Cities`;
 }
 
 async function animateEpidemicIntensify()
@@ -8595,8 +8586,8 @@ function bindInfectionRateInfoHoverEvents()
 {
 	new Tooltip({
 		getContent: () => `<p class='largeText'>Infection Rate: ${gameData.infectionRate}</p>${strings.infectionRateInfo}`,
-		hoverElementSelector: "#infectionRateMarker img",
-		juxtaposition: "bottom",
+		hoverElementSelector: "#infectionRateMarker img, #stepIndicator .info",
+		getJuxtaposition: ({ $hoveredElement }) => $hoveredElement.closest("#stepIndicator").length ? "left" : "bottom",
 		containerSelector: "#boardContainer",
 		cssClassString: "wideTooltip infectionRateTooltip",
 		allowTooltipHovering: true

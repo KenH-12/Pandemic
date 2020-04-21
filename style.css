@@ -823,6 +823,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 	line-height: 24px;
 	height: 26px;
 }
+#stepIndicator .info
+{
+	font-size: 14px;
+	float: left;
+}
+#stepIndicator .info + span { margin-left: -14px }
 #roleIndicator,
 .playerPanel .role
 { font-family: 'Oswald', 'Electrolize', sans-serif }
@@ -855,7 +861,9 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 100%;
 	margin-bottom: 5px;
 }
-#infectCitiesContainer > .infectionCard, #infectCitiesContainer > .btnContinue { margin-top: 20px }
+#infectCitiesContainer > .infectionCard,
+#infectCitiesContainer > .btnContinue
+{ margin-top: 20px }
 .infectionCardContents { position: relative }
 .infectionCard *
 {
