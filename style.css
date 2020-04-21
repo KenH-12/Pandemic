@@ -437,7 +437,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	background-color: #252525;
 	padding: 4px;
 }
-.tooltip  p { margin: 3px 0 }
+.tooltip  p { margin: 4px 0 }
 .tooltip .warning { font-size: 25px; vertical-align: super; }
 
 .eventTypeTooltip
