@@ -33,6 +33,8 @@ export default class Tooltip
 
         this.allowTooltipHovering = allowTooltipHovering;
         this.tooltipHoveringForgiveness = tooltipHoveringForgiveness;
+        if (allowTooltipHovering)
+            setTooltipHoveringForgivenessDefaults(this);
 
         this.beforeShow = beforeShow;
         this.afterShow = afterShow;
@@ -352,4 +354,17 @@ export default class Tooltip
 
         this.hoverEventsAreBound = false;
     }
+}
+
+function setTooltipHoveringForgivenessDefaults(tooltip)
+{
+    const { tooltipHoveringForgiveness: forgiveness } = tooltip,
+        sides = ["top", "right", "bottom", "left"];
+
+    if (!forgiveness)
+        forgiveness = {};
+
+    for (let side of sides)
+        if (!forgiveness[side])
+            forgiveness[side] = 0;
 }
