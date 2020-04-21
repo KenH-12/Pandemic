@@ -715,6 +715,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 10.6%;
 	opacity: 0.1;
 }
+.drawnInfectionCard, .infDiscardCardback, .forecastCardback { pointer-events: none }
 .drawnInfectionCard, .drawnPlayerCard {position: absolute;z-index: 10;}
 .marker { position: absolute }
 .marker > img { width: 100% }

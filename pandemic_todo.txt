@@ -15,8 +15,6 @@ if an event details tooltip is visible when the related icon is removed, the too
 
 TO DO
 -----
-keep track of the number of cards in the infection deck rather than calculating it every time
-
 tooltips
 	research station supply
 	infection rate track

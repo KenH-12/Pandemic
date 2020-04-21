@@ -4,7 +4,9 @@ import {
 	gameData, 
 	getPlayer,
 	getActivePlayer,
-	eventTypeIsBeingPrompted
+	eventTypeIsBeingPrompted,
+	decrementInfectionDeckSize,
+	resetInfectionDeckSize
 } from "./gameData.js";
 import getDimension from "./dimensions.js";
 import { strings } from "./strings.js";
@@ -5497,11 +5499,11 @@ async function epidemicIntensify()
 	}
 	disableEventCards();
 
-	await Promise.all(
-		[
-			requestAction(eventType),
-			animateEpidemicIntensify()
-		]);
+	await Promise.all([
+		requestAction(eventType),
+		animateEpidemicIntensify()
+	]);
+	resetInfectionDeckSize();
 	appendEventHistoryIconOfType(eventType);
 	
 	$epidemic.children(".highlighted").removeClass("highlighted");
@@ -6623,6 +6625,8 @@ async function dealFaceDownInfGroup(group)
 
 function dealFaceDownInfCard({ infectionIndex })
 {
+	decrementInfectionDeckSize();
+	
 	return new Promise(resolve =>
 	{
 		const $container = getInfectionContainer().find(".infectionCard").eq(infectionIndex)
@@ -7141,6 +7145,8 @@ function loadInfectionDiscards(cards)
 {
 	if (typeof cards == "undefined")
 		return false;
+	
+	gameData.infectionDeckSize -= cards.length;
 	
 	const $discardPile = $("#infectionDiscardContainer"),
 		$discardPileTitle = $discardPile.children(".title").first(),
@@ -8548,23 +8554,10 @@ function collapseInfectionDiscardPile()
 
 function bindInfectionDeckHoverEvents()
 {
-	const getContent = function()
-		{
-			const MAX_CARDS_IN_DECK = 48;
-			let numCardsInDeck = MAX_CARDS_IN_DECK - $("#infectionDiscardContainer").find(".infectionCard").length;
-			
-			if (currentStepIs("infect cities"))
-				numCardsInDeck -= $("#infectCitiesContainer").find(".infectionCard").length;
-			
-			if (currentStepIs("epInfect"))
-				numCardsInDeck -= $("#epidemicContainer").find(".infectionCard").length;
-			
-			return `<p class='largeText'>${numCardsInDeck} cards</p>`;
-		},
-		positionRelativeToSelector = "#infectionDeckContainer";
+	const positionRelativeToSelector = "#infectionDeckContainer";
 	
 	new Tooltip({
-		getContent,
+		getContent: () => `<p class='largeText'>${gameData.infectionDeckSize} cards</p>`,
 		hoverElementSelector: `${positionRelativeToSelector} img`,
 		positionRelativeToSelector,
 		juxtaposeTo: "bottom"

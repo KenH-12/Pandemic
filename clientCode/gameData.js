@@ -15,6 +15,8 @@ const gameData = {
 		u: false,
 		b: false
 	},
+	maxInfectionDeckSize: 48, // 1 card for each city
+	infectionDeckSize: 48,
 	epidemicCount: 0,
 	outbreakCount: 0,
 	diseaseCubeSupplies: {
@@ -74,10 +76,30 @@ function eventTypeIsBeingPrompted(eventType)
 	return promptingEventType && promptingEventType.code === eventType.code;
 }
 
+function decrementInfectionDeckSize()
+{
+	gameData.infectionDeckSize -= 1;
+	updateInfectionDeckTooltip();
+}
+
+function resetInfectionDeckSize()
+{
+	gameData.infectionDeckSize = gameData.maxInfectionDeckSize - $("#removedInfectionCards").find(".infectionCard").length;
+	updateInfectionDeckTooltip();
+}
+
+function updateInfectionDeckTooltip()
+{
+	if ($("#infectionDeckContainer img").is(":hover"))
+		$(".tooltip").find("p").html(`${gameData.infectionDeckSize} cards`);
+}
+
 export {
 	gameData,
 	getPlayer,
 	getActivePlayer,
 	replaceRoleNamesWithRoleTags,
-	eventTypeIsBeingPrompted
+	eventTypeIsBeingPrompted,
+	decrementInfectionDeckSize,
+	resetInfectionDeckSize
 };
