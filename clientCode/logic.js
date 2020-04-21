@@ -2378,7 +2378,7 @@ function newGrantStation()
 			.appendTo("#boardContainer");
 
 	researchStationKeys.add("grantStation");
-	$grantStation.offset($("#researchStationSupply img").offset());
+	$grantStation.offset($("#researchStationSupplyContainer img").offset());
 	
 	setTravelPathArrowColor({ governmentGranting: true });
 	$grantStation.draggable({
@@ -2408,7 +2408,7 @@ function animateResearchStationBackToSupply($researchStation)
 		
 		$researchStation
 			.draggable({ disabled: true })
-			.animate($("#researchStationSupply img").offset(),
+			.animate($("#researchStationSupplyContainer img").offset(),
 				getDuration("stationPlacement"),
 				function()
 				{
@@ -3682,7 +3682,7 @@ function resizeBottomPanelElements()
 		.height(topPanelHeight)
 		.offset({ top: panelOffsetTop });
 
-	$("#researchStationSupply").css("font-size", getDimension("stationSupplyCountFont") + "px");
+	$("#researchStationSupplyContainer").css("font-size", getDimension("stationSupplyCountFont") + "px");
 
 	$("#playerCards, .playerPile").height(getDimension("bottomPanelDivs"));
 
@@ -7364,9 +7364,10 @@ async function setup()
 	await removeCurtain();
 
 	bindCubeSuppliesInfoHoverEvents();
-	bindCuredDiseaseInfoHoverEvents();
-	bindPlayerDeckHoverEvents();
 	bindInfectionDeckHoverEvents();
+	bindCuredDiseaseInfoHoverEvents();
+	bindResearchStationInfoHoverEvents();
+	bindPlayerDeckHoverEvents();
 	enablePlayerDiscardHoverEvents();
 	bindEventCardHoverEvents();
 	bindActionButtonHoverEvents();
@@ -8020,6 +8021,31 @@ function placePileOntoPlayerDeck($pileContainer, deckProperties)
 		$pile.remove();
 		resolve();
 	});
+}
+
+function bindResearchStationInfoHoverEvents()
+{
+	const positionRelativeToSelector = "#researchStationSupplyContainer";
+
+	new Tooltip({
+		content: strings.researchStationSupplyInfo,
+		hoverElementSelector: `${positionRelativeToSelector} > .title .info`,
+		positionRelativeToSelector,
+		juxtaposeTo: "top",
+		containerSelector: "#boardContainer",
+		cssClassString: "wideTooltip rsInfo",
+		allowTooltipHovering: true,
+		tooltipHoveringForgiveness: { bottom: 30 }
+	}).bindHoverEvents();
+
+	new Tooltip({
+		getContent: ({ $hoveredElement }) => getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType"))),
+		hoverElementSelector: ".rsInfo .hoverInfo",
+		positionRelativeToSelector: ".rsInfo",
+		juxtaposeTo: "right",
+		containerSelector: "#boardContainer",
+		cssClassString: "wideTooltip eventTypeTooltip"
+	}).bindHoverEvents();
 }
 
 function bindPlayerDeckHoverEvents()

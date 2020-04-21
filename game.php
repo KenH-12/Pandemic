@@ -169,8 +169,8 @@
 						</div>
 
 						<div id='governmentGrantArrow' class='hidden'><div></div></div>
-						<div id='researchStationSupply' class='bottomPanelDiv'>
-							<p class='title'>RESEARCH STATION SUPPLY</p>
+						<div id='researchStationSupplyContainer' class='bottomPanelDiv'>
+							<p class='title'>RESEARCH STATION SUPPLY <span class='info'>&#9432;</span></p>
 							<p id='researchStationSupplyCount'>$MAX_RESEARCH_STATION_COUNT</p>
 							<div class='researchStation'>
 								<img src='images/pieces/researchStation.png' id='imgResearchStationSupply' alt='Research Station' />

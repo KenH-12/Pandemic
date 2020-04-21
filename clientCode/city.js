@@ -154,7 +154,7 @@ export default class City
 
 		if (animate)
 		{
-			stationInitialOffset = stationInitialOffset || $("#researchStationSupply .researchStation").offset();
+			stationInitialOffset = stationInitialOffset || $("#researchStationSupplyContainer .researchStation").offset();
 			return this.cluster({
 					stationInitialOffset,
 					animateResearchStation: true,
@@ -1420,7 +1420,7 @@ async function getGovernmentGrantTargetCity($researchStation, promptAction)
 
 async function highlightResearchStationSupply($grantStation)
 {
-	const $stationContainer = $("#researchStationSupply").children(".researchStation");
+	const $stationContainer = $("#researchStationSupplyContainer").children(".researchStation");
 
 	$grantStation.addClass("glowing");
 
@@ -1440,7 +1440,7 @@ async function highlightResearchStationSupply($grantStation)
 function turnOffResearchStationSupplyHighlight()
 {
 	$("#governmentGrantArrow").addClass("hidden");
-	$("#researchStationSupply").children(".researchStation").removeClass("bigGlow mediumGlow");
+	$("#researchStationSupplyContainer").children(".researchStation").removeClass("bigGlow mediumGlow");
 	$(".grantStation").removeClass("glowing");
 }
 
@@ -1458,7 +1458,7 @@ async function showGovernmentGrantArrow()
 
 function positionGovernmentGrantArrow($arrow)
 {
-	const $researchStationSupply = $("#researchStationSupply"),
+	const $researchStationSupply = $("#researchStationSupplyContainer"),
 		offset = $researchStationSupply.offset();
 	
 	$arrow = $arrow || $("#governmentGrantArrow");
@@ -1480,7 +1480,7 @@ async function resetGrantStation($grantStation)
 	if (!$grantStation.length)
 		return false;
 	
-	$grantStation.offset($("#researchStationSupply img").offset());
+	$grantStation.offset($("#researchStationSupplyContainer img").offset());
 }
 
 function getAllResearchStations()

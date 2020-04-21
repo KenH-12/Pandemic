@@ -16,7 +16,9 @@ if an event details tooltip is visible when the related icon is removed, the too
 TO DO
 -----
 tooltips
-	research station supply
+	secondary tooltips
+		epidemics
+		outbreaks
 	infection rate track
 		infection rate info icon beside infection rate displayed during infect cities step
 	outbreaks track

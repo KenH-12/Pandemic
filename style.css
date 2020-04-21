@@ -586,20 +586,20 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border-left: 1px solid #fff;
 	z-index: 2;
 }
-#researchStationSupply
+#researchStationSupplyContainer
 {
 	width: 16%;
 	left: 52%;
 }
-#researchStationSupply .title
+#researchStationSupplyContainer .title
 {
 	margin-bottom: 6px;
 }
-#researchStationSupply > *:not(.title)
+#researchStationSupplyContainer > *:not(.title)
 {
 	vertical-align: middle;
 }
-#researchStationSupply .researchStation
+#researchStationSupplyContainer .researchStation
 {
 	display: inline-block;
 	width: 20%;
