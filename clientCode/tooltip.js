@@ -8,6 +8,7 @@ export default class Tooltip
             hoverElementSelector,
             positionRelativeToSelector,
             juxtaposition = "left",
+            getJuxtaposition,
             arrowBasePx = 15,
             windowPadding = 5,
             containerSelector,
@@ -24,6 +25,7 @@ export default class Tooltip
         this.hoverElementSelector = hoverElementSelector;
         this.positionRelativeToSelector = positionRelativeToSelector || hoverElementSelector;
         this.juxtaposition = juxtaposition;
+        this.getJuxtaposition = getJuxtaposition;
 
         this.arrowBasePx = arrowBasePx;
         this.windowPadding = windowPadding;
@@ -65,6 +67,8 @@ export default class Tooltip
 
     async positionRelativeToElement()
     {
+        this.setJuxtaposition();
+        
         const {
                 $tooltip,
                 juxtaposition,
@@ -109,6 +113,20 @@ export default class Tooltip
         ensureDivPositionIsWithinWindowHeight($tooltip);
 
         this.setClipPath();
+    }
+
+    setJuxtaposition()
+    {
+        const validJuxtapositions = ["top", "right", "bottom", "left"];
+
+        if (typeof this.getJuxtaposition === "function")
+            this.juxtaposition = this.getJuxtaposition(this);
+
+        if (!validJuxtapositions.includes(this.juxtaposition))
+        {
+            console.error(`Invalid juxtaposition "${this.juxtaposition}" returned by Tooltip.getJuxtaposition method.`);
+            this.juxtaposition = "left";
+        }
     }
 
     getRelativeElement()
