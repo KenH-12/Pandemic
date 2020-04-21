@@ -1,4 +1,4 @@
-async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeTo = "left", tooltipMargin } = {})
+async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposition = "left", tooltipMargin } = {})
 {
 	tooltipMargin = tooltipMargin || 15;
 	
@@ -7,19 +7,19 @@ async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeT
 
 	$tooltip.appendTo("#boardContainer")
 		.data("relatedElementId", $element.attr("id"))
-		.data("juxt", juxtaposeTo)
+		.data("juxt", juxtaposition)
 		.data("margin", tooltipMargin);
 	
-	if (["left", "right"].includes(juxtaposeTo))
+	if (["left", "right"].includes(juxtaposition))
 	{
 		tooltipOffset.top -= Math.abs($element.height() - $tooltip.height()) / 2;
 		
-		if (juxtaposeTo === "left")
+		if (juxtaposition === "left")
 			tooltipOffset.left -= $tooltip.outerWidth();
-		else if (juxtaposeTo === "right")
+		else if (juxtaposition === "right")
 			tooltipOffset.left += $element.outerWidth();
 	}
-	else // juxtaposeTo top or bottom
+	else // top or bottom
 	{
 		const elementWidth = $element.width(),
 			tooltipWidth = $tooltip.width(),
@@ -30,9 +30,9 @@ async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeT
 		else
 			tooltipOffset.left += halfDeltaWidth;
 
-		if (juxtaposeTo === "top")
+		if (juxtaposition === "top")
 			tooltipOffset.top -= $tooltip.outerHeight() + tooltipMargin;
-		else // juxtaposeTo bottom
+		else // bottom
 			tooltipOffset.top += $element.outerHeight();
 	}
 
@@ -47,8 +47,8 @@ async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposeT
 function setTooltipArrowClipPath($tooltip)
 {
 	const tooltipMargin = $tooltip.data("margin"),
-		juxtaposeTo = $tooltip.data("juxt"),
-		tooltipOffset = setTooltipPaddingAndReturnOffset($tooltip, { tooltipMargin, juxtaposeTo }),
+		juxtaposition = $tooltip.data("juxt"),
+		tooltipOffset = setTooltipPaddingAndReturnOffset($tooltip, { tooltipMargin, juxtaposition }),
 		tooltipWidth = $tooltip.width(),
 		marginPercentageOfWidth = (tooltipMargin / tooltipWidth)*100,
 		tooltipHeight = $tooltip.height(),
@@ -62,14 +62,14 @@ function setTooltipArrowClipPath($tooltip)
 		arrowSideEdgePercentage,
 		clipPath;
 
-	if (["left", "right"].includes(juxtaposeTo))
+	if (["left", "right"].includes(juxtaposition))
 	{
 		actualArrowCentre = elementOffset.top + ($element.height() / 2);
 		arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.top) / tooltipHeight) * 100;
 		
 		halfArrowHeight = marginPercentageOfHeight / 2;
 		
-		if (juxtaposeTo === "left")
+		if (juxtaposition === "left")
 		{
 			arrowSideEdgePercentage = 100 - marginPercentageOfWidth;
 			
@@ -81,7 +81,7 @@ function setTooltipArrowClipPath($tooltip)
 						${arrowSideEdgePercentage}% 100%,
 						0 100%)`;
 		}
-		else // juxtaposeTo right
+		else // right
 		{
 			clipPath = `polygon(${marginPercentageOfWidth}% 0,
 						100% 0,
@@ -92,14 +92,14 @@ function setTooltipArrowClipPath($tooltip)
 						${marginPercentageOfWidth}% ${ arrowCentrePercentage - halfArrowHeight }%)`;
 		}
 	}
-	else // juxtaposeTo top or bottom
+	else // top or bottom
 	{
 		actualArrowCentre = elementOffset.left + ($element.width() / 2);
 		arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.left) / tooltipWidth) * 100;
 
 		const halfArrowWidth = marginPercentageOfWidth / 2;
 		
-		if (juxtaposeTo === "top")
+		if (juxtaposition === "top")
 		{
 			arrowSideEdgePercentage = 100 - marginPercentageOfHeight;
 			
@@ -111,7 +111,7 @@ function setTooltipArrowClipPath($tooltip)
 						${ arrowCentrePercentage - halfArrowWidth }% ${arrowSideEdgePercentage}%,
 						0 ${arrowSideEdgePercentage}%)`;
 		}
-		else // juxtaposeTo bottom
+		else // bottom
 		{
 			clipPath = `polygon(0 ${marginPercentageOfHeight}%,
 						${ arrowCentrePercentage - halfArrowWidth }% ${marginPercentageOfHeight}%,
@@ -126,11 +126,11 @@ function setTooltipArrowClipPath($tooltip)
 	$tooltip.children(".content").css({ clipPath });
 }
 
-function setTooltipPaddingAndReturnOffset($tooltip, { tooltipOffset, tooltipMargin, juxtaposeTo } = {})
+function setTooltipPaddingAndReturnOffset($tooltip, { tooltipOffset, tooltipMargin, juxtaposition } = {})
 {
 	tooltipOffset = tooltipOffset || $tooltip.offset();
 	tooltipMargin = tooltipMargin || $tooltip.data("margin");
-	juxtaposeTo = juxtaposeTo || $tooltip.data("juxt");
+	juxtaposition = juxtaposition || $tooltip.data("juxt");
 
 	const initialTooltipHeight = $tooltip.height(),
 		$tooltipContent = $tooltip.children(".content"),
@@ -141,13 +141,13 @@ function setTooltipPaddingAndReturnOffset($tooltip, { tooltipOffset, tooltipMarg
 			top: "bottom",
 			bottom: "top"
 		},
-		paddingDirection = paddingDirections[juxtaposeTo];
+		paddingDirection = paddingDirections[juxtaposition];
 	
 	$tooltipContent.css(`padding-${paddingDirection}`, `${tooltipPadding}px`);
 
 	// Horizontally juxtaposed tooltips sometimes require a slight offset adjustment.
 	const tooltipHeight = $tooltip.height();
-	if (["left", "right"].includes(juxtaposeTo) && tooltipHeight !== initialTooltipHeight)
+	if (["left", "right"].includes(juxtaposition) && tooltipHeight !== initialTooltipHeight)
 	{
 		tooltipOffset.top -= Math.max(tooltipMargin, tooltipHeight - initialTooltipHeight);
 		$tooltip.offset(tooltipOffset);

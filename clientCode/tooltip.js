@@ -7,7 +7,7 @@ export default class Tooltip
             getContent,
             hoverElementSelector,
             positionRelativeToSelector,
-            juxtaposeTo = "left",
+            juxtaposition = "left",
             arrowBasePx = 15,
             windowPadding = 5,
             containerSelector,
@@ -23,7 +23,7 @@ export default class Tooltip
         
         this.hoverElementSelector = hoverElementSelector;
         this.positionRelativeToSelector = positionRelativeToSelector || hoverElementSelector;
-        this.juxtaposeTo = juxtaposeTo;
+        this.juxtaposition = juxtaposition;
 
         this.arrowBasePx = arrowBasePx;
         this.windowPadding = windowPadding;
@@ -32,9 +32,11 @@ export default class Tooltip
         this.cssClassString = cssClassString || "";
 
         this.allowTooltipHovering = allowTooltipHovering;
-        this.tooltipHoveringForgiveness = tooltipHoveringForgiveness;
         if (allowTooltipHovering)
+        {
+            this.tooltipHoveringForgiveness = tooltipHoveringForgiveness || {};
             setTooltipHoveringForgivenessDefaults(this);
+        }
 
         this.beforeShow = beforeShow;
         this.afterShow = afterShow;
@@ -65,7 +67,7 @@ export default class Tooltip
     {
         const {
                 $tooltip,
-                juxtaposeTo,
+                juxtaposition,
                 arrowBasePx,
                 windowPadding
             } = this,
@@ -73,16 +75,16 @@ export default class Tooltip
             elementOffset = $element.offset(),
             tooltipOffset = elementOffset;
         
-        if (["left", "right"].includes(juxtaposeTo))
+        if (["left", "right"].includes(juxtaposition))
         {
             tooltipOffset.top -= Math.abs($element.height() - $tooltip.height()) / 2;
             
-            if (juxtaposeTo === "left")
+            if (juxtaposition === "left")
                 tooltipOffset.left -= $tooltip.outerWidth();
-            else // juxtaposeTo right
+            else // right
                 tooltipOffset.left += $element.outerWidth();
         }
-        else // juxtaposeTo top or bottom
+        else // top or bottom
         {
             const elementWidth = $element.width(),
                 tooltipWidth = $tooltip.width(),
@@ -93,9 +95,9 @@ export default class Tooltip
             else
                 tooltipOffset.left += halfDeltaWidth;
 
-            if (juxtaposeTo === "top")
+            if (juxtaposition === "top")
                 tooltipOffset.top -= $tooltip.outerHeight() + arrowBasePx;
-            else // juxtaposeTo bottom
+            else // bottom
                 tooltipOffset.top += $element.outerHeight();
         }
 
@@ -123,7 +125,7 @@ export default class Tooltip
         const {
                 $tooltip,
                 arrowBasePx,
-                juxtaposeTo
+                juxtaposition
             } = this,
             tooltipOffset = this.setPaddingAndReturnOffset(),
             tooltipWidth = $tooltip.width(),
@@ -139,14 +141,14 @@ export default class Tooltip
             arrowSideEdgePercentage,
             clipPath;
 
-        if (["left", "right"].includes(juxtaposeTo))
+        if (["left", "right"].includes(juxtaposition))
         {
             actualArrowCentre = elementOffset.top + ($element.height() / 2);
             arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.top) / tooltipHeight) * 100;
             
             halfArrowHeight = marginPercentageOfHeight / 2;
             
-            if (juxtaposeTo === "left")
+            if (juxtaposition === "left")
             {
                 arrowSideEdgePercentage = 100 - marginPercentageOfWidth;
                 
@@ -158,7 +160,7 @@ export default class Tooltip
                             ${arrowSideEdgePercentage}% 100%,
                             0 100%)`;
             }
-            else // juxtaposeTo right
+            else // right
             {
                 clipPath = `polygon(${marginPercentageOfWidth}% 0,
                             100% 0,
@@ -169,14 +171,14 @@ export default class Tooltip
                             ${marginPercentageOfWidth}% ${ arrowCentrePercentage - halfArrowHeight }%)`;
             }
         }
-        else // juxtaposeTo top or bottom
+        else // top or bottom
         {
             actualArrowCentre = elementOffset.left + ($element.width() / 2);
             arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.left) / tooltipWidth) * 100;
 
             const halfArrowWidth = marginPercentageOfWidth / 2;
             
-            if (juxtaposeTo === "top")
+            if (juxtaposition === "top")
             {
                 arrowSideEdgePercentage = 100 - marginPercentageOfHeight;
                 
@@ -188,7 +190,7 @@ export default class Tooltip
                             ${ arrowCentrePercentage - halfArrowWidth }% ${arrowSideEdgePercentage}%,
                             0 ${arrowSideEdgePercentage}%)`;
             }
-            else // juxtaposeTo bottom
+            else // bottom
             {
                 clipPath = `polygon(0 ${marginPercentageOfHeight}%,
                             ${ arrowCentrePercentage - halfArrowWidth }% ${marginPercentageOfHeight}%,
@@ -208,7 +210,7 @@ export default class Tooltip
         const {
                 $tooltip,
                 arrowBasePx,
-                juxtaposeTo
+                juxtaposition
             } = this,
             initialTooltipHeight = $tooltip.height(),
             $tooltipContent = $tooltip.children(".content"),
@@ -220,13 +222,13 @@ export default class Tooltip
                 top: "bottom",
                 bottom: "top"
             },
-            paddingDirection = paddingDirections[juxtaposeTo];
+            paddingDirection = paddingDirections[juxtaposition];
         
         $tooltipContent.css(`padding-${paddingDirection}`, `${tooltipPadding}px`);
 
         // Horizontally juxtaposed tooltips sometimes require a slight offset adjustment.
         const tooltipHeight = $tooltip.height();
-        if (["left", "right"].includes(juxtaposeTo) && tooltipHeight !== initialTooltipHeight)
+        if (["left", "right"].includes(juxtaposition) && tooltipHeight !== initialTooltipHeight)
         {
             tooltipOffset.top -= Math.max(arrowBasePx, tooltipHeight - initialTooltipHeight);
             $tooltip.offset(tooltipOffset);
@@ -276,16 +278,8 @@ export default class Tooltip
         this.hoverEventsAreBound = true;
     }
 
-    // NOTE: extendHoverBox and getTooltipHoverBox are only coded for tooltips with juxtaposeTo = "top".
-    // Code could be added for the other juxtapositions, but the need wasn't there when the methods were written.
     extendHoverBox($hoveredElement)
     {
-        if (this.juxtaposeTo !== "top")
-        {
-            console.error(`Tooltip.extendHoverBox method does not support the "${this.juxtaposeTo}" tooltip juxtaposition.`);
-            return this.hide();
-        }
-        
         this.isExtendingHoverBox = true;
         
         const $document = $(document),
@@ -312,16 +306,8 @@ export default class Tooltip
             });
     }
 
-    // NOTE: extendHoverBox and getTooltipHoverBox are only coded for tooltips with juxtaposeTo = "top".
-    // Code could be added for the other juxtapositions, but the need wasn't there when the methods were written.
     getTooltipHoverBox()
     {
-        if (this.juxtaposeTo !== "top")
-        {
-            console.error(`Tooltip.getTooltipHoverBox method does not support the "${this.juxtaposeTo}" tooltip juxtaposition.`);
-            return false;
-        }
-        
         const { $tooltip, tooltipHoveringForgiveness: forgiveness } = this,
             tooltipOffset = $tooltip.offset(),
             hoverBox = tooltipOffset;
@@ -360,10 +346,7 @@ function setTooltipHoveringForgivenessDefaults(tooltip)
 {
     const { tooltipHoveringForgiveness: forgiveness } = tooltip,
         sides = ["top", "right", "bottom", "left"];
-
-    if (!forgiveness)
-        forgiveness = {};
-
+    
     for (let side of sides)
         if (!forgiveness[side])
             forgiveness[side] = 0;
