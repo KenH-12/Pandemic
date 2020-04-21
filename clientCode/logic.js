@@ -958,7 +958,7 @@ function bindEventHistoryIconHoverEvents()
 		getContent,
 		hoverElementSelector: "#eventHistory > div",
 		containerSelector: "#boardContainer",
-		juxtaposeTo: "top",
+		juxtaposition: "top",
 		cssClassString: "eventDetails",
 		allowTooltipHovering: true,
 		tooltipHoveringForgiveness: { top: 2, left: 2, right: 3, bottom: 1 },
@@ -996,7 +996,7 @@ function bindEventDetailsHoverEvents()
 	const eventTypeInfoSelector = ".eventDetails .eventTypeInfo",
 		hoverInfoSelector = ".eventDetails .hoverInfo",
 		containerSelector = "#boardContainer",
-		juxtaposeTo = "right",
+		juxtaposition = "right",
 		cssClassString = "eventTypeTooltip wideTooltip";
 
 	new Tooltip({
@@ -1012,7 +1012,7 @@ function bindEventDetailsHoverEvents()
 				return getEventTypeTooltipContent(eventType, { includeName: false, includeRelatedRoleRule });
 			},
 		containerSelector,
-		juxtaposeTo,
+		juxtaposition,
 		cssClassString
 	}).bindHoverEvents();
 	
@@ -1027,7 +1027,7 @@ function bindEventDetailsHoverEvents()
 				return getEventTypeTooltipContent(eventType, { isDispatchType });
 			},
 		containerSelector,
-		juxtaposeTo,
+		juxtaposition,
 		cssClassString
 	}).bindHoverEvents();
 }
@@ -3745,13 +3745,13 @@ function bindCuredDiseaseInfoHoverEvents()
 					<br/>
 					<span class='largeText'>Cures Discovered: ${4 - gameData.cures.remaining}</span>`;
 		},
-		juxtaposeTo = "top",
+		juxtaposition = "top",
 		containerSelector = "#boardContainer";
 	
 	new Tooltip({
 			getContent,
 			hoverElementSelector: "#cureMarkerContainer .info",
-			juxtaposeTo,
+			juxtaposition,
 			containerSelector,
 			cssClassString: "wideTooltip"
 		}).bindHoverEvents();
@@ -3759,7 +3759,7 @@ function bindCuredDiseaseInfoHoverEvents()
 	new Tooltip({
 		content: `<p class='largeText'>Disease Cured</p>`,
 		hoverElementSelector: ".cureMarker:not([src$='eradicated.png'])",
-		juxtaposeTo,
+		juxtaposition,
 		containerSelector,
 		cssClassString: "curedTooltip"
 	}).bindHoverEvents();
@@ -3767,7 +3767,7 @@ function bindCuredDiseaseInfoHoverEvents()
 	new Tooltip({
 		content: `<p class='largeText'>Disease Eradicated</p>${strings.eradicationRules}`,
 		hoverElementSelector: ".cureMarker[src$='eradicated.png']",
-		juxtaposeTo,
+		juxtaposition,
 		containerSelector,
 		cssClassString: "wideTooltip"
 	}).bindHoverEvents();
@@ -7365,6 +7365,7 @@ async function setup()
 
 	bindCubeSuppliesInfoHoverEvents();
 	bindInfectionDeckHoverEvents();
+	bindInfectionRateInfoHoverEvents();
 	bindCuredDiseaseInfoHoverEvents();
 	bindResearchStationInfoHoverEvents();
 	bindPlayerDeckHoverEvents();
@@ -8031,7 +8032,7 @@ function bindResearchStationInfoHoverEvents()
 		content: strings.researchStationSupplyInfo,
 		hoverElementSelector: `${positionRelativeToSelector} > .title .info`,
 		positionRelativeToSelector,
-		juxtaposeTo: "top",
+		juxtaposition: "top",
 		containerSelector: "#boardContainer",
 		cssClassString: "wideTooltip rsInfo",
 		allowTooltipHovering: true,
@@ -8042,7 +8043,7 @@ function bindResearchStationInfoHoverEvents()
 		getContent: ({ $hoveredElement }) => getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType"))),
 		hoverElementSelector: ".rsInfo .hoverInfo",
 		positionRelativeToSelector: ".rsInfo",
-		juxtaposeTo: "right",
+		juxtaposition: "right",
 		containerSelector: "#boardContainer",
 		cssClassString: "wideTooltip eventTypeTooltip"
 	}).bindHoverEvents();
@@ -8051,7 +8052,7 @@ function bindResearchStationInfoHoverEvents()
 function bindPlayerDeckHoverEvents()
 {
 	const positionRelativeToSelector = "#playerDeckContainer",
-		juxtaposeTo = "top",
+		juxtaposition = "top",
 		containerSelector = "#boardContainer",
 		getPlayerDeckInfo = function()
 		{
@@ -8071,7 +8072,7 @@ function bindPlayerDeckHoverEvents()
 		getContent: getPlayerDeckInfo,
 		hoverElementSelector: `${positionRelativeToSelector} .info`,
 		positionRelativeToSelector,
-		juxtaposeTo,
+		juxtaposition,
 		containerSelector,
 		cssClassString: "wideTooltip"
 	}).bindHoverEvents();
@@ -8080,7 +8081,7 @@ function bindPlayerDeckHoverEvents()
 		getContent: () => `<p class='largeText'>${gameData.numPlayerCardsRemaining} cards left<p>`,
 		hoverElementSelector: `${positionRelativeToSelector} img`,
 		positionRelativeToSelector,
-		juxtaposeTo,
+		juxtaposition,
 		containerSelector
 	}).bindHoverEvents();
 }
@@ -8586,7 +8587,31 @@ function bindInfectionDeckHoverEvents()
 		getContent: () => `<p class='largeText'>${gameData.infectionDeckSize} cards</p>`,
 		hoverElementSelector: `${positionRelativeToSelector} img`,
 		positionRelativeToSelector,
-		juxtaposeTo: "bottom"
+		juxtaposition: "bottom"
+	}).bindHoverEvents();
+}
+
+function bindInfectionRateInfoHoverEvents()
+{
+	new Tooltip({
+		getContent: () => `<p class='largeText'>Infection Rate: ${gameData.infectionRate}</p>${strings.infectionRateInfo}`,
+		hoverElementSelector: "#infectionRateMarker img",
+		juxtaposition: "bottom",
+		containerSelector: "#boardContainer",
+		cssClassString: "wideTooltip infectionRateTooltip",
+		allowTooltipHovering: true
+	}).bindHoverEvents();
+
+	new Tooltip({
+		getContent: ({ $hoveredElement }) => 
+			{
+				const eventType = getEventType($hoveredElement.attr("data-eventType"));
+				return getEventTypeTooltipContent(eventType, { pluralNameForm: true });
+			},
+		hoverElementSelector: ".infectionRateTooltip .hoverInfo",
+		juxtaposition: "bottom",
+		containerSelector: "#boardContainer",
+		cssClassString: "wideTooltip eventTypeTooltip"
 	}).bindHoverEvents();
 }
 
@@ -8596,7 +8621,7 @@ function bindCubeSuppliesInfoHoverEvents()
 		content: `${strings.diseaseCubeSupplyInfo}<p>${strings.insufficientCubesWarning}</p>`,
 		hoverElementSelector: "#cubeSupplies .info",
 		positionRelativeToSelector: "#cubeSupplies",
-		juxtaposeTo: "bottom",
+		juxtaposition: "bottom",
 		containerSelector: "#boardContainer",
 		cssClassString: "wideTooltip"
 	}).bindHoverEvents();
@@ -8775,15 +8800,15 @@ function showFullEpidemicCard($epidemicCard)
 		eventDetails = ".eventDetails";
 	
 	let $relativeTo = $epidemicCard,
-		juxtaposeTo = "left";
+		juxtaposition = "left";
 	
 	if ($epidemicCard.closest(eventDetails).length)
 	{
 		$relativeTo = $(eventDetails);
-		juxtaposeTo = "right";
+		juxtaposition = "right";
 	}
 
-	positionTooltipRelativeToElement($fullEpidemicCard, $relativeTo, { juxtaposeTo });
+	positionTooltipRelativeToElement($fullEpidemicCard, $relativeTo, { juxtaposition });
 }
 
 function lastEventCanBeUndone()
