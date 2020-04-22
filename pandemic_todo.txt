@@ -23,7 +23,6 @@ tooltips
 		outbreaks
 	forecast "top" and "bottom" headings
 	play steps
-	event history buttons
 	full cards
 	perhaps event type tooltips should specify the event category
 		setup step

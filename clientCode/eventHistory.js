@@ -1,6 +1,9 @@
 "use strict";
 
-export default class EventHistory
+import { PermanentEvent } from "./event.js";
+import { hideEventHistoryButtonTooltip } from "./tooltipInstantiation.js";
+
+class EventHistory
 {
     constructor()
     {
@@ -13,6 +16,8 @@ export default class EventHistory
         this.scrollLeft = 0;
         this.scrollDuration = 300;
         this.scrollEasing = "easeOutCubic";
+
+        this.events = [];
     }
 
     appendIcon($icon)
@@ -107,6 +112,7 @@ export default class EventHistory
             if (!leaveButtonsDisabled && overflow > 0)
                 this.enableBackButton();
             
+            hideEventHistoryButtonTooltip();
             resolve();
         });
     }
@@ -129,6 +135,8 @@ export default class EventHistory
             .off("click")
             .click(() => self.scrollBack())
             .removeClass("btnDisabled");
+        
+        hideEventHistoryButtonTooltip();
     }
     
     enableForwardButton()
@@ -138,6 +146,8 @@ export default class EventHistory
             .off("click")
             .click(() => self.scrollForward())
             .removeClass("btnDisabled");
+        
+        hideEventHistoryButtonTooltip();
     }
 
     disableScrollButtons()
@@ -150,12 +160,16 @@ export default class EventHistory
     {
         this.$btnBack.off("click")
             .addClass("btnDisabled");
+        
+        hideEventHistoryButtonTooltip();
     }
 
     disableForwardButton()
     {
         this.$btnForward.off("click")
             .addClass("btnDisabled");
+        
+        hideEventHistoryButtonTooltip();
     }
 
     scrollBack()
@@ -200,15 +214,37 @@ export default class EventHistory
         this.$btnUndo
             .off("click")
             .removeClass("btnDisabled")
-            .click(function() { undoAction() })
-            .attr("title", "Undo last action");
+            .click(function() { undoAction() });
+        
+        hideEventHistoryButtonTooltip();
     }
 
-    disableUndo({ undoIsIllegal, lastEventName } = {})
+    disableUndo()
     {
         this.$btnUndo
             .off("click")
-            .addClass("btnDisabled")
-            .attr("title", undoIsIllegal ? `${lastEventName} events cannot be undone.` : "Cannot undo at this time...");
+            .addClass("btnDisabled");
+        
+        hideEventHistoryButtonTooltip();
+    }
+
+    lastEventCanBeUndone()
+    {
+        const { events } = this;
+        
+        let event;
+        for (let i = events.length - 1; i >= 0; i--)
+        {
+            event = events[i];
+
+            if (event instanceof PermanentEvent)
+                return false;
+            
+            if (event.isUndoable)
+                return true;
+        }
+        return false;
     }
 }
+
+export const eventHistory = new EventHistory();

@@ -52,7 +52,6 @@ import Event, {
 	getEventTypeTooltipContent,
 	movementTypeRequiresDiscard,
 	attachPlayersToEvents,
-	PermanentEvent,
 	MovementAction,
 	DriveFerry,
 	DirectFlight,
@@ -88,7 +87,7 @@ import Event, {
 	StartingHands,
 	PassActions
 } from "./event.js";
-import EventHistory from "./eventHistory.js";
+import { eventHistory } from "./eventHistory.js";
 import {
     showTravelPathArrow,
     setTravelPathArrowColor,
@@ -105,8 +104,7 @@ import instantiateTooltips, {
 } from "./tooltipInstantiation.js";
 
 $(function(){
-const eventHistory = new EventHistory(),
-	playerDeckImgManager = new DeckImageManager({
+const playerDeckImgManager = new DeckImageManager({
 		$deck: $("#playerDeckContainer img"),
 		imageUrlWithoutNumber: "images/cards/playerDeck_.png",
 		numImages: 7,
@@ -203,8 +201,8 @@ function parseEvents(events)
 				else if (e.code === eventTypes.forecastPlacement.code)
 				{
 					// The previously parsed Event is always the corresponding Forecast event which drew the top 6 infection cards.
-					// It can either be found in parsedEvents or gameData.events, but always at the end of whichever array.
-					const forecastEvent = parsedEvents.length ? parsedEvents[parsedEvents.length - 1] : gameData.events[gameData.events.length - 1],
+					// It can either be found in parsedEvents or eventHistory.events, but always at the end of whichever array.
+					const forecastEvent = parsedEvents.length ? parsedEvents[parsedEvents.length - 1] : eventHistory.events[eventHistory.events.length - 1],
 						placementEvent = new ForecastPlacement(e, cities, forecastEvent);
 					
 					parsedEvents.push(placementEvent);
@@ -231,7 +229,7 @@ function parseEvents(events)
 					parsedEvents.push(new Event(e, cities));
 			}
 
-			gameData.events = [...gameData.events, ...parsedEvents];
+			eventHistory.events = [...eventHistory.events, ...parsedEvents];
 
 			if (Object.keys(gameData.players).length)
 			{
@@ -245,7 +243,7 @@ function parseEvents(events)
 
 function addToEventHistoryQueue(newEvents)
 {
-	let eventIdx = gameData.events.length - newEvents.length;
+	let eventIdx = eventHistory.events.length - newEvents.length;
 	
 	for (let event of newEvents)
 	{
@@ -330,15 +328,10 @@ class Step
 
 		highlightTurnProcedureStep(this.name);
 		
-		if (lastEventCanBeUndone())
+		if (eventHistory.lastEventCanBeUndone())
 			eventHistory.enableUndo(undoAction);
 		else
-		{
-			const { events } = gameData,
-				lastEventName = events[events.length - 1].name;
-			
-			eventHistory.disableUndo({ undoIsIllegal: true, lastEventName });
-		}
+			eventHistory.disableUndo();
 	}
 
 	resume()
@@ -4257,7 +4250,7 @@ function instantiatePlayers(playerInfoArray)
 function getTurnOrder()
 {
 	const turnOrderCards = getDecidingTurnOrderCardPopulations(),
-		startingHandsEvent = gameData.events[0];
+		startingHandsEvent = eventHistory.events[0];
 	
 	startingHandsEvent.setPopulationRanks(turnOrderCards);
 	
@@ -5007,7 +5000,7 @@ async function epidemicIncrease()
 		// If two epidemics were drawn on the same turn, event cards can be played after resolving the first
 		// (but not during resolution of the second).
 		// We should also give the user a chance to undo the playing of any undoable event cards between epidemics.
-		if (anyPlayerHasAnyEventCard() || lastEventCanBeUndone())
+		if (anyPlayerHasAnyEventCard() || eventHistory.lastEventCanBeUndone())
 		{
 			enableEventCards();
 
@@ -5105,7 +5098,7 @@ async function epidemicIntensify()
 
 	// Resilient Population may be played between the infect and intensify steps of an epidemic.
 	// We should also give the user a chance to undo the Resilient Population event before beginning the intensify step.
-	if (anyPlayerHasResilientPopulation() || lastEventCanBeUndone())
+	if (anyPlayerHasResilientPopulation() || eventHistory.lastEventCanBeUndone())
 	{
 		enableEventCards({ resilientPopulationOnly: true });
 		
@@ -5668,7 +5661,7 @@ async function infectionStep()
 		// Event cards cannot be played while resolving infection cards,
 		// but they can be played before, between, or after resolving infection cards.
 		eventCardsCanBePlayed = anyPlayerHasAnyEventCard();
-		if (eventCardsCanBePlayed || lastEventCanBeUndone())
+		if (eventCardsCanBePlayed || eventHistory.lastEventCanBeUndone())
 		{
 			if (eventCardsCanBePlayed || infectionRate - infectionCount < 2)
 				$btn.html("INFECT CITY");
@@ -6150,7 +6143,7 @@ function dealInitialInfectionCards()
 	return new Promise(async (resolve) =>
 	{
 		// Filter initial infections and assign them indices
-		const initialInfections = gameData.events.filter(e => e instanceof InitialInfection)[0]
+		const initialInfections = eventHistory.events.filter(e => e instanceof InitialInfection)[0]
 			.infections.map((inf, i) => { return { ...inf, infectionIndex: i } }),
 			GROUP_SIZE = 3; // 3 groups of 3 infection cards
 		let group;
@@ -6832,7 +6825,7 @@ function getNumActionsRemaining()
 // Accepts an array of desiredEventTypes, or a single event type.
 function getEventsOfTurn(desiredEventTypes, { turnNum } = {})
 {
-	const { events } = gameData,
+	const { events } = eventHistory,
 		eventsOfTurn = [];
 	
 	turnNum = turnNum || gameData.turnNum;
@@ -6911,7 +6904,7 @@ async function setup()
 			diseaseStatuses
 		},
 		1: playerCards,
-		2: eventHistory
+		2: events
 	} = await Promise.all([retrieveGameData(), retrievePlayerCards(), retrieveEventHistory()])
 		.catch(function(err)
 		{
@@ -6922,15 +6915,15 @@ async function setup()
 	if (gamestate.gameIsResuming)
 		prepareToFlagRemovedEventCardEvents();
 	
-	await parseEvents(eventHistory);
+	await parseEvents(events);
 	loadGamestate(gamestate);
 	loadCityStates(cities);
 
 	gameData.startingHandPopulations = startingHandPopulations;
 	instantiatePlayers(players);
-	attachPlayersToEvents(gameData.events);
+	attachPlayersToEvents(eventHistory.events);
 	
-	addToEventHistoryQueue(gameData.events);
+	addToEventHistoryQueue(eventHistory.events);
 	if (gameData.gameIsResuming)
 		appendEventHistoryIcons();
 	
@@ -8220,25 +8213,6 @@ function collapsePlayerDiscardPile()
 	});
 }
 
-function lastEventCanBeUndone()
-{
-	const { events } = gameData;
-	let event;
-	
-	for (let i = events.length - 1; i >= 0; i--)
-	{
-		event = events[i];
-
-		if (event instanceof PermanentEvent)
-			return false;
-		
-		if (event.isUndoable)
-			return true;
-	}
-
-	return false;
-}
-
 async function undoAction()
 {
 	const { event, eventIndex } = getLastUndoableEvent();
@@ -8260,8 +8234,7 @@ async function undoAction()
 	else
 		resetActionPrompt({ actionCancelled: true });
 
-	const { currentStep, events } = gameData,
-		{
+	const {
 			undoneEventIds,
 			wasContingencyCard,
 			prevStepName,
@@ -8270,7 +8243,7 @@ async function undoAction()
 		} = await event.requestUndo();
 
 	await animateUndoEvents(undoneEventIds, wasContingencyCard);
-	events.length = eventIndex;
+	eventHistory.events.length = eventIndex;
 	
 	if (prevStepName)
 	{
@@ -8289,7 +8262,7 @@ async function undoAction()
 	}
 	else if (forecastInProgress())
 	{
-		currentStep.indicate();
+		gameData.currentStep.indicate();
 		indicatePromptingEventCard();
 	}
 	else
@@ -8298,7 +8271,7 @@ async function undoAction()
 
 function getLastUndoableEvent()
 {
-	const { events } = gameData;
+	const { events } = eventHistory;
 	let event, i;
 
 	for (i = events.length - 1; i >= 0; i--)
@@ -8322,7 +8295,7 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 		disableInfectionDiscardHoverEvents();
 		disablePlayerDiscardHoverEvents();
 		
-		const { events } = gameData;
+		const { events } = eventHistory;
 		let event;
 		
 		for (let id of undoneEventIds.reverse())

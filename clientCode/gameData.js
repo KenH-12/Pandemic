@@ -6,7 +6,6 @@ const gameData = {
     steps: {},
     currentStep: -1,
     promptingEventType: false,
-    events: [],
     eventHistoryQueue: [],
 	cures: {
 		remaining: 4,

@@ -21,6 +21,7 @@ import {
     resizeInfectionCards,
 	activePlayerCanTakeFromResearcher
 } from "./utilities/pandemicUtils.js";
+import { eventHistory } from "./eventHistory.js";
 
 export default function instantiateTooltips()
 {
@@ -29,6 +30,7 @@ export default function instantiateTooltips()
 	bindInfectionDeckHoverEvents();
 	bindInfectionRateInfoHoverEvents();
 	bindOutbreakMarkerHoverEvents();
+	bindEventHistoryButtonHoverEvents();
 	bindEventHistoryIconHoverEvents();
 	bindEventDetailsHoverEvents();
 	bindCuredDiseaseInfoHoverEvents();
@@ -172,17 +174,55 @@ function bindOutbreakMarkerHoverEvents()
 	}).bindHoverEvents();
 }
 
+const eventHistoryButtonTooltip = new Tooltip({
+	hoverElementSelector: ".eventHistoryButton",
+	cssClassString: "eventHistoryButtonTooltip",
+	juxtaposition: "top",
+	containerSelector: "#boardContainer",
+	windowPadding: 1
+});
+function bindEventHistoryButtonHoverEvents()
+{
+	eventHistoryButtonTooltip.getContent = function({ $hoveredElement })
+	{
+		const isEnabled = !$hoveredElement.hasClass("btnDisabled");
+
+		if ($hoveredElement.attr("id") === "btnUndo")
+		{
+			if (isEnabled)
+				return "Undo last action";
+
+			if (eventHistory.lastEventCanBeUndone())
+				return "Cannot undo at this time...";
+			
+			const { events } = eventHistory,
+				lastEventName = events[events.length - 1].name;
+			
+			return `"${lastEventName}" events cannot be undone`;
+		}
+
+		return `${ isEnabled ? "See" : "No" } ${ $hoveredElement.hasClass("btnBack") ? "older" : "newer" } events`;
+	}
+	
+	eventHistoryButtonTooltip.bindHoverEvents();
+}
+function hideEventHistoryButtonTooltip()
+{
+	if (eventHistoryButtonTooltip instanceof Tooltip)
+		eventHistoryButtonTooltip.hide();
+}
+
 function bindEventHistoryIconHoverEvents()
 {
 	const getContent = function({ $hoveredElement })
 		{
 			const eventIndex = $($hoveredElement).attr("data-index");
-			return gameData.events[eventIndex].getDetails();
+			return eventHistory.events[eventIndex].getDetails();
 		},
 		beforeShow = function({ $hoveredElement, $tooltip })
 		{
 			const eventIndex = $($hoveredElement).attr("data-index"),
-				event = gameData.events[eventIndex];
+				event = eventHistory.events[eventIndex];
 
 			$tooltip.attr("data-eventType", event.code);
 
@@ -197,7 +237,7 @@ function bindEventHistoryIconHoverEvents()
 		afterShow = function({ $hoveredElement, $tooltip })
 		{
 			const eventIndex = $($hoveredElement).attr("data-index"),
-				event = gameData.events[eventIndex];
+				event = eventHistory.events[eventIndex];
 			
 			bindRoleCardHoverEvents();
 			if (event instanceof StartingHands)
@@ -483,7 +523,8 @@ function showFullEpidemicCard($epidemicCard)
 
 export {
     bindPlayerDeckHoverEvents,
-    decrementInfectionDeckSize,
+	decrementInfectionDeckSize,
+	hideEventHistoryButtonTooltip,
     resetInfectionDeckSize,
     bindRoleCardHoverEvents,
     bindEpidemicCardHoverEvents,
