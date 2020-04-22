@@ -47,8 +47,77 @@ export default class Tooltip
         this.hoverEventsAreBound = false;
     }
 
+    bindHoverEvents()
+    {
+        if (this.hoverEventsAreBound)
+            return false;
+        
+        const { hoverElementSelector } = this,
+            self = this;
+
+        $(document).off("mouseenter mouseleave", hoverElementSelector)
+            .on("mouseenter", hoverElementSelector, function()
+            {
+                self.$hoveredElement = $(this);
+                self.show();
+            })
+            .on("mouseleave", hoverElementSelector, function()
+            {
+                if (self.allowTooltipHovering)
+                    return self.extendHoverBox($(this));
+                
+                self.hide();
+            });
+
+        this.hoverEventsAreBound = true;
+    }
+
+    unbindHoverEvents()
+    {
+        if (!this.hoverEventsAreBound)
+            return false;
+        
+        const {
+                hoverElementSelector    
+            } = this;
+        
+        $(document).off("mouseenter mouseleave", hoverElementSelector);
+
+        this.hoverEventsAreBound = false;
+    }
+
+    async show()
+    {
+        if (this.isExtendingHoverBox)
+            return false;
+        
+        this.create();
+
+        if (typeof this.beforeShow === "function")
+            await this.beforeShow(this);
+
+        this.$tooltip.appendTo(this.containerSelector);
+        this.positionRelativeToElement();
+
+        if (typeof this.afterShow === "function")
+            this.afterShow(this);
+    }
+
+    hide()
+    {
+        this.$hoveredElement = false;
+
+        if (this.$tooltip.length)
+            this.$tooltip.remove();
+        
+        this.$tooltip = false;
+    }
+
     create()
     {
+        if (this.$tooltip.length)
+            this.$tooltip.remove();
+        
         const {
                 content,
                 cssClassString
@@ -131,8 +200,7 @@ export default class Tooltip
 
     getRelativeElement()
     {
-        if (this.hoverElementSelector === this.positionRelativeToSelector
-            && this.$hoveredElement.length)
+        if (this.hoverElementSelector === this.positionRelativeToSelector && this.$hoveredElement.length)
             return this.$hoveredElement;
         
         return $(this.positionRelativeToSelector);
@@ -255,47 +323,6 @@ export default class Tooltip
         return tooltipOffset;
     }
 
-    bindHoverEvents()
-    {
-        if (this.hoverEventsAreBound)
-            return false;
-        
-        const {
-                hoverElementSelector,
-                containerSelector
-            } = this,
-            self = this;
-
-        $(document).off("mouseenter mouseleave", hoverElementSelector)
-            .on("mouseenter", hoverElementSelector, async function()
-            {
-                if (self.isExtendingHoverBox)
-                    return false;
-                
-                self.$hoveredElement = $(this);
-
-                self.create();
-
-                if (typeof self.beforeShow === "function")
-                    await self.beforeShow(self);
-                
-                self.$tooltip.appendTo(containerSelector);
-                self.positionRelativeToElement();
-
-                if (typeof self.afterShow === "function")
-                    self.afterShow(self);
-            })
-            .on("mouseleave", hoverElementSelector, function()
-            {
-                if (self.allowTooltipHovering)
-                    return self.extendHoverBox($(this));
-                
-                self.hide();
-            });
-
-        this.hoverEventsAreBound = true;
-    }
-
     extendHoverBox($hoveredElement)
     {
         this.isExtendingHoverBox = true;
@@ -336,27 +363,6 @@ export default class Tooltip
         hoverBox.bottom = tooltipOffset.top + $tooltip.height() + forgiveness.bottom;
 
         return hoverBox;
-    }
-
-    hide()
-    {
-        this.$hoveredElement = false;
-        this.$tooltip.remove();
-        this.$tooltip = false;
-    }
-
-    unbindHoverEvents()
-    {
-        if (!this.hoverEventsAreBound)
-            return false;
-        
-        const {
-                hoverElementSelector    
-            } = this;
-        
-        $(document).off("mouseenter mouseleave", hoverElementSelector);
-
-        this.hoverEventsAreBound = false;
     }
 }
 
