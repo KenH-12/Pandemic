@@ -1,3 +1,5 @@
+"use strict";
+
 function animationPromise({ $elements, initialProperties, desiredProperties, duration, easing, callback })
 {
 	return new Promise(resolve =>

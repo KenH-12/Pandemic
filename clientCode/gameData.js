@@ -69,6 +69,13 @@ function replaceRoleNamesWithRoleTags(string)
 	return string;
 }
 
+function locatePawnOnRoleTagClick($containingElement)
+{
+	$containingElement.find(".roleTag").not(".playerOption")
+		.off("click")
+		.click(function() { getPlayer($(this).data("role")).pinpointLocation() });
+}
+
 function eventTypeIsBeingPrompted(eventType)
 {
 	const { promptingEventType } = gameData;
@@ -76,22 +83,17 @@ function eventTypeIsBeingPrompted(eventType)
 	return promptingEventType && promptingEventType.code === eventType.code;
 }
 
-function decrementInfectionDeckSize()
+function getDifficultyName()
 {
-	gameData.infectionDeckSize -= 1;
-	updateInfectionDeckTooltip();
-}
+	const { numEpidemics } = gameData;
 
-function resetInfectionDeckSize()
-{
-	gameData.infectionDeckSize = gameData.maxInfectionDeckSize - $("#removedInfectionCards").find(".infectionCard").length;
-	updateInfectionDeckTooltip();
-}
-
-function updateInfectionDeckTooltip()
-{
-	if ($("#infectionDeckContainer img").is(":hover"))
-		$(".tooltip").find("p").html(`${gameData.infectionDeckSize} cards`);
+	if (numEpidemics == 4)
+		return "Introductory";
+	
+	if (numEpidemics == 5)
+		return "Standard";
+	
+	return "Heroic";
 }
 
 export {
@@ -99,7 +101,7 @@ export {
 	getPlayer,
 	getActivePlayer,
 	replaceRoleNamesWithRoleTags,
+	locatePawnOnRoleTagClick,
 	eventTypeIsBeingPrompted,
-	decrementInfectionDeckSize,
-	resetInfectionDeckSize
-};
+	getDifficultyName
+}

@@ -1,3 +1,5 @@
+"use strict";
+
 import { eventTypes } from "./event.js";
 import { gameData, eventTypeIsBeingPrompted, getPlayer } from "./gameData.js";
 import Tooltip from "./tooltip.js";

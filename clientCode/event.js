@@ -9,6 +9,11 @@ import {
 	replaceRoleNamesWithRoleTags
 } from "./gameData.js";
 import { setDuration } from "./durations.js";
+import {
+	getInfectionRate,
+	getColorWord,
+	newDiseaseCubeElement
+} from "./utilities/pandemicUtils.js";
 
 const dispatchDiscardRule = "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
 eventTypes = {

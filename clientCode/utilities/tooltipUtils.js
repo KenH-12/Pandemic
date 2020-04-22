@@ -1,3 +1,5 @@
+"use strict";
+
 async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposition = "left", tooltipMargin } = {})
 {
 	tooltipMargin = tooltipMargin || 15;

@@ -10,6 +10,7 @@ import {
 	setTravelPathArrowColor,
 	animateInvalidTravelPath
 } from "./travelPathArrow.js";
+import { getColorClass } from "./utilities/pandemicUtils.js";
 
 export default class City
 {
@@ -1256,6 +1257,99 @@ function isCityKey(cardKey)
 	return cities.hasOwnProperty(cardKey);
 }
 
+function bindCityLocatorClickEvents({ $containingElement } = {})
+{
+	const selector = ".infectionCard, .playerCard:not(.eventCard, .epidemic), .locatable",
+		$locatable = $containingElement ? $containingElement.find(selector) : $(selector);
+	
+	$locatable.off("click")
+		.click(function() { pinpointCityFromCard($(this)) });
+}
+
+function pinpointCityFromCard($card)
+{
+	if ($card.hasClass("sorting"))
+		return false;
+	
+	const city = getCity($card.data("key"));
+	pinpointCity(city.key, { pinpointClass: `${city.color}Border` });
+}
+
+// shows a city's location by animating 2 rectangles such that their points overlap on the specified city's position
+async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
+{
+	if (gameData.skipping)
+		return;
+	
+	const city = getCity(cityKey),
+		cityOffset = city.getOffset(),
+		{ cityWidth, boardWidth, boardHeight } = gameData,
+		cWidth = cityWidth,
+		adj = boardWidth * 0.003, // slight adjustment needed for $rectB coords
+		$rects = $(".pinpointRect").stop(),
+		$rectA = $rects.first(),
+		$rectB = $rects.last(),
+		duration = getDuration("pinpointCity"),
+		easing = "easeOutQuad";
+
+	$rects.attr("class", "pinpointRect hidden");
+	resetPinpointRectangles();
+
+	if (pinpointClass)
+		$rects.addClass(pinpointClass);
+	else if (pinpointColor)
+		$rects.css("border-color", pinpointColor);
+	else
+		$rects.css("border-color", "#fff");
+	
+	$rects.removeClass("hidden");
+	
+	await Promise.all(
+	[
+		animationPromise(
+		{
+			$elements: $rectA,
+			desiredProperties: {
+				left: cityOffset.left - cWidth,
+				top: cityOffset.top - cWidth
+			},
+			duration, 
+			easing
+		}),
+		animationPromise(
+		{
+			$elements: $rectB,
+			desiredProperties: {
+				left: (cityOffset.left + cWidth) - boardWidth - adj,
+				top: (cityOffset.top + cWidth) - boardHeight - adj
+			},
+			duration,
+			easing
+		})
+	]);
+
+	await sleep(750);
+
+	await animationPromise(
+	{
+		$elements: $rects,
+		desiredProperties: { opacity: 0 },
+		duration: 1250
+	});
+}
+
+function resetPinpointRectangles()
+{
+	const $pinpointers = $(".pinpointRect"),
+		{ boardHeight, boardWidth } = gameData;
+
+	$pinpointers.stop()
+		.removeAttr("style")
+		.height(boardHeight)
+		.width(boardWidth)
+		.addClass("hidden");
+}
+
 const researchStationKeys = new Set();
 function newResearchStationElement(cityKey, promptAction)
 {
@@ -1584,6 +1678,10 @@ export {
     cities,
 	getCity,
 	isCityKey,
+	bindCityLocatorClickEvents,
+	pinpointCityFromCard,
+	pinpointCity,
+	resetPinpointRectangles,
     researchStationKeys,
     updateResearchStationSupplyCount,
 	getResearchStationSupplyCount,

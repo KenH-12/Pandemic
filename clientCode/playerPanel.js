@@ -1,4 +1,5 @@
 "use strict";
+
 import { cities } from "./city.js";
 import { getDuration } from "./durations.js";
 

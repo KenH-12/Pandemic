@@ -1,3 +1,9 @@
+"use strict";
+
+import getDimension from "../dimensions.js";
+import { eventTypes } from "../event.js";
+import { gameData, getPlayer } from "../gameData.js";
+
 // Returns the Infection Rate (as seen on the Infection Rate Track on the game board)
 // which corresponds to the number of Epidemic cards drawn thus far.
 function getInfectionRate(epidemicCount)
@@ -60,4 +66,104 @@ function newPlayerCard(relatedObject, { noTooltip } = {})
 		return relatedObject.getPlayerCard({ noTooltip });
 
 	return `<div class='playerCard epidemic' data-key='epid'>EPIDEMIC</div>`;
+}
+
+function resizeInfectionCards($container)
+{
+	$container = $container || $("#boardContainer");
+
+	const $infectionCards = $container.find(".infectionCard");
+
+	if (!$infectionCards.length)
+		return false;
+
+	$infectionCards.height(getDimension("infDiscardHeight"))
+		.find(".cityName")
+		.css(getInfectionCardTextStyle($container));
+	
+	if ($container.hasClass("eventDetails"))
+	{
+		const cardWidth = gameData.boardWidth * 0.2,
+			newContainerWidth = cardWidth / .96,
+			checkWidth = !$container.width();
+		
+		$infectionCards.children(".infectionCardContents").width(cardWidth);
+		
+		if (checkWidth)
+			$container.appendTo("#boardContainer");
+
+		if ($container.width() < newContainerWidth)
+			$container.width(newContainerWidth);
+		
+		if (checkWidth)
+			$container.detach();
+	}
+}
+
+function getInfectionCardTextStyle($container)
+{
+	const fontSize = getDimension("infDiscardFont") + "px",
+		top = getDimension("infDiscardNameTop"),
+		styleProperties = {
+			top,
+			fontSize,
+		};
+	
+	if ($container.hasClass("eventDetails"))
+	{
+		styleProperties.top -= 1;
+		styleProperties.lineHeight = fontSize;
+	}
+
+	return styleProperties;
+}
+
+function useRoleColorForRelatedActionButtons(role)
+{
+	const {
+			buildResearchStation,
+			treatDisease,
+			shareKnowledge,
+			discoverACure
+		} = eventTypes,
+		actionsWithRelatedRoles = [
+			buildResearchStation,
+			treatDisease,
+			shareKnowledge,
+			discoverACure
+		];
+	
+	let $actionButton;
+	for (let action of actionsWithRelatedRoles)
+	{
+		$actionButton = $(`#btn${toPascalCase(action.name)}`);
+
+		if (role === action.relatedRoleName)
+			$actionButton.addClass(toCamelCase(role));
+		else if (action.name === "Share Knowledge" && activePlayerCanTakeFromResearcher())
+			$actionButton.addClass("researcher");
+		else
+			$actionButton.removeClass(toCamelCase(action.relatedRoleName));
+	}
+}
+
+function activePlayerCanTakeFromResearcher()
+{
+	const researcher = getPlayer("Researcher");
+
+	return researcher &&
+		researcher.isHoldingAnyCityCard() &&
+		researcher.cityKey === getActivePlayer().cityKey;
+}
+
+export {
+	getInfectionRate,
+	getColorClass,
+	getColorWord,
+	newDiseaseCubeElement,
+	newPlayerCard,
+	resizeInfectionCards,
+	getInfectionCardTextStyle,
+	useRoleColorForRelatedActionButtons,
+	activePlayerCanTakeFromResearcher
 }

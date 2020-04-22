@@ -1,3 +1,5 @@
+"use strict";
+
 // Returns a Promise that resolves after ms milliseconds.
 function sleep(ms)
 {

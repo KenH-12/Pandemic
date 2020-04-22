@@ -1,3 +1,5 @@
+"use strict";
+
 class Step
 {
     constructor(name, description, substeps)

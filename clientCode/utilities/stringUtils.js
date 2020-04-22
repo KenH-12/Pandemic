@@ -1,3 +1,5 @@
+"use strict";
+
 // Useful for extracting numbers from the beginning of css property values such as border or padding.
 function getLeadingNumber(string)
 {
