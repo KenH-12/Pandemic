@@ -13,15 +13,12 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 if an event details tooltip is visible when the related icon is removed, the tooltip remains
 
-the disabled event card tooltip needs to be fixed
-
 TO DO
 -----
 tooltips
 	secondary tooltips
 		epidemics
 		outbreaks
-	forecast "top" and "bottom" headings
 	play steps
 	full cards
 	perhaps event type tooltips should specify the event category
