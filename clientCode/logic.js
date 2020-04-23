@@ -3476,7 +3476,7 @@ function resizeRightPanelElements()
 	rightPanel.height(gameData.boardHeight);
 	gameData.panelWidth = rightPanel.width();
 	
-	if ($("#infectionsContainer, #initialInfectionsContainer").not(".hidden").length)
+	if ($("#infectionsContainer, #initialInfectionsContainer, #forecastContainer").not(".hidden").length)
 	{
 		positionInfectionPanelComponents();
 		positionFaceDownInfectionCards();
