@@ -28,6 +28,9 @@ strings = {
     scientistCardText: `<li><span>You need only 4 cards of the same color to do the Discover a Cure action.</span></li>`,
 
     additionalDiscoverACureInfo: "When a disease is cured, its cubes remain on the board and new cubes can still be placed during epidemics or infections. However treating this disease is now easier and your team is closer to winning.",
+
+    forecastTopInfo: "The top card will be put back on the deck last (and drawn from the deck first).",
+    forcastBottomInfo: "The bottom card will be put back on the deck first (and drawn from the deck sixth).",
 };
 
 export { strings };

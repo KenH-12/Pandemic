@@ -36,6 +36,7 @@ export default function instantiateTooltips()
 	bindCuredDiseaseInfoHoverEvents();
 	bindResearchStationInfoHoverEvents();
 	bindActionButtonHoverEvents();
+	bindForecastInfoHoverEvents();
 }
 
 function bindPlayerDeckHoverEvents()
@@ -298,6 +299,30 @@ function bindEventDetailsHoverEvents()
 	}).bindHoverEvents();
 }
 
+function enforceEventDetailsHeightLimit($detailsContainer)
+{
+	$detailsContainer = $detailsContainer || $(".eventDetails");
+
+	if (!$detailsContainer.length)
+		return false;
+	
+	const offsetTop = $detailsContainer.offset().top,
+		minOffsetTop = gameData.topPanelHeight + 5;
+	
+	if (offsetTop >= minOffsetTop)
+	{
+		$detailsContainer.removeClass("scrollable");
+		return false;
+	}
+
+	const currentHeight = $detailsContainer.height(),
+		heightReduction = minOffsetTop - offsetTop;
+
+	$detailsContainer.addClass("scrollable")
+		.height(currentHeight - heightReduction)
+		.offset({ top: minOffsetTop });
+}
+
 function bindCuredDiseaseInfoHoverEvents()
 {
 	const getContent = function()
@@ -414,28 +439,17 @@ function relatedRoleRuleApplies(eventType, { roleA, roleB } = {})
 	return roleB === "Researcher";
 }
 
-function enforceEventDetailsHeightLimit($detailsContainer)
+function bindForecastInfoHoverEvents()
 {
-	$detailsContainer = $detailsContainer || $(".eventDetails");
-
-	if (!$detailsContainer.length)
-		return false;
+	const containerSelector = "#forecastContainer";
 	
-	const offsetTop = $detailsContainer.offset().top,
-		minOffsetTop = gameData.topPanelHeight + 5;
-	
-	if (offsetTop >= minOffsetTop)
-	{
-		$detailsContainer.removeClass("scrollable");
-		return false;
-	}
-
-	const currentHeight = $detailsContainer.height(),
-		heightReduction = minOffsetTop - offsetTop;
-
-	$detailsContainer.addClass("scrollable")
-		.height(currentHeight - heightReduction)
-		.offset({ top: minOffsetTop });
+	new Tooltip({
+		getContent: ({ $hoveredElement }) => $hoveredElement.html() === "Top" ? strings.forecastTopInfo : strings.forcastBottomInfo,
+		getJuxtaposition: ({ $hoveredElement }) => $hoveredElement.html() === "Top" ? "top" : "bottom",
+		hoverElementSelector: `${containerSelector} .hoverInfo:not(.concealed)`,
+		positionRelativeToSelector: containerSelector,
+		containerSelector
+	}).bindHoverEvents();
 }
 
 function bindRoleCardHoverEvents()
