@@ -100,7 +100,7 @@ function unbindEventCardHoverEvents($container)
         .off("mouseenter mouseleave");
     
     if (disabledEventCardTooltip instanceof Tooltip)
-        disabledEventCardTooltip.unbindEventCardHoverEvents();
+        disabledEventCardTooltip.unbindHoverEvents();
 }
 
 function getFullCardOffset($eventCard, $fullCard)

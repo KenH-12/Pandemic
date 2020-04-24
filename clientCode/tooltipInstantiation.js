@@ -213,49 +213,49 @@ function hideEventHistoryButtonTooltip()
 		eventHistoryButtonTooltip.hide();
 }
 
+const eventDetailsTooltip = new Tooltip({
+	hoverElementSelector: "#eventHistory > div",
+	containerSelector: "#boardContainer",
+	juxtaposition: "top",
+	cssClassString: "eventDetails",
+	allowTooltipHovering: true,
+	tooltipHoveringForgiveness: { top: 2, left: 2, right: 3, bottom: 1 }
+});
 function bindEventHistoryIconHoverEvents()
 {
-	const getContent = function({ $hoveredElement })
-		{
-			const eventIndex = $($hoveredElement).attr("data-index");
-			return eventHistory.events[eventIndex].getDetails();
-		},
-		beforeShow = function({ $hoveredElement, $tooltip })
-		{
-			const eventIndex = $($hoveredElement).attr("data-index"),
-				event = eventHistory.events[eventIndex];
+	eventDetailsTooltip.getContent = function({ $hoveredElement })
+	{
+		const eventIndex = $($hoveredElement).attr("data-index");
+		return eventHistory.events[eventIndex].getDetails();
+	}
 
-			$tooltip.attr("data-eventType", event.code);
+	eventDetailsTooltip.beforeShow = function({ $hoveredElement, $tooltip })
+	{
+		const eventIndex = $($hoveredElement).attr("data-index"),
+			event = eventHistory.events[eventIndex];
 
-			bindEventCardHoverEvents($tooltip);
-			bindEpidemicCardHoverEvents($tooltip);
-			locatePawnOnRoleTagClick($tooltip);
-			bindCityLocatorClickEvents({ $containingElement: $tooltip });
+		$tooltip.attr("data-eventType", event.code);
 
-			resizeInfectionCards($tooltip);
-			enforceEventDetailsHeightLimit();
-		},
-		afterShow = function({ $hoveredElement, $tooltip })
-		{
-			const eventIndex = $($hoveredElement).attr("data-index"),
-				event = eventHistory.events[eventIndex];
-			
-			bindRoleCardHoverEvents();
-			if (event instanceof StartingHands)
-				event.positionPopulationRanks($tooltip);
-		};
+		bindEventCardHoverEvents($tooltip);
+		bindEpidemicCardHoverEvents($tooltip);
+		locatePawnOnRoleTagClick($tooltip);
+		bindCityLocatorClickEvents({ $containingElement: $tooltip });
+
+		resizeInfectionCards($tooltip);
+		enforceEventDetailsHeightLimit();
+	}
+
+	eventDetailsTooltip.afterShow = function({ $hoveredElement, $tooltip })
+	{
+		const eventIndex = $($hoveredElement).attr("data-index"),
+			event = eventHistory.events[eventIndex];
+		
+		bindRoleCardHoverEvents();
+		if (event instanceof StartingHands)
+			event.positionPopulationRanks($tooltip);
+	}
 	
-	new Tooltip({
-		getContent,
-		hoverElementSelector: "#eventHistory > div",
-		containerSelector: "#boardContainer",
-		juxtaposition: "top",
-		cssClassString: "eventDetails",
-		allowTooltipHovering: true,
-		tooltipHoveringForgiveness: { top: 2, left: 2, right: 3, bottom: 1 },
-		beforeShow,
-		afterShow
-	}).bindHoverEvents();
+	eventDetailsTooltip.bindHoverEvents();
 }
 
 function bindEventDetailsHoverEvents()
@@ -539,6 +539,7 @@ export {
     bindPlayerDeckHoverEvents,
 	decrementInfectionDeckSize,
 	hideEventHistoryButtonTooltip,
+	eventDetailsTooltip,
     resetInfectionDeckSize,
     bindRoleCardHoverEvents,
     bindEpidemicCardHoverEvents,

@@ -11,16 +11,19 @@ tooltips which have their offset adjusted after the load event of a contained im
 
 if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
 
-if an event details tooltip is visible when the related icon is removed, the tooltip remains
-
 TO DO
 -----
+in eventHistory...
+	unbind, rebind, and checkHoverstate of event history tooltip when...
+		scrolling to end
+		adding new icon
+	use checkHoverstate for the event history buttons
+
 tooltips
 	secondary tooltips
 		epidemics
 		outbreaks
 	play steps
-	full cards
 	perhaps event type tooltips should specify the event category
 		setup step
 		action

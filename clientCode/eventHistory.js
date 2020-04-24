@@ -1,7 +1,10 @@
 "use strict";
 
 import { PermanentEvent } from "./event.js";
-import { hideEventHistoryButtonTooltip } from "./tooltipInstantiation.js";
+import {
+    hideEventHistoryButtonTooltip,
+    eventDetailsTooltip
+} from "./tooltipInstantiation.js";
 
 class EventHistory
 {
@@ -29,6 +32,8 @@ class EventHistory
     {
         return new Promise(async resolve =>
         {
+            eventDetailsTooltip.hide().unbindHoverEvents();
+
             await this.scrollToEnd({ leaveButtonsDisabled: true});
 
             const { $iconContainer } = this,
@@ -63,6 +68,7 @@ class EventHistory
         
             this.scrollLeft = newScrollLeft;
 
+            eventDetailsTooltip.bindHoverEvents().checkHoverState();
             resolve();
         });
     }
