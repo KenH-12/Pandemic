@@ -2,7 +2,7 @@
 
 import { PermanentEvent } from "./event.js";
 import {
-    hideEventHistoryButtonTooltip,
+    eventHistoryButtonTooltip,
     eventDetailsTooltip
 } from "./tooltipInstantiation.js";
 
@@ -117,12 +117,10 @@ class EventHistory
             this.scrollLeft = overflow;
             
             if (!leaveButtonsDisabled && overflow > 0)
-            {
-                eventDetailsTooltip.bindHoverEvents().checkHoverState();
                 this.enableBackButton();
-            }
             
-            hideEventHistoryButtonTooltip();
+            eventDetailsTooltip.checkHoverState();
+
             resolve();
         });
     }
@@ -140,13 +138,16 @@ class EventHistory
 
     enableBackButton()
     {
+        if (this.getOverflow() === 0 || this.scrollLeft === 0)
+            return false;
+        
         const self = this;
         this.$btnBack
             .off("click")
             .click(() => self.scrollBack())
             .removeClass("btnDisabled");
         
-        hideEventHistoryButtonTooltip();
+        eventHistoryButtonTooltip.checkHoverState();
     }
     
     enableForwardButton()
@@ -157,7 +158,7 @@ class EventHistory
             .click(() => self.scrollForward())
             .removeClass("btnDisabled");
         
-        hideEventHistoryButtonTooltip();
+        eventHistoryButtonTooltip.checkHoverState();
     }
 
     disableScrollButtons()
@@ -171,7 +172,7 @@ class EventHistory
         this.$btnBack.off("click")
             .addClass("btnDisabled");
         
-        hideEventHistoryButtonTooltip();
+        eventHistoryButtonTooltip.checkHoverState();
     }
 
     disableForwardButton()
@@ -179,7 +180,7 @@ class EventHistory
         this.$btnForward.off("click")
             .addClass("btnDisabled");
         
-        hideEventHistoryButtonTooltip();
+        eventHistoryButtonTooltip.checkHoverState();
     }
 
     scrollBack()
@@ -210,10 +211,8 @@ class EventHistory
         $iconContainer.stop()
             .animate({ scrollLeft }, scrollDuration, scrollEasing);
         
-        if (this.scrollLeft !== scrollLeft)
-            this.enableBackButton();
-        
         this.scrollLeft = scrollLeft;
+        this.enableBackButton();
         
         if (scrollLeft === overflow)
             this.disableForwardButton();
@@ -221,12 +220,15 @@ class EventHistory
 
     enableUndo(undoAction)
     {
+        if (!this.lastEventCanBeUndone())
+            return false;
+        
         this.$btnUndo
             .off("click")
             .removeClass("btnDisabled")
             .click(function() { undoAction() });
         
-        hideEventHistoryButtonTooltip();
+        eventHistoryButtonTooltip.checkHoverState();
     }
 
     disableUndo()
@@ -235,7 +237,7 @@ class EventHistory
             .off("click")
             .addClass("btnDisabled");
         
-        hideEventHistoryButtonTooltip();
+        eventHistoryButtonTooltip.checkHoverState();
     }
 
     lastEventCanBeUndone()

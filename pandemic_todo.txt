@@ -13,9 +13,6 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 TO DO
 -----
-in eventHistory...
-	use checkHoverstate for the event history buttons
-
 tooltips
 	secondary tooltips
 		epidemics

@@ -207,11 +207,6 @@ function bindEventHistoryButtonHoverEvents()
 	
 	eventHistoryButtonTooltip.bindHoverEvents();
 }
-function hideEventHistoryButtonTooltip()
-{
-	if (eventHistoryButtonTooltip instanceof Tooltip)
-		eventHistoryButtonTooltip.hide();
-}
 
 const eventDetailsTooltip = new Tooltip({
 	hoverElementSelector: "#eventHistory > div",
@@ -538,7 +533,7 @@ function showFullEpidemicCard($epidemicCard)
 export {
     bindPlayerDeckHoverEvents,
 	decrementInfectionDeckSize,
-	hideEventHistoryButtonTooltip,
+	eventHistoryButtonTooltip,
 	eventDetailsTooltip,
     resetInfectionDeckSize,
     bindRoleCardHoverEvents,

@@ -1757,6 +1757,7 @@ async function forecastDraw(forecastEventToLoad)
 	
 	$("#btnCancelAction").off("click").addClass("hidden");
 	disableActions();
+	eventHistory.enableBackButton();
 	$(".discardSelections").remove();
 
 	indicatePromptingEventCard();
@@ -1890,6 +1891,7 @@ async function forecastPlacement(forecastEvent)
 		requestAction(eventTypes.forecastPlacement, { cardKeys, forecastingRole: forecastEvent.role }),
 		animateForecastPlacement($cardContainer)
 	]);
+	await eventHistory.scrollToEnd();
 
 	actionInterfacePopulator.$actionInterface.slideUp(function()
 	{
@@ -8338,7 +8340,10 @@ function animateUndoEvents(undoneEventIds, wasContingencyCard)
 			if (wasContingencyCard && !event.wasTriggered) await collapsePlayerDiscardPile();
 
 			if (event instanceof ForecastPlacement)
+			{
 				event.detachFromDrawEvent();
+				eventHistory.enableBackButton();
+			}
 			else
 				await eventHistory.removeIcon(event);
 		}
