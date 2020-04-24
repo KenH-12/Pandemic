@@ -70,6 +70,22 @@ export default class Tooltip
             });
 
         this.hoverEventsAreBound = true;
+
+        return this;
+    }
+
+    checkHoverState()
+    {
+        const { hoverElementSelector } = this,
+            $hovered = $(":hover").filter(hoverElementSelector);
+        
+        if ($hovered.length)
+        {
+            this.$hoveredElement = $hovered;
+            this.show()
+        }
+        else if (this.$tooltip)
+            this.hide();
     }
 
     unbindHoverEvents()
@@ -77,9 +93,7 @@ export default class Tooltip
         if (!this.hoverEventsAreBound)
             return false;
         
-        const {
-                hoverElementSelector    
-            } = this;
+        const { hoverElementSelector } = this;
         
         $(document).off("mouseenter mouseleave", hoverElementSelector);
 
@@ -111,6 +125,8 @@ export default class Tooltip
             this.$tooltip.remove();
         
         this.$tooltip = false;
+
+        return this;
     }
 
     create()
@@ -325,6 +341,9 @@ export default class Tooltip
 
     extendHoverBox($hoveredElement)
     {
+        if (!this.$tooltip)
+            return false;
+        
         this.isExtendingHoverBox = true;
         
         const $document = $(document),
