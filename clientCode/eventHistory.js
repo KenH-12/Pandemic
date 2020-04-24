@@ -119,7 +119,7 @@ class EventHistory
             if (!leaveButtonsDisabled && overflow > 0)
                 this.enableBackButton();
             
-            eventDetailsTooltip.checkHoverState();
+            eventDetailsTooltip.bindHoverEvents().checkHoverState();
 
             resolve();
         });
