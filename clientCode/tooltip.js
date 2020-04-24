@@ -50,7 +50,7 @@ export default class Tooltip
     bindHoverEvents()
     {
         if (this.hoverEventsAreBound)
-            return false;
+            return this;
         
         const { hoverElementSelector } = this,
             self = this;

@@ -14,9 +14,6 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 TO DO
 -----
 in eventHistory...
-	unbind, rebind, and checkHoverstate of event history tooltip when...
-		scrolling to end
-		adding new icon
 	use checkHoverstate for the event history buttons
 
 tooltips

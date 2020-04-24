@@ -105,7 +105,8 @@ class EventHistory
                 return this.slideInNewIcon();
             
             this.disableForwardButton();
-                
+            eventDetailsTooltip.hide().unbindHoverEvents();
+            
             await animationPromise({
                 $elements: this.$iconContainer,
                 desiredProperties: { scrollLeft: overflow },
@@ -116,7 +117,10 @@ class EventHistory
             this.scrollLeft = overflow;
             
             if (!leaveButtonsDisabled && overflow > 0)
+            {
+                eventDetailsTooltip.bindHoverEvents().checkHoverState();
                 this.enableBackButton();
+            }
             
             hideEventHistoryButtonTooltip();
             resolve();
