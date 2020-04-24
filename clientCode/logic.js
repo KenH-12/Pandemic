@@ -24,7 +24,12 @@ import { getDuration, setDuration } from "./durations.js";
 import { easings } from "./easings.js";
 import PlayerPanel from "./playerPanel.js";
 import DeckImageManager from "./deckImageManager.js";
-import { eventCards, bindEventCardHoverEvents, unbindEventCardHoverEvents } from "./eventCard.js";
+import {
+	eventCards,
+	isEventCardKey,
+	bindEventCardHoverEvents,
+	unbindEventCardHoverEvents
+} from "./eventCard.js";
 import {
 	cities,
 	getCity,
@@ -87,7 +92,11 @@ import Event, {
 	StartingHands,
 	PassActions
 } from "./event.js";
-import { eventHistory } from "./eventHistory.js";
+import {
+	eventHistory,
+	getEventHistoryIcon,
+	getEventIconHtml
+} from "./eventHistory.js";
 import {
     showTravelPathArrow,
     setTravelPathArrowColor,
@@ -289,7 +298,7 @@ function appendEventHistoryIconOfType(targetEventType)
 
 function appendEventHistoryIcon(event)
 {
-	const $icon = $(getEventIconHtml(getEventType(event.code), { event }));
+	const $icon = getEventHistoryIcon(event);
 	
 	$icon.attr("data-index", event.index);
 	eventHistory.appendIcon($icon);
@@ -761,97 +770,6 @@ function enableActionButton(buttonID)
 			$(".eventTypeTooltip").remove();
 			promptAction({ eventType: eventTypes[actionName] });
 		});
-}
-
-function getEventIconHtml(eventType, { event } = {})
-{
-	if (!eventType.hasIcon)
-		return "";
-	
-	const { name } = eventType,
-		fileName = getEventIconFileName(eventType, event),
-		fileExtension = getEventIconFileExtension(eventType, event),
-		classAttribute = `class='${getEventIconCssClasses(event)}'`;
-	
-	let iconHtml = event ? `<div id='icon${event.id}' ${classAttribute}>` : "";
-
-	iconHtml += `<img	src='images/eventIcons/${fileName}.${fileExtension}'
-						alt='${name}'
-						${ !event ? classAttribute : ""} />`;
-	
-	if (event)
-		iconHtml += "</div>";
-
-	return iconHtml;
-}
-
-function getEventIconFileName(eventType, event)
-{
-	let fileName = toCamelCase(eventType.name).replace("/", "");
-	
-	if (!event)
-	return fileName;
-
-	if (event instanceof TreatDisease
-		|| event instanceof AutoTreatDisease
-		|| event instanceof Eradication)
-		fileName += `_${event.diseaseColor}`;
-	else if (event instanceof InfectCity
-			|| event instanceof EpidemicInfect)
-	{
-		if (event instanceof EpidemicInfect)
-			fileName = toCamelCase(eventTypes.infectCity.name);
-		
-		fileName += `_${getCity(event.cityKey).color}`;
-		if (event.preventionCode !== infectionPreventionCodes.notPrevented)
-			fileName += `_${event.preventionCode}`;
-	}
-	else if (event instanceof DiscoverACure)
-		fileName += `_${getCity(event.cardKeys[0]).color}`;
-	else if (event instanceof StartingHands)
-		fileName += `_${Object.keys(gameData.players).length}`;
-	
-	return fileName;
-}
-
-function getEventIconFileExtension(eventType, event)
-{
-	if ( event instanceof InitialInfection
-		|| (event instanceof InfectCity || event instanceof EpidemicInfect) && event.preventionCode === infectionPreventionCodes.quarantine
-		|| event instanceof DiscoverACure && event
-		|| eventType.cardKey && isEventCardKey(eventType.cardKey)
-		|| event instanceof EpidemicIntensify
-		|| event instanceof AutoTreatDisease
-		|| event instanceof Eradication)
-		return "jpg";
-	
-	return "png";
-}
-
-function getEventIconCssClasses(event)
-{
-	if (!event) return "actionIcon";
-
-	if (event.role && gameData.players[event.role])
-		return `${gameData.players[event.role].camelCaseRole}Border`;
-	else if (event instanceof InfectCity)
-		return `${getCity(event.cityKey).color}Border darkBlueBackground`;
-	else if (event instanceof EpidemicInfect)
-		return "darkGreenBorder lightGreenBackground";
-	else if (event instanceof Eradication)
-		return `${event.diseaseColor}Border`;
-	
-	return "darkGreenBorder";
-}
-
-function hideEventIconDetails()
-{
-	$(".eventDetails")
-		.add(".eventTypeTooltip")
-		.add(".roleCard")
-		.add("#boardContainer > .epidemicFull")
-		.add("#boardContainer > .eventCardFull")
-		.remove();
 }
 
 function enableBtnCancelAction()
@@ -3443,8 +3361,6 @@ function positionRemovedInfectionCardsContainer()
 
 function resizeBottomPanelElements()
 {
-	hideEventIconDetails();
-	
 	const $eventHistoryContainer = $("#eventHistoryContainer"),
 		{ boardHeight, topPanelHeight } = gameData,
 		panelOffsetTop = boardHeight - topPanelHeight;
@@ -5573,10 +5489,6 @@ function animateDiscardPlayerCard($card, { removingContingencyCard } = {})
 	return sleep(getDuration("discardPlayerCard") * gameData.playerCardAnimationInterval);
 }
 
-function isEventCardKey(cardKey)
-{
-	return eventCards.hasOwnProperty(cardKey);
-}
 function isEpidemicKey(cardKey)
 {
 	return cardKey.substring(0,3) === "epi";

@@ -11,6 +11,8 @@ tooltips which have their offset adjusted after the load event of a contained im
 
 if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
 
+event history button background-color doesn't transition
+
 TO DO
 -----
 tooltips
@@ -53,7 +55,6 @@ consider removing the special actions container
 	plan contingency is an other action
 
 event history
-	remove icons which are not visible?
 	detailed tooltips
 		game end
 		hoverable --- for the below descriptions, consider linking to a certain place in a rules file

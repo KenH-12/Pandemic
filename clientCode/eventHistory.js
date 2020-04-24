@@ -1,10 +1,26 @@
 "use strict";
 
-import { PermanentEvent } from "./event.js";
 import {
     eventHistoryButtonTooltip,
     eventDetailsTooltip
 } from "./tooltipInstantiation.js";
+import { gameData } from "./gameData.js";
+import { getCity } from "./city.js";
+import { getEventType } from "./event.js";
+import { isEventCardKey } from "./eventCard.js";
+import {
+    PermanentEvent,
+    TreatDisease,
+    AutoTreatDisease,
+    Eradication,
+    InfectCity,
+    EpidemicInfect,
+    EpidemicIntensify,
+    DiscoverACure,
+    StartingHands,
+    InitialInfection,
+    infectionPreventionCodes
+} from "./event.js";
 
 class EventHistory
 {
@@ -34,7 +50,7 @@ class EventHistory
         {
             eventDetailsTooltip.hide().unbindHoverEvents();
 
-            await this.scrollToEnd({ leaveButtonsDisabled: true});
+            await this.scrollToEnd({ leaveButtonsDisabled: true, removingIcon: true });
 
             const { $iconContainer } = this,
                 scrollLeft = $iconContainer.scrollLeft(),
@@ -49,6 +65,8 @@ class EventHistory
                 return false;
             }
 
+            this.appendIconImagesToBeDisplayed(newScrollLeft);
+            
             animationPromise({
                 $elements: $icon,
                 desiredProperties: { opacity: 0 },
@@ -93,9 +111,11 @@ class EventHistory
         });
 
         $newIcon.removeAttr("style");
+
+        this.removeUnseenIconImages();
     }
 
-    scrollToEnd({ addingNewIcon, leaveButtonsDisabled } = {})
+    scrollToEnd({ addingNewIcon, leaveButtonsDisabled, removingIcon } = {})
     {
         return new Promise(async resolve =>
         {
@@ -106,6 +126,7 @@ class EventHistory
             
             this.disableForwardButton();
             eventDetailsTooltip.hide().unbindHoverEvents();
+            this.appendIconImagesToBeDisplayed(overflow);
             
             await animationPromise({
                 $elements: this.$iconContainer,
@@ -119,7 +140,10 @@ class EventHistory
             if (!leaveButtonsDisabled && overflow > 0)
                 this.enableBackButton();
             
-            eventDetailsTooltip.bindHoverEvents().checkHoverState();
+            this.removeUnseenIconImages();
+
+            if (!removingIcon)
+                eventDetailsTooltip.bindHoverEvents().checkHoverState();
 
             resolve();
         });
@@ -183,39 +207,63 @@ class EventHistory
         eventHistoryButtonTooltip.checkHoverState();
     }
 
-    scrollBack()
+    async scrollBack()
     {
-        const { $iconContainer, scrollDuration, scrollEasing } = this,
-            newScrollLeft = $iconContainer.scrollLeft() - $iconContainer.width(),
-            scrollLeft = newScrollLeft > 0 ? newScrollLeft : 0;
+        eventDetailsTooltip.hide().unbindHoverEvents();
         
-        $iconContainer.stop()
-            .animate({ scrollLeft }, scrollDuration, scrollEasing);
+        const { $iconContainer, scrollDuration, scrollEasing } = this;
         
+        let scrollLeft = $iconContainer.scrollLeft() - $iconContainer.width();
+        if (scrollLeft <= 0)
+        {
+            this.disableBackButton();
+            scrollLeft = 0;
+        }
+
+        this.appendIconImagesToBeDisplayed(scrollLeft);
+        
+        await animationPromise({
+            $elements: $iconContainer.stop(),
+            desiredProperties: { scrollLeft },
+            duration: scrollDuration,
+            easing: scrollEasing
+        });
+
         if (this.scrollLeft !== scrollLeft)
             this.enableForwardButton();
         
         this.scrollLeft = scrollLeft;
-        
-        if (scrollLeft === 0)
-            this.disableBackButton();
+        this.removeUnseenIconImages();
+        eventDetailsTooltip.bindHoverEvents().checkHoverState();
     }
 
-    scrollForward()
+    async scrollForward()
     {
-        const { $iconContainer, scrollDuration, scrollEasing } = this,
-            overflow = this.getOverflow(),
-            newScrollLeft = $iconContainer.scrollLeft() + $iconContainer.width(),
-            scrollLeft = newScrollLeft > overflow ? overflow : newScrollLeft;
+        eventDetailsTooltip.hide().unbindHoverEvents();
         
-        $iconContainer.stop()
-            .animate({ scrollLeft }, scrollDuration, scrollEasing);
+        const { $iconContainer, scrollDuration, scrollEasing } = this,
+            overflow = this.getOverflow();
+        
+        let scrollLeft = $iconContainer.scrollLeft() + $iconContainer.width();
+        if (scrollLeft >= overflow)
+        {
+            this.disableForwardButton();
+            scrollLeft = overflow;
+        }
+        
+        this.appendIconImagesToBeDisplayed(scrollLeft);
+        
+        await animationPromise({
+            $elements: $iconContainer.stop(),
+            desiredProperties: { scrollLeft },
+            duration: scrollDuration,
+            easing: scrollEasing
+        });
         
         this.scrollLeft = scrollLeft;
         this.enableBackButton();
-        
-        if (scrollLeft === overflow)
-            this.disableForwardButton();
+        this.removeUnseenIconImages();
+        eventDetailsTooltip.bindHoverEvents().checkHoverState();
     }
 
     enableUndo(undoAction)
@@ -257,6 +305,164 @@ class EventHistory
         }
         return false;
     }
+
+    removeUnseenIconImages()
+    {
+        const $eventHistory = $("#eventHistory"),
+            $icons = $eventHistory.children(),
+            iconWidth = $icons.first().width(),
+            limits = $eventHistory.offset();
+        
+        limits.right = limits.left + $eventHistory.width();
+
+        let $icon,
+            $img,
+            iconOffsetLeft;
+        
+        for (let i = 0; i < $icons.length; i++)
+        {
+            $icon = $icons.eq(i);
+            $img = $icon.children("img");
+
+            if (!$img.length)
+                continue;
+            
+            iconOffsetLeft = $icon.offset().left;
+            
+            if (iconOffsetLeft + iconWidth < limits.left
+                || iconOffsetLeft > limits.right)
+                $img.remove();
+        }
+    }
+
+    appendIconImagesToBeDisplayed(aniticipatedScrollLeft)
+    {
+        const $eventHistory = $("#eventHistory"),
+            containerWidth = $eventHistory.width(),
+            $icons = $eventHistory.children(),
+            iconWidth = $icons.first().width(),
+            limits = {
+                left: aniticipatedScrollLeft,
+                right: aniticipatedScrollLeft + containerWidth
+            };
+        
+        let $icon,
+            iconOffsetLeft,
+            event,
+            eventType,
+            fileName,
+            fileExtension;
+        
+        for (let i = 0; i < $icons.length; i++)
+        {
+            $icon = $icons.eq(i);
+            iconOffsetLeft = $icon.offset().left;
+            
+            if (!$icon.children().length &&
+                (iconOffsetLeft + iconWidth > limits.left ||
+                iconOffsetLeft < limits.right))
+            {
+                event = this.events[$icon.attr("data-index")];
+                eventType = getEventType(event.code);
+                fileName = getEventIconFileName(eventType, event);
+                fileExtension = getEventIconFileExtension(eventType, event);
+                
+                $icon.append(`<img src='images/eventIcons/${fileName}.${fileExtension}' alt='${eventType.name}' />`);
+            }
+        }
+    }
 }
 
-export const eventHistory = new EventHistory();
+function getEventHistoryIcon(event)
+{
+    return $(getEventIconHtml(getEventType(event.code), { event }))
+}
+
+function getEventIconHtml(eventType, { event } = {})
+{
+	if (!eventType.hasIcon)
+		return "";
+	
+	const { name } = eventType,
+		fileName = getEventIconFileName(eventType, event),
+		fileExtension = getEventIconFileExtension(eventType, event),
+		classAttribute = `class='${getEventIconCssClasses(event)}'`;
+	
+	let iconHtml = event ? `<div id='icon${event.id}' ${classAttribute}>` : "";
+
+	iconHtml += `<img	src='images/eventIcons/${fileName}.${fileExtension}'
+						alt='${name}'
+						${ !event ? classAttribute : ""} />`;
+	
+	if (event)
+		iconHtml += "</div>";
+
+	return iconHtml;
+}
+
+function getEventIconFileName(eventType, event)
+{
+	let fileName = toCamelCase(eventType.name).replace("/", "");
+	
+	if (!event)
+	return fileName;
+
+	if (event instanceof TreatDisease
+		|| event instanceof AutoTreatDisease
+		|| event instanceof Eradication)
+		fileName += `_${event.diseaseColor}`;
+	else if (event instanceof InfectCity
+			|| event instanceof EpidemicInfect)
+	{
+		if (event instanceof EpidemicInfect)
+			fileName = toCamelCase(eventTypes.infectCity.name);
+		
+		fileName += `_${getCity(event.cityKey).color}`;
+		if (event.preventionCode !== infectionPreventionCodes.notPrevented)
+			fileName += `_${event.preventionCode}`;
+	}
+	else if (event instanceof DiscoverACure)
+		fileName += `_${getCity(event.cardKeys[0]).color}`;
+	else if (event instanceof StartingHands)
+		fileName += `_${Object.keys(gameData.players).length}`;
+	
+	return fileName;
+}
+
+function getEventIconFileExtension(eventType, event)
+{
+	if ( event instanceof InitialInfection
+		|| (event instanceof InfectCity || event instanceof EpidemicInfect) && event.preventionCode === infectionPreventionCodes.quarantine
+		|| event instanceof DiscoverACure && event
+		|| eventType.cardKey && isEventCardKey(eventType.cardKey)
+		|| event instanceof EpidemicIntensify
+		|| event instanceof AutoTreatDisease
+		|| event instanceof Eradication)
+		return "jpg";
+	
+	return "png";
+}
+
+function getEventIconCssClasses(event)
+{
+	if (!event) return "actionIcon";
+
+	if (event.role && gameData.players[event.role])
+		return `${gameData.players[event.role].camelCaseRole}Border`;
+	else if (event instanceof InfectCity)
+		return `${getCity(event.cityKey).color}Border darkBlueBackground`;
+	else if (event instanceof EpidemicInfect)
+		return "darkGreenBorder lightGreenBackground";
+	else if (event instanceof Eradication)
+		return `${event.diseaseColor}Border`;
+	
+	return "darkGreenBorder";
+}
+
+const eventHistory = new EventHistory();
+
+export {
+    eventHistory,
+    getEventHistoryIcon,
+    getEventIconHtml
+}

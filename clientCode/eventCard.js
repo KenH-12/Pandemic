@@ -73,6 +73,11 @@ const eventCards = {};
 		eventCards[card[0]] = new EventCard(card[0], card[1]);
 })();
 
+function isEventCardKey(cardKey)
+{
+	return eventCards.hasOwnProperty(cardKey);
+}
+
 function bindEventCardHoverEvents($container)
 {
     const eventCardSelector = ".playerCard.eventCard",
@@ -163,6 +168,7 @@ function bindDisabledEventCardHoverEvents()
 
 export {
     eventCards,
+    isEventCardKey,
     bindEventCardHoverEvents,
     unbindEventCardHoverEvents
 }
