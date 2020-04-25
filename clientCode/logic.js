@@ -5024,6 +5024,7 @@ async function epidemicIntensify()
 		await buttonClickPromise($btn.html("INTENSIFY"));
 		$btn.addClass("hidden");
 	}
+	eventHistory.disableUndo();
 	disableEventCards();
 
 	await Promise.all([

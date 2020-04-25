@@ -13,8 +13,20 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 event history button background-color doesn't transition
 
+when the second epidemic is drawn, the full card doesn't show
+
 TO DO
 -----
+hide discards which aren't visible while the piles are collapsed
+
+when prompting infect, indicate that event cards can be played
+
+during the infection step, if an infection card has already been drawn...
+	one quiet night is not playable, therefore the remaining infections should happen automatically
+	if oqn is the only event card held
+
+when starting a new game, wait until the player deck has been arranged before showing the tooltip
+
 tooltips
 	secondary tooltips
 		epidemics
