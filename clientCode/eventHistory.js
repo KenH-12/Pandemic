@@ -6,7 +6,7 @@ import {
 } from "./tooltipInstantiation.js";
 import { gameData } from "./gameData.js";
 import { getCity } from "./city.js";
-import { getEventType } from "./event.js";
+import { eventTypes, getEventType } from "./event.js";
 import { isEventCardKey } from "./eventCard.js";
 import {
     PermanentEvent,

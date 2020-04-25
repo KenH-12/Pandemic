@@ -93,7 +93,7 @@ function getTravelPathVector(actionProperties)
 		{
 			if ($researchStation.hasClass("grantStation"))
 			{
-				const $supplyStation = $("#researchStationSupply").find(".researchStation");
+				const $supplyStation = $("#researchStationSupplyContainer").find(".researchStation");
 
 				originOffset = $supplyStation.offset();
 				originOffset.left += $supplyStation.width() / 2;

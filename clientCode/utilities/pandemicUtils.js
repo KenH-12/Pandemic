@@ -2,7 +2,7 @@
 
 import getDimension from "../dimensions.js";
 import { eventTypes } from "../event.js";
-import { gameData, getPlayer } from "../gameData.js";
+import { gameData, getPlayer, getActivePlayer } from "../gameData.js";
 
 // Returns the Infection Rate (as seen on the Infection Rate Track on the game board)
 // which corresponds to the number of Epidemic cards drawn thus far.
