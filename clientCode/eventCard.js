@@ -91,7 +91,7 @@ function bindEventCardHoverEvents($container)
             $this = $(this);
             eventCards[$this.data("key")].showFullCard($this);
         },
-        function() { $("#boardContainer").children("#contingencyWrapper, .eventCardFull").remove() });
+        function() { $("#boardContainer").children("#contingencyWrapper, .eventCardFull, .disabledEventCardTooltip").remove() });
     
     bindDisabledEventCardHoverEvents();
 }
@@ -162,7 +162,7 @@ function bindDisabledEventCardHoverEvents()
         juxtaposition: "right",
         arrowBasePx: 20,
         containerSelector: "#boardContainer",
-        cssClassString: "wideTooltip"
+        cssClassString: "wideTooltip disabledEventCardTooltip"
     }).bindHoverEvents();
 }
 
