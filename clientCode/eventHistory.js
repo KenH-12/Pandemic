@@ -64,8 +64,6 @@ class EventHistory
                 console.error(`Encountered unexpected icon ('${alt}') when attempting to remove event icon: '${event.name}'`);
                 return false;
             }
-
-            this.appendIconImagesToBeDisplayed(newScrollLeft);
             
             animationPromise({
                 $elements: $icon,
@@ -111,8 +109,6 @@ class EventHistory
         });
 
         $newIcon.removeAttr("style");
-
-        this.removeUnseenIconImages();
     }
 
     scrollToEnd({ addingNewIcon, leaveButtonsDisabled, removingIcon } = {})
@@ -126,7 +122,6 @@ class EventHistory
             
             this.disableForwardButton();
             eventDetailsTooltip.hide().unbindHoverEvents();
-            this.appendIconImagesToBeDisplayed(overflow);
             
             await animationPromise({
                 $elements: this.$iconContainer,
@@ -139,8 +134,6 @@ class EventHistory
             
             if (!leaveButtonsDisabled && overflow > 0)
                 this.enableBackButton();
-            
-            this.removeUnseenIconImages();
 
             if (!removingIcon)
                 eventDetailsTooltip.bindHoverEvents().checkHoverState();
@@ -219,8 +212,6 @@ class EventHistory
             this.disableBackButton();
             scrollLeft = 0;
         }
-
-        this.appendIconImagesToBeDisplayed(scrollLeft);
         
         await animationPromise({
             $elements: $iconContainer.stop(),
@@ -233,7 +224,6 @@ class EventHistory
             this.enableForwardButton();
         
         this.scrollLeft = scrollLeft;
-        this.removeUnseenIconImages();
         eventDetailsTooltip.bindHoverEvents().checkHoverState();
     }
 
@@ -251,8 +241,6 @@ class EventHistory
             scrollLeft = overflow;
         }
         
-        this.appendIconImagesToBeDisplayed(scrollLeft);
-        
         await animationPromise({
             $elements: $iconContainer.stop(),
             desiredProperties: { scrollLeft },
@@ -262,7 +250,6 @@ class EventHistory
         
         this.scrollLeft = scrollLeft;
         this.enableBackButton();
-        this.removeUnseenIconImages();
         eventDetailsTooltip.bindHoverEvents().checkHoverState();
     }
 
@@ -304,72 +291,6 @@ class EventHistory
                 return true;
         }
         return false;
-    }
-
-    removeUnseenIconImages()
-    {
-        const $eventHistory = $("#eventHistory"),
-            $icons = $eventHistory.children(),
-            iconWidth = $icons.first().width(),
-            limits = $eventHistory.offset();
-        
-        limits.right = limits.left + $eventHistory.width();
-
-        let $icon,
-            $img,
-            iconOffsetLeft;
-        
-        for (let i = 0; i < $icons.length; i++)
-        {
-            $icon = $icons.eq(i);
-            $img = $icon.children("img");
-
-            if (!$img.length)
-                continue;
-            
-            iconOffsetLeft = $icon.offset().left;
-            
-            if (iconOffsetLeft + iconWidth < limits.left
-                || iconOffsetLeft > limits.right)
-                $img.remove();
-        }
-    }
-
-    appendIconImagesToBeDisplayed(aniticipatedScrollLeft)
-    {
-        const $eventHistory = $("#eventHistory"),
-            containerWidth = $eventHistory.width(),
-            $icons = $eventHistory.children(),
-            iconWidth = $icons.first().width(),
-            limits = {
-                left: aniticipatedScrollLeft,
-                right: aniticipatedScrollLeft + containerWidth
-            };
-        
-        let $icon,
-            iconOffsetLeft,
-            event,
-            eventType,
-            fileName,
-            fileExtension;
-        
-        for (let i = 0; i < $icons.length; i++)
-        {
-            $icon = $icons.eq(i);
-            iconOffsetLeft = $icon.offset().left;
-            
-            if (!$icon.children().length &&
-                (iconOffsetLeft + iconWidth > limits.left ||
-                iconOffsetLeft < limits.right))
-            {
-                event = this.events[$icon.attr("data-index")];
-                eventType = getEventType(event.code);
-                fileName = getEventIconFileName(eventType, event);
-                fileExtension = getEventIconFileExtension(eventType, event);
-                
-                $icon.append(`<img src='images/eventIcons/${fileName}.${fileExtension}' alt='${eventType.name}' />`);
-            }
-        }
     }
 }
 
