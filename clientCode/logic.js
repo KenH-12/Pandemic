@@ -8082,6 +8082,7 @@ function collapsePlayerDiscardPile()
 		
 		unbindEventCardHoverEvents($discardPile);
 		unbindEpidemicCardHoverEvents($discardPile);
+		removeRepresentationsOfDiscardedEventCards($discardPile);
 		
 		$discardPile.stop()
 			.css("overflow-y", "hidden")
@@ -8104,6 +8105,14 @@ function collapsePlayerDiscardPile()
 				resolve();
 			});
 	});
+}
+
+function removeRepresentationsOfDiscardedEventCards($discardPile)
+{
+	const $discardedEventCards = $discardPile.find(".eventCard");
+
+	for (let i = 0; i < $discardedEventCards.length; i++)
+		$(`.eventCardFull[data-key='${$discardedEventCards.eq(i).attr("data-key")}']`).remove();
 }
 
 async function undoAction()
