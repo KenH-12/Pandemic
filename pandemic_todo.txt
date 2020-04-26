@@ -13,12 +13,8 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 event history button background-color doesn't transition
 
-when the second epidemic is drawn, the full card doesn't show
-
 TO DO
 -----
-hide discards which aren't visible while the piles are collapsed
-
 when prompting infect, indicate that event cards can be played
 
 during the infection step, if an infection card has already been drawn...

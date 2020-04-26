@@ -496,7 +496,7 @@ function unbindEpidemicCardHoverEvents($container)
 	$container.find(".playerCard.epidemic")
 		.off("mouseenter mouseleave");
 	
-	$(".epidemicFull").remove();
+	$("#boardContainer").children(".epidemicFull").remove();
 }
 
 function showFullEpidemicCard($epidemicCard)
