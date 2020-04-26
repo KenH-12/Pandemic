@@ -15,6 +15,8 @@ event history button background-color doesn't transition
 
 TO DO
 -----
+role cards should be positioned with positioTooltipRelativeToElement
+
 when prompting infect, indicate that event cards can be played
 
 during the infection step, if an infection card has already been drawn...

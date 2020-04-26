@@ -1451,7 +1451,6 @@ const actionInterfacePopulator = {
 			actionInterfacePopulator.replaceInstructions(newSubtitle);
 			bindRoleCardHoverEvents();
 			locatePawnOnRoleTagClick(actionInterfacePopulator.$actionInterface);
-			bindDispatchTypeHoverEvents(actionInterfacePopulator.$actionInterface);
 		}
 
 		return true;
@@ -2348,27 +2347,6 @@ function getDispatchInstructionTooltip(eventType)
 	
 	console.error("Failed not fetch dispatch instuctions: invalid event type.");
 	return "";
-}
-
-function bindDispatchTypeHoverEvents($container)
-{
-	const $elements = $container.length ? $container.find(".dispatchTypeInfo") : $(".dispatchTypeInfo"),
-		$rightPanel = $("#rightPanel");
-	
-	let $this,
-		$tooltip;
-	
-	$elements.hover(function()
-		{
-			$this = $(this);
-			$tooltip = getEventTypeTooltipContent(getEventType($this.attr("data-eventType")), { includeName: true, isDispatchType: true });
-			
-			positionTooltipRelativeToElement($tooltip, $rightPanel);
-		},
-		function()
-		{
-			$(".eventTypeTooltip").remove();
-		});
 }
 
 class DiscardPrompt

@@ -1540,6 +1540,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	font-family: sans-serif;
 	font-weight: 700;
 	border-bottom: 1px dashed #67acc8;
+	white-space: nowrap;
 	cursor: help;
 }
 sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px }

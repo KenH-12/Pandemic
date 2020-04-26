@@ -36,6 +36,7 @@ export default function instantiateTooltips()
 	bindCuredDiseaseInfoHoverEvents();
 	bindResearchStationInfoHoverEvents();
 	bindActionButtonHoverEvents();
+	bindDispatchTypeHoverEvents();
 	bindForecastInfoHoverEvents();
 }
 
@@ -432,6 +433,20 @@ function relatedRoleRuleApplies(eventType, { roleA, roleB } = {})
 		return activePlayerCanTakeFromResearcher();
 	
 	return roleB === "Researcher";
+}
+
+function bindDispatchTypeHoverEvents()
+{
+	new Tooltip({
+		hoverElementSelector: ".dispatchTypeInfo",
+		getContent: ({ $hoveredElement }) => {
+			const eventType = getEventType($hoveredElement.attr("data-eventType"));
+			return getEventTypeTooltipContent(eventType, { includeName: true, isDispatchType: true });
+		},
+		juxtaposition: "top",
+		containerSelector: "#rightPanel",
+		cssClassString: "eventTypeTooltip"
+	}).bindHoverEvents();
 }
 
 function bindForecastInfoHoverEvents()
