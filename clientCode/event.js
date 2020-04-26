@@ -19,7 +19,6 @@ const dispatchDiscardRule = "When moving another role's pawn as if it were his o
 eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
-		hasIcon: true,
 		code: "dr",
 		rules: ["Move to a city connected by a white line to the one you are in."],
 		instructions: "Select a Destination:",
@@ -28,7 +27,6 @@ eventTypes = {
 	},
 	directFlight: {
 		name: "Direct Flight",
-		hasIcon: true,
 		code: "df",
 		rules: ["Discard a city card to move to the city named on the card."],
 		instructions: "Select a Destination:",
@@ -40,7 +38,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	charterFlight: {
 		name: "Charter Flight",
-		hasIcon: true,
 		code: "cf",
 		rules: ["Discard the city card that <i>matches</i> the city you are in to move to <i>any</i> city."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
@@ -52,11 +49,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	chooseFlightType: {
 		name: "Choose Flight Type",
-		code: "ft"
+		code: "ft",
+		noIcon: true
 	},
 	shuttleFlight: {
 		name: "Shuttle Flight",
-		hasIcon: true,
 		code: "sf",
 		rules: ["Move from a city with a research station to any other city that has a research station."],
 		instructions: "Select a Destination:",
@@ -65,7 +62,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	buildResearchStation: {
 		name: "Build Research Station",
-		hasIcon: true,
 		code: "rs",
 		rules: [
 			"Discard the city card that matches the city you are in to place a research station there.",
@@ -79,7 +75,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	shareKnowledge: {
 		name: "Share Knowledge",
-		hasIcon: true,
 		code: "sk",
 		rules: [
 			"You can do this action in two ways:",
@@ -94,7 +89,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	treatDisease: {
 		name: "Treat Disease",
-		hasIcon: true,
 		code: "td",
 		rules: [
 			"Remove 1 disease cube from the city you are in, placing it in the cube supply next to the board.",
@@ -108,7 +102,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	autoTreatDisease: {
 		name: "Auto-Treat Disease",
-		hasIcon: true,
 		code: "at",
 		propertyNames: ["cityKey", "diseaseColor", "numCubesRemoved"],
 		rules: [
@@ -119,7 +112,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	discoverACure: {
 		name: "Discover A Cure",
-		hasIcon: true,
 		code: "dc",
 		rules: [
 			`At any research station, discard 5 city cards of the same color from your hand to cure the disease of that color.`,
@@ -135,14 +127,12 @@ The card must come from the Dispatcher&#39;s hand.`,
 	eradication: {
 		name: "eradication",
 		displayName: "Disease Eradicated",
-		hasIcon: true,
 		code: "er",
 		propertyNames: ["diseaseColor"],
 		rules: [strings.eradicationRules]
 	},
 	planContingency: {
 		name: "Plan Contingency",
-		hasIcon: true,
 		code: "pc",
 		capableRoleName: "Contingency Planner",
 		propertyNames: ["cardKey"],
@@ -156,7 +146,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	dispatchPawn: {
 		name: "Dispatch Pawn",
-		hasIcon: true,
 		code: "dp",
 		capableRoleName: "Dispatcher",
 		rules: [
@@ -184,11 +173,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 	rendezvous: {
 		name: "Rendezvous",
 		code: "rv",
-		actionPathName: "movementAction"
+		actionPathName: "movementAction",
+		noIcon: true
 	},
 	operationsFlight: {
 		name: "Operations Flight",
-		hasIcon: true,
 		code: "of",
 		capableRoleName: "Operations Expert",
 		rules: ["<i>Once per turn</i>, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
@@ -198,7 +187,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	pass: {
 		name: "Pass",
-		hasIcon: true,
 		code: "pa",
 		propertyNames: [],
 		rules: [`Forfeit your remaining actions for this turn and proceed to the "Draw 2 cards" step.`],
@@ -208,7 +196,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	cardDraw: {
 		name: "Draw 2 Cards",
-		hasIcon: true,
 		code: "cd",
 		actionPathName: "drawPlayerCards",
 		propertyNames: ["cardKeys"],
@@ -224,7 +211,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "ec",
 		actionPathName: "epidemicIncrease",
 		propertyNames: ["epidemicCount"],
-		hasIcon: true,
 		rules: [
 			"The infection rate marker is moved forward 1 space on the Infection Rate Track.",
 			"The current infection rate determines how many infection cards are flipped over during a turn's Infect Cities step."
@@ -235,7 +221,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "ef",
 		actionPathName: "epidemicInfect",
 		propertyNames: ["cityKey", "prevCubeCount", "preventionCode"],
-		hasIcon: true,
 		rules: [
 			"The <i>bottom</i> card of the Infection Deck is flipped over and 3 disease cubes of the matching color are placed on the named city.",
 			"If the city already contains cubes of this color, cubes are added until the city has 3 cubes of this color and then an <i>outbreak</i> of this disease occurs in the city.",
@@ -249,13 +234,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "et",
 		actionPathName: "epidemicIntensify",
 		propertyNames: ["numDiscardsShuffled"],
-		hasIcon: true,
 		rules: ["The cards in the Infection Discard Pile are shuffled and then placed on top of the Infection Deck."]
 	},
 	discard: {
 		name: "Discard",
 		displayName: "Discard To 7 Cards",
-		hasIcon: true,
 		code: "ds",
 		actionPathName: "discardPlayerCards",
 		propertyNames: ["cardKeys"],
@@ -264,7 +247,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	infectCity: {
 		name: "Infect City",
 		pluralName: "Infect Cities",
-		hasIcon: true,
 		code: "ic",
 		actionPathName: "infectCity",
 		propertyNames: ["cityKey", "preventionCode"],
@@ -279,7 +261,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	initialInfection: {
 		name: "Initial Infection",
 		displayName: "Infect 9 Cities",
-		hasIcon: true,
 		code: "ii",
 		propertyNames: ["cityKey", "numCubes"],
 		rules: [
@@ -295,7 +276,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	startingHands: {
 		name: "Starting Hands",
-		hasIcon: true,
 		code: "sh",
 		propertyNames: ["cardKeys"],
 		rules: [
@@ -309,12 +289,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	outbreak: {
 		name: "Outbreak",
-		hasIcon: true,
 		code: "ob",
 		propertyNames: ["outbreakCount", "originKey", "diseaseColor", "triggeredByKey"],
 		rules: [
 			"When a disease outbreak occurs, the outbreaks marker is moved forward 1 space on the Outbreaks Track.",
-			"Then, 1 cube of the disease color is placed on every city connected to the outbreaking city. If any of them already has 3 cubes of the disease color, a <i>chain reaction outbreak</i> occurs after the current outbreak is done.",
+			"Then, 1 cube of the disease color is placed on every city connected to the outbreaking city. If any of those cities already has 3 cubes of the disease color, a <i>chain reaction outbreak</i> occurs after the current outbreak is done.",
 			"<br/>",
 			"When a chain reaction outbreak occurs, the outbreaks marker is moved forward one space and disease cube are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> infection card.",
 			"<br/>",
@@ -324,11 +303,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 	outbreakInfection: {
 		name: "Outbreak",
 		code: "oi",
-		propertyNames: ["originKey", "infectedKey", "diseaseColor", "preventionCode"]
+		propertyNames: ["originKey", "infectedKey", "diseaseColor", "preventionCode"],
+		noIcon: true
 	},
 	resilientPopulation: {
 		name: "Resilient Population",
-		hasIcon: true,
 		code: "rp",
 		cardKey: "resi",
 		rules: [
@@ -342,7 +321,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	oneQuietNight: {
 		name: "One Quiet Night",
-		hasIcon: true,
 		code: "oq",
 		cardKey: "oneq",
 		rules: [
@@ -353,11 +331,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	skipInfectionStep: { // this is here as a simple way to use the actionPathName in the requestAction function.
 		code: "",
-		actionPathName: "skipInfectionStep"
+		actionPathName: "skipInfectionStep",
+		noIcon: true
 	},
 	forecast: {
 		name: "Forecast",
-		hasIcon: true,
 		code: "fd",
 		cardKey: "fore",
 		rules: [
@@ -378,11 +356,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "Drag and drop to rearrange the cards.",
 		propertyNames: ["cardKeys"],
-		actionPathName: "forecastPlacement"
+		actionPathName: "forecastPlacement",
+		noIcon: true
 	},
 	airlift: {
 		name: "Airlift",
-		hasIcon: true,
 		code: "ar",
 		cardKey: "airl",
 		rules: ["Play at any time. Not an action.", "Move any 1 pawn to any city."],
@@ -392,7 +370,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	governmentGrant: {
 		name: "Government Grant",
-		hasIcon: true,
 		code: "gg",
 		cardKey: "gove",
 		rules: ["Play at any time. Not an action.", "Add 1 research station to any city."],
@@ -403,7 +380,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 	gameEnd: {
 		name: "Game End",
 		code: "ge",
-		propertyNames: ["reason"]
+		propertyNames: ["reason"],
+		noIcon: true
 	}
 },
 eventCodes = {
@@ -482,7 +460,7 @@ export default class Event
 
 	hasIcon()
 	{
-		return getEventType(this.code).hasIcon;
+		return !getEventType(this.code).noIcon;
 	}
 
 	getDetails()

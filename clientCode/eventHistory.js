@@ -301,7 +301,7 @@ function getEventHistoryIcon(event)
 
 function getEventIconHtml(eventType, { event } = {})
 {
-	if (!eventType.hasIcon)
+	if (eventType.noIcon)
 		return "";
 	
 	const { name } = eventType,
