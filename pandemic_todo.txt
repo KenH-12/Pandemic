@@ -3,20 +3,13 @@ BUGS
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page loading
 
-the eradication tooltip in infection prevention details appears behind the event details
-	secondary tooltips should have a higher z-index
-
 tooltips which have their offset adjusted after the load event of a contained image appear to jump sideways
 	try positioning within the window once before awaiting the load events
 
 if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
 
-event history button background-color doesn't transition
-
 TO DO
 -----
-role cards should be positioned with positioTooltipRelativeToElement
-
 when prompting infect, indicate that event cards can be played
 
 during the infection step, if an infection card has already been drawn...
@@ -169,6 +162,10 @@ in the discard prompt, give the x/y a red or green background with white text in
 
 SMALL FIXES
 -----------
+role cards should be positioned with positioTooltipRelativeToElement
+
+event history button background-color doesn't transition
+
 instead of importing gameData at the top of event.js, try dynamically importing only where it is needed
 
 perhaps epidemic intensify events should be undoable until an infection has occured
