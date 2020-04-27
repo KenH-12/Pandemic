@@ -176,7 +176,7 @@
 							</div>
 						</div>
 						<div id='playerDeckContainer' class='bottomPanelDiv'>
-							<p class='title'>PLAYER DECK <span class='info'>&#9432;</span></p>
+							<p class='title'>PLAYER DECK <span class='info hidden'>&#9432;</span></p>
 							<img id='imgPlayerDeck' src='images/cards/playerDeck_6.png' alt='Player Deck'/>
 						</div>
 						<div id='playerDiscardContainer' class='bottomPanelDiv'>

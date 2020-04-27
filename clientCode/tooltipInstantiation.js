@@ -26,7 +26,6 @@ import { eventHistory } from "./eventHistory.js";
 export default function instantiateTooltips()
 {
     bindCubeSuppliesInfoHoverEvents();
-	bindPlayerDeckHoverEvents();
 	bindInfectionDeckHoverEvents();
 	bindInfectionRateInfoHoverEvents();
 	bindOutbreakMarkerHoverEvents();
@@ -44,6 +43,7 @@ export default function instantiateTooltips()
 function bindPlayerDeckHoverEvents()
 {
 	const positionRelativeToSelector = "#playerDeckContainer",
+		infoIconSelector = `${positionRelativeToSelector} .info`,
 		juxtaposition = "top",
 		containerSelector = "#boardContainer",
 		getPlayerDeckInfo = function()
@@ -60,9 +60,11 @@ function bindPlayerDeckHoverEvents()
 				<p>${outOfCardsWarning}</p>`;
 		};
 	
+	$(infoIconSelector).removeClass("hidden");
+
 	new Tooltip({
 		getContent: getPlayerDeckInfo,
-		hoverElementSelector: `${positionRelativeToSelector} .info`,
+		hoverElementSelector: infoIconSelector,
 		positionRelativeToSelector,
 		juxtaposition,
 		containerSelector,

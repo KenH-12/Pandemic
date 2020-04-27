@@ -3086,8 +3086,6 @@ async function drawStep()
 			gameData.epidemicCount += 2;
 			title = "DOUBLE EPIDEMIC!!";
 		}
-
-		bindPlayerDeckHoverEvents();
 		
 		await specialEventAlert({ title, eventClass: "epidemic", visibleMs: 1250 });
 	}
@@ -6842,18 +6840,23 @@ async function setup()
 	bindEventCardHoverEvents();
 	enablePlayerDiscardHoverEvents();
 	
-	if (forecastInProgress())
-	{
-		gameData.currentStep.indicate();
-		indicatePromptingEventCard();
-	}
-	else if (currentStepIs("setup"))
+	if (currentStepIs("setup"))
 	{
 		gameData.allRoles = allRoles;
 		animateNewGameSetup();
 	}
 	else
-		proceed();
+	{
+		bindPlayerDeckHoverEvents();
+		
+		if (forecastInProgress())
+		{
+			gameData.currentStep.indicate();
+			indicatePromptingEventCard();
+		}
+		else
+			proceed();
+	}
 }
 
 async function animateRoleDetermination()
@@ -7309,6 +7312,8 @@ function animatePreparePlayerDeck()
 			await placePileOntoPlayerDeck($divs.eq(i), deckProperties);
 			playerDeckImgManager.incrementCardCount(pileSize).setImage();
 		}
+
+		bindPlayerDeckHoverEvents();
 	
 		$container.addClass("hidden");
 		finishedSetupStep();
