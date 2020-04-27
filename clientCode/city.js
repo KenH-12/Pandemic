@@ -521,7 +521,7 @@ const cities = {};
 			name: "san francisco",
 			color: "u",
 			percentFromTop: 0.332,
-			percentFromLeft: 0.047,
+			percentFromLeft: 0.048,
 			checksPanelOcclusion: true,
 			connectedCityKeys: ["toky", "mani", "chic", "losa"],
 			quarantineBoundaries: [
@@ -549,7 +549,7 @@ const cities = {};
 			name: "chicago",
 			color: "u",
 			percentFromTop: 0.293,
-			percentFromLeft: 0.143,
+			percentFromLeft: 0.144,
 			checksPanelOcclusion: true,
 			connectedCityKeys: ["atla", "mont", "sanf", "losa", "mexi"],
 			quarantineBoundaries: [
@@ -563,8 +563,8 @@ const cities = {};
 		{
 			name: "montreal",
 			color: "u",
-			percentFromTop: 0.288,
-			percentFromLeft: 0.217,
+			percentFromTop: 0.289,
+			percentFromLeft: 0.218,
 			checksPanelOcclusion: true,
 			connectedCityKeys: ["chic", "wash", "newy"],
 			quarantineBoundaries: [
@@ -578,8 +578,8 @@ const cities = {};
 		{
 			name: "new york",
 			color: "u",
-			percentFromTop: 0.299,
-			percentFromLeft: 0.275,
+			percentFromTop: 0.301,
+			percentFromLeft: 0.276,
 			checksPanelOcclusion: true,
 			connectedCityKeys: ["mont", "wash", "lond", "madr"],
 			quarantineBoundaries: [
@@ -592,7 +592,7 @@ const cities = {};
 		{
 			name: "atlanta",
 			color: "u",
-			percentFromTop: 0.372,
+			percentFromTop: 0.371,
 			percentFromLeft: 0.172,
 			connectedCityKeys: ["chic", "wash", "miam"],
 			quarantineBoundaries: [
@@ -606,8 +606,8 @@ const cities = {};
 		{
 			name: "washington",
 			color: "u",
-			percentFromTop: 0.365,
-			percentFromLeft: 0.250,
+			percentFromTop: 0.366,
+			percentFromLeft: 0.251,
 			connectedCityKeys: ["atla", "mont", "newy", "miam"],
 			quarantineBoundaries: [
 				{ key: "mont", points: ["tl"] },
@@ -635,8 +635,8 @@ const cities = {};
 		{
 			name: "essen",
 			color: "u",
-			percentFromTop: 0.217,
-			percentFromLeft: 0.489,
+			percentFromTop: 0.218,
+			percentFromLeft: 0.49,
 			connectedCityKeys: ["lond", "pari", "mila", "stpe"],
 			quarantineBoundaries: [
 				{ key: "lond", points: ["tl", "bl"] },
@@ -679,8 +679,8 @@ const cities = {};
 		{
 			name: "paris",
 			color: "u",
-			percentFromTop: 0.289,
-			percentFromLeft: 0.471,
+			percentFromTop: 0.29,
+			percentFromLeft: 0.472,
 			connectedCityKeys: ["lond", "madr", "algi", "mila", "esse"],
 			quarantineBoundaries: [
 				{ key: "lond", points: ["tl"] },
@@ -705,8 +705,8 @@ const cities = {};
 		{
 			name: "los angeles",
 			color: "y",
-			percentFromTop: 0.438,
-			percentFromLeft: 0.063,
+			percentFromTop: 0.439,
+			percentFromLeft: 0.064,
 			connectedCityKeys: ["sydn", "sanf", "mexi", "chic"],
 			quarantineBoundaries: 
 			[
@@ -733,7 +733,7 @@ const cities = {};
 		{
 			name: "mexico city",
 			color: "y",
-			percentFromTop: 0.475,
+			percentFromTop: 0.474,
 			percentFromLeft: 0.133,
 			connectedCityKeys: ["losa", "lima", "bogo", "miam", "chic"],
 			quarantineBoundaries: [
@@ -761,8 +761,8 @@ const cities = {};
 		{
 			name: "bogota",
 			color: "y",
-			percentFromTop: 0.566,
-			percentFromLeft: 0.212,
+			percentFromTop: 0.567,
+			percentFromLeft: 0.213,
 			connectedCityKeys: ["mexi", "lima", "buen", "saop", "miam"],
 			quarantineBoundaries: [
 				{ key: "mexi", points: ["tl", "bl"] },
@@ -776,7 +776,7 @@ const cities = {};
 			name: "lima",
 			color: "y",
 			percentFromTop: 0.681,
-			percentFromLeft: 0.185,
+			percentFromLeft: 0.186,
 			connectedCityKeys: ["mexi", "bogo", "sant"],
 			quarantineBoundaries: [
 				{ key: "mexi", points: ["tr", "tl", "bl"] },
@@ -787,8 +787,8 @@ const cities = {};
 		{
 			name: "santiago",
 			color: "y",
-			percentFromTop: 0.799,
-			percentFromLeft: 0.195,
+			percentFromTop: 0.8,
+			percentFromLeft: 0.197,
 			connectedCityKeys: ["lima"],
 			quarantineBoundaries: [
 				{ key: "lima", points: ["tr", "tl", "bl"] },
@@ -798,8 +798,8 @@ const cities = {};
 		{
 			name: "buenos aires",
 			color: "y",
-			percentFromTop: 0.777,
-			percentFromLeft: 0.274,
+			percentFromTop: 0.779,
+			percentFromLeft: 0.275,
 			connectedCityKeys: ["bogo", "saop"],
 			quarantineBoundaries: [
 				{ key: "bogo", points: ["tr", "tl", "bl"] },
@@ -811,7 +811,7 @@ const cities = {};
 			name: "sao paulo",
 			color: "y",
 			percentFromTop: 0.698,
-			percentFromLeft: 0.318,
+			percentFromLeft: 0.319,
 			connectedCityKeys: ["bogo", "buen", "lago", "madr"],
 			quarantineBoundaries: [
 				{ key: "bogo", points: ["tr", "tl", "bl"] },
@@ -826,8 +826,8 @@ const cities = {};
 		{
 			name: "lagos",
 			color: "y",
-			percentFromTop: 0.547,
-			percentFromLeft: 0.463,
+			percentFromTop: 0.548,
+			percentFromLeft: 0.464,
 			connectedCityKeys: ["saop", "kins", "khar"],
 			quarantineBoundaries: [
 				{ key: "lago", points: ["tl"] },
@@ -840,8 +840,8 @@ const cities = {};
 		{
 			name: "khartoum",
 			color: "y",
-			percentFromTop: 0.527,
-			percentFromLeft: 0.559,
+			percentFromTop: 0.528,
+			percentFromLeft: 0.56,
 			connectedCityKeys: ["lago", "kins", "joha", "cair"],
 			quarantineBoundaries: [
 				{ key: "cair", points: ["tr", "tl"] },
@@ -854,7 +854,7 @@ const cities = {};
 		{
 			name: "kinshasa",
 			color: "y",
-			percentFromTop: 0.620,
+			percentFromTop: 0.622,
 			percentFromLeft: 0.511,
 			connectedCityKeys: ["lago", "khar", "joha"],
 			quarantineBoundaries: [
@@ -866,8 +866,8 @@ const cities = {};
 		{
 			name: "johannesburg",
 			color: "y",
-			percentFromTop: 0.728,
-			percentFromLeft: 0.553,
+			percentFromTop: 0.729,
+			percentFromLeft: 0.554,
 			connectedCityKeys: ["kins", "khar"],
 			quarantineBoundaries: [
 				{ key: "kins", points: ["tl", "bl"] },
@@ -878,8 +878,8 @@ const cities = {};
 		{
 			name: "algiers",
 			color: "b",
-			percentFromTop: 0.402,
-			percentFromLeft: 0.487,
+			percentFromTop: 0.401,
+			percentFromLeft: 0.488,
 			connectedCityKeys: ["madr", "pari", "ista", "cair"],
 			quarantineBoundaries: [
 				{ key: "pari", points: ["br", "tr", "tl"] },
@@ -908,8 +908,8 @@ const cities = {};
 		{
 			name: "moscow",
 			color: "b",
-			percentFromTop: 0.270,
-			percentFromLeft: 0.613,
+			percentFromTop: 0.269,
+			percentFromLeft: 0.614,
 			connectedCityKeys: ["stpe", "ista", "tehr"],
 			quarantineBoundaries: [
 				{ key: "stpe", points: ["tr", "tl"] },
@@ -935,7 +935,7 @@ const cities = {};
 			name: "baghdad",
 			color: "b",
 			percentFromTop: 0.387,
-			percentFromLeft: 0.606,
+			percentFromLeft: 0.608,
 			connectedCityKeys: ["ista", "cair", "riya", "kara", "tehr"],
 			quarantineBoundaries: [
 				{ key: "ista", points: ["tl"] },
@@ -949,7 +949,7 @@ const cities = {};
 			name: "tehran",
 			color: "b",
 			percentFromTop: 0.320,
-			percentFromLeft: 0.664,
+			percentFromLeft: 0.665,
 			connectedCityKeys: ["mosc", "bagh", "kara", "delh"],
 			quarantineBoundaries: [
 				{ key: "mosc", points: ["tr", "tl"] },
@@ -962,8 +962,8 @@ const cities = {};
 		{
 			name: "riyadh",
 			color: "b",
-			percentFromTop: 0.484,
-			percentFromLeft: 0.616,
+			percentFromTop: 0.483,
+			percentFromLeft: 0.617,
 			connectedCityKeys: ["cair", "bagh", "kara"],
 			quarantineBoundaries: [
 				{ key: "bagh", points: ["tr", "tl"] },
@@ -990,7 +990,7 @@ const cities = {};
 			name: "delhi",
 			color: "b",
 			percentFromTop: 0.392,
-			percentFromLeft: 0.733,
+			percentFromLeft: 0.734,
 			connectedCityKeys: ["tehr", "kara", "mumb", "chen", "kolk"],
 			quarantineBoundaries: [
 				{ key: "tehr", points: ["tr", "tl", "bl"] },
@@ -1003,7 +1003,7 @@ const cities = {};
 			name: "kolkata",
 			color: "b",
 			percentFromTop: 0.418,
-			percentFromLeft: 0.786,
+			percentFromLeft: 0.787,
 			connectedCityKeys: ["delh", "chen", "bang", "hong"],
 			quarantineBoundaries: [
 				{ key: "delh", points: ["tr", "tl", "bl"] },
@@ -1017,7 +1017,7 @@ const cities = {};
 			name: "mumbai",
 			color: "b",
 			percentFromTop: 0.500,
-			percentFromLeft: 0.686,
+			percentFromLeft: 0.687,
 			connectedCityKeys: ["kara", "delh", "chen"],
 			quarantineBoundaries: [
 				{ key: "kara", points: ["tl", "bl"] },
@@ -1030,7 +1030,7 @@ const cities = {};
 			name: "chennai",
 			color: "b",
 			percentFromTop: 0.557,
-			percentFromLeft: 0.744,
+			percentFromLeft: 0.745,
 			connectedCityKeys: ["mumb", "delh", "kolk", "bang", "jaka"],
 			quarantineBoundaries: [
 				{ key: "delh", points: ["tr", "tl"] },
@@ -1055,7 +1055,7 @@ const cities = {};
 		{
 			name: "seoul",
 			color: "r",
-			percentFromTop: 0.289,
+			percentFromTop: 0.29,
 			percentFromLeft: 0.896,
 			connectedCityKeys: ["beij", "shan", "toky"],
 			quarantineBoundaries: [
@@ -1083,8 +1083,8 @@ const cities = {};
 		{
 			name: "tokyo",
 			color: "r",
-			percentFromTop: 0.332,
-			percentFromLeft: 0.948,
+			percentFromTop: 0.333,
+			percentFromLeft: 0.949,
 			connectedCityKeys: ["seou", "shan", "osak", "sanf"],
 			quarantineBoundaries: [
 				...[
@@ -1109,7 +1109,7 @@ const cities = {};
 		{
 			name: "bangkok",
 			color: "r",
-			percentFromTop: 0.506,
+			percentFromTop: 0.507,
 			percentFromLeft: 0.797,
 			connectedCityKeys: ["chen", "kolk", "hong", "hoch", "jaka"],
 			quarantineBoundaries: [
@@ -1124,7 +1124,7 @@ const cities = {};
 			name: "hong kong",
 			color: "r",
 			percentFromTop: 0.460,
-			percentFromLeft: 0.840,
+			percentFromLeft: 0.841,
 			connectedCityKeys: ["shan", "taip", "mani", "hoch", "bang", "kolk"],
 			quarantineBoundaries: [
 				{ key: "shan", points: ["tr", "tl"] },
@@ -1138,8 +1138,8 @@ const cities = {};
 		{
 			name: "taipei",
 			color: "r",
-			percentFromTop: 0.444,
-			percentFromLeft: 0.900,
+			percentFromTop: 0.445,
+			percentFromLeft: 0.901,
 			connectedCityKeys: ["osak", "mani", "hong", "shan"],
 			quarantineBoundaries: [
 				{ key: "shan", points: ["tr", "tl"] },
@@ -1178,7 +1178,7 @@ const cities = {};
 			name: "ho chi minh city",
 			color: "r",
 			percentFromTop: 0.583,
-			percentFromLeft: 0.843,
+			percentFromLeft: 0.844,
 			connectedCityKeys: ["jaka", "bang", "hong", "mani"],
 			quarantineBoundaries: [
 				{ key: "hong", points: ["tr", "tl"] },
@@ -1190,7 +1190,7 @@ const cities = {};
 		{
 			name: "manila",
 			color: "r",
-			percentFromTop: 0.576,
+			percentFromTop: 0.577,
 			percentFromLeft: 0.917,
 			connectedCityKeys: ["sydn", "hoch", "hong", "taip", "sanf"],
 			quarantineBoundaries: [
@@ -1216,8 +1216,8 @@ const cities = {};
 		{
 			name: "sydney",
 			color: "r",
-			percentFromTop: 0.794,
-			percentFromLeft: 0.958,
+			percentFromTop: 0.796,
+			percentFromLeft: 0.96,
 			connectedCityKeys: ["jaka", "mani", "losa"],
 			quarantineBoundaries: [
 				...[

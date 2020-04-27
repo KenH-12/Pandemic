@@ -10,8 +10,6 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 TO DO
 -----
-some city coords are not centred
-
 event cards' "play at any time" should have a tooltip that describes exactly when they can be played.
 
 for the epidemic infect step, make sure the card looks like it's coming from the bottom of the deck
