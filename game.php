@@ -192,14 +192,14 @@
 					
 					<div id='rightPanel'>
 						<div id='setupProcedureContainer' class='procedureContainer hidden'>
-							<p class='title'>SETUP</p>
-							<p class='step'>1. Determine roles</p>
-							<p class='step'>2. Give cards to each player</p>
-							<p class='step'>3. Determine turn order</p>
-							<p class='step'>4. Prepare the player deck</p>
-							<p class='step'>5. Infect 9 cities</p>
-							<p class='step'>6. Place pawns in Atlanta</p>
-							<p class='step'>7. Place 1 research station in Atlanta</p>
+							<p class='title'><span>SETUP</p>
+							<p class='step'><span>1. Determine roles</span></p>
+							<p class='step'><span>2. Give cards to each role</span></p>
+							<p class='step'><span>3. Determine turn order</span></p>
+							<p class='step'><span>4. Prepare the player deck</span></p>
+							<p class='step'><span>5. Infect 9 cities</span></p>
+							<p class='step'><span>6. Place pawns in Atlanta</span></p>
+							<p class='step'><span>7. Place 1 research station in Atlanta</span></p>
 						</div>
 						<div id='skipSetupButtons' class='hidden'>
 							<div class='btnSkip' id='btnSkipSetupStep'>
@@ -231,12 +231,27 @@
 						</div>
 
 						<div id='turnProcedureContainer' class='procedureContainer hidden'>
-							<p class='title'>PLAY</p>
-							<p class='step action'>1. Do 4 actions</p>
-							<p class='step draw'>2. Draw 2 cards</p>
-							<li class='substep epidemic'>Resolve any epidemics</li>
-							<li class='substep discard'>Discard to 7 cards</li>
-							<p class='step infect'>3. Infect Cities</p>
+							<p class='title'>PLAY<span class='info' id='turnProcedureInfo'>&#9432;</span></p>
+							<p class='step action'>
+								<span>1. Do 4 actions</span>
+								<span class='info playStepInfo hidden' data-eventType='ac'>&#9432;</span>
+							</p>
+							<p class='step draw'>
+								<span>2. Draw 2 cards</span>
+								<span class='info playStepInfo hidden' data-eventType='cd'>&#9432;</span>
+							</p>
+							<li class='substep epidemic'>
+								<span>Resolve any epidemics</span>
+								<span class='info playStepInfo resolveEpidemicsInfo hidden'>&#9432;</span>
+							</li>
+							<li class='substep discard'>
+								<span>Discard to 7 cards</span>
+								<span class='info playStepInfo hidden' data-eventType='ds'>&#9432;</span>
+							</li>
+							<p class='step infect'>
+								<span>3. Infect Cities</span>
+								<span class='info playStepInfo hidden' data-eventType='ic'>&#9432;</span>
+							</p>
 						</div>
 						
 						<div id='indicatorContainer' class='hidden'>

@@ -495,8 +495,8 @@ span.r, p.r {color: #ef282a; background: none !important }
 	margin-left: 5px;
 }
 .eventDetails  .title > .eventTypeInfo:hover,
-#topPanel .info:hover,
-.bottomPanelDiv .info:hover
+.info:hover,
+.whiteTextShadow
 { text-shadow: 0px 0px 3px #fff }
 .eventDetails .playerCard
 {
@@ -1587,12 +1587,21 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	margin-bottom: 3px;
 	color: #fff;
 }
+#turnProcedureInfo, .playStepInfo { font-size: 12px }
+#turnProcedureInfo
+{
+	line-height: 18px;
+	float: right;
+}
+.playStepInfo { margin-left: 10px }
+.playStepInfo:hover { color: #fff }
+.playStepTooltip { top: 5 }
 .procedureContainer .substep
 {
 	margin-left: 6%;
 	font-size: 13px;
 }
-.procedureContainer .highlighted
+.procedureContainer .highlighted span:not(.playStepInfo)
 {
 	color: #fff;
 	font-size: 15px;

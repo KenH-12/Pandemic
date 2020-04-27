@@ -1902,7 +1902,7 @@ function indicateOneQuietNightStep({ off } = {})
 		title = `One Quiet Night: skip the next Infect Cities step.`;
 	}
 	
-	$("#turnProcedureContainer").find(".step.infect")
+	$("#turnProcedureContainer").find(".step.infect").children("span").first()
 		.attr("title", title)
 		.html(html);
 }
