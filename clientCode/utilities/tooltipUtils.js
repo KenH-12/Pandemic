@@ -17,9 +17,9 @@ async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposit
 		tooltipOffset.top -= Math.abs($element.height() - $tooltip.height()) / 2;
 		
 		if (juxtaposition === "left")
-			tooltipOffset.left -= $tooltip.outerWidth();
+			tooltipOffset.left -= $tooltip.outerWidth() + tooltipMargin;
 		else if (juxtaposition === "right")
-			tooltipOffset.left += $element.outerWidth();
+			tooltipOffset.left += $element.outerWidth() + tooltipMargin;
 	}
 	else // top or bottom
 	{
@@ -35,7 +35,7 @@ async function positionTooltipRelativeToElement($tooltip, $element, { juxtaposit
 		if (juxtaposition === "top")
 			tooltipOffset.top -= $tooltip.outerHeight() + tooltipMargin;
 		else // bottom
-			tooltipOffset.top += $element.outerHeight();
+			tooltipOffset.top += $element.outerHeight() + tooltipMargin;
 	}
 
 	$tooltip.offset(tooltipOffset);
@@ -161,9 +161,27 @@ function setTooltipPaddingAndReturnOffset($tooltip, { tooltipOffset, tooltipMarg
 async function ensureDivPositionIsWithinWindowHeight($div, { windowPadding = 5 } = {})
 {
 	const windowHeight = $(window).height(),
-		divHeight = $div.outerHeight() + windowPadding;
+		scrollable = "scrollable";
+	
+	let divHeight = $div.outerHeight() + windowPadding,
+		divOffsetTop = $div.offset().top;
 
-    if ($div.offset().top + divHeight > windowHeight)
+	if (divHeight > windowHeight + windowPadding)
+	{
+		divHeight = windowHeight - windowPadding*2;
+		$div.height(divHeight).addClass(scrollable);
+	}
+	else
+		$div.removeClass(scrollable);
+	
+	if (divOffsetTop < windowPadding)
+	{
+		await sleep(1); // without this delay, divs can still be cut off at the top.
+		divOffsetTop = windowPadding;
+		$div.offset({ top: divOffsetTop });
+	}
+
+	if (divOffsetTop + divHeight > windowHeight)
 		$div.offset({ top: windowHeight - divHeight });
 }
 
