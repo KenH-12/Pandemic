@@ -8,6 +8,8 @@ tooltips which have their offset adjusted after the load event of a contained im
 
 if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
 
+determine turn order animation malfunctions when a role receives only event cards in their starting hand
+
 TO DO
 -----
 when prompting infect, indicate that event cards can be played
@@ -17,18 +19,6 @@ during the infection step, if an infection card has already been drawn...
 	if oqn is the only event card held
 
 when starting a new game, wait until the player deck has been arranged before showing the tooltip
-
-tooltips
-	secondary tooltips
-		epidemics
-		outbreaks
-	play steps
-	perhaps event type tooltips should specify the event category
-		setup step
-		action
-		event card
-		play step
-		triggered event
 
 special action button tooltips should have role names replaced by role tags
 

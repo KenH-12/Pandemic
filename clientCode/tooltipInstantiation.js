@@ -38,6 +38,7 @@ export default function instantiateTooltips()
 	bindActionButtonHoverEvents();
 	bindDispatchTypeHoverEvents();
 	bindForecastInfoHoverEvents();
+	bindPlayStepHoverEvents();
 }
 
 function bindPlayerDeckHoverEvents()
@@ -497,7 +498,7 @@ function bindRoleCardHoverEvents()
 
 function bindEpidemicCardHoverEvents($container)
 {
-	$container.find(".playerCard.epidemic")
+	$container.find(".playerCard.epidemic, .resolveEpidemicsInfo")
 		.off("mouseenter mouseleave")
 		.hover(function() { showFullEpidemicCard($(this).attr("id", "epidemicFullAnchor")) },
 			function()
@@ -515,7 +516,7 @@ function unbindEpidemicCardHoverEvents($container)
 	$("#boardContainer").children(".epidemicFull").remove();
 }
 
-function showFullEpidemicCard($epidemicCard)
+function showFullEpidemicCard($hoveredElement)
 {
 	const $fullEpidemicCard = $(`<div class='epidemicFull'>
 									<h2>EPIDEMIC</h2>
@@ -534,16 +535,65 @@ function showFullEpidemicCard($epidemicCard)
 								</div>`),
 		eventDetails = ".eventDetails";
 	
-	let $relativeTo = $epidemicCard,
-		juxtaposition = "left";
+	let $relativeTo = $hoveredElement,
+		juxtaposition = "left",
+		tooltipMargin = 5;
 	
-	if ($epidemicCard.closest(eventDetails).length)
+	if ($hoveredElement.closest(eventDetails).length)
 	{
 		$relativeTo = $(eventDetails);
 		juxtaposition = "right";
 	}
+	else if ($hoveredElement.hasClass("resolveEpidemicsInfo"))
+	{
+		tooltipMargin = 10;
+		$relativeTo = $("#turnProcedureContainer");
+	}
 
-	positionTooltipRelativeToElement($fullEpidemicCard, $relativeTo, { juxtaposition });
+	positionTooltipRelativeToElement($fullEpidemicCard, $relativeTo, { juxtaposition, tooltipMargin });
+}
+
+function bindPlayStepHoverEvents()
+{
+	const positionRelativeToSelector = "#turnProcedureContainer",
+		$procedureContainer = $(positionRelativeToSelector),
+		playStepInfoSelector = ".playStepInfo",
+		epidemicInfoSelector = ".resolveEpidemicsInfo",
+		getContent = function({ $hoveredElement })
+		{
+			const eventTypeCode = $hoveredElement.attr("data-eventType"),
+				pluralNameForm = $hoveredElement.parent().hasClass("infect");
+			
+			return getEventTypeTooltipContent(getEventType(eventTypeCode), { pluralNameForm });
+		},
+		hiddenClass = "hidden",
+		playStepTooltip = new Tooltip({
+			hoverElementSelector: `${playStepInfoSelector}:not(.${hiddenClass}):not(${epidemicInfoSelector})`,
+			getContent,
+			containerSelector: "#boardContainer",
+			positionRelativeToSelector,
+			cssClassString: "playStepTooltip eventTypeTooltip wideTooltip"
+		}).bindHoverEvents();
+	
+	$("#turnProcedureInfo").on("mouseenter", function()
+	{
+		const $infoIcon = $(this),
+			$playStepInfoIcons = $procedureContainer.find(playStepInfoSelector).removeClass(hiddenClass),
+			textShadowClass = "whiteTextShadow";
+
+		$infoIcon.addClass(textShadowClass);
+		$procedureContainer.off("mouseleave").on("mouseleave", function()
+		{
+			$procedureContainer.off("mouseleave");
+			$playStepInfoIcons.addClass(hiddenClass);
+			$infoIcon.removeClass(textShadowClass);
+			playStepTooltip.hide();
+
+			unbindEpidemicCardHoverEvents($procedureContainer)
+		});
+
+		bindEpidemicCardHoverEvents($procedureContainer);
+	});
 }
 
 export {

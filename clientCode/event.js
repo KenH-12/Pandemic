@@ -126,7 +126,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 	},
 	eradication: {
 		name: "eradication",
-		displayName: "Disease Eradicated",
 		code: "er",
 		propertyNames: ["diseaseColor"],
 		rules: [strings.eradicationRules]
@@ -382,6 +381,16 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "ge",
 		propertyNames: ["reason"],
 		noIcon: true
+	},
+	// This is not an actual event — it's here for the convenience of generating the play step tooltip.
+	doFourActions: {
+		name: "Do 4 Actions",
+		code: "ac",
+		rules: [
+			"A role may do up to 4 actions each turn. Any combination of actions may be performed. The same action may be done several times, each time counting as 1 action.",
+			"A role’s special abilities may change how an action is done."
+		],
+		noIcon: true
 	}
 },
 eventCodes = {
@@ -420,7 +429,8 @@ eventCodes = {
 	ar: "airlift",
 	// aa: "airliftAccept",
 	gg: "governmentGrant",
-	ge: "gameEnd"
+	ge: "gameEnd",
+	ac: "doFourActions" // This is not an actual event — it's here for the convenience of generating the play step tooltip.
 };
 
 export default class Event
@@ -1685,7 +1695,7 @@ function getEventTypeTooltipContent(eventType, { includeName = true, pluralNameF
 	if (includeName)
 	{
 		const dispatchPrefix = isDispatchType && eventType.code !== eventTypes.rendezvous.code ? "DISPATCH PAWN VIA<br/> " : "",
-			eventTypeName = eventType[ pluralNameForm ? "pluralName" : "name" ].toUpperCase();
+			eventTypeName = eventType[ pluralNameForm ? "pluralName" : eventType.displayName ? "displayName" : "name" ].toUpperCase();
 		
 		content += `<h3>${dispatchPrefix}${eventTypeName}</h3>`;
 	}
