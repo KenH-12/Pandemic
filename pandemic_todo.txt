@@ -10,26 +10,26 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 TO DO
 -----
-when prompting infect, indicate that event cards can be played
+some city coords are not centred
 
-during the infection step, if an infection card has already been drawn...
-	one quiet night is not playable, therefore the remaining infections should happen automatically
-	if oqn is the only event card held
+event cards' "play at any time" should have a tooltip that describes exactly when they can be played.
 
-special action button tooltips should have role names replaced by role tags
+for the epidemic infect step, make sure the card looks like it's coming from the bottom of the deck
+
+in the discard prompt, give the x/y a red or green background with white text instead of colored text
+
+the infection rate tooltip should indicate that epidemics increase the infection rate
 
 bottom panel elements should be positioned in way that's similar to the event history container
 	consider using position: fixed
 	pieces should appear behind the bottom panel elements
 
-when a cube supply gets low, its count should glow red
-	same for the player deck
-		show warnings when getting low on cards?
+when at risk of defeat, warn the players somehow...
+	when a cube supply gets low, its count should glow red
+	when few player cards are left in the deck, show a warning
+	the outbreaks marker should glow red when approaching the last space on the track
 
 when a button is disabled, change the cursor or something
-
-put strings in strings.js file
-	game end cause descriptions
 
 indicate loading when waiting for a response from the server
 
@@ -39,26 +39,14 @@ starting a new game
 when the game is over
 	navigate back to home screen
 
-consider removing the special actions container
-	dispatch pawn and operations flight are movement actions
-	plan contingency is an other action
+menu
+	rules / instructions / FAQ
+	resign button
 
 event history
-	detailed tooltips
-		game end
-		hoverable --- for the below descriptions, consider linking to a certain place in a rules file
-			travel paths for movement actions and research station relocations?
-			outbreak spread paths?
-
-rendezvous button
-
-rules / instructions / FAQ
-
-standardize prompt appearance / button behaviour
-
-resign button
-
-compare client and server side hand sizes after drawing?
+	game end icon and details
+	travel paths for movement actions and research station relocations?
+	outbreak spread paths?
 
 handle errors
 	retrieveEventHistory
@@ -74,16 +62,16 @@ for multiplayer games, require permission for certain actions
 
 IDEAS
 -----
+consider removing the special actions container
+	dispatch pawn and operations flight are movement actions
+	plan contingency is an other action
+
 the 'choose flight type' interface should provide only the flight type options with descriptions viewable on hover
 	when a flight type is selected, the normal action interface should be displayed
 
 display difficulty on board above infection rate
 
-treat disease button should receive hover background-color when a treatable cube is hovered
-
 change "x actions remaining" to 4 lights which turn off as actions are used
-
-skippable infection steps and epidemics
 
 hovering over the quarantine specialist's pawn should display the quarantine area
 	role tag also?
@@ -98,59 +86,36 @@ when stacking outbreak infection cubes on the origin city, use placeDiseaseCubes
 trophy background or those fern things around the text on the victory screen
 skull background or something for defeat screen
 
-hovering over the player deck causes the cursor to become a "?".
-	clicking shows the explaination of what happens when the cards run out.
-
 pinpointing should happen on mousover of playercards/infection cards?
 
 have an explicit rendezvous action button and prompt?
 
-concede button?
-
-perhaps the discard prompt should be in the player's hand
-
-have dragged pawns leave translucent duplicates that remain in the pawn's current location
-have an arrow between the pawn and the DestinationKeys
-	it should follow the dragged pawn's translucent image
-
-store eventTypeInfo in db?
-
-to keep the player panels from covering any cities, consider checking the bottom-right corner of the far-right panel
-	if it's past a certain top/left percentage, reduce the width of .player and/or the height of contained elements
-
-use dotted underlines with the "?" cursor and a tooltip on mouseover to explain things that may be unclear
-
-instead of the space-consuming title, "RESEARCH STATION SUPPLY", use the station img as the title?
-
 access epidemicsDrawn, infectionRate, and numOutbreaks from vw_disease?
 
-animate outbreakInfection cubes to the origin city first, then to the affected city. (more intuitive change in cube supply)
-
 add the "async" suffix to async function names?
-
-display checkboxes beside epidemic steps
-
-include the "play" steps from the board beside the player deck or somewhere
-
-prompt the player to draw cards instead of dealing them automatically ?
 
 include country name and population for infection cards?
 
 centralize event types in a php file?
 
-when retrieving events / eventHistory, parse events into more useful objects based on their type?
-
-animate color on buttons that are waiting to be clicked ('continue' buttons)
-
 split data.currentStep into an object containing 'next' and 'current' keys
-
-in the discard prompt, give the x/y a red or green background with white text instead of colored text
 
 SMALL FIXES
 -----------
+when prompting infect, indicate that event cards can be played
+
+during the infection step, if an infection card has already been drawn...
+	one quiet night is not playable, therefore the remaining infections should happen automatically
+	if oqn is the only event card held
+
+special action button tooltips should have role names replaced by role tags
+
+put strings in strings.js file
+	game end cause descriptions
+
 role cards should be positioned with positioTooltipRelativeToElement
 
-event history button background-color doesn't transition
+event history button background-color should transition
 
 instead of importing gameData at the top of event.js, try dynamically importing only where it is needed
 
@@ -164,8 +129,6 @@ center gameEnd text vertically
 
 use a more straightforward way of retrieving the turn order in retrieveGameData.php
 
-use flexbox for #playerPanelContainer
-
 show outbreak symbol on outbreaking city
 
 One Quiet Night should notify success in a more visible way
@@ -174,64 +137,15 @@ Resilient Population animation looks a little funny when very few cards (3ish or
 
 make DiscardPrompt a singleton
 
-infection cards should scroll with their container (forecast is an obvious example when there is overflow)
-
 reduce the number of arguments in php function definitions (pass objects instead?)
 
-there should be some message below the active role that says a request is being processed
-
-when event cards cannot be played, the epidemic infect step should happen automatically
-
-event cards' "play at any time" should have a tooltip that describes exactly when they can be played.
-
 pawns should have a data-key property instead of a cityKey class
-
-put a cancel button at the top of the action prompt?
 
 instead of counting the cubes on the board, keep a cubeCount column in the game table
 
 do steps need a procedure? perhaps they only need a single method
 
-for the valid[eventType.name]DestinationKeys methods, use camelcase eventType names.
-
-use a similar draggable approach to pawn dragging?
-
-bindDiseaseCubeEvents should be 2 separate functions -- 1 to enable and 1 to disable
-
-for any array containing only unique values, use a Set instead
-
-in the arrangePlayerCards procedure, change the way epidemic division remainders are handled
-	make it randomly choose whether to use a remainder for each division.
-
-flip pawn images horizontally to make the lighting consistent with the research stations
-
-for the epidemic infect step, make sure the card looks like it's coming from the bottom of the deck
-
-the stored procedure increment_gamephase...
-	should only work for actions 1-4
-	should be renamed to nextActionStep or similar.
-
-facedown infectioncards need to be repositioned by resizeBoard
-
-ensure that the game initiated properly
-
 replace php associative arrays with objects
-
-discard panels should have a greater z-index than pieces (except pawns that are being dragged)
-
-implement a constant duration for panel slide up/down
-
-in php files, put $game not found and such at the top instead of nesting everything
-
-create a js function that performs data.events.push and updates the nextEventIndex
-
-include a step description in the db that can be used in the status
-
-create a function, getDuration, to handle the fast forwarding mechanic
-
-prevent pinpoint rectangles from triggering mouse events -- they mess with the discard pile hovers
-
-consider changing the color of the bottom panel -- black discards blend in
 
 use fetch instead of ajax
 
@@ -239,19 +153,7 @@ use em instead of px for font sizes?
 
 use css variables for colors n stuff
 
-not enough space for initial infections at smallest screen width (playerPanel gets in the way)
-
-some city coords are not centred
-
-create trigger that updates a card's index after updating its location
-in movementAction.php and drawPlayerCards.php, set the cardIndex of discarded cards
-also allow players to rearrange their hands. update cardIndex to reflect the hand order.
-
-check rows returned or whatever in php files
-
 private properties in objects?
 use Object.freeze() on objects that should never change?
 
 consider using a locationID instead of cityKey + gameID
-
-probably don't need getDisplayName
