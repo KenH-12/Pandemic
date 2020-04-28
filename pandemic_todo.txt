@@ -10,9 +10,9 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 TO DO
 -----
-event cards' "play at any time" should have a tooltip that describes exactly when they can be played.
+have a slight delay before displaying full cards in the player discard pile
 
-for the epidemic infect step, make sure the card looks like it's coming from the bottom of the deck
+event cards' "play at any time" should have a tooltip that describes exactly when they can be played
 
 in the discard prompt, give the x/y a red or green background with white text instead of colored text
 

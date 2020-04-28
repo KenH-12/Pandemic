@@ -118,7 +118,7 @@ function resetInfectionDeckSize()
 
 function updateInfectionDeckTooltip()
 {
-	if ($("#infectionDeckContainer img").is(":hover"))
+	if (gameData.currentStep.name !== "setup" && $("#infectionDeckContainer img").is(":hover"))
 		$(".tooltip").find("p").html(`${gameData.infectionDeckSize} cards`);
 }
 

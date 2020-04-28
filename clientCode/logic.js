@@ -4944,7 +4944,7 @@ async function epidemicInfect()
 
 	getInfectionContainer().append(newInfectionCardTemplate());
 	positionInfectionPanelComponents();
-	await dealFaceDownInfCard(card);
+	await dealFaceDownInfCard(card, { dealFromBottomOfDeck: true });
 	await revealInfectionCard(card);
 
 	const { color } = card.city;
@@ -6096,7 +6096,7 @@ async function dealFaceDownInfGroup(group)
 	return sleep(getDuration("dealCard") * 0.35);
 }
 
-function dealFaceDownInfCard({ infectionIndex })
+function dealFaceDownInfCard({ infectionIndex }, { dealFromBottomOfDeck } = {})
 {
 	decrementInfectionDeckSize();
 	
@@ -6111,7 +6111,7 @@ function dealFaceDownInfCard({ infectionIndex })
 								alt='Infection Card' />`),
 			{ infectionDeckOffset, boardWidth } = gameData;
 		
-		$cardback.appendTo("body");
+		$cardback.appendTo(dealFromBottomOfDeck ? "#boardContainer" : "body");
 
 		// align the drawn card with the deck, and animate it to where it will be revealed
 		$cardback
@@ -6121,7 +6121,7 @@ function dealFaceDownInfCard({ infectionIndex })
 				left: infectionDeckOffset.left,
 				top: infectionDeckOffset.top
 			})
-			.attr("z-index", "1")
+			.css("z-index", dealFromBottomOfDeck ? 1 : 5)
 			.animate(
 			{
 				width: getDimension("diseaseIcon"),
@@ -6130,7 +6130,13 @@ function dealFaceDownInfCard({ infectionIndex })
 			},
 			getDuration("dealCard"),
 			easings.dealCard,
-			function() { resolve() });
+			function()
+			{
+				if (dealFromBottomOfDeck)
+					$cardback.appendTo("#epidemicContainer");
+				
+				resolve();
+			});
 	});
 }
 
