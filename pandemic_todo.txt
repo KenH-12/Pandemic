@@ -8,10 +8,10 @@ tooltips which have their offset adjusted after the load event of a contained im
 
 if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
 
+dragging a pawn over the outbreak or infection rate marker causes odd behaviour
+
 TO DO
 -----
-have a slight delay before displaying full cards in the player discard pile
-
 event cards' "play at any time" should have a tooltip that describes exactly when they can be played
 
 in the discard prompt, give the x/y a red or green background with white text instead of colored text

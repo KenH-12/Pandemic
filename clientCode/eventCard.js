@@ -86,9 +86,18 @@ function bindEventCardHoverEvents($container)
     let $this;
     $eventCards.not(".contingency")
         .off("mouseenter mouseleave")
-        .hover(function()
+        .hover(async function()
         {
             $this = $(this);
+
+            if ($this.closest("#playerDiscardContainer").length)
+            {
+                await sleep(250);
+
+                if (!$this.filter(":hover").length)
+                    return false;
+            }
+
             eventCards[$this.data("key")].showFullCard($this);
         },
         function() { $("#boardContainer").children("#contingencyWrapper, .eventCardFull, .disabledEventCardTooltip").remove() });

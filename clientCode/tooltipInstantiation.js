@@ -518,8 +518,17 @@ function unbindEpidemicCardHoverEvents($container)
 	$("#boardContainer").children(".epidemicFull").remove();
 }
 
-function showFullEpidemicCard($hoveredElement)
+async function showFullEpidemicCard($hoveredElement)
 {
+	if ($hoveredElement.closest("#playerDiscardContainer").length)
+	{
+		await sleep(250);
+		
+		if (!$hoveredElement.filter(":hover").length)
+			return false;
+	}
+	
+	
 	const $fullEpidemicCard = $(`<div class='epidemicFull'>
 									<h2>EPIDEMIC</h2>
 									<div class='increase'>
