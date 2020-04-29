@@ -7137,9 +7137,13 @@ class RoleSlotMachine
 		
 		roleOffset.top += this.optionHeight * this.numOptions;
 		
+		if (gameData.skipping)
+			$role.addClass("hidden");
+		
 		$role.appendTo(this.$container.parent())
 			.offset(roleOffset)
-			.addClass("role");
+			.addClass("role")
+			.removeClass("hidden");
 
 		await animationPromise(
 		{
