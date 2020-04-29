@@ -132,19 +132,25 @@ function isOverflowingVertically($element)
 	return element.scrollHeight > element.clientHeight;
 }
 
-function removeStylePropertiesFrom($element, propertyNames)
+function removeInlineStylePropertiesFrom($elements, propertyNames)
 {
 	if (!propertyNames)
 	{
-		$element.removeAttr("style");
+		$elements.removeAttr("style");
 		return false;
 	}
 
-	const element = $element[0],
+	let element,
+		removalMethod;
+	
+	for (let i = 0; i < $elements.length; i++)
+	{
+		element = $elements.eq(i)[0];
 		removalMethod = element.style.removeProperty ? "removeProperty" : "removeAttribute";
-
-	for (let propertyName of ensureIsArray(propertyNames))
-		element.style[removalMethod](propertyName);
+	
+		for (let propertyName of ensureIsArray(propertyNames))
+			element.style[removalMethod](propertyName);
+	}
 }
 
 // Sets the height of all matched elements to the first matched element's width.

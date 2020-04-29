@@ -1415,7 +1415,7 @@ function showPlaceholderStation($originalStation)
 }
 function hidePlaceholderStation($originalStation)
 {
-	removeStylePropertiesFrom($originalStation.removeClass("hidden"), ["z-index", "opacity"]);
+	removeInlineStylePropertiesFrom($originalStation.removeClass("hidden"), ["z-index", "opacity"]);
 	$("#placeholderStation").addClass("hidden");
 }
 
