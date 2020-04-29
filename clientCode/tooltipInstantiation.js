@@ -130,7 +130,8 @@ function bindInfectionRateInfoHoverEvents()
 		getJuxtaposition: ({ $hoveredElement }) => $hoveredElement.closest("#stepIndicator").length ? "left" : "bottom",
 		containerSelector: "#boardContainer",
 		cssClassString: "wideTooltip infectionRateTooltip",
-		allowTooltipHovering: true
+		allowTooltipHovering: true,
+		afterShow: ({ $tooltip }) => bindEpidemicCardHoverEvents($tooltip)
 	}).bindHoverEvents();
 
 	new Tooltip({
@@ -139,7 +140,7 @@ function bindInfectionRateInfoHoverEvents()
 				const eventType = getEventType($hoveredElement.attr("data-eventType"));
 				return getEventTypeTooltipContent(eventType, { pluralNameForm: true });
 			},
-		hoverElementSelector: ".infectionRateTooltip .hoverInfo",
+		hoverElementSelector: ".infectionRateTooltip .hoverInfo:not(.epidemicInfo)",
 		juxtaposition: "bottom",
 		containerSelector: "#boardContainer",
 		cssClassString: "wideTooltip eventTypeTooltip"
@@ -500,7 +501,7 @@ function bindRoleCardHoverEvents()
 
 function bindEpidemicCardHoverEvents($container)
 {
-	$container.find(".playerCard.epidemic, .resolveEpidemicsInfo")
+	$container.find(".playerCard.epidemic, .epidemicInfo")
 		.off("mouseenter mouseleave")
 		.hover(function() { showFullEpidemicCard($(this).attr("id", "epidemicFullAnchor")) },
 			function()
@@ -528,7 +529,6 @@ async function showFullEpidemicCard($hoveredElement)
 			return false;
 	}
 	
-	
 	const $fullEpidemicCard = $(`<div class='epidemicFull'>
 									<h2>EPIDEMIC</h2>
 									<div class='increase'>
@@ -555,10 +555,18 @@ async function showFullEpidemicCard($hoveredElement)
 		$relativeTo = $(eventDetails);
 		juxtaposition = "right";
 	}
-	else if ($hoveredElement.hasClass("resolveEpidemicsInfo"))
+	else if ($hoveredElement.hasClass("epidemicInfo"))
 	{
-		tooltipMargin = 10;
-		$relativeTo = $("#turnProcedureContainer");
+		if ($hoveredElement.closest(".infectionRateTooltip").length)
+		{
+			$relativeTo = $(".infectionRateTooltip");
+			juxtaposition = "bottom";
+		}
+		else
+		{
+			tooltipMargin = 10;
+			$relativeTo = $("#turnProcedureContainer");
+		}
 	}
 
 	positionTooltipRelativeToElement($fullEpidemicCard, $relativeTo, { juxtaposition, tooltipMargin });
@@ -569,7 +577,7 @@ function bindPlayStepHoverEvents()
 	const positionRelativeToSelector = "#turnProcedureContainer",
 		$procedureContainer = $(positionRelativeToSelector),
 		playStepInfoSelector = ".playStepInfo",
-		epidemicInfoSelector = ".resolveEpidemicsInfo",
+		epidemicInfoSelector = ".epidemicInfo",
 		getContent = function({ $hoveredElement })
 		{
 			const eventTypeCode = $hoveredElement.attr("data-eventType"),

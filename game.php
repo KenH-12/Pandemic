@@ -242,7 +242,7 @@
 							</p>
 							<li class='substep epidemic'>
 								<span>Resolve any epidemics</span>
-								<span class='info playStepInfo resolveEpidemicsInfo hidden'>&#9432;</span>
+								<span class='info playStepInfo epidemicInfo hidden'>&#9432;</span>
 							</li>
 							<li class='substep discard'>
 								<span>Discard to 7 cards</span>
