@@ -8,8 +8,6 @@ tooltips which have their offset adjusted after the load event of a contained im
 
 if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
 
-dragging a pawn over the outbreak or infection rate marker causes odd behaviour
-
 TO DO
 -----
 event cards' "play at any time" should have a tooltip that describes exactly when they can be played
@@ -100,6 +98,8 @@ split data.currentStep into an object containing 'next' and 'current' keys
 
 SMALL FIXES
 -----------
+if the event history will scroll to within a few pixels of the start or end, it should just go all the way
+
 when prompting infect, indicate that event cards can be played
 
 during the infection step, if an infection card has already been drawn...

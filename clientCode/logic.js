@@ -109,7 +109,9 @@ import instantiateTooltips, {
 	resetInfectionDeckSize,
 	bindRoleCardHoverEvents,
 	bindEpidemicCardHoverEvents,
-    unbindEpidemicCardHoverEvents
+    unbindEpidemicCardHoverEvents,
+	disableTooltipsWhileDragging,
+	enableTooltipsAfterDragging
 } from "./tooltipInstantiation.js";
 
 $(function(){
@@ -2114,7 +2116,11 @@ function newGrantStation()
 	setTravelPathArrowColor({ governmentGranting: true });
 	$grantStation.draggable({
 			containment: $boardContainer,
-			drag: function() { showTravelPathArrow({ $researchStation: $(this) }) }
+			drag: function()
+			{
+				disableTooltipsWhileDragging();
+				showTravelPathArrow({ $researchStation: $(this) });
+			}
 		})
 		.mousedown(function()
 		{
@@ -2124,6 +2130,8 @@ function newGrantStation()
 			{
 				$(window).off("mouseup");
 				getGovernmentGrantTargetCity($grantStation, promptAction);
+				
+				enableTooltipsAfterDragging()
 			});
 		});
 	
@@ -4177,6 +4185,8 @@ function bindPawnEvents()
 			containment: $("#boardContainer"),
 			drag: function()
 			{
+				disableTooltipsWhileDragging();
+				
 				const $this = $(this);
 				showTravelPathArrow({ $pawn: $this, player: getPlayer($this.attr("data-role")) });
 			}
@@ -4216,6 +4226,7 @@ function bindPawnEvents()
 						fn(playerWhosePawnWasDropped);
 					
 					hidePlaceholderPawn($this);
+					enableTooltipsAfterDragging();
 				});
 
 			// The dragged pawn appear in front of other pawns and disease cubes.

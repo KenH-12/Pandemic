@@ -607,6 +607,22 @@ function bindPlayStepHoverEvents()
 	});
 }
 
+function getHoverElementsWhichInterfereWithDragging()
+{
+	return $("#boardContainer").find(".info, .marker, #eventHistory > div");
+}
+
+function disableTooltipsWhileDragging()
+{
+	getHoverElementsWhichInterfereWithDragging()
+		.css("pointer-events", "none");
+}
+
+function enableTooltipsAfterDragging()
+{
+	removeInlineStylePropertiesFrom(getHoverElementsWhichInterfereWithDragging(), "pointer-events");
+}
+
 export {
     bindPlayerDeckHoverEvents,
 	decrementInfectionDeckSize,
@@ -615,5 +631,7 @@ export {
     resetInfectionDeckSize,
     bindRoleCardHoverEvents,
     bindEpidemicCardHoverEvents,
-    unbindEpidemicCardHoverEvents
+	unbindEpidemicCardHoverEvents,
+	disableTooltipsWhileDragging,
+	enableTooltipsAfterDragging
 }
