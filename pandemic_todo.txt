@@ -12,8 +12,6 @@ TO DO
 -----
 event cards' "play at any time" should have a tooltip that describes exactly when they can be played
 
-in the discard prompt, give the x/y a red or green background with white text instead of colored text
-
 the infection rate tooltip should indicate that epidemics increase the infection rate
 
 bottom panel elements should be positioned in way that's similar to the event history container

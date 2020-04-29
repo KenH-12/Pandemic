@@ -2471,7 +2471,7 @@ class DiscardPrompt
 	
 	updateCountIndicators()
 	{
-		const textColor = this.requirementsMet() ? "green" : "red";
+		const textColor = this.requirementsMet() ? "#0bad0b" : "red";
 		
 		// Show the keeper count for a plain old discard event to emphasize the hand limit.
 		if (this.eventTypeCode === eventTypes.discard.code)
