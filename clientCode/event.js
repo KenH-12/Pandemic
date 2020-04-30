@@ -310,7 +310,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "rp",
 		cardKey: "resi",
 		rules: [
-			"Play at any time. Not an action.",
+			strings.eventCardPlayabilityRule,
 			"Remove any 1 card in the Infection Discard Pile from the game.",
 			"* You may play this between the Infect and Intensify steps of an epidemic."
 		],
@@ -323,7 +323,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "oq",
 		cardKey: "oneq",
 		rules: [
-			"Play at any time. Not an action.",
+			strings.eventCardPlayabilityRule,
 			"Skip the next Infect Cities step (do not flip over any Infection cards)."
 		],
 		actionPathName: "oneQuietNight"
@@ -338,7 +338,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "fd",
 		cardKey: "fore",
 		rules: [
-			"Play at any time. Not an action.",
+			strings.eventCardPlayabilityRule,
 			"Draw, look at, and rearrange the top 6 cards of the Infection Deck.",
 			"Put them back on top."
 		],
@@ -349,7 +349,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Forecast",
 		code: "fp",
 		rules: [
-			"Play at any time. Not an action.",
+			strings.eventCardPlayabilityRule,
 			"Draw, look at, and rearrange the top 6 cards of the Infection Deck.",
 			"Put them back on top."
 		],
@@ -362,7 +362,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Airlift",
 		code: "ar",
 		cardKey: "airl",
-		rules: ["Play at any time. Not an action.", "Move any 1 pawn to any city."],
+		rules: [strings.eventCardPlayabilityRule, "Move any 1 pawn to any city."],
 		instructions: "To airlift a pawn, drag and drop it onto the destination city.",
 		propertyNames: ["airliftedRoleID", "originKey", "destinationKey"],
 		actionPathName: "airlift"
@@ -371,7 +371,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Government Grant",
 		code: "gg",
 		cardKey: "gove",
-		rules: ["Play at any time. Not an action.", "Add 1 research station to any city."],
+		rules: [strings.eventCardPlayabilityRule, "Add 1 research station to any city."],
 		instructions: "Drag and drop a research station from the research station supply onto the city of your choice.",
 		propertyNames: ["cityKey", "relocationKey"],
 		actionPathName: "buildResearchStation"

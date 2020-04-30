@@ -13,8 +13,6 @@ TO DO
 allow an element to be specified to which a Tooltip's arrow should align
 	specifically, the 'draw 2 cards' and 'infect cities' tooltip arrows do not event align with the play step container
 
-event cards' "play at any time" should have a tooltip that describes exactly when they can be played
-
 bottom panel elements should be positioned in way that's similar to the event history container
 	consider using position: fixed
 	pieces should appear behind the bottom panel elements
