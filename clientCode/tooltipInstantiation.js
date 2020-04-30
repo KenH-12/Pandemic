@@ -175,6 +175,7 @@ function bindOutbreakMarkerHoverEvents()
 		hoverElementSelector: `.${obMarkerTooltipClassName} .hoverInfo`,
 		positionRelativeToSelector: `.${obMarkerTooltipClassName}`,
 		juxtaposition,
+		alignArrowWithHoveredElement: true,
 		containerSelector,
 		cssClassString: "wideTooltip eventTypeTooltip"
 	}).bindHoverEvents();
@@ -383,6 +384,7 @@ function bindResearchStationInfoHoverEvents()
 		hoverElementSelector: ".rsInfo .hoverInfo",
 		positionRelativeToSelector: ".rsInfo",
 		juxtaposition: "right",
+		alignArrowWithHoveredElement: true,
 		containerSelector: "#boardContainer",
 		cssClassString: "wideTooltip eventTypeTooltip"
 	}).bindHoverEvents();
@@ -591,6 +593,7 @@ function bindPlayStepHoverEvents()
 			getContent,
 			containerSelector: "#boardContainer",
 			positionRelativeToSelector,
+			alignArrowWithHoveredElement: true,
 			cssClassString: "playStepTooltip eventTypeTooltip wideTooltip"
 		}).bindHoverEvents();
 	
