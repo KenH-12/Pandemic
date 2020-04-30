@@ -1512,21 +1512,13 @@ async function getGovernmentGrantTargetCity($researchStation, promptAction)
 	enableResearchStationDragging();
 }
 
-async function highlightResearchStationSupply($grantStation)
+async function highlightResearchStationSupply()
 {
-	const $stationContainer = $("#researchStationSupplyContainer").children(".researchStation");
-
-	$grantStation.addClass("glowing");
-
-	while ($grantStation.hasClass("glowing"))
-	{
-		if ($stationContainer.hasClass("bigGlow"))
-			$stationContainer.removeClass("bigGlow").addClass("mediumGlow");
-		else
-			$stationContainer.removeClass("mediumGlow").addClass("bigGlow");
-		
-		await sleep(500);
-	}
+	const $stationContainer = $("#researchStationSupplyContainer").children(".researchStation"),
+		$grantStation = $(".grantStation").addClass("glowing");
+	
+	await oscillateBetweenCssTransitions($stationContainer, "bigGlow", "mediumGlow", 500,
+		() => $grantStation.hasClass("glowing"));
 	
 	$stationContainer.removeClass("bigGlow mediumGlow");
 }

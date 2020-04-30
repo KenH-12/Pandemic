@@ -1536,7 +1536,8 @@ const actionInterfacePopulator = {
 		if (!gameData.promptedTravelPathProperties)
 		{
 			hideTravelPathArrow();
-			highlightResearchStationSupply(newGrantStation());
+			appendGrantStation();
+			highlightResearchStationSupply();
 			showGovernmentGrantArrow();
 		}
 		
@@ -2100,7 +2101,7 @@ async function airlift(playerToAirlift, destination)
 	resumeCurrentStep();
 }
 
-function newGrantStation()
+async function appendGrantStation()
 {
 	const $boardContainer = $("#boardContainer");
 
@@ -2111,7 +2112,6 @@ function newGrantStation()
 			.appendTo("#boardContainer");
 
 	researchStationKeys.add("grantStation");
-	$grantStation.offset($("#researchStationSupplyContainer img").offset());
 	
 	setTravelPathArrowColor({ governmentGranting: true });
 	$grantStation.draggable({
@@ -2135,6 +2135,10 @@ function newGrantStation()
 			});
 		});
 	
+	// Without a slight delay here, the offset will not be set correctly.
+	await sleep(1);
+	$grantStation.offset($("#researchStationSupplyContainer img").offset());
+
 	return $grantStation;
 }
 

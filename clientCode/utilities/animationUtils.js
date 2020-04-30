@@ -104,3 +104,24 @@ async function oscillateButtonBackgroundColor($button)
 
 	$button.removeClass(`${flashing} ${secondaryButtonColors}`);
 }
+
+function oscillateBetweenCssTransitions($elements, classA, classB, interval, conditionFn)
+{
+	return new Promise(async resolve =>
+	{
+		conditionFn = typeof conditionFn === "function" ? conditionFn : () => false;
+		
+		do
+		{
+			if ($elements.hasClass(classA))
+				$elements.removeClass(classA).addClass(classB);
+			else
+				$elements.removeClass(classB).addClass(classA);
+			
+			await sleep(interval);
+		}
+		while (conditionFn());
+
+		resolve();
+	});
+}
