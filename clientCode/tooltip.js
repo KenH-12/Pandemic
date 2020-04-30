@@ -9,6 +9,7 @@ export default class Tooltip
             positionRelativeToSelector,
             juxtaposition = "left",
             getJuxtaposition,
+            alignArrowWithHoveredElement,
             arrowBasePx = 15,
             windowPadding = 5,
             containerSelector,
@@ -26,6 +27,7 @@ export default class Tooltip
         this.positionRelativeToSelector = positionRelativeToSelector || hoverElementSelector;
         this.juxtaposition = juxtaposition;
         this.getJuxtaposition = getJuxtaposition;
+        this.alignArrowWithHoveredElement = alignArrowWithHoveredElement;
 
         this.arrowBasePx = arrowBasePx;
         this.windowPadding = windowPadding;
@@ -158,7 +160,8 @@ export default class Tooltip
                 $tooltip,
                 juxtaposition,
                 arrowBasePx,
-                windowPadding
+                windowPadding,
+                alignArrowWithHoveredElement
             } = this,
             $element = this.getRelativeElement(),
             elementOffset = $element.offset(),
@@ -197,6 +200,10 @@ export default class Tooltip
         ensureDivPositionIsWithinWindowWidth($tooltip, { windowPadding });
         ensureDivPositionIsWithinWindowHeight($tooltip);
 
+        // Without this delay, setClipPath will be called before any offset adjustments have had time to take effect.
+        if (alignArrowWithHoveredElement)
+            await sleep(1);
+        
         this.setClipPath();
     }
 
@@ -227,7 +234,9 @@ export default class Tooltip
         const {
                 $tooltip,
                 arrowBasePx,
-                juxtaposition
+                juxtaposition,
+                alignArrowWithHoveredElement,
+                $hoveredElement
             } = this,
             tooltipOffset = this.setPaddingAndReturnOffset(),
             tooltipWidth = $tooltip.width(),
@@ -245,7 +254,11 @@ export default class Tooltip
 
         if (["left", "right"].includes(juxtaposition))
         {
-            actualArrowCentre = elementOffset.top + ($element.height() / 2);
+            if (alignArrowWithHoveredElement)
+                actualArrowCentre = $hoveredElement.offset().top + ($hoveredElement.height() / 2);
+            else
+                actualArrowCentre = elementOffset.top + ($element.height() / 2);
+            
             arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.top) / tooltipHeight) * 100;
             
             halfArrowHeight = marginPercentageOfHeight / 2;
@@ -275,7 +288,11 @@ export default class Tooltip
         }
         else // top or bottom
         {
-            actualArrowCentre = elementOffset.left + ($element.width() / 2);
+            if (alignArrowWithHoveredElement)
+                actualArrowCentre = $hoveredElement.offset().left + ($hoveredElement.width() / 2);
+            else
+                actualArrowCentre = elementOffset.left + ($element.width() / 2);
+            
             arrowCentrePercentage = ((actualArrowCentre - tooltipOffset.left) / tooltipWidth) * 100;
 
             const halfArrowWidth = marginPercentageOfWidth / 2;
