@@ -1519,8 +1519,6 @@ async function highlightResearchStationSupply()
 	
 	await oscillateBetweenCssTransitions($stationContainer, "bigGlow", "mediumGlow", 500,
 		() => $grantStation.hasClass("glowing"));
-	
-	$stationContainer.removeClass("bigGlow mediumGlow");
 }
 
 function turnOffResearchStationSupplyHighlight()

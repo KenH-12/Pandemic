@@ -122,6 +122,8 @@ function oscillateBetweenCssTransitions($elements, classA, classB, interval, con
 		}
 		while (conditionFn());
 
+		$elements.removeClass(`${classA} ${classB}`);
+
 		resolve();
 	});
 }
