@@ -17,8 +17,6 @@ body
 	font-size: 16px;
 	
 	position: relative;
-	overflow-x: hidden;
-	overflow-y: hidden;
 	
 	-webkit-touch-callout: none; /* iOS Safari */
 	-webkit-user-select: none;   /* Chrome/Safari/Opera */
@@ -359,7 +357,6 @@ span.r, p.r {color: #ef282a; background: none !important }
 #topPanel,
 .bottomPanelDiv:not(#cureMarkerContainer)
 {
-	position: absolute;
 	background-color: #252525;
 }
 #topPanel > div

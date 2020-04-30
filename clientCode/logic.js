@@ -3352,10 +3352,6 @@ function resizeBottomPanelElements()
 		.height(topPanelHeight)
 		.offset({ top: panelOffsetTop });
 
-	$("#researchStationSupplyContainer").css("font-size", getDimension("stationSupplyCountFont") + "px");
-
-	$("#playerCards, .playerPile").height(getDimension("bottomPanelDivs"));
-
 	const $cureMarkerContainer = $("#cureMarkerContainer"),
 		titleHeight = $cureMarkerContainer.children(".title").outerHeight() + 4;
 	$cureMarkerContainer
@@ -3368,7 +3364,9 @@ function resizeBottomPanelElements()
 		.children().height(ehContainerHeight)
 		.css("line-height", ehContainerHeight*1.07 + "px");
 	
-	ensureDivPositionIsWithinWindowHeight($eventHistoryContainer, { windowPadding: 0 });
+	if (boardHeight <= $(window).height())
+		ensureDivPositionIsWithinWindowHeight($eventHistoryContainer, { windowPadding: 0 });
+	
 	eventHistory.scrollToEnd();
 }
 

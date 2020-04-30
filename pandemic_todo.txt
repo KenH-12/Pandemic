@@ -10,10 +10,6 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 TO DO
 -----
-bottom panel elements should be positioned in way that's similar to the event history container
-	consider using position: fixed
-	pieces should appear behind the bottom panel elements
-
 when at risk of defeat, warn the players somehow...
 	when a cube supply gets low, its count should glow red
 	when few player cards are left in the deck, show a warning

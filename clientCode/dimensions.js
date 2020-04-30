@@ -50,7 +50,6 @@ new SizeRatio("infDiscardFont",             "boardWidth", 0.0136);
 new SizeRatio("infDiscardNameTop",          "boardWidth", 0.0038);
 new SizeRatio("outbreaksMarkerLeft",        "boardWidth", 0.028);
 new SizeRatio("outbreaksMarkerRight",       "boardWidth", 0.067);
-new SizeRatio("stationSupplyCountFont",     "boardWidth", 0.0208);
 new SizeRatio("specialEventImgMarginLeft",  "windowWidth", 0.47);
 
 // Facilitates responsiveness where simple css rules fail.
