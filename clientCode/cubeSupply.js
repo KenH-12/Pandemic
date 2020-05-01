@@ -17,6 +17,14 @@ class CubeSupply
     {
         this.cubeCount = newCount;
         this.$supplyCount.html(newCount);
+
+        if (newCount < 0) // defeat!
+        {
+            removeOtherWarningLevelClasses(this.$supplyCount);
+            this.$supplyCount.css("color", "red");
+            return false;
+        }
+
         this.animateCubeSupplyWarning();
     }
 
@@ -53,31 +61,31 @@ class CubeSupply
 
         oscillateBetweenCssTransitions($supplyCount.add($supplyCube),
             `warning-${warningLevel}-bigGlow`,
-            `warning-${warningClass}-smallGlow`,
-            500,
+            `warning-${warningLevel}-smallGlow`,
+            warningLevels[warningLevel].animationInterval,
             () => $supplyCount.hasClass(warningClass));
     }
 }
 
-const warningLevelThresholds = {
-    none: 11,
-    mild: 6,
-    moderate: 4,
-    critical: -6 // The theoretical minumum cube count
+const warningLevels = {
+    none: { lowerThreshold: 10 },
+    mild: { lowerThreshold: 7, animationInterval: 1000 },
+    moderate: { lowerThreshold: 4, animationInterval: 500 },
+    critical: { lowerThreshold: 0, animationInterval: 250 }
 }
 
 function getWarningLevelFromCubeCount(cubeCount)
 {
-    for (let warningLevel in warningLevelThresholds)
-        if (cubeCount >= warningLevelThresholds[warningLevel])
+    for (let warningLevel in warningLevels)
+        if (cubeCount >= warningLevels[warningLevel].lowerThreshold)
             return warningLevel;
 }
 
 function removeOtherWarningLevelClasses($supplyCount, warningLevel)
 {
-    for (let lvl in warningLevelThresholds)
+    for (let lvl in warningLevels)
         if (lvl !== warningLevel)
-            $supplyCount.removeClass(`warning-${warningLevel}`);
+            $supplyCount.removeClass(`warning-${lvl}`);
 }
 
 function instantiateCubeSupplies()

@@ -6381,7 +6381,7 @@ async function outOfPlayerCardsDefeatAnimation($cardDrawContainer)
 
 function diseaseCubeLimitExceeded(color)
 {
-	return gameData.gameEndCause === "cubes" && cubeSupplies[color] < 0;
+	return gameData.gameEndCause === "cubes" && cubeSupplies[color].cubeCount < 0;
 }
 
 async function diseaseCubeDefeatAnimation(diseaseColor)
@@ -6394,7 +6394,7 @@ async function diseaseCubeDefeatAnimation(diseaseColor)
 	{
 		initialState: { backgroundColor: $cubeSupply.css("background-color") },
 		strobeState: { backgroundColor: "#8a181a" },
-		numFlashes: 10,
+		numFlashes: 8,
 		flashIntervalMs: 125,
 		endOnStrobeState: true
 	});

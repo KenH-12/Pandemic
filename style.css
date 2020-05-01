@@ -17,6 +17,8 @@ body
 	font-size: 16px;
 	
 	position: relative;
+	overflow-x: hidden;
+	overflow-y: hidden;
 	
 	-webkit-touch-callout: none; /* iOS Safari */
 	-webkit-user-select: none;   /* Chrome/Safari/Opera */
@@ -604,24 +606,27 @@ span.r, p.r {color: #ef282a; background: none !important }
 
 .smallGlow,
 .mediumGlow,
-.bigGlow,
-.warning-mild-bigGlow,
-.warning-moderate-bigGlow,
-.warning-critical-bigGlow,
-.warning-mild-smallGlow,
-.warning-moderate-smallGlow,
-.warning-critical-smallGlow
+.bigGlow
 { transition: filter 0.5s }
 .smallGlow { filter: drop-shadow(0px 0px 2px #fff) }
 .mediumGlow { filter: drop-shadow(0px 0px 6px #fff) }
 .bigGlow { filter: drop-shadow(0px 0px 10px #fff) }
 
-.warning-mild-bigGlow { filter: drop-shadow(0px 0px 12px orange) }
-.warning-moderate-bigGlow { filter: drop-shadow(0px 0px 12px rgb(255, 72, 0)) }
-.warning-critical-bigGlow { filter: drop-shadow(0px 0px 12px red) }
-.warning-mild-smallGlow { filter: drop-shadow(0px 0px 4px orange) }
-.warning-moderate-smallGlow { filter: drop-shadow(0px 0px 4px rgb(255, 72, 0)) }
+.warning-mild-bigGlow { filter: drop-shadow(0px 0px 6px yellow) }
+.warning-mild-smallGlow { filter: drop-shadow(0px 0px 2px yellow) }
+.warning-mild-bigGlow,
+.warning-mild-smallGlow
+{ transition: filter 1s }
+.warning-moderate-bigGlow { filter: drop-shadow(0px 0px 8px orange) }
+.warning-moderate-smallGlow { filter: drop-shadow(0px 0px 3px orange) }
+.warning-moderate-bigGlow,
+.warning-moderate-smallGlow
+{ transition: filter .5s }
+.warning-critical-bigGlow { filter: drop-shadow(0px 0px 10px red) }
 .warning-critical-smallGlow { filter: drop-shadow(0px 0px 4px red) }
+.warning-critical-bigGlow,
+.warning-critical-smallGlow
+{ transition: filter .25s }
 
 #researchStationSupplyCount
 {
