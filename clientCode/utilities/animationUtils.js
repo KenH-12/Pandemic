@@ -127,3 +127,12 @@ function oscillateBetweenCssTransitions($elements, classA, classB, interval, con
 		resolve();
 	});
 }
+
+function warningGlowAnimation($elements, warningLevel, interval, conditionFn)
+{
+	oscillateBetweenCssTransitions($elements,
+		`warning-${warningLevel}-bigGlow`,
+		`warning-${warningLevel}-smallGlow`,
+		interval,
+		conditionFn);
+}

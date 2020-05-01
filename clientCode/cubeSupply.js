@@ -20,12 +20,12 @@ class CubeSupply
 
         if (newCount < 0) // defeat!
         {
-            removeOtherWarningLevelClasses(this.$supplyCount);
+            this.warningLevel = "none";
             this.$supplyCount.css("color", "red");
             return false;
         }
 
-        this.animateCubeSupplyWarning();
+        this.playWarningAnimation();
     }
 
     decrementCubeCount(numToRemove = 1)
@@ -38,32 +38,22 @@ class CubeSupply
         this.setCubeCount(this.cubeCount + parseInt(numToAdd));
     }
 
-    animateCubeSupplyWarning()
+    playWarningAnimation()
     {
         const warningLevel = getWarningLevelFromCubeCount(this.cubeCount);
 
         if (warningLevel === this.warningLevel)
             return false;
         
-        const warningClass = `warning-${warningLevel}`,
-            {
-                $supplyCount,
-                $supplyCube
-            } = this;
+        const { $supplyCount, $supplyCube } = this;
         
         this.warningLevel = warningLevel;
-        removeOtherWarningLevelClasses($supplyCount, warningLevel);
 
         if (warningLevel === "none")
             return false;
-        
-        $supplyCount.addClass(warningClass);
 
-        oscillateBetweenCssTransitions($supplyCount.add($supplyCube),
-            `warning-${warningLevel}-bigGlow`,
-            `warning-${warningLevel}-smallGlow`,
-            warningLevels[warningLevel].animationInterval,
-            () => $supplyCount.hasClass(warningClass));
+        warningGlowAnimation($supplyCount.add($supplyCube), warningLevel, warningLevels[warningLevel].animationInterval,
+            () => this.warningLevel === warningLevel);
     }
 }
 
@@ -79,13 +69,6 @@ function getWarningLevelFromCubeCount(cubeCount)
     for (let warningLevel in warningLevels)
         if (cubeCount >= warningLevels[warningLevel].lowerThreshold)
             return warningLevel;
-}
-
-function removeOtherWarningLevelClasses($supplyCount, warningLevel)
-{
-    for (let lvl in warningLevels)
-        if (lvl !== warningLevel)
-            $supplyCount.removeClass(`warning-${lvl}`);
 }
 
 function instantiateCubeSupplies()
