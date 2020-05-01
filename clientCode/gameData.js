@@ -18,12 +18,6 @@ const gameData = {
 	infectionDeckSize: 48,
 	epidemicCount: 0,
 	outbreakCount: 0,
-	diseaseCubeSupplies: {
-		y: 24,
-		r: 24,
-		u: 24,
-		b: 24
-	},
 	pendingClusters: new Set(),
 	fastForwarding: false,
 	HAND_LIMIT: 7,

@@ -45,21 +45,17 @@ export default class City
 		};
 	}
 
-	incrementCubeCount(diseaseCubeSupplies, color = this.color)
+	incrementCubeCount(color = this.color)
 	{
 		const MAX_CUBES_OF_COLOR_PER_CITY = 3;
 
 		if (this.cubes[color] < MAX_CUBES_OF_COLOR_PER_CITY)
-		{
 			this.cubes[color]++;
-			diseaseCubeSupplies[color]--;
-		}
 	}
 
-	decrementCubeCount(diseaseCubeSupplies, color, numCubesRemoved)
+	decrementCubeCount(color, numCubesRemoved = 1)
 	{
 		this.cubes[color] -= numCubesRemoved;
-		diseaseCubeSupplies[color] += numCubesRemoved;
 	}
 
 	getDiseaseColorOptions()
