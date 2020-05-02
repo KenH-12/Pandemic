@@ -4517,10 +4517,7 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 			gameData.outbreakCount = outbreakCount;
 		
 			if (animate)
-			{
-				$marker.addClass("mediumGlow");
-				await highlightMarkerTrack("outbreaks");
-			}
+				await highlightMarkerTrack("outbreaks", $marker);
 
 			await animationPromise(
 			{
@@ -4542,8 +4539,8 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 					gameData.gameEndCause = "outbreak";
 					return resolve();
 				}
-				await highlightMarkerTrack("outbreaks", { off: true });
-				$marker.removeClass("mediumGlow");
+0
+				await highlightMarkerTrack("outbreaks", $marker, { off: true });
 			}
 
 			resolve();
@@ -5047,21 +5044,29 @@ function finishIntensifyStep($epidemic)
 	});
 }
 
-async function highlightMarkerTrack(trackName, { off } = {})
+async function highlightMarkerTrack(trackName, $marker, { off } = {})
 {
 	const $highlighters = $("." + trackName + "Highlight");
+
+	if (off)
+		$marker.removeClass("mediumGlow").addClass("noGlow");
+	else
+		$marker.removeClass("noGlow").addClass("mediumGlow");
 
 	await animationPromise(
 		{
 			$elements: $highlighters.removeClass("hidden"),
 			initialProperties: { opacity: (off ? 0.5 : 0) },
 			desiredProperties: { opacity: (off ? 0 : 0.5) },
-			duration: (off ? 300 : 600)
+			duration: (off ? 300 : 500)
 		}
 	);
 
 	if (off)
+	{
+		$marker.removeClass("noGlow");
 		$highlighters.addClass("hidden");
+	}
 
 	return sleep(getDuration("shortInterval"));
 }
@@ -5082,9 +5087,8 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 		
 		if (animate)
 		{
-			$marker.offset({ left: (gameData.boardWidth * spaceLocations[epidemicCount - 1]) })
-				.addClass("smallGlow");
-			await highlightMarkerTrack(trackName);
+			$marker.offset({ left: (gameData.boardWidth * spaceLocations[epidemicCount - 1]) });
+			await highlightMarkerTrack(trackName, $marker);
 		}
 		
 		await animationPromise(
@@ -5100,8 +5104,7 @@ function moveInfectionRateMarker({ newEpidemicCount, animate } = {})
 		if (animate)
 		{
 			await sleep(getDuration("mediumInterval"));
-			$marker.removeClass("smallGlow");
-			await highlightMarkerTrack(trackName, { off: true });
+			await highlightMarkerTrack(trackName, $marker, { off: true });
 		}
 		
 		resolve();
