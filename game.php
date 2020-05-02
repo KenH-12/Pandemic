@@ -46,7 +46,7 @@
 						<h3 class='cubesDefeat hidden'>(too many <span></span> disease cubes on the board)</h3>
 						
 						<h2 class='cardsDefeat hidden'>Your team ran out of time!</h2>
-						<h3 class='cardsDefeat hidden'>(a role was unable to draw 2 cards)</h3>
+						<h3 class='cardsDefeat hidden'>(unable to draw 2 cards)</h3>
 					</div>
 				</div>
 				<div id='container'>

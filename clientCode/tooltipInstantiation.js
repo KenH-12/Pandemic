@@ -58,7 +58,12 @@ function bindPlayerDeckHoverEvents()
 				<p>${playerDeckInfo}</p>
 				<p>${discardRule}</p>
 				<p>${outOfCardsWarning}</p>`;
-		};
+		},
+		getCardsLeft = function()
+		{
+			const { numPlayerCardsRemaining } = gameData;
+			return `<p class='largeText'>${gameData.numPlayerCardsRemaining} card${ parseInt(numPlayerCardsRemaining) !== 1 ? "s" : "" } left<p>`;
+		}
 	
 	$(infoIconSelector).removeClass("hidden");
 
@@ -72,7 +77,7 @@ function bindPlayerDeckHoverEvents()
 	}).bindHoverEvents();
 
 	new Tooltip({
-		getContent: () => `<p class='largeText'>${gameData.numPlayerCardsRemaining} cards left<p>`,
+		getContent: getCardsLeft,
 		hoverElementSelector: `${positionRelativeToSelector} img`,
 		positionRelativeToSelector,
 		juxtaposition,
