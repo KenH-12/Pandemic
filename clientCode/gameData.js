@@ -1,5 +1,7 @@
 "use strict";
 
+import WarningLevelManager from "./warningLevelManager.js";
+
 const gameData = {
     players: {},
     turn: -1,
@@ -18,6 +20,10 @@ const gameData = {
 	infectionDeckSize: 48,
 	epidemicCount: 0,
 	outbreakCount: 0,
+	outbreakWarningLevelManager: new WarningLevelManager({
+		upperThresholds: [4, 5, 6, 7],
+		$elementsToAnimate: $("#outbreaksMarker")
+	}),
 	pendingClusters: new Set(),
 	fastForwarding: false,
 	HAND_LIMIT: 7,

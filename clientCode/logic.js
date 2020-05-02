@@ -4515,12 +4515,12 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 				$marker = $("#outbreaksMarker");
 			
 			gameData.outbreakCount = outbreakCount;
-		
+			gameData.outbreakWarningLevelManager.setWarningLevelBasedOn(outbreakCount);
+
 			if (animate)
 				await highlightMarkerTrack("outbreaks", $marker);
 
-			await animationPromise(
-			{
+			await animationPromise({
 				$elements: $marker,
 				desiredProperties: {
 					top: (gameData.boardHeight * topPercentages[outbreakCount]),
@@ -4539,7 +4539,7 @@ function moveOutbreaksMarker(outbreakCount, { animate } = {})
 					gameData.gameEndCause = "outbreak";
 					return resolve();
 				}
-0
+
 				await highlightMarkerTrack("outbreaks", $marker, { off: true });
 			}
 
@@ -5048,19 +5048,20 @@ async function highlightMarkerTrack(trackName, $marker, { off } = {})
 {
 	const $highlighters = $("." + trackName + "Highlight");
 
-	if (off)
-		$marker.removeClass("mediumGlow").addClass("noGlow");
-	else
-		$marker.removeClass("noGlow").addClass("mediumGlow");
+	if (!$marker.attr("class").includes("warning"))
+	{
+		if (off)
+			$marker.removeClass("mediumGlow").addClass("noGlow");
+		else
+			$marker.removeClass("noGlow").addClass("mediumGlow");
+	}
 
-	await animationPromise(
-		{
-			$elements: $highlighters.removeClass("hidden"),
-			initialProperties: { opacity: (off ? 0.5 : 0) },
-			desiredProperties: { opacity: (off ? 0 : 0.5) },
-			duration: (off ? 300 : 500)
-		}
-	);
+	await animationPromise({
+		$elements: $highlighters.removeClass("hidden"),
+		initialProperties: { opacity: (off ? 0.5 : 0) },
+		desiredProperties: { opacity: (off ? 0 : 0.5) },
+		duration: (off ? 300 : 500)
+	});
 
 	if (off)
 	{
