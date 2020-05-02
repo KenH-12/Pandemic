@@ -1,5 +1,7 @@
 "use strict";
 
+import WarningLevelManager from "./warningLevelManager.js";
+
 class CubeSupply
 {
     constructor(diseaseColor, cubeCount = 24)
@@ -10,7 +12,10 @@ class CubeSupply
         this.$supplyCount = $(`#${diseaseColor}Supply`);
         this.$supplyCube = $(`#${diseaseColor}SupplyCube`);
 
-        this.warningLevel = "none";
+        this.warningLevelManager = new WarningLevelManager({
+            lowerThresholds: [10, 7, 4, 0],
+            $elementsToAnimate: this.$supplyCount.add(this.$supplyCube)
+        });
     }
 
     setCubeCount(newCount)
@@ -20,12 +25,11 @@ class CubeSupply
 
         if (newCount < 0) // defeat!
         {
-            this.warningLevel = "none";
             this.$supplyCount.css("color", "red");
             return false;
         }
 
-        this.playWarningAnimation();
+        this.warningLevelManager.setWarningLevelBasedOn(newCount);
     }
 
     decrementCubeCount(numToRemove = 1)
@@ -37,38 +41,6 @@ class CubeSupply
     {
         this.setCubeCount(this.cubeCount + parseInt(numToAdd));
     }
-
-    playWarningAnimation()
-    {
-        const warningLevel = getWarningLevelFromCubeCount(this.cubeCount);
-
-        if (warningLevel === this.warningLevel)
-            return false;
-        
-        const { $supplyCount, $supplyCube } = this;
-        
-        this.warningLevel = warningLevel;
-
-        if (warningLevel === "none")
-            return false;
-
-        warningGlowAnimation($supplyCount.add($supplyCube), warningLevel, warningLevels[warningLevel].animationInterval,
-            () => this.warningLevel === warningLevel);
-    }
-}
-
-const warningLevels = {
-    none: { lowerThreshold: 10 },
-    mild: { lowerThreshold: 7, animationInterval: 1000 },
-    moderate: { lowerThreshold: 4, animationInterval: 500 },
-    critical: { lowerThreshold: 0, animationInterval: 250 }
-}
-
-function getWarningLevelFromCubeCount(cubeCount)
-{
-    for (let warningLevel in warningLevels)
-        if (cubeCount >= warningLevels[warningLevel].lowerThreshold)
-            return warningLevel;
 }
 
 function instantiateCubeSupplies()
