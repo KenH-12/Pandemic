@@ -2,7 +2,7 @@
 
 export default class WarningLevelManager
 {
-    constructor({ lowerThresholds, $elementsToAnimate, getElementsToAnimate })
+    constructor({ lowerThresholds, upperThresholds, $elementsToAnimate, getElementsToAnimate })
     {
         this.warningLevels = {
             none: {},
@@ -12,7 +12,8 @@ export default class WarningLevelManager
         };
         this.warningLevel = "none";
         
-        this.setThresholds(lowerThresholds);
+        this.usesUpperThresholds = Array.isArray(upperThresholds);
+        this.setThresholds(lowerThresholds || upperThresholds);
 
         if (typeof getElementsToAnimate === "function")
             this.getElementsToAnimate = getElementsToAnimate;
@@ -22,11 +23,11 @@ export default class WarningLevelManager
         this.$elementsToAnimate = "";
     }
 
-    setThresholds(lowerThresholds)
+    setThresholds(thresholds)
     {
         let i = 0;
         for (let lvl in this.warningLevels)
-            this.warningLevels[lvl].lowerThreshold = lowerThresholds[i++];
+            this.warningLevels[lvl].threshold = thresholds[i++];
     }
     
     setWarningLevelBasedOn(decidingValue)
@@ -35,7 +36,7 @@ export default class WarningLevelManager
 
         for (let lvlName in warningLevels)
         {
-            if (decidingValue >= warningLevels[lvlName].lowerThreshold)
+            if (this.isWithinThreshold(decidingValue, warningLevels[lvlName].threshold))
             {
                 if (lvlName !== this.warningLevel || this.willAnimateDifferentElements())
                 {
@@ -46,6 +47,14 @@ export default class WarningLevelManager
                 return false;
             }
         }
+    }
+
+    isWithinThreshold(decidingValue, threshold)
+    {
+        if (this.usesUpperThresholds)
+            return decidingValue <= threshold;
+
+        return decidingValue >= threshold;
     }
 
     willAnimateDifferentElements()
@@ -77,19 +86,11 @@ export default class WarningLevelManager
         }
 
         this.$elementsToAnimate = this.getElementsToAnimate();
-        
-        const { animationInterval } = this.warningLevels[currentLvl];
 
-        warningGlowAnimation(this.$elementsToAnimate, currentLvl, animationInterval,
+        oscillateBetweenCssTransitions(this.$elementsToAnimate,
+            `warning-${currentLvl}-bigGlow`,
+            `warning-${currentLvl}-smallGlow`,
+            this.warningLevels[currentLvl].animationInterval,
             () => this.warningLevel === currentLvl);
     }
-}
-
-function warningGlowAnimation($elements, warningLevel, interval, conditionFn)
-{
-	oscillateBetweenCssTransitions($elements,
-		`warning-${warningLevel}-bigGlow`,
-		`warning-${warningLevel}-smallGlow`,
-		interval,
-		conditionFn);
 }
