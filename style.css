@@ -638,6 +638,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	width: 14%;
 	left: 68%;
+	z-index: 8;
 }
 #playerDeckContainer img
 {

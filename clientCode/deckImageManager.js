@@ -1,5 +1,7 @@
 "use strict";
 
+import { gameData } from "./gameData.js";
+
 // As the number of cards in the deck changes, so should the apparent stack size.
 // This class manages an image depicting a deck of cards, dynamically modifying the apparent number of cards in the stack 
 // by selecting the appropriate image from a collection of numbered images, each depicting a different stack size.
@@ -30,6 +32,7 @@ export default class DeckImageManager
     decrementCardCount(numToRemove = 1)
     {
         this.setCardCount(this.cardCount - numToRemove);
+        this.playWarningAnimation();
         return this;
     }
 
@@ -52,6 +55,9 @@ export default class DeckImageManager
         
         this.cardCount = cardCount;
         this.setImage();
+
+        if (gameData.currentStep.name !== "setup")
+            this.playWarningAnimation();
     }
 
     // Set the image to a specific imageNumber,
@@ -131,4 +137,37 @@ export default class DeckImageManager
 
         return deckProperties;
     }
+
+    playWarningAnimation()
+    {
+        const { cardCount, $deck } = this,
+            warningLevel = getWarningLevelFromCardCount(cardCount);
+
+        if (warningLevel === this.warningLevel)
+            return false;
+        
+        const $elementToAnimate = cardCount > 0 ? $deck : $deck.prev().add($deck.parent());
+        
+        this.warningLevel = warningLevel;
+
+        if (warningLevel === "none")
+            return false;
+
+        warningGlowAnimation($elementToAnimate, warningLevel, warningLevels[warningLevel].animationInterval,
+            () => this.warningLevel === warningLevel);
+    }
+}
+
+const warningLevels = {
+    none: { lowerThreshold: 10 },
+    mild: { lowerThreshold: 7, animationInterval: 1000 },
+    moderate: { lowerThreshold: 3, animationInterval: 500 },
+    critical: { lowerThreshold: 0, animationInterval: 250 }
+}
+
+function getWarningLevelFromCardCount(cardCount)
+{
+    for (let warningLevel in warningLevels)
+        if (cardCount >= warningLevels[warningLevel].lowerThreshold)
+            return warningLevel;
 }

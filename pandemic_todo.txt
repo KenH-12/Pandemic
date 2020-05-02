@@ -10,12 +10,9 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 TO DO
 -----
-action prompt doesn't need scrollbar trigger
-disable scrolling during certain setup steps
-
 when at risk of defeat, warn the players somehow...
-	when few player cards are left in the deck, show a warning
 	the outbreaks marker should glow red when approaching the last space on the track
+	elements with a warning glow should display a warning tooltip when hovered
 
 when a button is disabled, change the cursor or something
 
