@@ -19,9 +19,12 @@ import { bindEventCardHoverEvents } from "./eventCard.js";
 import { bindCityLocatorClickEvents } from "./city.js";
 import {
     resizeInfectionCards,
-	activePlayerCanTakeFromResearcher
+	activePlayerCanTakeFromResearcher,
+	getColorWord,
+	getColorClass
 } from "./utilities/pandemicUtils.js";
 import { eventHistory } from "./eventHistory.js";
+import { cubeSupplies } from "./cubeSupply.js";
 
 export default function instantiateTooltips()
 {
@@ -72,8 +75,7 @@ function bindPlayerDeckHoverEvents()
 		hoverElementSelector: infoIconSelector,
 		positionRelativeToSelector,
 		juxtaposition,
-		containerSelector,
-		cssClassString: "wideTooltip"
+		containerSelector
 	}).bindHoverEvents();
 
 	new Tooltip({
@@ -87,13 +89,33 @@ function bindPlayerDeckHoverEvents()
 
 function bindCubeSuppliesInfoHoverEvents()
 {
+	const { diseaseCubeSupplyInfo, insufficientCubesWarning } = strings,
+		cubeSuppliesSelector = "#cubeSupplies",
+		juxtaposition = "bottom",
+		containerSelector = "#boardContainer";
+	
 	new Tooltip({
-		content: `${strings.diseaseCubeSupplyInfo}<p>${strings.insufficientCubesWarning}</p>`,
-		hoverElementSelector: "#cubeSupplies .info",
-		positionRelativeToSelector: "#cubeSupplies",
-		juxtaposition: "bottom",
-		containerSelector: "#boardContainer",
-		cssClassString: "wideTooltip"
+		content: `${diseaseCubeSupplyInfo}<p>${insufficientCubesWarning}</p>`,
+		hoverElementSelector: `${cubeSuppliesSelector} .info`,
+		positionRelativeToSelector: cubeSuppliesSelector,
+		juxtaposition,
+		containerSelector
+	}).bindHoverEvents();
+
+	const getContent = function({ $hoveredElement })
+	{
+		const color = getColorWord(getColorClass($hoveredElement));
+		
+		return `<p>The ${color} disease is threatening to spread out of control!</p>
+			<p>${insufficientCubesWarning}</p>`;
+	}
+
+	new Tooltip({
+		getContent,
+		hoverElementSelector: `${cubeSuppliesSelector} .diseaseCube[class*='warning']`,
+		juxtaposition,
+		containerSelector,
+		cssClassString: "cubeWarningTooltip"
 	}).bindHoverEvents();
 }
 
@@ -134,7 +156,7 @@ function bindInfectionRateInfoHoverEvents()
 		hoverElementSelector: "#infectionRateMarker img, #stepIndicator .info",
 		getJuxtaposition: ({ $hoveredElement }) => $hoveredElement.closest("#stepIndicator").length ? "left" : "bottom",
 		containerSelector: "#boardContainer",
-		cssClassString: "wideTooltip infectionRateTooltip",
+		cssClassString: "infectionRateTooltip",
 		allowTooltipHovering: true,
 		afterShow: ({ $tooltip }) => bindEpidemicCardHoverEvents($tooltip)
 	}).bindHoverEvents();
@@ -148,7 +170,7 @@ function bindInfectionRateInfoHoverEvents()
 		hoverElementSelector: ".infectionRateTooltip .hoverInfo:not(.epidemicInfo)",
 		juxtaposition: "bottom",
 		containerSelector: "#boardContainer",
-		cssClassString: "wideTooltip eventTypeTooltip"
+		cssClassString: "eventTypeTooltip"
 	}).bindHoverEvents();
 }
 function bindOutbreakMarkerHoverEvents()
@@ -182,7 +204,7 @@ function bindOutbreakMarkerHoverEvents()
 		juxtaposition,
 		alignArrowWithHoveredElement: true,
 		containerSelector,
-		cssClassString: "wideTooltip eventTypeTooltip"
+		cssClassString: "eventTypeTooltip"
 	}).bindHoverEvents();
 }
 
@@ -270,7 +292,7 @@ function bindEventDetailsHoverEvents()
 		hoverInfoSelector = ".eventDetails .hoverInfo",
 		containerSelector = "#boardContainer",
 		juxtaposition = "right",
-		cssClassString = "eventTypeTooltip wideTooltip";
+		cssClassString = "eventTypeTooltip";
 
 	new Tooltip({
 		hoverElementSelector: eventTypeInfoSelector,
@@ -348,8 +370,7 @@ function bindCuredDiseaseInfoHoverEvents()
 			getContent,
 			hoverElementSelector: "#cureMarkerContainer .info",
 			juxtaposition,
-			containerSelector,
-			cssClassString: "wideTooltip"
+			containerSelector
 		}).bindHoverEvents();
 	
 	new Tooltip({
@@ -364,8 +385,7 @@ function bindCuredDiseaseInfoHoverEvents()
 		content: `<p class='largeText'>Disease Eradicated</p>${strings.eradicationRules}`,
 		hoverElementSelector: ".cureMarker[src$='eradicated.png']",
 		juxtaposition,
-		containerSelector,
-		cssClassString: "wideTooltip"
+		containerSelector
 	}).bindHoverEvents();
 }
 
@@ -379,7 +399,7 @@ function bindResearchStationInfoHoverEvents()
 		positionRelativeToSelector,
 		juxtaposition: "top",
 		containerSelector: "#boardContainer",
-		cssClassString: "wideTooltip rsInfo",
+		cssClassString: "rsInfo",
 		allowTooltipHovering: true,
 		tooltipHoveringForgiveness: { bottom: 30 }
 	}).bindHoverEvents();
@@ -391,7 +411,7 @@ function bindResearchStationInfoHoverEvents()
 		juxtaposition: "right",
 		alignArrowWithHoveredElement: true,
 		containerSelector: "#boardContainer",
-		cssClassString: "wideTooltip eventTypeTooltip"
+		cssClassString: "eventTypeTooltip"
 	}).bindHoverEvents();
 }
 
@@ -421,7 +441,7 @@ function bindActionButtonHoverEvents()
 			hoverElementSelector: `${buttonSelector} .actionInfo`,
 			positionRelativeToSelector: buttonSelector,
 			containerSelector,
-			cssClassString: "eventTypeTooltip wideTooltip"
+			cssClassString: "eventTypeTooltip"
 		}).bindHoverEvents();
 	}
 }
@@ -599,7 +619,7 @@ function bindPlayStepHoverEvents()
 			containerSelector: "#boardContainer",
 			positionRelativeToSelector,
 			alignArrowWithHoveredElement: true,
-			cssClassString: "playStepTooltip eventTypeTooltip wideTooltip"
+			cssClassString: "playStepTooltip eventTypeTooltip"
 		}).bindHoverEvents();
 	
 	$("#turnProcedureInfo").on("mouseenter", function()

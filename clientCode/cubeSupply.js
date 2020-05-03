@@ -25,11 +25,14 @@ class CubeSupply
 
         if (newCount < 0) // defeat!
         {
-            this.$supplyCount.css("color", "red");
+            this.removeWarningTooltip();
             return false;
         }
 
         this.warningLevelManager.setWarningLevelBasedOn(newCount);
+
+        if (this.warningLevelManager.warningLevel === "none")
+            this.removeWarningTooltip();
     }
 
     decrementCubeCount(numToRemove = 1)
@@ -40,6 +43,14 @@ class CubeSupply
     incrementCubeCount(numToAdd = 1)
     {
         this.setCubeCount(this.cubeCount + parseInt(numToAdd));
+    }
+
+    removeWarningTooltip()
+    {
+        const $warningTooltip = $(".cubeWarningTooltip");
+
+        if ($warningTooltip.length)
+            $warningTooltip.remove();
     }
 }
 

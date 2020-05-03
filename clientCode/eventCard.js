@@ -171,7 +171,7 @@ function bindDisabledEventCardHoverEvents()
         juxtaposition: "right",
         arrowBasePx: 20,
         containerSelector: "#boardContainer",
-        cssClassString: "wideTooltip disabledEventCardTooltip"
+        cssClassString: "disabledEventCardTooltip"
     }).bindHoverEvents();
 }
 
