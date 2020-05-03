@@ -200,10 +200,6 @@ export default class Tooltip
         ensureDivPositionIsWithinWindowWidth($tooltip, { windowPadding });
         ensureDivPositionIsWithinWindowHeight($tooltip);
 
-        // Without this delay, setClipPath will be called before any offset adjustments have had time to take effect.
-        if (alignArrowWithHoveredElement)
-            await sleep(1);
-        
         this.setClipPath();
     }
 
@@ -349,8 +345,13 @@ export default class Tooltip
         const tooltipHeight = $tooltip.height();
         if (["left", "right"].includes(juxtaposition) && tooltipHeight !== initialTooltipHeight)
         {
-            tooltipOffset.top -= Math.max(arrowBasePx, tooltipHeight - initialTooltipHeight);
-            $tooltip.offset(tooltipOffset);
+            const proposedOffsetTop = tooltipOffset.top - Math.max(arrowBasePx, tooltipHeight - initialTooltipHeight);
+            
+            if (proposedOffsetTop > this.windowPadding)
+            {
+                tooltipOffset.top = proposedOffsetTop;
+                $tooltip.offset(tooltipOffset);
+            }
         }
         
         return tooltipOffset;

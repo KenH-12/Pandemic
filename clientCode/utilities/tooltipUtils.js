@@ -158,7 +158,7 @@ function setTooltipPaddingAndReturnOffset($tooltip, { tooltipOffset, tooltipMarg
 	return tooltipOffset;
 }
 
-async function ensureDivPositionIsWithinWindowHeight($div, { windowPadding = 5 } = {})
+function ensureDivPositionIsWithinWindowHeight($div, { windowPadding = 5 } = {})
 {
 	const windowHeight = $(window).height(),
 		scrollable = "scrollable";
@@ -176,7 +176,6 @@ async function ensureDivPositionIsWithinWindowHeight($div, { windowPadding = 5 }
 	
 	if (divOffsetTop < windowPadding)
 	{
-		await sleep(1); // without this delay, divs can still be cut off at the top.
 		divOffsetTop = windowPadding;
 		$div.offset({ top: divOffsetTop });
 	}

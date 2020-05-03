@@ -65,7 +65,8 @@ function bindPlayerDeckHoverEvents()
 		getCardsLeft = function({ $hoveredElement })
 		{
 			const { numPlayerCardsRemaining: numCards } = gameData,
-				hasWarningGlow = $hoveredElement.attr("class").includes("warning");
+				hoveredElementClasses = $hoveredElement.attr("class"),
+				hasWarningGlow = hoveredElementClasses && hoveredElementClasses.includes("warning");
 
 			let centeredText = "",
 				exclam = "",
