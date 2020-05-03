@@ -1353,7 +1353,8 @@ function newResearchStationElement(cityKey, promptAction)
 					<img src='images/pieces/researchStation.png' alt='Research Station' />
 				</div>`),
 		$boardContainer = $("#boardContainer"),
-		$window = $(window);
+		$window = $(window),
+		dragging = "dragging";
 
 	$rs.appendTo($boardContainer)
 		.draggable(
@@ -1373,12 +1374,14 @@ function newResearchStationElement(cityKey, promptAction)
 			if ($this.draggable("option", "disabled"))
 				return false;
 
+			$this.add($boardContainer).addClass(dragging);
 			turnOffResearchStationHighlights();
 			showPlaceholderStation($this);
 
 			$window.off("mouseup").mouseup(function()
 			{
 				$window.off("mouseup");
+				$this.add($boardContainer).removeClass(dragging);
 				getGovernmentGrantTargetCity($this, promptAction);
 			});
 		});

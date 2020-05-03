@@ -114,6 +114,7 @@ body,
 	z-index: 4;
 	width: 1.6%;
 }
+.pawn.ui-draggable { cursor: grab }
 .pawnArrow,
 #resilientPopulationArrow,
 #governmentGrantArrow
@@ -154,14 +155,17 @@ body,
 	width: 100%;
 	pointer-events: none;
 }
-.researchStation.relocatable
+.researchStation.relocatable,
+.grantStation
 {
-	cursor: pointer;
+	cursor: grab;
 }
+.dragging,
+.pawn.ui-draggable.dragging
+{ cursor: grabbing }
 .grantStation
 {
 	z-index: 6;
-	cursor: pointer;
 	opacity: 0.7;
 }
 .diseaseCube
@@ -920,7 +924,6 @@ span.r, p.r {color: #ef282a; background: none !important }
 	margin-top: 2px;
 }
 #infectionDiscardContainer .infectionCardContents { width: 100% }
-#epidemicContainer .btnDisabled { cursor: progress }
 #epidemicContainer > .epidemicFull
 {
 	width: 98%;
@@ -1308,6 +1311,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .btnDisabled
 {
 	background-color: #064058;
+	cursor: default;
 }
 .btnDisabled:hover { background-color: #064058 }
 .actionCategory h2

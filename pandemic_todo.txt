@@ -12,8 +12,6 @@ TO DO
 -----
 disable tooltips when a game-end condition is reached
 
-when a button is disabled, change the cursor or something
-
 indicate loading when waiting for a response from the server
 
 starting a new game

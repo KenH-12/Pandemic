@@ -2102,7 +2102,8 @@ async function airlift(playerToAirlift, destination)
 
 async function appendGrantStation()
 {
-	const $boardContainer = $("#boardContainer");
+	const $boardContainer = $("#boardContainer"),
+		dragging = "dragging";
 
 	let $grantStation = $boardContainer.find(".researchStation.grantStation");
 	
@@ -2123,11 +2124,15 @@ async function appendGrantStation()
 		})
 		.mousedown(function()
 		{
+			const $this = $(this);
+			
 			turnOffResearchStationSupplyHighlight();
+			$this.add($boardContainer).addClass(dragging);
 
 			$(window).off("mouseup").mouseup(function()
 			{
 				$(window).off("mouseup");
+				$this.add($boardContainer).removeClass("dragging");
 				getGovernmentGrantTargetCity($grantStation, promptAction);
 				
 				enableTooltipsAfterDragging()
@@ -3623,7 +3628,6 @@ class Player
 	enablePawn()
 	{
 		this.$pawn
-			.css("cursor", "pointer")
 			.draggable("enable");
 		
 		this.animatePawnArrow();
@@ -3667,7 +3671,6 @@ class Player
 	disablePawn()
 	{
 		this.$pawn
-			.css("cursor", "default")
 			.draggable({ disabled: true });
 		
 		this.$pawnArrow.stop().addClass("hidden");
@@ -4194,9 +4197,13 @@ function bindPawnEvents()
 				return false;
 			
 			const $this = $(this),
+				$boardContainer = $("#boardContainer"),
+				dragging = "dragging",
 				pawnRole = $this.data("role"),
 				activeRole = getActivePlayer().role,
 				canDispatch = activeRole === "Dispatcher";
+			
+			$this.add($boardContainer).addClass(dragging);
 			
 			let fn = movementAction;
 			if (eventTypeIsBeingPrompted(eventTypes.airlift))
@@ -4214,6 +4221,7 @@ function bindPawnEvents()
 				.mouseup(function()
 				{
 					$(window).off("mouseup");
+					$this.add($boardContainer).removeClass(dragging);
 
 					const playerWhosePawnWasDropped = getPlayer(pawnRole);
 
