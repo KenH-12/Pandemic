@@ -175,13 +175,15 @@ function bindInfectionRateInfoHoverEvents()
 }
 function bindOutbreakMarkerHoverEvents()
 {
-	const getContent = function()
+	const getContent = function({ $hoveredElement })
 		{
 			const { outbreakCount } = gameData,
-				plural = parseInt(outbreakCount) !== 1;
+				plural = parseInt(outbreakCount) !== 1,
+				markerHasWarningGlow = $hoveredElement.parent().attr("class").includes("warning");
 
             return `<p class='largeText'>${outbreakCount} <span class='hoverInfo' data-eventType='${eventTypes.outbreak.code}'>outbreak${ plural ? "s" : "" }</span>
-                <br/>${ plural ? "have" : "has" } occured.</p>`;
+				<br/>${ plural ? "have" : "has" } occured${ markerHasWarningGlow ? "!" : "." }</p>
+				<p>${strings.tooManyOutbreaksWarning}</p>`;
 		},
 		juxtaposition = "right",
 		obMarkerTooltipClassName = "outbreaksMarkerTooltip",
@@ -199,6 +201,13 @@ function bindOutbreakMarkerHoverEvents()
 
 	new Tooltip({
 		getContent: ({ $hoveredElement }) => getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType"))),
+		beforeShow: ({ $tooltip }) => {
+			// Don't show the 'too many outbreaks' warning in the secondary toolip.
+			const $tooManyOutbreaksWarning = $tooltip.find("p").last(),
+				$br = $tooManyOutbreaksWarning.prev();
+			
+			$tooManyOutbreaksWarning.add($br).remove();
+		},
 		hoverElementSelector: `.${obMarkerTooltipClassName} .hoverInfo`,
 		positionRelativeToSelector: `.${obMarkerTooltipClassName}`,
 		juxtaposition,

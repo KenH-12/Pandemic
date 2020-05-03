@@ -10,9 +10,9 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 TO DO
 -----
-when at risk of defeat, warn the players somehow...
-	the outbreaks marker should glow red when approaching the last space on the track
-	elements with a warning glow should display a warning tooltip when hovered
+when the player deck has a warning glow, it should display a warning tooltip when hovered
+
+disable tooltips when a game-end condition is reached
 
 when a button is disabled, change the cursor or something
 
