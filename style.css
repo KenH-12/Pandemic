@@ -39,6 +39,7 @@ body,
 	background-color: #09154f;
 }
 .largeText { font-size: 20px }
+.centeredText { text-align: center }
 #curtain
 {
 	position: fixed;

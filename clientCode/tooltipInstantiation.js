@@ -62,10 +62,22 @@ function bindPlayerDeckHoverEvents()
 				<p>${discardRule}</p>
 				<p>${outOfCardsWarning}</p>`;
 		},
-		getCardsLeft = function()
+		getCardsLeft = function({ $hoveredElement })
 		{
-			const { numPlayerCardsRemaining } = gameData;
-			return `<p class='largeText'>${gameData.numPlayerCardsRemaining} card${ parseInt(numPlayerCardsRemaining) !== 1 ? "s" : "" } left<p>`;
+			const { numPlayerCardsRemaining: numCards } = gameData,
+				hasWarningGlow = $hoveredElement.attr("class").includes("warning");
+
+			let centeredText = "",
+				exclam = "",
+				warningMsg = "";
+			if (hasWarningGlow)
+			{
+				centeredText = " centeredText";
+				exclam = "!";
+				warningMsg = `<p>${strings.outOfCardsWarning}</p>`;
+			} 
+			
+			return `<p class='largeText${centeredText}'>${numCards} card${ parseInt(numCards) !== 1 ? "s" : "" } left${exclam}<p>${warningMsg}`;
 		}
 	
 	$(infoIconSelector).removeClass("hidden");
@@ -181,7 +193,7 @@ function bindOutbreakMarkerHoverEvents()
 				plural = parseInt(outbreakCount) !== 1,
 				markerHasWarningGlow = $hoveredElement.parent().attr("class").includes("warning");
 
-            return `<p class='largeText'>${outbreakCount} <span class='hoverInfo' data-eventType='${eventTypes.outbreak.code}'>outbreak${ plural ? "s" : "" }</span>
+            return `<p class='largeText centeredText'>${outbreakCount} <span class='hoverInfo' data-eventType='${eventTypes.outbreak.code}'>outbreak${ plural ? "s" : "" }</span>
 				<br/>${ plural ? "have" : "has" } occured${ markerHasWarningGlow ? "!" : "." }</p>
 				<p>${strings.tooManyOutbreaksWarning}</p>`;
 		},
