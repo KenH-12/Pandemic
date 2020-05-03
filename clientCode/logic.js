@@ -3356,13 +3356,14 @@ function resizeBottomPanelElements()
 		.height(topPanelHeight + titleHeight)
 		.offset({ top: panelOffsetTop - titleHeight });
 	
-	const ehContainerHeight = topPanelHeight * 0.4;
+	const ehContainerHeight = topPanelHeight * 0.4,
+		boardHeightForgiveness = 3;
 	$eventHistoryContainer.height(ehContainerHeight)
 		.offset({ top: boardHeight - ehContainerHeight })
 		.children().height(ehContainerHeight)
 		.css("line-height", ehContainerHeight*1.07 + "px");
 	
-	if (boardHeight <= $(window).height())
+	if (boardHeight - boardHeightForgiveness <= $(window).height())
 		ensureDivPositionIsWithinWindowHeight($eventHistoryContainer, { windowPadding: 0 });
 	
 	eventHistory.scrollToEnd();
