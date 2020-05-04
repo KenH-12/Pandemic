@@ -3,16 +3,11 @@ BUGS
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page loading
 
-tooltips which have their offset adjusted after the load event of a contained image appear to jump sideways
-	try positioning within the window once before awaiting the load events
-
 if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
 
 TO DO
 -----
-disable tooltips when a game-end condition is reached
-
-indicate loading when waiting for a response from the server
+when a city or contained piece is hovered, show the city name in a larger font
 
 starting a new game
 	select difficulty
@@ -35,6 +30,11 @@ handle errors
 add tests
 
 make sure things look ok for different screen sizes
+
+index
+	access key verification
+	allow access keys to be requested
+	tab / enter key bindings
 
 for multiplayer games, require permission for certain actions
 	share knowledge
@@ -83,6 +83,11 @@ split data.currentStep into an object containing 'next' and 'current' keys
 
 SMALL FIXES
 -----------
+indicate loading when waiting for a response from the server
+	notify when the response is taking too long
+
+disable tooltips when a game-end condition is reached
+
 if the event history will scroll to within a few pixels of the start or end, it should just go all the way
 
 when prompting infect, indicate that event cards can be played
