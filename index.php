@@ -17,6 +17,7 @@
                     <script src='clientCode/utilities/geometryUtils.js'></script>
                     <script src='clientCode/utilities/animationUtils.js'></script>
                     <script src='clientCode/setup.js'></script>
+                    <script src='clientCode/gateKeeper.js'></script>
                     <script type='module' src='clientCode/logic.js'></script>
                 </head>
                 <body>
@@ -28,15 +29,18 @@
                             </div>
                         </div>
                         
-                        <form>
-                            <label for='txtAccessKey'>Enter Access Key:</label>
-                            <input id='txtAccessKey' type='text' />
-                            <div class='button'>Continue</div>
-                        </form>
+                        <div class='content'>
+                            <form>
+                                <label for='txtAccessKey'>Enter Access Key:</label>
+                                <input id='txtAccessKey' type='text' />
+                                <div id='btnAttemptAccess' class='button'>Continue</div>
+                                <p class='errorMsg hidden'></p>
+                            </form>
 
-                        <p id='disclaimer' class='smallText'>DISCLAIMER: <span class='italics'>this is a fan-made re-creation which is intended to be a portfolio piece and is not available to the general public.
-                        It cannot be played without an access key, which are granted exclusively to potential employers and a few close friends.
-                        This project is not intended for sale of any kind and is in no way affiliated with or sponsored by the creators of the original game.</span></p>
+                            <p id='disclaimer' class='smallText'>DISCLAIMER: <span class='italics'>this is a fan-made re-creation which is intended to be a portfolio piece and is not available to the general public.
+                            It cannot be played without an access key, which are granted exclusively to potential employers and a few close friends.
+                            This project is not intended for sale of any kind and is in no way affiliated with or sponsored by the creators of the original game.</span></p>
+                        </content>
                     </div>
                 </body>
             </html>";

@@ -7,6 +7,14 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 TO DO
 -----
+main menu
+	role selection
+		use + / - buttons to add and remove roles
+		show a pawn for each role
+		when 'randomize roles' is checked, show pawns with "?" on them
+
+load other js files only when necessary
+
 when a city or contained piece is hovered, show the city name in a larger font
 
 starting a new game
