@@ -42,6 +42,8 @@ body
 	-moz-user-select: none;      /* Firefox */
 	-ms-user-select: none;       /* Internet Explorer/Edge */
 }
+input, select { background-color: #fff }
+input[type='text'] { cursor: text }
 #lobby {
 	--lobby-padding: 30px;
 	--lobby-full-width: 560px;
@@ -74,18 +76,53 @@ body
 	font-family: 'Audiowide', sans-serif;
 	font-size: 40px;
 }
+#lobby #header,
 #lobby form
+{
+	margin-bottom: var(--lobby-padding);
+}
+#lobby form > *:not(#btnLogIn)
+{
+	height: 24px;
+	font-size: 20px;
+}
+#lobby h2
+{
+	font-family: 'Audiowide';
+	font-size: 22px;
+	font-weight: 400;
+	margin: calc(var(--lobby-padding)*2) 0 6px 0;
+}
+#frmLogIn > *
+{
+	display: block;
+}
+#frmLogIn *:not(label)
+{
+	border-radius: var(--lobby-control-border-radius);
+}
+#frmLogIn *:not(label),
+#btnAttemptAccess
+{
+	width: calc(var(--lobby-content-width)*0.5);
+}
+#frmLogIn input[type='text']
+{
+	margin-bottom: 8px;
+}
+#btnLogIn
+{
+	font-size: 26px;
+	padding: 4px 0;
+	margin: 16px 0 0 0;
+}
+#frmAccessCode
 {
 	white-space: nowrap;
 }
-#lobby form,
-#lobby p:first-of-type
-{ margin-bottom: var(--lobby-padding) }
-#lobby form > *
+#frmAccessCode > *
 {
 	vertical-align: middle;
-	height: 24px;
-	font-size: 20px;
 }
 #lobby label { width: calc(var(--lobby-content-width) * 0.3) }
 #lobby .errorMsg
@@ -96,21 +133,18 @@ body
 	color: #ef282a;
 	font-size: 16px;
 }
-input, select { background-color: #fff }
-input[type='text'] { cursor: text }
-#txtAccessKey
+#txtAccessCode
 {
-	width: calc(var(--lobby-content-width) * 0.5);
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
 	padding: 0 2px;
 }
-#lobby #btnAttemptAccess
+#btnAttemptAccess
 {
 	display: inline-block;
-	width: calc(var(--lobby-content-width) * 0.215);
+	width: calc(var(--lobby-content-width) * 0.18);
+	padding: 2px 0;
 	margin-left: -3px;
-	padding: 2px 8px;
 	border-top-right-radius: var(--lobby-control-border-radius);
 	border-bottom-right-radius: var(--lobby-control-border-radius);
 }

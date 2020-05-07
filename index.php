@@ -30,15 +30,27 @@
                         </div>
                         
                         <div class='content'>
-                            <form>
-                                <label for='txtAccessKey'>Enter Access Key:</label>
-                                <input id='txtAccessKey' type='text' />
+
+                            <form id='frmLogIn'>
+                                <label for='txtUsername'>Username:</label>
+                                <input id='txtUsername' type='text' />
+
+                                <label for='txtPassword'>Password:</label>
+                                <input id='txtPassword' type='text' />
+
+                                <div id='btnLogIn' class='button'>Log In</div>
+                            </form>
+                            
+                            <h2>Don't Have an Account?</h2>
+                            <form id='frmAccessCode'>    
+                                <label for='txtAccessCode'>Enter Access Code:</label>
+                                <input id='txtAccessCode' type='text' />
                                 <div id='btnAttemptAccess' class='button'>Continue</div>
                                 <p class='errorMsg hidden'></p>
                             </form>
 
                             <p id='disclaimer' class='smallText'>DISCLAIMER: <span class='italics'>this is a fan-made re-creation which is intended to be a portfolio piece and is not available to the general public.
-                            It cannot be played without an access key, which are granted exclusively to potential employers and a few close friends.
+                            It cannot be played without an access code, which are granted exclusively to potential employers and a few close friends.
                             This project is not intended for sale of any kind and is in no way affiliated with or sponsored by the creators of the original game.</span></p>
                         </content>
                     </div>
