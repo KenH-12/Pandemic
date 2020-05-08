@@ -81,36 +81,47 @@ input[type='text'] { cursor: text }
 {
 	margin-bottom: var(--lobby-padding);
 }
-#lobby form > *:not(#btnLogIn)
+#lobby form > label, #btnAttemptAccess
 {
-	height: 24px;
 	font-size: 20px;
+}
+#lobby input, #btnAttemptAccess { height: 24px }
+#lobby .content > h1, #lobby h2
+{
+	font-family: 'Audiowide';
+	font-weight: 400;
+}
+#lobby .content > h1
+{
+	font-size: 30px;
+}
+#lobby .content > p
+{
+	margin-bottom: calc(var(--lobby-padding)/2);
 }
 #lobby h2
 {
-	font-family: 'Audiowide';
 	font-size: 22px;
-	font-weight: 400;
 	margin: calc(var(--lobby-padding)*2) 0 6px 0;
 }
-#frmLogIn > *
+#lobby form:not(#frmAccessCode) > *
 {
 	display: block;
 }
-#frmLogIn *:not(label)
+#lobby form:not(#frmAccessCode) *:not(label)
 {
 	border-radius: var(--lobby-control-border-radius);
 }
-#frmLogIn *:not(label),
+#lobby form:not(#frmAccessCode) *:not(label),
 #btnAttemptAccess
 {
 	width: calc(var(--lobby-content-width)*0.5);
 }
-#frmLogIn input[type='text']
+#lobby form:not(#frmAccessCode) label
 {
-	margin-bottom: 8px;
+	margin-top: 8px;
 }
-#btnLogIn
+#btnLogIn, #btnCreateAccount
 {
 	font-size: 26px;
 	padding: 4px 0;
@@ -124,14 +135,16 @@ input[type='text'] { cursor: text }
 {
 	vertical-align: middle;
 }
-#lobby label { width: calc(var(--lobby-content-width) * 0.3) }
-#lobby .errorMsg
+#frmAccessCode label { width: calc(var(--lobby-content-width) * 0.3) }
+#lobby .validationError
 {
-	position: absolute;
-	margin-left: calc(var(--lobby-content-width) * 0.28);
-	margin-top: 2px;
 	color: #ef282a;
 	font-size: 16px;
+}
+.accessCodeError.validationError
+{
+	position: absolute;
+	margin-left: calc(var(--lobby-content-width) * 0.3)
 }
 #txtAccessCode
 {
@@ -378,7 +391,7 @@ html,
 
 .hidden,
 #btnCancelAction.hidden
-{ display: none }
+{ display: none !important }
 .y:not(.diseaseCube)
 {
 	background: linear-gradient(to right,
