@@ -17,8 +17,8 @@
                     <script src='clientCode/utilities/geometryUtils.js'></script>
                     <script src='clientCode/utilities/animationUtils.js'></script>
                     <script src='clientCode/setup.js'></script>
-                    <script src='clientCode/gateKeeper.js'></script>
-                    <script type='module' src='clientCode/logic.js'></script>
+                    <script src='clientCode/gateKeeper.js' type='module'></script>
+                    
                 </head>
                 <body>
                     <div id='lobby'>
@@ -32,11 +32,11 @@
                         <div class='content'>
 
                             <form id='frmLogIn'>
-                                <label for='txtUsername'>Username:</label>
+                                <label for='txtUsername'>Username or Email:</label>
                                 <input id='txtUsername' type='text' />
 
                                 <label for='txtPassword'>Password:</label>
-                                <input id='txtPassword' type='text' />
+                                <input id='txtPassword' type='password' />
 
                                 <div id='btnLogIn' class='button'>Log In</div>
                             </form>
@@ -46,7 +46,6 @@
                                 <label for='txtAccessCode'>Enter Access Code:</label>
                                 <input id='txtAccessCode' type='text' />
                                 <div id='btnAttemptAccess' class='button'>Continue</div>
-                                <p class='errorMsg hidden'></p>
                             </form>
 
                             <p id='disclaimer' class='smallText'>DISCLAIMER: <span class='italics'>this is a fan-made re-creation which is intended to be a portfolio piece and is not available to the general public.

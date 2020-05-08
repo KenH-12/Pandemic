@@ -1,5 +1,27 @@
 "use strict";
 
+function fetchHtml(pageUrl)
+{
+	return fetch(pageUrl)
+		.then(status)
+		.then(response => response.text())
+		.then(data => data)
+		.catch(error => console.log(error));
+}
+
+function status(response)
+{
+	if (response.status >= 200 && response.status < 300)
+		return Promise.resolve(response);
+	
+	return Promise.reject(new Error(response.statusText));
+}
+
+function json(response)
+{
+	return response.json()
+}
+
 // Returns a Promise that resolves after ms milliseconds.
 function sleep(ms)
 {
