@@ -16,6 +16,7 @@
                     <input id='txtEmailAddress' type='text' />
 
                     <div id='btnCreateAccount' class='button'>Create Account</div>
+                    <p class='validationError errorSummary hidden'>Please fix the above error(s).</p>
                 </form>";
     
     echo $mainMenu;

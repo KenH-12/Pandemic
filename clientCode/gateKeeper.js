@@ -15,7 +15,7 @@ $(function()
         if (!accessCode.length)
         {
             new ValidationError("#txtAccessCode", "An access code is required to create an account.", "accessCodeError").show();
-            hideValidationErrorsOnKeypress("#txtAccessCode");
+            hideValidationErrorsOnChangeEvent("#txtAccessCode");
 
             return false;
         }
@@ -28,12 +28,10 @@ $(function()
         {
             const account = new UserAccountCreator();
 
-            $(".validationError").remove();
-
             if (account.detailsAreValid())
                 return account.create();
             
-            hideValidationErrorsOnKeypress("input");
+            hideValidationErrorsOnChangeEvent("input");
         });
     });
 });
@@ -76,13 +74,16 @@ function createGame()
     // load game script
 }
 
-function hideValidationErrorsOnKeypress(selector)
+function hideValidationErrorsOnChangeEvent(selector)
 {
-    $(selector).off("keypress").keypress(function()
+    $(selector).off("change").change(function()
     {
         const $errorMsg = $(this).next();
         if ($errorMsg.hasClass("validationError"))
             $errorMsg.remove();
+        
+        if ($(".validationError").length === 1)
+            $(".validationError.errorSummary").addClass("hidden");
     });
 }
 
@@ -98,22 +99,41 @@ class UserAccountCreator
         this.username = $("#txtUsername").val();
         this.password = $("#txtPassword").val();
         this.passwordConfirmation = $("#txtConfirmPassword").val();
-        this.email = $("#txtEmail").val();
+        this.email = $("#txtEmailAddress").val();
     }
 
     detailsAreValid()
     {
-        const errors = [];
+        const {
+              username,
+              password,
+              passwordConfirmation,
+              email  
+            } = this,
+            txtUsernameSelector = "#txtUsername",
+            txtPasswordSelector = "#txtPassword",
+            txtConfirmPasswordSelector = "#txtConfirmPassword",
+            txtEmailSelector = "#txtEmailAddress",
+            errors = [];
 
-        // validate username
-        if (this.username.length < 2)
-            errors.push(new ValidationError("#txtUsername", "Username must be at least 2 characters in length."));
+        if (!username.length)
+            errors.push(new ValidationError(txtUsernameSelector, "Username is required."));
+        else if (username.length < 2)
+            errors.push(new ValidationError(txtUsernameSelector, "Username must include at least 2 characters."));
         
-        // passwords must match
-        if (this.password !== this.passwordConfirmation)
-            errors.push(new ValidationError("#txtConfirmPassword", "Passwords do not match."));
+        if (!password.length)
+            errors.push(new ValidationError(txtPasswordSelector, "Password is required."));
+        else if (password.length < 8)
+            errors.push(new ValidationError(txtPasswordSelector, "Password must include at least 8 characters."));
+        else if (!passwordConfirmation.length)
+            errors.push(new ValidationError(txtConfirmPasswordSelector, "Please confirm your password."));
+        else if (password !== passwordConfirmation)
+            errors.push(new ValidationError(txtConfirmPasswordSelector, "Passwords do not match."));
 
-        // validate email
+        if (!email.length)
+            errors.push(new ValidationError(txtEmailSelector, "Email is required."));
+        else if (emailIsInvalid(email))
+            errors.push(new ValidationError(txtEmailSelector, "Please enter a valid email address."));
 
         if (errors.length)
         {

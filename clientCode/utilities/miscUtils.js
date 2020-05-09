@@ -215,3 +215,8 @@ function loadAllImagesPromise($images)
 		
 	return Promise.all(promises);
 }
+
+function emailIsInvalid(email)
+{
+	return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.toLowerCase());
+}

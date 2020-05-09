@@ -112,8 +112,7 @@ input[type='text'] { cursor: text }
 {
 	border-radius: var(--lobby-control-border-radius);
 }
-#lobby form:not(#frmAccessCode) *:not(label),
-#btnAttemptAccess
+#lobby form:not(#frmAccessCode) input, #lobby form .button:not(#btnAttemptAccess)
 {
 	width: calc(var(--lobby-content-width)*0.5);
 }
@@ -140,6 +139,10 @@ input[type='text'] { cursor: text }
 {
 	color: #ef282a;
 	font-size: 16px;
+}
+.validationError::before
+{
+	content: "* ";
 }
 .accessCodeError.validationError
 {
@@ -575,7 +578,6 @@ span.r, p.r {color: #ef282a; background: none !important }
 	background-color: #064058 !important;
 }
 #btnUndo.btnDisabled:hover { cursor: not-allowed }
-.eventHistoryButton:not(.btnDisabled):active { color: #0c658b }
 #eventHistory
 {
 	width: 79%;
@@ -1445,6 +1447,11 @@ span.r, p.r {color: #ef282a; background: none !important }
 	margin-left: 12.5%;
 	background-color: #0e7aa8;
 	cursor: pointer;
+}
+.button:not(.btnDisabled):active,
+.eventHistoryButton:not(.btnDisabled):active
+{
+	background-color: #046f9c;
 }
 #cardDrawContainer .button,
 #infectCitiesContainer .button,

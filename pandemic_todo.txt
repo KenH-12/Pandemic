@@ -7,8 +7,13 @@ if the developer tools are opened and then closed, the topPanelHeight is incorre
 
 TO DO
 -----
+account creation
+	button to check username availability
+	show password strength with each keypress
+
 main menu
-	role selection
+	if a game associated with the access key is in progress, give the options: resume / new game
+	role selection -- perhaps this can be saved for last since random roles is fine
 		use + / - buttons to add and remove roles
 		show a pawn for each role
 		when 'randomize roles' is checked, show pawns with "?" on them
@@ -38,6 +43,11 @@ handle errors
 add tests
 
 make sure things look ok for different screen sizes
+
+cross-browser compatabililty
+	animations
+	css
+		calc variants
 
 index
 	access key verification
@@ -91,6 +101,8 @@ split data.currentStep into an object containing 'next' and 'current' keys
 
 SMALL FIXES
 -----------
+use Promise.resolve() instead of Return new Promise...
+
 indicate loading when waiting for a response from the server
 	notify when the response is taking too long
 

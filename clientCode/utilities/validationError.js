@@ -15,12 +15,14 @@ export default class ValidationError
     {
         const { $inputControl, errorMsg, cssClassesToAdd } = this,
             msgClass = "validationError",
-            html = `<p class='${msgClass}${cssClassesToAdd ? ` ${cssClassesToAdd}` : "" }'>* ${errorMsg}</p>`,
+            html = `<p class='${msgClass}${cssClassesToAdd ? ` ${cssClassesToAdd}` : "" }'>${errorMsg}</p>`,
             $errorMsg = $inputControl.next(`p.${msgClass}`);
 
         if ($errorMsg.length)
             $errorMsg.replaceWith(html);
         else
             $inputControl.after(html);
+        
+        $(".errorSummary").removeClass("hidden");
     }
 }
