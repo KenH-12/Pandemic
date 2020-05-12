@@ -302,15 +302,15 @@ function nextStep($mysqli, $game, $currentStep, $currentTurnRoleID)
     return $nextStep;
 }
 
-function countCardsInPlayerDeck($mysqli, $game)
+function countCardsInPlayerDeck($pdo, $game)
 {
-    $numCards = $mysqli->query("SELECT COUNT(*) AS 'numCards'
-								FROM vw_playerCard
-								WHERE game = $game
-								AND pile = 'deck'")
-                        ->fetch_assoc()["numCards"];
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS 'numCards'
+                        FROM pandemic.vw_playerCard
+                        WHERE game = ?
+                        AND pile = 'deck'");
+    $stmt->execute([$game]);
     
-    return $numCards;
+    return $stmt->fetch()["numCards"];
 }
 
 // Updates the step to the specified nextStep,
