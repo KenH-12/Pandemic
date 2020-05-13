@@ -834,16 +834,16 @@ function countEpidemicsResolvedOnTurn($mysqli, $game, $turnNum = false)
     return $numResolvedThisTurn;
 }
 
-function getEpidemicIntensifyCardKeys($mysqli, $eventID)
+function getEpidemicIntensifyCardKeys($pdo, $eventID)
 {
-    $intensifyKeys = $mysqli->query("SELECT cityKey
-                            FROM epidemicIntensify
-                            WHERE eventID = $eventID
-                            ORDER BY cardIndex DESC");
-
-    $cardKeys = array();
-    while ($row = mysqli_fetch_assoc($intensifyKeys))
-        array_push($cardKeys, $row["cityKey"]);
+    $stmt = $pdo->prepare("SELECT cityKey
+                        FROM pandemic.epidemicIntensify
+                        WHERE eventID = ?
+                        ORDER BY cardIndex DESC");
+    $stmt->execute([$eventID]);
+    
+    while ($row = $stmt->fetchAll())
+        $cardKeys[] = $row["cityKey"];
     
     return $cardKeys;
 }

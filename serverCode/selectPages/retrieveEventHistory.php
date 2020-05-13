@@ -8,23 +8,22 @@
 		if (!isset($_SESSION["game"]))
 			throw new Exception("Game not found");
 		
-		$game = $_SESSION["game"];
-		$response = array();
+		$stmt = $pdo->prepare("SELECT	id,
+										turnNum,
+										role,
+										eventType AS 'code',
+										details
+								FROM pandemic.vw_event
+								WHERE game = ?
+								ORDER BY id");
+		$stmt->execute([$_SESSION["game"]]);
+		$events = $stmt->fetchAll();
+
 		$EPIDEMIC_INTENSIFY_CODE = "et";
-		
-		$results = $mysqli->query("SELECT	id,
-											turnNum,
-											role,
-											eventType AS 'code',
-											details
-									FROM vw_event
-									WHERE game = $game
-									ORDER BY id");
-		
-		while ($row = mysqli_fetch_assoc($results))
+		foreach ($events as $row)
 		{
 			if ($row["code"] === $EPIDEMIC_INTENSIFY_CODE)
-				$row["cardKeys"] = getEpidemicIntensifyCardKeys($mysqli, $row["id"]);
+				$row["cardKeys"] = getEpidemicIntensifyCardKeys($pdo, $row["id"]);
 
 			$response[] = $row;
 		}
@@ -35,8 +34,6 @@
 	}
 	finally
 	{
-		$mysqli->close();
-
 		echo json_encode($response);
 	}
 ?>
