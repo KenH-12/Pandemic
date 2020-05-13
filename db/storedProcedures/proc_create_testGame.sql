@@ -36,8 +36,8 @@ BEGIN
 		END WHILE;
 		
 	CALL proc_insert_locations(gID);
-	CALL proc_infectNineCities(gID);
 	CALL proc_arrangePlayerCards(gID);
+	CALL proc_infectNineCities(gID);
 	CALL proc_update_turnOrder(gID);
 	
 	-- Ready to begin turn 1
