@@ -1,5 +1,6 @@
 "use strict";
 
+import { getData } from "./utilities/fetchUtils.js";
 import {
 	gameData, 
 	getPlayer,
@@ -6800,24 +6801,29 @@ function loadDiseaseStatuses(diseaseStatuses)
 
 async function setup()
 {
-	const {
-		0: {
-			gamestate,
-			allRoles,
-			startingHandPopulations,
-			cities,
-			players,
-			infectionDiscards,
-			diseaseStatuses
-		},
-		1: playerCards,
-		2: events
-	} = await Promise.all([retrieveGameData(), retrievePlayerCards(), retrieveEventHistory()])
-		.catch(function(err)
+	const selectPath = "serverCode/selectPages/",
 		{
-			console.error(err);
-			$("#curtain").children("p").first().html("An error occured: " + err);
-		});
+			0: {
+				gamestate,
+				allRoles,
+				startingHandPopulations,
+				cities,
+				players,
+				infectionDiscards,
+				diseaseStatuses
+			},
+			1: playerCards,
+			2: events
+		} = await Promise.all([
+				getData(`${selectPath}retrieveGameData.php`),
+				getData(`${selectPath}retrievePlayerCards.php`),
+				getData(`${selectPath}retrieveEventHistory.php`)
+			])
+			.catch(function(err)
+			{
+				console.error(err);
+				$("#curtain").children("p").first().html("An error occured: " + err);
+			});
 	
 	if (gamestate.gameIsResuming)
 		prepareToFlagRemovedEventCardEvents();
