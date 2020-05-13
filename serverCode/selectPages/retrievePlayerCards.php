@@ -7,20 +7,14 @@
 		if (!isset($_SESSION["game"]))
 			throw new Exception("Game not found");
 		
-		$game = $_SESSION["game"];
-		
 		// get all player cards which are in a player's hand or the discard pile
-		$cards = $mysqli->query("SELECT pileID, pile, cardKey as `key`
-								FROM vw_playerCard
-								WHERE game = $game
-								AND pile NOT IN ('deck')
-								ORDER BY pileID, cardIndex");
-		
-		$response = array();
-		while ($row = mysqli_fetch_assoc($cards))
-		{
-			$response[] = $row;
-		}
+		$stmt = $pdo->prepare("SELECT pileID, pile, cardKey as `key`
+							FROM pandemic.vw_playerCard
+							WHERE game = ?
+							AND pile != 'deck'
+							ORDER BY pileID, cardIndex");
+		$stmt->execute([$_SESSION["game"]]);
+		$response = $stmt->fetchAll();
 	}
 	catch(Exception $e)
 	{
@@ -28,8 +22,6 @@
 	}
 	finally
 	{
-		$mysqli->close();
-
 		echo json_encode($response);
 	}
 ?>
