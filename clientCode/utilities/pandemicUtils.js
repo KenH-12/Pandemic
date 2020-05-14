@@ -156,6 +156,12 @@ function activePlayerCanTakeFromResearcher()
 		researcher.cityKey === getActivePlayer().cityKey;
 }
 
+function showLoadingGif($afterElement)
+{
+	return $(`<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>`)
+		.insertAfter($afterElement);
+}
+
 export {
 	getInfectionRate,
 	getColorClass,
@@ -165,5 +171,6 @@ export {
 	resizeInfectionCards,
 	getInfectionCardTextStyle,
 	useRoleColorForRelatedActionButtons,
-	activePlayerCanTakeFromResearcher
+	activePlayerCanTakeFromResearcher,
+	showLoadingGif
 }

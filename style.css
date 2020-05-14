@@ -1321,7 +1321,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .cardsToKeep .playerCard:last-of-type { margin-bottom: 0 !important }
 .btnConfirm { margin: 5px }
-.btnConfirmAction { margin: 10px 0 }
+.btnConfirmAction { margin: 10px 0 5px 0 }
 .scientist:not(.pawnArrow),
 .pawnArrow.scientist > div
 {
@@ -1486,6 +1486,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 	cursor: default;
 }
 .btnDisabled:hover { background-color: #064058 }
+
+.loadingGif
+{
+	display: block;
+	text-align: center;
+}
+.loadingGif img { width: 8% }
 .actionCategory h2
 {
 	font-size: 18px;
@@ -1500,9 +1507,8 @@ span.r, p.r {color: #ef282a; background: none !important }
 	font-family: 'Exo 2', sans-serif;
 	font-size: 18px;
 }
-.actionCategory > .btnDisabled:not(.wait)
+.actionCategory > .btnDisabled
 { cursor: default }
-.wait { cursor: wait }
 .actionButton * { display: inline-block }
 .actionButton *:not(.actionInfo)
 {
