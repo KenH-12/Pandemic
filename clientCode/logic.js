@@ -1,6 +1,6 @@
 "use strict";
 
-import { getData } from "./utilities/fetchUtils.js";
+import { getData, postData } from "./utilities/fetchUtils.js";
 import {
 	gameData, 
 	getPlayer,
@@ -135,7 +135,7 @@ function parseEvents(events)
 			let parsedEvent;
 			for (let e of events)
 			{
-				//console.log("parsing event: ", e);
+				console.log("parsing event: ", e);
 				if (!e) continue;
 				
 				if (e.code === eventTypes.startingHands.code)
@@ -2514,7 +2514,7 @@ class DiscardPrompt
 	}
 }
 
-function requestAction(eventType, dataToPost)
+async function requestAction(eventType, dataToPost)
 {
 	if (eventType.code !== eventTypes.pass.code)
 		indicateActionsLeft({ addend: -1 });
@@ -2522,59 +2522,50 @@ function requestAction(eventType, dataToPost)
 		indicateActionsLeft({ zeroRemaining: true });
 	
 	console.log(`requestAction(${eventType.code})`);
-	return new Promise((resolve, reject) =>
-	{
-		$.post(`serverCode/actionPages/${eventType.actionPathName}.php`,
-		{
+	const response = await postData(`serverCode/actionPages/${eventType.actionPathName}.php`, {
 			...{
 				actionCode: eventType.code,
 				currentStep: gameData.currentStep.name,
 				role: getActivePlayer().rID
 			},
 			...dataToPost
-		},
-		function(response)
-		{
-			console.log(response);
-			const {
-				events,
-				nextStep,
-				proceedFromDiscardToStep, // in case playing an event card satisfied the discard requirement.
-				turnNum,
-				numPlayerCardsRemaining,
-				gameEndCause,
-				failure
-			} = JSON.parse(response);
-			
-			if (failure)
-			{
-				indicateActionsLeft({ addend: 1 });
-				reject(failure);
-			}
-			else
-			{
-				// Only some actions report back with the turn number and the next step.
-				if (turnNum)
-					gameData.turnNum = turnNum;
-					
-				if (nextStep)
-					gameData.nextStep = nextStep;
-				else if (proceedFromDiscardToStep)
-					bypassDiscardStep(proceedFromDiscardToStep);
-
-				if (numPlayerCardsRemaining)
-					gameData.numPlayerCardsRemaining = numPlayerCardsRemaining;
-
-				if (gameEndCause)
-					gameData.gameEndCause = gameEndCause;
-				
-				if (events)
-					resolve(parseEvents(events));
-				else
-					resolve();
-			}
 		});
-	});
+	
+	console.log(response);
+	const {
+		events,
+		nextStep,
+		proceedFromDiscardToStep, // in case playing an event card satisfied the discard requirement.
+		turnNum,
+		numPlayerCardsRemaining,
+		gameEndCause,
+		failure
+	} = response;
+	
+	if (failure)
+	{
+		indicateActionsLeft({ addend: 1 });
+		return Promise.reject(failure);
+	}
+	else
+	{
+		// Only some actions report back with the turn number and the next step.
+		if (turnNum)
+			gameData.turnNum = turnNum;
+			
+		if (nextStep)
+			gameData.nextStep = nextStep;
+		else if (proceedFromDiscardToStep)
+			bypassDiscardStep(proceedFromDiscardToStep);
+
+		if (numPlayerCardsRemaining)
+			gameData.numPlayerCardsRemaining = numPlayerCardsRemaining;
+
+		if (gameEndCause)
+			gameData.gameEndCause = gameEndCause;
+		
+		return Promise.resolve(events ? parseEvents(events) : false);
+	}
 }
 
 async function passActions()
@@ -6791,7 +6782,7 @@ function loadDiseaseStatuses(diseaseStatuses)
 		{
 			gameData.cures[diseaseColor] = status;
 			gameData.cures.remaining--;
-
+			
 			newCureMarker(diseaseColor, status);
 		}
 	}
@@ -6818,12 +6809,7 @@ async function setup()
 				getData(`${selectPath}retrieveGameData.php`),
 				getData(`${selectPath}retrievePlayerCards.php`),
 				getData(`${selectPath}retrieveEventHistory.php`)
-			])
-			.catch(function(err)
-			{
-				console.error(err);
-				$("#curtain").children("p").first().html("An error occured: " + err);
-			});
+			]);
 	
 	if (gamestate.gameIsResuming)
 		prepareToFlagRemovedEventCardEvents();
