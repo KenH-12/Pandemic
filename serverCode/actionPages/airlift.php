@@ -2,64 +2,67 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["currentStep"]))
+        require "../connect.php";
+        require "../utilities.php";
+
+        $airliftDetails = json_decode(file_get_contents("php://input"), true);
+        
+        if (!isset($airliftDetails["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["role"]))
+        if (!isset($airliftDetails["role"]))
             throw new Exception("Role not set.");
 
-        if (!isset($_POST["roleToAirlift"]))
+        if (!isset($airliftDetails["roleToAirlift"]))
             throw new Exception("Role to airlift not set.");
 
-        if (!isset($_POST["originKey"]))
+        if (!isset($airliftDetails["originKey"]))
             throw new Exception("Origin city not set.");
 
-        if (!isset($_POST["destinationKey"]))
+        if (!isset($airliftDetails["destinationKey"]))
             throw new Exception("Destination city not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["role"];
-        $roleToAirlift = $_POST["roleToAirlift"];
-        $originKey = $_POST["originKey"];
-        $destinationKey = $_POST["destinationKey"];
+        $currentStep = $airliftDetails["currentStep"];
+        $activeRole = $airliftDetails["role"];
+        $roleToAirlift = $airliftDetails["roleToAirlift"];
+        $originKey = $airliftDetails["originKey"];
+        $destinationKey = $airliftDetails["destinationKey"];
         
         $EVENT_CODE = "ar";
         $CARD_KEY = "airl";
 
-        checkEventCardLegality($mysqli, $game, $CARD_KEY);
+        checkEventCardLegality($pdo, $game, $CARD_KEY);
         
         // The destination must be different than the origin.
         if ($originKey === $destinationKey)
             throw new Exception("The player is already at the specified destination.");
         
-        $discardingRole = getEventCardHolder($mysqli, $game, $CARD_KEY);
+        $discardingRole = getEventCardHolder($pdo, $game, $CARD_KEY);
         
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
         
-        discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
-        $discardingRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
+        discardOrRemoveEventCard($pdo, $game, $discardingRole, $CARD_KEY);
+        $discardingRole = convertRoleFromPossibleContingency($pdo, $discardingRole);
         
-        updateRoleLocation($mysqli, $game, $roleToAirlift, $originKey, $destinationKey);
+        updateRoleLocation($pdo, $game, $roleToAirlift, $originKey, $destinationKey);
 
         $details = "$roleToAirlift,$originKey,$destinationKey";
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $details, $discardingRole);
+        $response["events"][] = recordEvent($pdo, $game, $EVENT_CODE, $details, $discardingRole);
         
-        if (getRoleName($mysqli, $roleToAirlift) === "Medic")
+        if (getRoleName($pdo, $roleToAirlift) === "Medic")
         {
-            $autoTreatEvents = getAutoTreatDiseaseEvents($mysqli, $game, $destinationKey);
+            $autoTreatEvents = getAutoTreatDiseaseEvents($pdo, $game, $destinationKey);
 
             if ($autoTreatEvents)
                 $response["events"] = array_merge($response["events"], $autoTreatEvents);
         }
 
-        $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $discardingRole, $activeRole);
+        $proceedToNextStep = eventCardSatisfiedDiscard($pdo, $game, $currentStep, $discardingRole, $activeRole);
 
         if ($proceedToNextStep)
             $response["proceedFromDiscardToStep"] = $proceedToNextStep;
@@ -71,12 +74,10 @@
     finally
     {
         if (isset($response["failure"]))
-            $mysqli->rollback();
+            $pdo->rollback();
         else
-            $mysqli->commit();
+            $pdo->commit();
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>
