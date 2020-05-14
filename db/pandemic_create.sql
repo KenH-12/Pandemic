@@ -85,7 +85,7 @@ SELECT
 	udf_getDiseaseStatusDescription(yStatusID) AS yStatus,
 	udf_getDiseaseStatusDescription(rStatusID) AS rStatus,
 	udf_getDiseaseStatusDescription(uStatusID) AS uStatus,
-(bStatusID) AS bStatus
+	udf_getDiseaseStatusDescription(bStatusID) AS bStatus
 FROM pandemic
 INNER JOIN game ON game.gameID = pandemic.gameID;
 
