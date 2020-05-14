@@ -3,7 +3,7 @@
 	{
 		session_start();
 		require "../connect.php";
-		include "../utilities.php";
+		require "../utilities.php";
 		
 		if (!isset($_SESSION["game"]))
 			throw new Exception("Game does not exist.");
@@ -68,7 +68,7 @@
 								FROM pandemic.vw_disease
 								WHERE game = ?");
 			$stmt->execute([$game]);
-			$response["diseaseStatuses"] = $stmt->fetchAll();
+			$response["diseaseStatuses"] = $stmt->fetch();
 		}
 		else // beginning new game
 		{
@@ -103,7 +103,7 @@
 			for ($i = 0; $i < count($cardKeys); $i++)
 			{
 				$cityKey = $cardKeys[$i];
-				$popQuery = $pdo->prepare("SELECT population FROM pandemic.city WHERE cityKey = ?");
+				$popQuery = $pdo->prepare("SELECT population FROM city WHERE cityKey = ?");
 				$popQuery->execute([$cityKey]);
 				
 				$response["startingHandPopulations"][]

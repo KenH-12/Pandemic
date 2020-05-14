@@ -9,7 +9,7 @@
 		
 		// get all player cards which are in a player's hand or the discard pile
 		$stmt = $pdo->prepare("SELECT pileID, pile, cardKey as `key`
-							FROM pandemic.vw_playerCard
+							FROM vw_playerCard
 							WHERE game = ?
 							AND pile != 'deck'
 							ORDER BY pileID, cardIndex");

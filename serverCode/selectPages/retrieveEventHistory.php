@@ -3,7 +3,6 @@
 	{
 		session_start();
 		require "../connect.php";
-		include "../utilities.php";
 		
 		if (!isset($_SESSION["game"]))
 			throw new Exception("Game not found");
@@ -13,7 +12,7 @@
 										role,
 										eventType AS 'code',
 										details
-								FROM pandemic.vw_event
+								FROM vw_event
 								WHERE game = ?
 								ORDER BY id");
 		$stmt->execute([$_SESSION["game"]]);
@@ -23,7 +22,10 @@
 		foreach ($events as $row)
 		{
 			if ($row["code"] === $EPIDEMIC_INTENSIFY_CODE)
+			{
+				require_once("../utilities.php");
 				$row["cardKeys"] = getEpidemicIntensifyCardKeys($pdo, $row["id"]);
+			}
 
 			$response[] = $row;
 		}
