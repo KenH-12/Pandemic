@@ -1,4 +1,9 @@
 <?php
+function throwException($pdo, $msg)
+{
+    throw new Exception("$msg: " . implode(", ", $pdo->errorInfo()));
+}
+
 function callDbFunctionSafe($pdo, $fnName, $args)
 {
     $placeholders = "?";
@@ -96,9 +101,9 @@ function getCubeCount($pdo, $game, $cityKey, $diseaseColor)
     $cubeCount = $stmt->fetch()[$cubeColumn];
     
     if (!is_numeric($cubeCount))
-        throw new Exception("Failed to retrieve cube count ($cityKey, $cubeColumn): " . $pdo->errorInfo());
+        throwException($pdo, "Failed to retrieve cube count ($cityKey, $cubeColumn)");
     else if ($cubeCount > 3 || $cubeCount < 0)
-        throw new Exception("Cube count out of range ($cityKey, $cubeColumn, $cubeCount): " . $pdo->errorInfo());
+        throwException($pdo, "Cube count out of range ($cityKey, $cubeColumn, $cubeCount)");
 
     return $cubeCount;
 }
@@ -126,7 +131,7 @@ function addCubesToCity($mysqli, $game, $cityKey, $diseaseColor, $cubesToAdd)
                         AND locationKey = '$cityKey'");
         
         if ($mysqli->affected_rows != 1)
-            throw new Exception("Failed to add $cubesToAdd cubes ($diseaseColor) to $cityKey: $mysqli->error");
+            throwException($pdo, "Failed to add $cubesToAdd cubes ($diseaseColor) to $cityKey: $mysqli->error");
         
         checkAndRecordDiseaseCubeDefeat($mysqli, $game, $diseaseColor);
     }
@@ -146,7 +151,7 @@ function removeCubesFromCity($pdo, $game, $role, $cityKey, $cubeColor, $removeAl
         $newCubeCount = $cubeCount - 1;
 
         if ($newCubeCount < 0)
-            throw new Exception("Failed to remove cube from $cityKey: city already has 0 $cubeColor cubes.");
+            throwException($pdo, "Failed to remove cube from $cityKey: city already has 0 $cubeColor cubes.");
     }
     
     $cubeColumn = getCubeColumnName($cubeColor);
@@ -157,7 +162,7 @@ function removeCubesFromCity($pdo, $game, $role, $cityKey, $cubeColor, $removeAl
     $stmt->execute([$game, $cityKey]);
 
     if ($mysqli->rowCount() !== 1)
-        throw new Exception("Failed to remove $cubeColor cube(s) from $cityKey: " . $pdo->errorInfo());
+        throwException($pdo, "Failed to remove $cubeColor cube(s) from $cityKey");
 
     if ($eventType === "td")
         return recordEvent($pdo, $game, $eventType, "$cityKey,$cubeColor,$cubeCount,$newCubeCount", $role);
@@ -182,7 +187,7 @@ function recordEvent($pdo, $game, $type, $details, $role = "NULL")
     ]);
     
     if ($stmt->rowCount() != 1)
-        throw new Exception("Failed to insert event ($type, $details): " . $pdo->errorInfo());
+        throwException($pdo, "Failed to insert event ($type, $details)");
 
     return array("id" => $pdo->lastInsertId(),
                 "turnNum" => $turnNum,
@@ -235,12 +240,12 @@ function outbreak($mysqli, $game, $originCityKey, $diseaseColor)
         $mysqli->query("UPDATE vw_gamestate SET outbreakCount = $outbreakCount WHERE game = $game");
         
         if ($mysqli->affected_rows != 1)
-            throw new Exception("Failed to update gamestate after outbreak.");
+            throwException($pdo, "Failed to update gamestate after outbreak.");
 
         $connections = getConnectedCityKeyPairs($mysqli, $outbreakKey);
 
         if ($connections->num_rows == 0)
-            throw new Exception("Failed to retrieve cities connected to $outbreakKey: " . $mysqli->error);
+            throwException($pdo, "Failed to retrieve cities connected to $outbreakKey");
 
         while ($con = mysqli_fetch_assoc($connections))					
         {
@@ -270,7 +275,7 @@ function outbreak($mysqli, $game, $originCityKey, $diseaseColor)
                                 AND locationKey = '$affectedKey'");
 
                 if ($mysqli->affected_rows != 1)
-                    throw new Exception("Failed to add $cubeColumn to $affectedKey (outbreak infection triggered by $outbreakKey): " . $mysqli->error);
+                    throwException($pdo, "Failed to add $cubeColumn to $affectedKey (outbreak infection triggered by $outbreakKey)");
                 
                 $events[] = recordEvent($mysqli, $game, "oi", "$outbreakKey,$affectedKey,$diseaseColor,$infectionPrevention");
             }
@@ -311,7 +316,7 @@ function nextTurn($pdo, $game, $currentTurnRoleID)
     $stmt->execute([$game, $currentTurnRoleID]);
 
     if ($stmt->rowCount() !== 1)
-        throw new Exception("Failed to increment turn: " . $pdo->errorInfo());
+        throwException($pdo, "Failed to increment turn");
 
     return $nextTurnRoleID;
 }
@@ -321,26 +326,35 @@ function nextTurn($pdo, $game, $currentTurnRoleID)
             (such as from 'action1' through to 'action 4' to 'draw cards').
             The order of some steps will vary based on card draws etc.
 */
-function nextStep($mysqli, $game, $currentStep, $currentTurnRoleID)
+function nextStep($pdo, $game, $currentStep, $currentTurnRoleID)
 {
-    $nextStep = $mysqli->query("SELECT description
-                                FROM step
-                                WHERE stepID = getStepID('$currentStep') + 1")->fetch_assoc()["description"];
+    $stmt = $pdo->prepare("SELECT description
+                            FROM step
+                            WHERE stepID = udf_getStepID(?) + 1");
+    $stmt->execute([$currentStep]);
 
-    if (is_null($nextStep))
+    if ($stmt->rowCount() === 1)
+        $nextStep = $stmt->fetch()["description"];
+    else
         $nextStep = "action 1";
     
-    $mysqli->query("UPDATE vw_gamestate
-                    SET step = getStepID('$nextStep')
-                    WHERE game = $game
-                    AND turn = $currentTurnRoleID
-                    AND stepName = '$currentStep'");
+    $stmt = $pdo->prepare("UPDATE vw_gamestate
+                            SET step = udf_getStepID(:nextStep)
+                            WHERE game = :game
+                            AND turn = :turn
+                            AND stepName = :currentStep");
+    $stmt->execute([
+        "nextStep" => $nextStep,
+        "game" => $game,
+        "turn" => $currentTurnRoleID,
+        "currentStep" => $currentStep
+    ]);
 
-    if ($mysqli->affected_rows != 1)
-        throw new Exception("Failed to update step ($currentStep -> $nextStep): " . $mysqli->error);
+    if ($stmt->rowCount() !== 1)
+        throwException($pdo, "Failed to update step ($currentStep -> $nextStep)");
     
-    if ($nextStep === "draw" && countCardsInPlayerDeck($mysqli, $game) == 0)
-        recordGameEndCause($mysqli, $game, "cards");
+    if ($nextStep === "draw" && countCardsInPlayerDeck($pdo, $game) == 0)
+        recordGameEndCause($pdo, $game, "cards");
     
     return $nextStep;
 }
@@ -390,7 +404,7 @@ function updateStep($pdo, $game, $currentStep, $nextStep, $currentTurnRoleID)
     $stmt->execute([$game, $currentStep, $currentTurnRoleID]);
     
     if ($stmt->rowCount() !== 1)
-        throw new Exception("Failed to update step from '$currentStep' to '$nextStep': " . $pdo->errorInfo());
+        throwException($pdo, "Failed to update step from '$currentStep' to '$nextStep'");
     
     return $nextStep;
 }
@@ -437,7 +451,7 @@ function discardInfectionCards($pdo, $game, $cardKeys)
 function moveCardsToPile($pdo, $game, $cardType, $currentPile, $newPile, $cardKeys)
 {
     if ($cardType !== "infection" && $cardType !== "player")
-        throw new Exception("Failed to move cards. Invalid card type: '$cardType'");
+        throwException($pdo, "Failed to move cards. Invalid card type: '$cardType'");
     
     $cardView = "vw_" . $cardType . "Card";
 
@@ -472,7 +486,7 @@ function moveCardsToPile($pdo, $game, $cardType, $currentPile, $newPile, $cardKe
         $stmt->execute($inputParams);
 
         if ($stmt->rowCount() !== 1)
-            throw new Exception("Failed to move player card '$cardKey' from $currentPile to $newPile: " . implode(", ", $stmt->errorInfo()));
+            throwException($pdo, "Failed to move player card '$cardKey' from $currentPile to $newPile");
     }
 }
 
@@ -543,29 +557,24 @@ function cityHasResearchStation($mysqli, $game, $cityKey)
     return $hasResearchStation;
 }
 
-function placeResearchStation($mysqli, $game, $cityKey, $relocationKey = "0")
+function placeResearchStation($pdo, $game, $cityKey, $relocationKey = "0")
 {
     if ($relocationKey != "0")
-        removeResearchStation($mysqli, $game, $relocationKey);
+        addOrRemoveResearchStation($pdo, $game, $relocationKey, true);
     
-    $mysqli->query("UPDATE vw_location
-                    SET researchStation = 1
-                    WHERE game = $game
-                    AND locationKey = '$cityKey'");
-
-    if ($mysqli->affected_rows != 1)
-        throw new Exception("Failed to place research station on '$cityKey': " . $mysqli->error);
+    addOrRemoveResearchStation($pdo, $game, $cityKey);
 }
 
-function removeResearchStation($mysqli, $game, $cityKey)
+function addOrRemoveResearchStation($pdo, $game, $cityKey, $remove = false)
 {
-    $mysqli->query("UPDATE vw_location
-                    SET researchStation = 0
-                    WHERE game = $game
-                    AND locationKey = '$cityKey'");
-             
-    if ($mysqli->affected_rows != 1)
-        throw new Exception("Invalid research station relocation (from '$cityKey'): " . $mysqli->error);
+    $stmt = $pdo->prepare("UPDATE vw_location
+                            SET researchStation = ?
+                            WHERE game = ?
+                            AND locationKey = ?");
+    $stmt->execute([($remove ? 0 : 1), $game, $cityKey]);
+
+    if ($stmt->rowCount() !== 1)
+        throwException($pdo, "Failed to " . ($remove ? "remove" : "add") . " research station (from '$cityKey')");
 }
 
 function getCityColor($mysqli, $cityKey)
@@ -597,7 +606,7 @@ function setDiseaseStatus($pdo, $game, $diseaseColor, $newStatus)
     $stmt->execute([$game]);
     
     if ($stmt->rowCount() !== 1)
-        throw new Exception("Failed to set disease status ($diseaseColor, $newStatus): " . $pdo->errorInfo());
+        throwException($pdo, "Failed to set disease status ($diseaseColor, $newStatus)");
 
     // Record and return any "eradicaton" events
     if ($newStatus === "eradicated")
@@ -720,18 +729,18 @@ function updateRoleLocation($pdo, $game, $role, $originKey, $destinationKey)
     ]);
     
     if ($stmt->rowCount() !== 1)
-        throw new Exception("Failed to update pawn location from '$originKey' to '$destinationKey': " . $pdo->errorInfo());
+        throwException($pdo, "Failed to update pawn location from '$originKey' to '$destinationKey'");
 }
 
 function validateOperationsFlight($mysqli, $game, $role, $discardKey)
 {
     // The specified discard must be a City card.
     if (getPlayerCardType($mysqli, $discardKey) != "city")
-        throw new Exception("Invalid Operations Flight: the discard must be a City card.");
+        throwException($pdo, "Invalid Operations Flight: the discard must be a City card.");
     
     // The player must be the Operations Expert.
     if (getRoleName($mysqli, $role) != "Operations Expert")
-        throw new Exception("Invalid Operations Flight: invalid role.");
+        throwException($pdo, "Invalid Operations Flight: invalid role.");
 
     // The player cannot have already performed Operations Flight this turn.
     $turnNum = getTurnNumber($mysqli, $game);
@@ -745,11 +754,11 @@ function validateOperationsFlight($mysqli, $game, $role, $discardKey)
                 ->fetch_assoc()["numOpFlightsThisTurn"] > 0;
     
     if ($opFlightUnavailable)
-        throw new Exception("Invalid Operations Flight: this action can be performed only once per turn.");
+        throwException($pdo, "Invalid Operations Flight: this action can be performed only once per turn.");
 }
 
 // Returns an array of roles whose pawns are currently at the specified destination.
-// Validates Rendezvous event requests by throwing an Exception if 0 pawns are at the specified destination.
+// Validates Rendezvous event requests by throwing an PDOException if 0 pawns are at the specified destination.
 function getRolesAtRendezvousDestination($mysqli, $game, $role, $destinationKey)
 {
     // The Dispatcher can move any pawn to any city containing another pawn.
@@ -761,7 +770,7 @@ function getRolesAtRendezvousDestination($mysqli, $game, $role, $destinationKey)
                             AND rID != $role");
     
     if ($result->num_rows == 0)
-        throw new Exception("Invalid Rendezvous: there must be at least one pawn at the specified destination.");
+        throwException($pdo, "Invalid Rendezvous: there must be at least one pawn at the specified destination.");
     
     while ($row = mysqli_fetch_assoc($result))
         array_push($rolesAtDestination, $row["rID"]);
@@ -769,7 +778,7 @@ function getRolesAtRendezvousDestination($mysqli, $game, $role, $destinationKey)
     return $rolesAtDestination;
 }
 
-// Throws an Exception if playing the specified $eventCardKey is illegal in the current game state.
+// Throws an PDOException if playing the specified $eventCardKey is illegal in the current game state.
 // "Event cards can be played at any time, except in between drawing and resolving a card."
 // Therefore, event cards cannot be played during the "draw" step or while resolving an epidemic.
 //      EXCEPT:
@@ -792,11 +801,11 @@ function checkEventCardLegality($pdo, $game, $eventCardKey)
         || ($currentStep === "epIncrease" && countEventsOfTurn($pdo, $game, $INTENSIFY_EVENT_CODE) == 0) // 1.
         || $currentStep === "epInfect"
         || ($currentStep === "epIntensify" && $cardIsNotResilientPopulation)) // 2.
-        throw new Exception("Event cards cannot be played between drawing and resolving a card.");
+        throwException($pdo, "Event cards cannot be played between drawing and resolving a card.");
 
     // Additionally, event cards cannot be played mid-forecast (the drawn infection cards are considered unresolved).
     if (forecastIsInProgress($pdo, $game))
-        throw new Exception("The Forecast must be resolved before another action can be performed.");
+        throwException($pdo, "The Forecast must be resolved before another action can be performed.");
 }
 
 // A Forecast event manifests in the db as a pair of events: the draw, and the placement.
@@ -821,7 +830,7 @@ function getEventCardHolder($pdo, $game, $cardKey)
     $eventCardHolder = $stmt->fetch()["role"];
     
     if (!$eventCardHolder)
-        throw new Exception("The event card was not found in any player's hand.");
+        throwException($pdo, "The event card was not found in any player's hand.");
     
     return $eventCardHolder;
 }
@@ -999,28 +1008,28 @@ function checkVictory($mysqli, $game)
     return true;
 }
 
-function recordGameEndCause($mysqli, $game, $endCauseName)
+function recordGameEndCause($pdo, $game, $endCauseName)
 {
     // If there is already a gameEndCause, don't overwrite it.
     // The first one triggered is the one that counts.
-    if (getGameEndCause($mysqli, $game))
+    if (getGameEndCause($pdo, $game))
         return;
     
-    $mysqli->query("UPDATE vw_gamestate
-                    SET endCause = getEndCauseID('$endCauseName')
-                    WHERE game = $game");
+    $stmt = $pdo->prepare("UPDATE vw_gamestate
+                        SET endCause = getEndCauseID(?)
+                        WHERE game = ?");
+    $stmt->execute([$endCauseName, $game]);
     
-    if ($mysqli->affected_rows != 1)
-        throw new Exception("Failed to record game end cause: $mysqli->error");
+    if ($stmt->rowCount !== 1)
+        throwException($pdo, "Failed to record game end cause");
 }
 
-function getGameEndCause($mysqli, $game)
+function getGameEndCause($pdo, $game)
 {
-    $endCauseName = $mysqli->query("SELECT endCauseName
-                                FROM vw_gamestate
-                                WHERE game = $game")->fetch_assoc()["endCauseName"];
+    $stmt = $pdo->prepare("SELECT endCauseName FROM vw_gamestate WHERE game = ?");
+    $stmt->execute([$game]);
     
-    return $endCauseName;
+    return $stmt->fetch()["endCauseName"];
 }
 
 function getEventById($mysqli, $game, $eventID)
@@ -1028,19 +1037,19 @@ function getEventById($mysqli, $game, $eventID)
     $result = $mysqli->query("SELECT * FROM vw_event WHERE game = $game AND id = $eventID");
     
     if ($result->num_rows === 0)
-        throw new Exception("the event does not exist.");
+        throwException($pdo, "the event does not exist.");
     
     return $result->fetch_assoc();
 }
 
-// Throws an Exception if undoing $event is not allowed.
+// Throws an PDOException if undoing $event is not allowed.
 function validateEventCanBeUndone($mysqli, $game, $event)
 {
     $disallowedEventTypes = array("sh", "ii", "cd", "ic", "ec", "ef", "et", "ob", "oi", "fd", "ge");
 
     $eventType = $event["eventType"];
     if (in_array($eventType, $disallowedEventTypes))
-        throw new Exception("events of type '$eventType' cannot be undone.");
+        throwException($pdo, "events of type '$eventType' cannot be undone.");
     
     $eventID = $event["id"];
     $eventsAfterEvent = $mysqli->query("SELECT eventType FROM vw_event
@@ -1064,10 +1073,10 @@ function validateEventCanBeUndone($mysqli, $game, $event)
     }
 
     if ($disallowedEventsOccured)
-        throw new Exception("one or more events which cannot be undone occured after the event in question.");
+        throwException($pdo, "one or more events which cannot be undone occured after the event in question.");
         
     if ($notLastUndoableEvent)
-        throw new Exception("one or more undoable events occured after the event in question.");
+        throwException($pdo, "one or more undoable events occured after the event in question.");
 }
 
 function undoEventsTriggeredByEvent($mysqli, $game, $triggerEventID)
@@ -1089,7 +1098,7 @@ function undoEventsTriggeredByEvent($mysqli, $game, $triggerEventID)
         else if ($eventType === $ERADICATION)
             array_push($undoneEventIds, undoEradicationEvent($mysqli, $game, $event));
         else
-            throw new Exception("Failed to undo events triggered by event -- unexpected event type found: '$eventType'");
+            throwException($pdo, "Failed to undo events triggered by event -- unexpected event type found: '$eventType'");
     }
 
     return $undoneEventIds;
@@ -1119,7 +1128,7 @@ function undoEradicationEvent($mysqli, $game, $event)
                     WHERE gameID = $game");
 
     if ($mysqli->affected_rows != 1)
-        throw new Exception("Failed to undo Eradication event: " . $mysqli->error);
+        throwException($pdo, "Failed to undo Eradication event");
     
     deleteEvent($mysqli, $game, $eventID);
 
@@ -1133,7 +1142,7 @@ function deleteEvent($mysqli, $game, $eventID)
                     AND id = $eventID");
 
     if ($mysqli->affected_rows != 1)
-        throw new Exception("Failed to delete event: " . $mysqli->error);
+        throwException($pdo, "Failed to delete event");
 }
 
 function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eventToUndo = false)
@@ -1154,7 +1163,7 @@ function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eve
     else if (substr($currentStepName, 0, 6) === "action")
         $prevStepName = "action " . ($currentStepName[7] - 1);
     else
-        throw new Exception("Cannot revert to previous step from '$currentStepName' step.");
+        throwException($pdo, "Cannot revert to previous step from '$currentStepName' step.");
     
     $mysqli->query("UPDATE vw_gamestate
                     SET step = getStepID('$prevStepName')
@@ -1163,7 +1172,7 @@ function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eve
                     AND turn = $currentTurnRoleID");
     
     if ($mysqli->affected_rows != 1)
-        throw new Exception("Failed to revert to previous '$prevStepName' step from '$currentStepName' step: " . $mysqli->error);
+        throwException($pdo, "Failed to revert to previous '$prevStepName' step from '$currentStepName' step");
     
     return $prevStepName;
 }
@@ -1209,7 +1218,7 @@ function goToStepBeforeOneQuietNight($mysqli, $game, $prevStepName)
                     AND stepName = 'action 1'");
     
     if ($mysqli->affected_rows != 1)
-        throw new Exception("could not revert to the step which preceded the skipped 'infect cities' step of the previous turn." . $mysqli->error);
+        throwException($pdo, "could not revert to the step which preceded the skipped 'infect cities' step of the previous turn.");
     
     return $prevTurnRoleID;
 }

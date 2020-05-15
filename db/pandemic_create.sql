@@ -268,11 +268,8 @@ SELECT	game.gameID AS game,
 			epidemicCards AS numEpidemics,
 			infectionRate AS infRate,
 			epidemicsDrawn AS epidemicCount,
-			numOutbreaks AS outbreakCount,
-			game.endCauseID AS endCause,
-			gameEndCause.description AS endCauseName
+			numOutbreaks AS outbreakCount
 FROM game
 INNER JOIN step ON game.stepID = step.stepID
-LEFT OUTER JOIN gameEndCause ON game.endCauseID = gameEndCause.endCauseID
 INNER JOIN player ON game.gameID = player.gameID
 WHERE turnRoleID = roleID;

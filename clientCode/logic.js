@@ -18,7 +18,8 @@ import {
 	newPlayerCard,
 	resizeInfectionCards,
 	getInfectionCardTextStyle,
-	useRoleColorForRelatedActionButtons
+	useRoleColorForRelatedActionButtons,
+	showLoadingGif
 } from "./utilities/pandemicUtils.js";
 import { strings } from "./strings.js";
 import getDimension from "./dimensions.js";
@@ -512,7 +513,7 @@ function disableActions()
 
 	$actionsContainer.find(".button").not("#btnCancelAction")
 		.off("click")
-		.addClass("btnDisabled wait");
+		.addClass("btnDisabled");
 
 	disableDiseaseCubeEvents();
 	disableEventCards();
@@ -529,8 +530,7 @@ function enableAvailableActions()
 	
 	$actionsContainer.find(".button").not("#btnCancelAction")
 		.off("click")
-		.addClass("btnDisabled")
-		.removeClass("wait");
+		.addClass("btnDisabled");
 	
 	$actionsContainer.find(".actionCategory").removeClass("hidden");
 	
@@ -2682,14 +2682,16 @@ async function buildResearchStation(relocationKey)
 	const player = getActivePlayer(),
 		playerIsOperationsExpert = player.role === "Operations Expert",
 		city = player.getLocation(),
-		eventType = eventTypes.buildResearchStation;
-
+		eventType = eventTypes.buildResearchStation,
+		$loadingGif = showLoadingGif($(".btnConfirmAction").html("CONFIRMING..."));
+	
 	await requestAction(eventType,
 		{
 			locationKey: city.key,
 			relocationKey: relocationKey || 0
 		});
 	
+	$loadingGif.addClass("hidden");
 	// Operations Expert special ability:
 	// "As an action, build a research station in his current city without discarding a city card"
 	if (!playerIsOperationsExpert)
