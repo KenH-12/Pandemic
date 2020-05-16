@@ -4,6 +4,7 @@ import { newPlayerCard, getCityOrEventCardObject } from "./utilities/pandemicUti
 import { bindCityLocatorClickEvents } from "./city.js";
 import { bindEventCardHoverEvents } from "./eventCard.js";
 import { eventTypes } from "./event.js";
+import { gameData } from "./gameData.js";
 
 export default class DiscardPrompt
 {
