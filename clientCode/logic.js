@@ -6177,9 +6177,9 @@ function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAut
 
 async function discoverACure(cardKeys)
 {
-	resetActionPrompt();
 	disableActions();
-	
+	showLoadingGif($(".btnConfirm").html("DISCOVERING CURE..."));
+
 	const player = getActivePlayer();
 	await player.panel.expandIfCollapsed();
 	
@@ -6196,7 +6196,8 @@ async function discoverACure(cardKeys)
 		]),
 		autoTreatEvents = events.filter(e => e.isOfType(autoTreatDisease)),
 		eradicationEvents = events.filter(e => e.isOfType(eradication));
-
+	
+	resetActionPrompt();
 	player.removeCardsFromHand(cardKeys);
 
 	// If there was an eradication event, there are 2 possible causes:
