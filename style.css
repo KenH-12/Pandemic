@@ -1650,6 +1650,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	margin-left: 5%;
 	cursor: pointer;
 }
+#actionInterface .diseaseCube.disabled { pointer-events: none }
 .actionInterfaceDivision
 {
 	text-align: center;

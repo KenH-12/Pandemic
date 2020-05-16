@@ -19,7 +19,8 @@ import {
 	resizeInfectionCards,
 	getInfectionCardTextStyle,
 	useRoleColorForRelatedActionButtons,
-	showLoadingGif
+	showLoadingGif,
+	showActionButtonLoadingGifAfterMs
 } from "./utilities/pandemicUtils.js";
 import { strings } from "./strings.js";
 import getDimension from "./dimensions.js";
@@ -2888,18 +2889,38 @@ function movementActionDiscard(eventType, destination, { playerToDispatch, opera
 async function treatDisease($cube, diseaseColor)
 {
 	disableActions();
-	resetActionPrompt();
 	
-	const city = getActivePlayer().getLocation(),
-		eventType = eventTypes.treatDisease;
-
 	diseaseColor = diseaseColor || getColorClass($cube);
 
-	const events = await requestAction(eventType,
-		{
-			cityKey: city.key,
-			diseaseColor
-		});
+	const city = getActivePlayer().getLocation(),
+		eventType = eventTypes.treatDisease,
+		usingActionPrompt = !$("#actionPrompt").hasClass("hidden");
+	
+	let resetActionButtonImg;
+	if (usingActionPrompt)
+	{
+		const { $actionInterface } = actionInterfacePopulator;
+
+		delayExecution(function()
+			{
+				if (!$("#actionPrompt").hasClass("hidden"))
+				{
+					$actionInterface.find(".instructions").html(`Treating disease in ${city.name}...`)
+						.siblings(".diseaseCube").off("click").addClass("disabled").not(`.${diseaseColor}`).fadeTo(200, .001);
+					
+					showLoadingGif($actionInterface);
+				}
+			}, 1000);
+	}
+	else
+		resetActionButtonImg = showActionButtonLoadingGifAfterMs($("#btnTreatDisease"));
+	
+	const events = await requestAction(eventType, { cityKey: city.key, diseaseColor });
+	
+	if (typeof resetActionButtonImg === "function")
+		resetActionButtonImg();
+	
+	resetActionPrompt();
 		
 	let numToRemove,
 		eradicated = false;
