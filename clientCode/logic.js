@@ -56,7 +56,7 @@ import {
 	getGovernmentGrantTargetCity,
 	getPacificPath
 } from "./city.js";
-import DiscardPrompt from "./discardPrompt.js";
+import DiscardPrompt, { removeDiscardPrompt } from "./discardPrompt.js";
 import Event, {
 	eventTypes,
 	movementTypeRequiresDiscard,
@@ -5234,36 +5234,24 @@ function getPlayerWithTooManyCards()
 async function confirmDiscards(discardKeys)
 {
 	const player = getPlayerWithTooManyCards(),
-		eventType = eventTypes.discard;
+		eventType = eventTypes.discard,
+		$btnConfirm = $(".discardPrompt").find(".btnConfirm").off("click").addClass("btnDisabled");
 	
+	showLoadingGif($btnConfirm.html("DISCARDING..."));
+	
+	await requestAction(eventType,
+		{
+			discardingRole: player.rID,
+			cardKeys: discardKeys
+		});
 	removeDiscardPrompt();
-
-	await Promise.all(
-		[
-			requestAction(eventType,
-				{
-					discardingRole: player.rID,
-					cardKeys: discardKeys
-				}),
-			movePlayerCardsToDiscards({ player, cardKeys: discardKeys })
-		]);
-
+	
+	await movePlayerCardsToDiscards({ player, cardKeys: discardKeys });
+	
 	player.removeCardsFromHand(discardKeys);
 	appendEventHistoryIconOfType(eventType);
 	
 	proceed();
-}
-
-function removeDiscardPrompt()
-{
-	const $discardStepContainer = $("#discardStepContainer");
-
-	$discardStepContainer.find("btnConfirm").off("click");
-
-	$discardStepContainer.slideUp(function()
-	{
-		$discardStepContainer.children(".discardPrompt").remove();
-	});
 }
 
 function movePlayerCardsToDiscards({ player, cardKeys, $card } = {})

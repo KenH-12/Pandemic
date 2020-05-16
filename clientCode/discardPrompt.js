@@ -156,3 +156,16 @@ export default class DiscardPrompt
 		oscillateButtonBackgroundColor($btn);
 	}
 }
+
+export function removeDiscardPrompt()
+{
+	const $discardStepContainer = $("#discardStepContainer");
+	
+	$discardStepContainer.find(".btnConfirm").off("click")
+		.siblings(".loadingGif").remove();
+
+	$discardStepContainer.slideUp(function()
+	{
+		$discardStepContainer.children(".discardPrompt").remove();
+	});
+}
