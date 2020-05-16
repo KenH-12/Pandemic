@@ -2922,7 +2922,7 @@ function getDestination(eventType, { player, dispatching } = {})
 async function drawStep()
 {
 	const $container = $("#cardDrawContainer"),
-		$btn = $container.find(".button");
+		$btn = $container.find(".button").html("DRAW 2 CARDS");
 	
 	getActivePlayer().disablePawn();
 	$container.find(".playerCard").remove();
@@ -2939,17 +2939,18 @@ async function drawStep()
 	enableEventCards();
 
 	oscillateButtonBackgroundColor($btn);
-	await buttonClickPromise($btn,
-	{
-		beforeClick: "fadeIn",
-		afterClick: "hide"
-	});
+	await buttonClickPromise($btn);
 
 	disableEventCards();
 	eventHistory.disableUndo();
 
-	const cardKeys = await performDrawStep()
-		.catch((reason) => console.log(reason));
+	const $loadigGif = showLoadingGif($btn.off("click").addClass("btnDisabled").html("DRAWING...")),
+		events = await requestAction(eventTypes.cardDraw);
+	
+	$btn.addClass("hidden");
+	$loadigGif.remove();
+
+	const cardKeys = await animateDrawStep(events[0]);
 	if (!cardKeys) return false;
 
 	if (gameData.nextStep === "epIncrease")
@@ -2974,45 +2975,39 @@ async function drawStep()
 	finishDrawStep(cardKeys);
 }
 
-async function performDrawStep()
+async function animateDrawStep(cardDrawEvent)
 {
-	return new Promise(async (resolve, reject) =>
+	const $container = $("#cardDrawContainer"),
+		{ numPlayerCardsRemaining } = gameData,
+		numCardsToDeal = numPlayerCardsRemaining >= 2 ? 2 : numPlayerCardsRemaining;
+	
+	await dealFaceDownPlayerCards($container, numCardsToDeal);
+
+	$("img.drawnPlayerCard").remove();
+	$container.children().not(".button").remove();
+	
+	// It's possible that 0 cards are left in the deck.
+	if (cardDrawEvent.cardKeys)
 	{
-		const $container = $("#cardDrawContainer"),
-			{ numPlayerCardsRemaining } = gameData,
-			numCardsToDeal = numPlayerCardsRemaining >= 2 ? 2 : numPlayerCardsRemaining,
-			{ 0: events } = await Promise.all(
-			[
-				requestAction(eventTypes.cardDraw),
-				dealFaceDownPlayerCards($container, numCardsToDeal)
-			]),
-			cardDrawEvent = events[0];
+		// Without reversing the cardKeys array, the cards will be added to the player's hand in
+		// an order that does not match the cardIndex order.
+		for (let key of ensureIsArray(cardDrawEvent.cardKeys).reverse())
+			revealPlayerCard(key, $container);
+	}
+	
+	if (gameData.gameEndCause) // not enough player cards remain in the deck -- the players lose.
+	{
+		await sleep(getDuration("longInterval"));
+		reject("Out of player cards -- the players lose.");
+		return outOfPlayerCardsDefeatAnimation($container);
+	}
 
-		$("img.drawnPlayerCard").remove();
-		$container.children().not(".button").remove();
-		
-		// It's possible that 0 cards are left in the deck.
-		if (cardDrawEvent.cardKeys)
-		{
-			// Without reversing the cardKeys array, the cards will be added to the player's hand in
-			// an order that does not match the cardIndex order.
-			for (let key of ensureIsArray(cardDrawEvent.cardKeys).reverse())
-				revealPlayerCard(key, $container);
-		}
-		
-		if (gameData.gameEndCause) // not enough player cards remain in the deck -- the players lose.
-		{
-			await sleep(getDuration("longInterval"));
-			reject("Out of player cards -- the players lose.");
-			return outOfPlayerCardsDefeatAnimation($container);
-		}
-
-		bindCityLocatorClickEvents();
-		bindEventCardHoverEvents($container);
-		
-		await sleep(getDuration("mediumInterval"));
-		resolve(cardDrawEvent.cardKeys);
-	});
+	bindCityLocatorClickEvents();
+	bindEventCardHoverEvents($container);
+	
+	await sleep(getDuration("mediumInterval"));
+	
+	return Promise.resolve(cardDrawEvent.cardKeys);
 }
 
 async function finishDrawStep(cardKeys)
