@@ -170,7 +170,7 @@ function removeCubesFromCity($pdo, $game, $role, $cityKey, $cubeColor, $removeAl
         return recordEvent($pdo, $game, $eventType, "$cityKey,$cubeColor,$cubeCount", $role);
 }
 
-function recordEvent($pdo, $game, $type, $details, $role = "NULL")
+function recordEvent($pdo, $game, $type, $details, $role = NULL)
 {
     $turnNum = getTurnNumber($pdo, $game);
 
@@ -532,29 +532,29 @@ function getRoleName($pdo, $roleID)
     return $stmt->fetch()["roleName"];
 }
 
-function getLocationKey($mysqli, $game, $role)
+function getLocationKey($pdo, $game, $role)
 {
-    if (!is_numeric($role))
-        $role = "getRoleID('$role')";
+    $stmt = $pdo->prepare("SELECT location as 'locationKey'
+                            FROM vw_player
+                            WHERE game = ?
+                            AND rID = " . (is_numeric($role) ? "?" : "udf_getRoleID(?)"));
+    $stmt->execute([$game, $role]);
     
-    $location = $mysqli->query("SELECT location as 'locationKey'
-                                    FROM vw_player
-                                    WHERE game = $game
-                                    AND rID = $role");
-    
-    if ($location->num_rows == 1)
-        return $location->fetch_assoc()["locationKey"];
+    if ($stmt->rowCount() === 1)
+        return $stmt->fetch()["locationKey"];
 
     return false;
 }
 
-function cityHasResearchStation($mysqli, $game, $cityKey)
+function cityHasResearchStation($pdo, $game, $cityKey)
 {
-    $hasResearchStation = $mysqli->query("SELECT researchStation
-                                        FROM vw_location
-                                        WHERE game = $game
-                                        AND locationKey = '$cityKey'")->fetch_assoc()["researchStation"] == "1";
-    return $hasResearchStation;
+    $stmt = $pdo->prepare("SELECT researchStation
+                            FROM vw_location
+                            WHERE game = ?
+                            AND locationKey = ?");
+    $stmt->execute([$game, $cityKey]);
+
+    return $stmt->fetch()["researchStation"] == "1";
 }
 
 function placeResearchStation($pdo, $game, $cityKey, $relocationKey = "0")
@@ -577,12 +577,12 @@ function addOrRemoveResearchStation($pdo, $game, $cityKey, $remove = false)
         throwException($pdo, "Failed to " . ($remove ? "remove" : "add") . " research station (from '$cityKey')");
 }
 
-function getCityColor($mysqli, $cityKey)
+function getCityColor($pdo, $cityKey)
 {
-    $color = $mysqli->query("SELECT diseaseColor FROM city WHERE cityKey = '$cityKey'")
-        ->fetch_assoc()["diseaseColor"];
+    $stmt = $pdo->prepare("SELECT diseaseColor FROM city WHERE cityKey = ?");
+    $stmt->execute([$cityKey]);
 
-    return $color;
+    return $stmt->fetch()["diseaseColor"];
 }
 
 function getDiseaseStatus($pdo, $game, $diseaseColor)
@@ -597,7 +597,7 @@ function getDiseaseStatus($pdo, $game, $diseaseColor)
 
 function setDiseaseStatus($pdo, $game, $diseaseColor, $newStatus)
 {
-    $statusColumn = getCubeColumnName($diseaseColor);
+    $statusColumn = validateColor($diseaseColor) . "StatusID";
     $newStatusID = callDbFunctionSafe($pdo, "udf_getDiseaseStatusID", $newStatus);
 
     $stmt = $pdo->prepare("UPDATE pandemic
@@ -983,27 +983,27 @@ function numDiseaseCubesOnBoard($pdo, $game, $diseaseColor)
 
     $stmt = $pdo->prepare("SELECT SUM($cubeColumn) AS 'numCubes' FROM vw_location WHERE game = ?");
     $stmt->execute([$game]);
-
+    
     return $stmt->fetch()["numCubes"];
 }
 
-function checkVictory($mysqli, $game)
+function checkVictory($pdo, $game)
 {
-    $diseaseStatuses = $mysqli->query("SELECT   yStatus,
-                                                rStatus,
-                                                uStatus,
-                                                bStatus
-                                        FROM vw_disease
-                                        WHERE game = $game")->fetch_assoc();
+    $stmt = $pdo->prepare("SELECT yStatus,
+                                rStatus,
+                                uStatus,
+                                bStatus
+                            FROM vw_disease
+                            WHERE game = ?");
+    $stmt->Execute([$game]);
+    $diseaseStatuses = $stmt->fetch();
 
     foreach ($diseaseStatuses as $key => $value)
-    {
         if ($value === "rampant")
             return false;
-    }
 
     // All diseases are cured or eradicated and the players are victorious.
-    recordGameEndCause($mysqli, $game, "victory");
+    recordGameEndCause($pdo, $game, "victory");
 
     return true;
 }
@@ -1015,21 +1015,26 @@ function recordGameEndCause($pdo, $game, $endCauseName)
     if (getGameEndCause($pdo, $game))
         return;
     
-    $stmt = $pdo->prepare("UPDATE vw_gamestate
-                        SET endCause = getEndCauseID(?)
-                        WHERE game = ?");
+    $stmt = $pdo->prepare("UPDATE game
+                        SET endCauseID = udf_getEndCauseID(?)
+                        WHERE gameID = ?");
     $stmt->execute([$endCauseName, $game]);
     
-    if ($stmt->rowCount !== 1)
+    if ($stmt->rowCount() !== 1)
         throwException($pdo, "Failed to record game end cause");
 }
 
 function getGameEndCause($pdo, $game)
 {
-    $stmt = $pdo->prepare("SELECT endCauseName FROM vw_gamestate WHERE game = ?");
+    $stmt = $pdo->prepare("SELECT endCauseID FROM game WHERE gameID = ? AND endCauseID IS NOT NULL");
     $stmt->execute([$game]);
+
+    if ($stmt->rowCount() === 0)
+        return false;
     
-    return $stmt->fetch()["endCauseName"];
+    $endCauseID = $stmt->fetch()["endCauseID"];
+    $result = $pdo->query("SELECT udf_getEndCauseDescription($endCauseID) AS 'endCause'");
+    return $result->fetch()["endCause"];
 }
 
 function getEventById($mysqli, $game, $eventID)

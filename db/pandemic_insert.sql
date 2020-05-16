@@ -207,7 +207,7 @@ INSERT INTO DISEASESTATUS (description) VALUES ('rampant');
 INSERT INTO DISEASESTATUS (description) VALUES ('cured');
 INSERT INTO DISEASESTATUS (description) VALUES ('eradicated');
 
-INSERT INTO user (userName, pass, email) VALUES ('Ken', '', '');
+INSERT INTO user (userName, pass, email) VALUES ('Edward', '', '');
 INSERT INTO user (userName, pass, email) VALUES ('Pawandeep', '', '');
-INSERT INTO user (userName, pass, email) VALUES ('Joe', '', '');
-INSERT INTO user (userName, pass, email) VALUES ('Greg', '', '');
+INSERT INTO user (userName, pass, email) VALUES ('Rajkumar', '', '');
+INSERT INTO user (userName, pass, email) VALUES ('Princhi', '', '');

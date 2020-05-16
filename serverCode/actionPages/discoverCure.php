@@ -2,50 +2,53 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["role"]))
+        require "../connect.php";
+        require "../utilities.php";
+        
+        $details = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($details["role"]))
             throw new Exception("Role not set.");
         
-        if (!isset($_POST["currentStep"]))
+        if (!isset($details["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["cityKey"]))
+        if (!isset($details["cityKey"]))
             throw new Exception("City key not set.");
         
-        if (!isset($_POST["diseaseColor"]))
+        if (!isset($details["diseaseColor"]))
             throw new Exception("Disease color not set.");
         
-        if (!isset($_POST["cardKeys"]))
+        if (!isset($details["cardKeys"]))
             throw new Exception("Card keys not set.");
         
         $game = $_SESSION["game"];
-        $role = $_POST["role"];
-        $currentStep = $_POST["currentStep"];
-        $cityKey = $_POST["cityKey"];
-        $diseaseColor = $_POST["diseaseColor"];
-        $cardKeys = $_POST["cardKeys"];
+        $role = $details["role"];
+        $currentStep = $details["currentStep"];
+        $cityKey = $details["cityKey"];
+        $diseaseColor = $details["diseaseColor"];
+        $cardKeys = $details["cardKeys"];
 
         // Make sure the disease has not already been cured.
-        if (getDiseaseStatus($mysqli, $game, $diseaseColor) != "rampant")
+        if (getDiseaseStatus($pdo, $game, $diseaseColor) !== "rampant")
             throw new Exception("the disease color has already been cured.");
 
         // Verify that the cityKey reported by the client.
-        if (getLocationKey($mysqli, $game, $role) != $cityKey)
+        if (getLocationKey($pdo, $game, $role) !== $cityKey)
             throw new Exception("inconsistent cityKey");
 
         // Verify that the current location has a research station.
-        if (!cityHasResearchStation($mysqli, $game, $cityKey))
+        if (!cityHasResearchStation($pdo, $game, $cityKey))
             throw new Exception("the city must have a research station.");
 
         // Normally, discover a cure costs 5 cards of the same color.
         $numCardsRequired = 5;
         // Scientist special ability allows discover a cure for only 4 cards of the same color.
-        if (getRoleName($mysqli, $role) == "Scientist")
+        if (getRoleName($pdo, $role) == "Scientist")
             $numCardsRequired = 4;
 
         $numCards = count($cardKeys);
@@ -55,58 +58,56 @@
         // Check that all cards are the same color.
         for ($i = 0; $i < $numCards; $i++)
         {
-            if (getCityColor($mysqli, $cardKeys[$i]) != $diseaseColor)
+            if (getCityColor($pdo, $cardKeys[$i]) !== $diseaseColor)
                 throw new Exception("all cards must be the same color.");
         }
 
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
 
-        discardPlayerCards($mysqli, $game, $role, $cardKeys);
+        discardPlayerCards($pdo, $game, $role, $cardKeys);
         
         // Record "discover cure" event
         $eventType = "dc";
-        $details = implode(",", $cardKeys);
-        $response["events"][] = recordEvent($mysqli, $game, $eventType, $details, $role);
+        $eventDetails = implode(",", $cardKeys);
+        $response["events"][] = recordEvent($pdo, $game, $eventType, $eventDetails, $role);
 
         // If there are 0 cubes of a cured disease color on the board, the disease becomes eradicated.
         // Determine and update the disease status.
-        if (numDiseaseCubesOnBoard($mysqli, $game, $diseaseColor) > 0)
-            setDiseaseStatus($mysqli, $game, $diseaseColor, "cured");
+        if (numDiseaseCubesOnBoard($pdo, $game, $diseaseColor) > 0)
+            setDiseaseStatus($pdo, $game, $diseaseColor, "cured");
         else // Add any "eradication" events to the response.
-            $response["events"][] = setDiseaseStatus($mysqli, $game, $diseaseColor, "eradicated");
+            $response["events"][] = setDiseaseStatus($pdo, $game, $diseaseColor, "eradicated");
 
-        $playersAreVictorious = checkVictory($mysqli, $game);
-
+        $playersAreVictorious = checkVictory($pdo, $game);
+        
         if ($playersAreVictorious) // Medic auto-treat events are irrelevant
             $response["gameEndCause"] = "victory";
         else
         {
             // The Medic automatically treats cured diseases in his location.
-            $medicLocationKey = getLocationKey($mysqli, $game, "Medic");
+            $medicLocationKey = getLocationKey($pdo, $game, "Medic");
             if ($medicLocationKey)
             {
-                $autoTreatEvents = getAutoTreatDiseaseEvents($mysqli, $game, $medicLocationKey, $diseaseColor);
+                $autoTreatEvents = getAutoTreatDiseaseEvents($pdo, $game, $medicLocationKey, $diseaseColor);
     
                 if ($autoTreatEvents)
                     $response["events"] = array_merge($response["events"], $autoTreatEvents);
             }
     
-            $response["nextStep"] = nextStep($mysqli, $game, $currentStep, $role);
+            $response["nextStep"] = nextStep($pdo, $game, $currentStep, $role);
         }
     }
     catch(Exception $e)
     {
-        $response["failure"] = "Failed to discover cure: " . $e->getMessage();
+        $response["failure"] = "Discover A Cure failed: " . $e->getMessage();
     }
     finally
     {
         if (isset($response["failure"]))
-            $mysqli->rollback();
+            $pdo->rollback();
         else
-            $mysqli->commit();
+            $pdo->commit();
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>
