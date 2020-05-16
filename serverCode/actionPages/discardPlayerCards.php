@@ -2,29 +2,32 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("game not found");
 
-        if (!isset($_POST["currentStep"]))
+        require "../connect.php";
+        require "../utilities.php";
+
+        $details = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($details["currentStep"]))
             throw new Exception("current step not set");
         
-        if (!isset($_POST["role"]))
+        if (!isset($details["role"]))
             throw new Exception("role not set");
         
-        if (!isset($_POST["discardingRole"]))
+        if (!isset($details["discardingRole"]))
             throw new Exception("discarding role not set");
         
-        if (!isset($_POST["cardKeys"]))
+        if (!isset($details["cardKeys"]))
             throw new Exception("card keys not set");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $currentTurnRole = $_POST["role"];
-        $discardingRole = $_POST["discardingRole"];
-        $cardKeys = $_POST["cardKeys"];
+        $currentStep = $details["currentStep"];
+        $currentTurnRole = $details["role"];
+        $discardingRole = $details["discardingRole"];
+        $cardKeys = $details["cardKeys"];
         
         if ($currentStep === "discard")
             $nextStep = "infect cities";
@@ -33,32 +36,33 @@
         else
             throw new Exception("Discard player card attempt unexpected during current step: '$currentStep'");
 
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
 
-        discardPlayerCards($mysqli, $game, $discardingRole, $cardKeys);
+        discardPlayerCards($pdo, $game, $discardingRole, $cardKeys);
 
         // Confirm that the discardingRole has discarded enough cards to be within the hand limit.
-        if (roleHasTooManyCards($mysqli, $game, $discardingRole))
+        if (roleHasTooManyCards($pdo, $game, $discardingRole))
             throw new Exception("Too many cards in hand after discarding.");
 
-        $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $nextStep, $currentTurnRole);
+        $response["nextStep"] = updateStep($pdo, $game, $currentStep, $nextStep, $currentTurnRole);
         
         $eventDetails = implode(",", $cardKeys);
-        $response["events"] = recordEvent($mysqli, $game, "ds", $eventDetails, $discardingRole);
+        $response["events"] = recordEvent($pdo, $game, "ds", $eventDetails, $discardingRole);
     }
     catch(Exception $e)
     {
-        $response["failure"] = $e->getMessage();
+        $response["failure"] = "Discard failed: " . $e->getMessage();
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>
