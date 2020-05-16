@@ -162,6 +162,29 @@ function showLoadingGif($afterElement)
 		.insertAfter($afterElement);
 }
 
+// Returns an anonymous function which resets the action button image to its original icon.
+function showActionButtonLoadingGifAfterMs($actionButton, ms = 2000)
+{
+	const $img = $actionButton.children(".actionIcon").find("img"),
+		iconSrc = $img.attr("src"),
+		loading = "loading",
+		showGifIfStillWaiting = () =>
+		{
+			if ($actionButton.hasClass(loading))
+				$img.attr("src", "images/loading.gif");
+		},
+		resetImg = () => {
+			$actionButton.removeClass(loading);
+			$img.attr("src", iconSrc);
+		};
+	
+	$actionButton.addClass(loading);
+	
+	delayExecution(showGifIfStillWaiting, ms);
+
+	return resetImg;
+}
+
 export {
 	getInfectionRate,
 	getColorClass,
@@ -172,5 +195,6 @@ export {
 	getInfectionCardTextStyle,
 	useRoleColorForRelatedActionButtons,
 	activePlayerCanTakeFromResearcher,
-	showLoadingGif
+	showLoadingGif,
+	showActionButtonLoadingGifAfterMs
 }
