@@ -2,6 +2,8 @@
 
 import getDimension from "../dimensions.js";
 import { eventTypes } from "../event.js";
+import { eventCards } from "../eventCard.js";
+import { getCity } from "../city.js";
 import { gameData, getPlayer, getActivePlayer } from "../gameData.js";
 
 // Returns the Infection Rate (as seen on the Infection Rate Track on the game board)
@@ -66,6 +68,11 @@ function newPlayerCard(relatedObject, { noTooltip } = {})
 		return relatedObject.getPlayerCard({ noTooltip });
 
 	return `<div class='playerCard epidemic' data-key='epid'>EPIDEMIC</div>`;
+}
+
+function getCityOrEventCardObject(key)
+{
+	return eventCards[key] || getCity(key);
 }
 
 function resizeInfectionCards($container)
@@ -191,6 +198,7 @@ export {
 	getColorWord,
 	newDiseaseCubeElement,
 	newPlayerCard,
+	getCityOrEventCardObject,
 	resizeInfectionCards,
 	getInfectionCardTextStyle,
 	useRoleColorForRelatedActionButtons,
