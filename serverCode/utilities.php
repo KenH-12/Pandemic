@@ -492,7 +492,7 @@ function moveCardsToPile($pdo, $game, $cardType, $currentPile, $newPile, $cardKe
 
 function getMaxCardIndex($pdo, $game, $viewName, $pile)
 {
-    $pileID = callDbFunctionSafe($pdo, "udf_getPileID", $pile);
+    $pileID = is_numeric($pile) ? $pile : callDbFunctionSafe($pdo, "udf_getPileID", $pile);
 
     $stmt = $pdo->prepare("SELECT MAX(cardIndex) AS 'maxIdx'
                         FROM $viewName
