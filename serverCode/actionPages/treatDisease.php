@@ -2,59 +2,63 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["role"]))
+        require "../connect.php";
+        require "../utilities.php";
+
+        $details = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($details["role"]))
             throw new Exception("Role not set.");
 
-        if (!isset($_POST["currentStep"]))
+        if (!isset($details["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["diseaseColor"]))
+        if (!isset($details["diseaseColor"]))
             throw new Exception("Disease color not set.");
         
+        if (!isset($details["cityKey"]))
+            throw new Exception("City not set.");
+        
         $game = $_SESSION["game"];
-        $role = $_POST["role"];
-        $currentStep = $_POST["currentStep"];
-        $diseaseColor = $_POST["diseaseColor"];
-        $cityKey = $_POST["cityKey"];
+        $role = $details["role"];
+        $currentStep = $details["currentStep"];
+        $diseaseColor = $details["diseaseColor"];
+        $cityKey = $details["cityKey"];
 
         // Medic special ability is to remove all cubes of the same color when performing treat disease.
-		$playerIsMedic = getRoleName($mysqli, $role) == "Medic";
+		$playerIsMedic = getRoleName($pdo, $role) === "Medic";
         // Likewise, if the disease color is cured,
         // treat disease removes all cubes of the specified color from the city regardless of the player's role.
-        $diseaseStatus = getDiseaseStatus($mysqli, $game, $diseaseColor);
+        $diseaseStatus = getDiseaseStatus($pdo, $game, $diseaseColor);
         // Note that the "eradicated" disease status is irrelevant here
         // because there can be no cubes of an eradicated disease on the board by definition.
         $removeAllCubes = ($playerIsMedic || $diseaseStatus == "cured");
 
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
         
-        $response["events"][] = removeCubesFromCity($mysqli, $game, $role, $cityKey, $diseaseColor, $removeAllCubes, "td");
+        $response["events"][] = removeCubesFromCity($pdo, $game, $role, $cityKey, $diseaseColor, $removeAllCubes, "td");
 
         // Removing the last cube of a cured disease causes the disease to become eradicated.
-        if ($diseaseStatus == "cured" && numDiseaseCubesOnBoard($mysqli, $game, $diseaseColor) == 0)
-            $response["events"][] = setDiseaseStatus($mysqli, $game, $diseaseColor, "eradicated");
+        if ($diseaseStatus == "cured" && numDiseaseCubesOnBoard($pdo, $game, $diseaseColor) == 0)
+            $response["events"][] = setDiseaseStatus($pdo, $game, $diseaseColor, "eradicated");
 
-        $response["nextStep"] = nextStep($mysqli, $game, $currentStep, $role);
+        $response["nextStep"] = nextStep($pdo, $game, $currentStep, $role);
     }
     catch(Exception $e)
     {
-        $response["failure"] = $e->getMessage();
+        $response["failure"] = "Treat Disease failed: " . $e->getMessage();
     }
     finally
     {
         if (isset($response["failure"]))
-            $mysqli->rollback();
+            $pdo->rollback();
         else
-            $mysqli->commit();
+            $pdo->commit();
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>

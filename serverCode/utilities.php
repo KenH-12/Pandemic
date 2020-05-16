@@ -161,7 +161,7 @@ function removeCubesFromCity($pdo, $game, $role, $cityKey, $cubeColor, $removeAl
                         AND locationKey = ?");
     $stmt->execute([$game, $cityKey]);
 
-    if ($mysqli->rowCount() !== 1)
+    if ($stmt->rowCount() !== 1)
         throwException($pdo, "Failed to remove $cubeColor cube(s) from $cityKey");
 
     if ($eventType === "td")
