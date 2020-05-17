@@ -1371,13 +1371,9 @@ const actionInterfacePopulator = {
 	},
 	[eventTypes.pass.name]()
 	{
-		const $btnConfirm = $("<div id='btnConfirmPass' class='button'>CONFIRM</div>");
+		const $btnConfirm = $("<div class='button btnConfirm'>CONFIRM</div>");
 
-		$btnConfirm.click(function()
-		{
-			resetActionPrompt();
-			passActions();
-		});
+		$btnConfirm.click(passActions);
 		oscillateButtonBackgroundColor($btnConfirm);
 
 		actionInterfacePopulator.$actionInterface.append($btnConfirm);
@@ -2429,7 +2425,10 @@ async function passActions()
 	
 	const { pass } = eventTypes;
 
+	showLoadingGif($("#actionInterface").find(".btnConfirm").off("click").html("PASSING..."));
 	await requestAction(pass);
+	resetActionPrompt();
+
 	appendEventHistoryIconOfType(pass);
 	proceed();
 }
