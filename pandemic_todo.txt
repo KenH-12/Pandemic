@@ -5,8 +5,19 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
 
+disabled pawns receive the "grab" cursor when another pawn is enabled
+
+the cancel button is still clickable when awaiting discover a cure request
+
 TO DO
 -----
+test...
+	outbreaks caused by infect city
+	game end conditions
+	the infect cities loading gif when auto-infecting single/multiple
+
+after loading for x ms, show some error message
+
 account creation
 	button to check username availability
 	show password strength with each keypress
@@ -38,6 +49,7 @@ event history
 	outbreak spread paths?
 
 handle errors
+	if the game is not set, redirect to either home or login
 	retrieveEventHistory
 
 add tests
@@ -101,6 +113,8 @@ split data.currentStep into an object containing 'next' and 'current' keys
 
 SMALL FIXES
 -----------
+if auto-infecting cities, fetch all infections in one request
+
 use Promise.resolve() instead of Return new Promise...
 
 indicate loading when waiting for a response from the server
@@ -142,8 +156,6 @@ show outbreak symbol on outbreaking city
 One Quiet Night should notify success in a more visible way
 
 Resilient Population animation looks a little funny when very few cards (3ish or fewer) are in the discard pile
-
-make DiscardPrompt a singleton
 
 reduce the number of arguments in php function definitions (pass objects instead?)
 

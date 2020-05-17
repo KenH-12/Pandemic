@@ -1262,7 +1262,8 @@ span.r, p.r {color: #ef282a; background: none !important }
 .playerCard * { pointer-events: none }
 .playerPanel > .playerCard:first-of-type { margin-top: 4px }
 .playerPanel .playerCard.eventCard:not(.unavailable) { cursor: pointer }
-#cardDrawContainer .button
+#cardDrawContainer .button,
+#infectCitiesContainer .button
 {
 	margin-bottom: 5px;
 }
