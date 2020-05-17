@@ -2,102 +2,112 @@
 	try
 	{
 		session_start();
-		require "../connect.php";
-		include "../utilities.php";
 		
 		if (!isset($_SESSION["game"]))
 			throw new Exception("game not found.");
+		
+		require "../connect.php";
+		require "../utilities.php";
 
-		if (!isset($_POST["role"]))
+		$details = json_decode(file_get_contents("php://input"), true);
+
+		if (!isset($details["role"]))
 			throw new Exception("required values not set.");
 				
 		$game = $_SESSION["game"];
-		$role = $_POST["role"];
+		$role = $details["role"];
 		
 		$CURRENT_STEP = "infect cities";
 		$NEXT_STEP = "action 1";
 		$EVENT_CODE = "ic";
 		$CUBES_TO_ADD = 1;
 		
-		$turnNum = getTurnNumber($mysqli, $game);
+		$turnNum = getTurnNumber($pdo, $game);
 
 		// One Quiet Night event card: "Skip the next Infect Cities step (do not flip over any Infection cards)."
 		// If the event card was played this turn and Infect Cities is attempted, something went wrong.
-		if (oneQuietNightScheduledThisTurn($mysqli, $game))
+		if (oneQuietNightScheduledThisTurn($pdo, $game))
 			throw new Exception("Infect Cities step not skipped for One Quiet Night.");
 
 		// Get the infection rate (the number of cities to infect),
 		// and confirm the current step.
-		$infRate = $mysqli->query("SELECT infRate
-									FROM vw_gamestate
-									WHERE game = $game
-									AND stepName = '$CURRENT_STEP'")->fetch_assoc()["infRate"];
+		$stmt = $pdo->prepare("SELECT infRate
+								FROM vw_gamestate
+								WHERE game = ?
+								AND stepName = ?");
+		$stmt->execute([$game, $CURRENT_STEP]);
 		
-		if (!$infRate)
+		if ($stmt->rowCount() === 0)
 			throw new Exception("Failed to infect city: wrong step.");
+
+		$infRate = $stmt->fetch()["infRate"];
 		
-		$numInfected = $mysqli->query("SELECT COUNT(*) AS 'numInfected'
-										FROM vw_event
-										WHERE game = $game
-										AND turnNum = $turnNum
-										AND eventType = '$EVENT_CODE'")->fetch_assoc()["numInfected"];
+		$stmt = $pdo->prepare("SELECT COUNT(*) AS 'numInfected'
+								FROM vw_event
+								WHERE game = ?
+								AND turnNum = ?
+								AND eventType = ?");
+		$stmt->execute([$game, $turnNum, $EVENT_CODE]);
+		$numInfected = $stmt->fetch()["numInfected"];
 		
 		if ($numInfected == $infRate)
 			throw new Exception("Infection step already finished.");
 			
-		$mysqli->autocommit(FALSE);
+		$pdo->beginTransaction();
 		
-		// Get the top card from the infection deck	
-		$card = $mysqli->query("SELECT cardKey, color
+		// Get the top card from the infection deck
+		$stmt = $pdo->prepare("SELECT cardKey, color
 								FROM vw_infectioncard
-								WHERE game = $game
+								WHERE game = ?
 								AND pile = 'deck'
-								AND cardIndex =	(SELECT MAX(cardIndex)
-												FROM vw_infectioncard
-												WHERE game = $game
-												AND pile = 'deck')")->fetch_assoc();
+								ORDER BY cardIndex DESC
+								LIMIT 1");
+		$stmt->execute([$game]);
+
+		if ($stmt->rowCount() === 0)
+			throw new Exception("Failed to draw infection card.");
+
+		$card = $stmt->fetch();
 		
 		$key = $card["cardKey"];
 		$diseaseColor = $card["color"];
-		
-		if (is_null($key))
-			throw new Exception("Failed to draw infection card.");
 
-		discardInfectionCards($mysqli, $game, $key);
+		discardInfectionCards($pdo, $game, $key);
 
-		$infectionPrevention = checkInfectionPrevention($mysqli, $game, $key, $diseaseColor);
+		$infectionPrevention = checkInfectionPrevention($pdo, $game, $key, $diseaseColor);
 		
 		$eventDetails = "$key,$infectionPrevention";
-		$response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails);
+		$response["events"][] = recordEvent($pdo, $game, $EVENT_CODE, $eventDetails);
 
 		if ($infectionPrevention == "0")
 		{
-			$infectionResult = addCubesToCity($mysqli, $game, $key, $diseaseColor, $CUBES_TO_ADD);
+			$infectionResult = addCubesToCity($pdo, $game, $key, $diseaseColor, $CUBES_TO_ADD);
 
 			if (isset($infectionResult["outbreakEvents"]))
 				$response["events"] = array_merge($response["events"], $infectionResult["outbreakEvents"]);
 			
 			// Adding disease cubes to the board can cause the game to end in defeat.
-			if (getGameEndCause($mysqli, $game) === "cubes")
+			if (getGameEndCause($pdo, $game) === "cubes")
 				$response["gameEndCause"] = "cubes";
 		}
 		
 		if (!isset($response["gameEndCause"]) && ++$numInfected == $infRate)
-			$response["nextStep"] = updateStep($mysqli, $game, $CURRENT_STEP, $NEXT_STEP, $role);
+			$response["nextStep"] = updateStep($pdo, $game, $CURRENT_STEP, $NEXT_STEP, $role);
 	}
 	catch(Exception $e)
 	{
-		$response["failure"] = $e->getMessage();
+		$response["failure"] = "Failed to infect city: " . $e->getMessage();
 	}
 	finally
-	{
-		if (isset($response["failure"]))
-			$mysqli->rollback();
-		else
-			$mysqli->commit();
-		
-		$mysqli->close();
-
-		echo json_encode($response);
-	}
+    {
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
+        
+        echo json_encode($response);
+    }
 ?>

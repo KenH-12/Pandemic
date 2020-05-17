@@ -108,10 +108,10 @@ function getCubeCount($pdo, $game, $cityKey, $diseaseColor)
     return $cubeCount;
 }
 
-function addCubesToCity($mysqli, $game, $cityKey, $diseaseColor, $cubesToAdd)
+function addCubesToCity($pdo, $game, $cityKey, $diseaseColor, $cubesToAdd)
 {
     $MAX_CUBE_COUNT = 3;
-    $cubeCount = getCubeCount($mysqli, $game, $cityKey, $diseaseColor);
+    $cubeCount = getCubeCount($pdo, $game, $cityKey, $diseaseColor);
     $cubeColumn = getCubeColumnName($diseaseColor);
     $result["prevCubeCount"] = $cubeCount;
     
@@ -120,20 +120,21 @@ function addCubesToCity($mysqli, $game, $cityKey, $diseaseColor, $cubesToAdd)
     else
     {
         $newCubeCount = $MAX_CUBE_COUNT;
-        $result["outbreakEvents"] = outbreak($mysqli, $game, $cityKey, $diseaseColor);
+        $result["outbreakEvents"] = outbreak($pdo, $game, $cityKey, $diseaseColor);
     }
 
     if ($newCubeCount != $cubeCount)
     {
-        $mysqli->query("UPDATE vw_location
-                        SET $cubeColumn = $newCubeCount
-                        WHERE game = $game
-                        AND locationKey = '$cityKey'");
+        $stmt = $pdo->prepare("UPDATE vw_location
+                                SET $cubeColumn = $newCubeCount
+                                WHERE game = ?
+                                AND locationKey = ?");
+        $stmt->execute([$game, $cityKey]);
         
-        if ($mysqli->affected_rows != 1)
-            throwException($pdo, "Failed to add $cubesToAdd cubes ($diseaseColor) to $cityKey: $mysqli->error");
+        if ($stmt->rowCount() !== 1)
+            throwException($pdo, "Failed to add $cubesToAdd cubes ($diseaseColor) to $cityKey");
         
-        checkAndRecordDiseaseCubeDefeat($mysqli, $game, $diseaseColor);
+        checkAndRecordDiseaseCubeDefeat($pdo, $game, $diseaseColor);
     }
 
     return $result;
@@ -196,15 +197,17 @@ function recordEvent($pdo, $game, $type, $details, $role = NULL)
                 "role" => $role);
 }
 
-function outbreak($mysqli, $game, $originCityKey, $diseaseColor)
+function outbreak($pdo, $game, $originCityKey, $diseaseColor)
 {
     $events = array();
 
     $OUTBREAK_LIMIT = 8;
 
-    $outbreakCount = $mysqli->query("SELECT outbreakCount
-                                    FROM vw_gamestate
-                                    WHERE game = $game")->fetch_assoc()["outbreakCount"];
+    $stmt = $pdo->prepare("SELECT outbreakCount
+                            FROM vw_gamestate
+                            WHERE game = ?");
+    $stmt->execute([$game]);
+    $outbreakCount = $stmt->fetch()["outbreakCount"];
     
     $cubeColumn = getCubeColumnName($diseaseColor);
     $pendingOutbreakKeys = array($originCityKey);
@@ -228,28 +231,29 @@ function outbreak($mysqli, $game, $originCityKey, $diseaseColor)
         } 
         
         $outbreakCount++;
-        $events[] = recordEvent($mysqli, $game, "ob", "$outbreakCount,$outbreakKey,$diseaseColor,$triggeredByKey");
+        $events[] = recordEvent($pdo, $game, "ob", "$outbreakCount,$outbreakKey,$diseaseColor,$triggeredByKey");
 
         // If the outbreak limit is reached, the game is over and the players lose.
         if ($outbreakCount == $OUTBREAK_LIMIT)
         {
-            recordGameEndCause($mysqli, $game, "outbreak");
+            recordGameEndCause($pdo, $game, "outbreak");
             return $events;
         }
 
-        $mysqli->query("UPDATE vw_gamestate SET outbreakCount = $outbreakCount WHERE game = $game");
+        $stmt = $pdo->prepare("UPDATE vw_gamestate SET outbreakCount = $outbreakCount WHERE game = ?");
+        $stmt->execute([$game]);
         
-        if ($mysqli->affected_rows != 1)
+        if ($stmt->rowCount() !== 1)
             throwException($pdo, "Failed to update gamestate after outbreak.");
 
-        $connections = getConnectedCityKeyPairs($mysqli, $outbreakKey);
+        $connections = getConnectedCityKeyPairs($pdo, $outbreakKey);
 
-        if ($connections->num_rows == 0)
+        if (count($connections) === 0)
             throwException($pdo, "Failed to retrieve cities connected to $outbreakKey");
 
-        while ($con = mysqli_fetch_assoc($connections))					
+        foreach ($connections as $con)				
         {
-            $affectedKey = $con["cityKeyA"] == $outbreakKey ? $con["cityKeyB"] : $con["cityKeyA"];
+            $affectedKey = $con["cityKeyA"] === $outbreakKey ? $con["cityKeyB"] : $con["cityKeyA"];
 
             // Cities which have already been triggered to outbreak as a result of
             // resolving the current infection card will already contain 3 cubes of the relevant color,
@@ -257,27 +261,28 @@ function outbreak($mysqli, $game, $originCityKey, $diseaseColor)
             if (in_array($affectedKey, $currentOutbreakKeys))
                 continue;
         
-            $infectionPrevention = checkInfectionPrevention($mysqli, $game, $affectedKey, $diseaseColor);
+            $infectionPrevention = checkInfectionPrevention($pdo, $game, $affectedKey, $diseaseColor);
             if ($infectionPrevention != "0")
             {
                 // Infection prevented -- the city will not be affected.
-                $events[] = recordEvent($mysqli, $game, "oi", "$outbreakKey,$affectedKey,$diseaseColor,$infectionPrevention");
+                $events[] = recordEvent($pdo, $game, "oi", "$outbreakKey,$affectedKey,$diseaseColor,$infectionPrevention");
                 continue;
             }
 
-            $cubeCount = getCubeCount($mysqli, $game, $affectedKey, $diseaseColor);
+            $cubeCount = getCubeCount($pdo, $game, $affectedKey, $diseaseColor);
 
             if ($cubeCount < 3) // add one more cube to the city
             {
-                $mysqli->query("UPDATE vw_location
-                                SET $cubeColumn = ($cubeCount + 1)
-                                WHERE game = $game
-                                AND locationKey = '$affectedKey'");
+                $stmt = $pdo->prepare("UPDATE vw_location
+                                        SET $cubeColumn = ($cubeCount + 1)
+                                        WHERE game = ?
+                                        AND locationKey = '$affectedKey'");
+                $stmt->execute([$game]);
 
-                if ($mysqli->affected_rows != 1)
+                if ($stmt->rowCount() !== 1)
                     throwException($pdo, "Failed to add $cubeColumn to $affectedKey (outbreak infection triggered by $outbreakKey)");
                 
-                $events[] = recordEvent($mysqli, $game, "oi", "$outbreakKey,$affectedKey,$diseaseColor,$infectionPrevention");
+                $events[] = recordEvent($pdo, $game, "oi", "$outbreakKey,$affectedKey,$diseaseColor,$infectionPrevention");
             }
             else // the affected city will have an outbreak
             {
@@ -289,7 +294,7 @@ function outbreak($mysqli, $game, $originCityKey, $diseaseColor)
 
         // Let each individual outbreak resolve fully before checking this,
         // and return early if the players lose.
-        if (checkAndRecordDiseaseCubeDefeat($mysqli, $game, $diseaseColor))
+        if (checkAndRecordDiseaseCubeDefeat($pdo, $game, $diseaseColor))
             return $events;
     }
 
@@ -301,18 +306,18 @@ function nextTurn($pdo, $game, $currentTurnRoleID)
     $nextTurnNum = getTurnNumber($pdo, $game) + 1;
 
     $stmt = $pdo->prepare("SELECT nextID
-                        FROM vw_player
-                        WHERE game = ?
-                        AND rID = ?");
+                            FROM vw_player
+                            WHERE game = ?
+                            AND rID = ?");
     $stmt->execute([$game, $currentTurnRoleID]);
     $nextTurnRoleID = $stmt->fetch()["nextID"];
     
-    $stmt = $pdo->prepare("UPDATE vw_gamestate
-                        SET turn = $nextTurnRoleID,
-                            turnNum = $nextTurnNum
-                        WHERE game = ?
-                        AND turn = ?
-                        AND stepName = 'infect cities'"); // 'infect cities' is always the last step in a turn
+    $stmt = $pdo->prepare("UPDATE game
+                        SET turnRoleID = $nextTurnRoleID,
+                            turnNumber = $nextTurnNum
+                        WHERE gameID = ?
+                        AND turnRoleID = ?
+                        AND stepID = udf_getStepID('infect cities')"); // 'infect cities' is always the last step in a turn
     $stmt->execute([$game, $currentTurnRoleID]);
 
     if ($stmt->rowCount() !== 1)
@@ -396,12 +401,12 @@ function updateStep($pdo, $game, $currentStep, $nextStep, $currentTurnRoleID)
         return $nextStep;
 
     $nextStepID = callDbFunctionSafe($pdo, "udf_getStepID", $nextStep);
-    $stmt = $pdo->prepare("UPDATE vw_gamestate
-                        SET step = $nextStepID
-                        WHERE game = ?
-                        AND stepName = ?
-                        AND turn = ?");
-    $stmt->execute([$game, $currentStep, $currentTurnRoleID]);
+    $stmt = $pdo->prepare("UPDATE game
+                        SET stepID = $nextStepID
+                        WHERE gameID = ?
+                        AND stepID = ?
+                        AND turnRoleID = ?");
+    $stmt->execute([$game, callDbFunctionSafe($pdo, "udf_getStepID", $currentStep), $currentTurnRoleID]);
     
     if ($stmt->rowCount() !== 1)
         throwException($pdo, "Failed to update step from '$currentStep' to '$nextStep'");
@@ -613,40 +618,40 @@ function setDiseaseStatus($pdo, $game, $diseaseColor, $newStatus)
         return recordEvent($pdo, $game, "er", $diseaseColor);
 }
 
-function checkInfectionPrevention($mysqli, $game, $cityKey, $diseaseColor)
+function checkInfectionPrevention($pdo, $game, $cityKey, $diseaseColor)
 {
     // Possible return values
-    $prevention = array("eradicated" => "e",
+    $preventionCodes = array("eradicated" => "e",
                         "quarantined" => "q",
                         "medic" => "m",
                         "not prevented" => "0");
     
-    $diseaseStatus = getDiseaseStatus($mysqli, $game, $diseaseColor);
+    $diseaseStatus = getDiseaseStatus($pdo, $game, $diseaseColor);
 
     // There are 3 ways an infection can be prevented:
     // - The disease color is eradicated
     // - The Quarantine Specialist is in the city or in a connected city
     // - The disease is cured and the Medic is in the city
     if ($diseaseStatus == "eradicated")
-        return $prevention["eradicated"];
+        return $preventionCodes["eradicated"];
     
-    if (cityIsQuarantined($mysqli, $game, $cityKey))
-        return $prevention["quarantined"];
+    if (cityIsQuarantined($pdo, $game, $cityKey))
+        return $preventionCodes["quarantined"];
     
-    if ($diseaseStatus == "cured" && roleIsInCity($mysqli, $game, "Medic", $cityKey))
-        return $prevention["medic"];
+    if ($diseaseStatus == "cured" && roleIsInCity($pdo, $game, "Medic", $cityKey))
+        return $preventionCodes["medic"];
 
-    return $prevention["not prevented"];
+    return $preventionCodes["not prevented"];
 }
 
-function roleIsInCity($mysqli, $game, $role, $cityKey)
+function roleIsInCity($pdo, $game, $role, $cityKey)
 {
-    return (getLocationKey($mysqli, $game, $role) == $cityKey);
+    return (getLocationKey($pdo, $game, $role) === $cityKey);
 }
 
-function cityIsQuarantined($mysqli, $game, $cityKey)
+function cityIsQuarantined($pdo, $game, $cityKey)
 {
-    $qsLocationKey = getLocationKey($mysqli, $game, "Quarantine Specialist");
+    $qsLocationKey = getLocationKey($pdo, $game, "Quarantine Specialist");
 
     // No Quarantine Specialist in the game?
     if (!$qsLocationKey)
@@ -654,14 +659,14 @@ function cityIsQuarantined($mysqli, $game, $cityKey)
     
     // The Quarantine Specialist quarantines their current location
     // and all cities connected to their current location.
-    return $qsLocationKey === $cityKey || citiesAreConnected($mysqli, $qsLocationKey, $cityKey);
+    return $qsLocationKey === $cityKey || citiesAreConnected($pdo, $qsLocationKey, $cityKey);
 }
 
-function citiesAreConnected($mysqli, $cityKeyA, $cityKeyB)
+function citiesAreConnected($pdo, $cityKeyA, $cityKeyB)
 {
-    $cityConnections = getConnectedCityKeyPairs($mysqli, $cityKeyA);
+    $cityConnections = getConnectedCityKeyPairs($pdo, $cityKeyA);
     
-    while ($row = mysqli_fetch_assoc($cityConnections))
+    foreach ($cityConnections as $row)
     {
         if ($cityKeyA == $row["cityKeyA"])
             $connectedKey = $row["cityKeyB"];
@@ -675,11 +680,14 @@ function citiesAreConnected($mysqli, $cityKeyA, $cityKeyB)
     return false;
 }
 
-function getConnectedCityKeyPairs($mysqli, $cityKey)
+function getConnectedCityKeyPairs($pdo, $cityKey)
 {
-    return $mysqli->query("SELECT cityKeyA, cityKeyB
+    $stmt = $pdo->prepare("SELECT cityKeyA, cityKeyB
                             FROM cityConnection
-                            WHERE '$cityKey' IN (cityKeyA, cityKeyB)");
+                            WHERE ? IN (cityKeyA, cityKeyB)");
+    $stmt->execute([$cityKey]);
+
+    return $stmt->fetchAll();
 }
 
 function getAutoTreatDiseaseEvents($pdo, $game, $cityKey, $diseaseColor = false)
@@ -945,18 +953,20 @@ function getEpidemicIntensifyCardKeys($pdo, $eventID)
     return $cardKeys;
 }
 
-function oneQuietNightScheduledThisTurn($mysqli, $game)
+function oneQuietNightScheduledThisTurn($pdo, $game)
 {
-    $EVENT_CODE = "oq";
-    $turnNum = getTurnNumber($mysqli, $game);
-
-    $isOneQuietNight = $mysqli->query("SELECT COUNT(*) AS 'numEvents'
-                                        FROM vw_event
-                                        WHERE game = $game
-                                        AND turnNum = $turnNum
-                                        AND eventType = '$EVENT_CODE'")->fetch_assoc()["numEvents"];
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS 'numEvents'
+                            FROM vw_event
+                            WHERE game = :game
+                            AND turnNum = :turnNum
+                            AND eventType = :eventType");
+    $stmt->execute([
+        "game" => $game,
+        "turnNum" => getTurnNumber($pdo, $game),
+        "eventType" => "oq"
+    ]);
     
-    return $isOneQuietNight;
+    return $stmt->fetch()["numEvents"] > 0;
 }
 
 // The players lose if not enough disease cubes are left when needed.
@@ -964,13 +974,13 @@ function oneQuietNightScheduledThisTurn($mysqli, $game)
 // Meaning a cube supply can be 0, but the players lose if it ever becomes negative).
 // To make the cause of defeat more obvious for the user, the cube supply will become negative,
 // after which the user will immediately be notified of defeat.
-function checkAndRecordDiseaseCubeDefeat($mysqli, $game, $diseaseColor)
+function checkAndRecordDiseaseCubeDefeat($pdo, $game, $diseaseColor)
 {
     $MAX_CUBES_ON_BOARD = 24;
 
-    if (numDiseaseCubesOnBoard($mysqli, $game, $diseaseColor) > $MAX_CUBES_ON_BOARD)
+    if (numDiseaseCubesOnBoard($pdo, $game, $diseaseColor) > $MAX_CUBES_ON_BOARD)
     {
-        recordGameEndCause($mysqli, $game, "cubes");
+        recordGameEndCause($pdo, $game, "cubes");
         return true;
     }
 
