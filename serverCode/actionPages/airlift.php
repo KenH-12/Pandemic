@@ -67,6 +67,10 @@
         if ($proceedToNextStep)
             $response["proceedFromDiscardToStep"] = $proceedToNextStep;
     }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Airlift failed: PDOException: " . $e->getMessage();
+    }
     catch(Exception $e)
     {
         $response["failure"] = "Airlift failed: " . $e->getMessage();

@@ -94,6 +94,10 @@
 		if (!isset($response["gameEndCause"]) && ++$numInfected == $infRate)
 			$response["nextStep"] = updateStep($pdo, $game, $CURRENT_STEP, $NEXT_STEP, $role);
 	}
+	catch(PDOException $e)
+	{
+		$response["failure"] = "Failed to infect city: PDOException: " . $e->getMessage();
+	}
 	catch(Exception $e)
 	{
 		$response["failure"] = "Failed to infect city: " . $e->getMessage();

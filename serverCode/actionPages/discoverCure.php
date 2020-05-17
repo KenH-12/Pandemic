@@ -97,6 +97,10 @@
             $response["nextStep"] = nextStep($pdo, $game, $currentStep, $role);
         }
     }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Discover A Cure failed: PDOException: " . $e->getMessage();
+    }
     catch(Exception $e)
     {
         $response["failure"] = "Discover A Cure failed: " . $e->getMessage();

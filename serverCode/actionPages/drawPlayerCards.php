@@ -78,9 +78,13 @@
 			$response["numPlayerCardsRemaining"] = $cardsLeftInDeck;
 		}
 	}
+	catch(PDOException $e)
+    {
+        $response["failure"] = "Failed to Draw 2 Cards: PDOException: " . $e->getMessage();
+    }
 	catch(Exception $e)
 	{
-		$response["failure"] = "Failed to draw 2 cards: " . $e->getMessage();
+		$response["failure"] = "Failed to Draw 2 Cards: " . $e->getMessage();
 	}
 	finally
     {

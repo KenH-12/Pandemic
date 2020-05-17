@@ -49,6 +49,10 @@
         $eventDetails = implode(",", $cardKeys);
         $response["events"] = recordEvent($pdo, $game, "ds", $eventDetails, $discardingRole);
     }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Discard failed: PDOException: " . $e->getMessage();
+    }
     catch(Exception $e)
     {
         $response["failure"] = "Discard failed: " . $e->getMessage();

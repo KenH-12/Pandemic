@@ -89,6 +89,10 @@
         placeResearchStation($pdo, $game, $locationKey, $relocationKey);
         $response["events"] = recordEvent($pdo, $game, $actionCode, $actionDetails, $eventRole);
     }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Build Research Station failed: PDOException: " . $e->getMessage();
+    }
     catch(Exception $e)
     {
         $response["failure"] = "Build Research Station failed: " . $e->getMessage();

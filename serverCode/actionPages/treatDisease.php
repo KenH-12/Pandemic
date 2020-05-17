@@ -48,16 +48,23 @@
 
         $response["nextStep"] = nextStep($pdo, $game, $currentStep, $role);
     }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Treat Disease failed: PDOException: " . $e->getMessage();
+    }
     catch(Exception $e)
     {
         $response["failure"] = "Treat Disease failed: " . $e->getMessage();
     }
     finally
     {
-        if (isset($response["failure"]))
-            $pdo->rollback();
-        else
-            $pdo->commit();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
         
         echo json_encode($response);
     }
