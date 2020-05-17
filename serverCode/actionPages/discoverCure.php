@@ -103,10 +103,13 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $pdo->rollback();
-        else
-            $pdo->commit();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
         
         echo json_encode($response);
     }
