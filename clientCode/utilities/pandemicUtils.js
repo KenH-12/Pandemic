@@ -163,14 +163,47 @@ function activePlayerCanTakeFromResearcher()
 		researcher.cityKey === getActivePlayer().cityKey;
 }
 
-function showLoadingGif($afterElement)
+function showLoadingGif(eventType)
 {
-	return $(`<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>`)
-		.insertAfter($afterElement);
+	let $btn = $(".actionButton:visible");
+
+	if ($btn.length)
+	{
+		$btn = $btn.filter(`#btn${toPascalCase(eventType.name.replace("/",""))}`);
+		return {
+			resetActionButtonImg: showActionButtonLoadingGifAfterMs($btn),
+			$loadingGif: false
+		}
+	}
+	
+	const  $rightPanel = $("#rightPanel"),
+		$actionPrompt = $("#actionPrompt"),
+		buttonGetters = [
+			() => $rightPanel.find(".btnConfirm:visible"),
+			() => $rightPanel.find(".btnContinue:visible"),
+			() => $actionPrompt.find(".playerCard"),
+			() => $actionPrompt.find(".actionPromptOption"),
+			() => {
+				const $btn = $actionPrompt.find(".diseaseCube.selected");
+				if ($btn.length) return $btn.parent()
+			}
+		];
+	
+	for (let getButton of buttonGetters)
+	{
+		$btn = getButton();
+		if ($btn.length)
+		{
+			return {
+				$loadingGif: $(`<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>`).insertAfter($btn),
+				resetActionButtonImg: false
+			}
+		}
+	}
 }
 
 // Returns an anonymous function which resets the action button image to its original icon.
-function showActionButtonLoadingGifAfterMs($actionButton, ms = 2000)
+function showActionButtonLoadingGifAfterMs($actionButton, ms = 1000)
 {
 	const $img = $actionButton.children(".actionIcon").find("img"),
 		iconSrc = $img.attr("src"),
@@ -192,6 +225,11 @@ function showActionButtonLoadingGifAfterMs($actionButton, ms = 2000)
 	return resetImg;
 }
 
+function updateConfirmButtonText($btnConfirm, newText)
+{
+	$btnConfirm.off("click").addClass("btnDisabled").html(newText);
+}
+
 export {
 	getInfectionRate,
 	getColorClass,
@@ -204,5 +242,5 @@ export {
 	useRoleColorForRelatedActionButtons,
 	activePlayerCanTakeFromResearcher,
 	showLoadingGif,
-	showActionButtonLoadingGifAfterMs
+	updateConfirmButtonText
 }

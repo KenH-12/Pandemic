@@ -196,6 +196,7 @@ select
 
 .smallText { font-size: 12px }
 .largeText { font-size: 20px }
+.whiteText { color: #fff !important }
 .italics { font-style: italic }
 #container
 {
@@ -1325,8 +1326,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	padding-bottom: 3px;
 }
 .cardsToKeep .playerCard:last-of-type { margin-bottom: 0 !important }
-.btnConfirm { margin: 5px }
-.btnConfirmAction { margin: 10px 0 5px 0 }
+.btnConfirm { margin: 10px 0 5px 0 }
 .scientist:not(.pawnArrow),
 .pawnArrow.scientist > div
 {
@@ -1532,6 +1532,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	padding: 0 2%;
 	border-radius: 15%;
 }
+.actionIcon img[src='images/loading.gif'] { background-color: #0d2c5b }
 .actionName
 {
 	width: 65.5%;

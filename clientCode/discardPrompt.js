@@ -145,7 +145,9 @@ export default class DiscardPrompt
 		$btn.off("click")
 			.click(function()
 			{
-				$btn.add(self.getDiscardSelectionElements())
+				$btn.addClass("btnDisabled")
+					.html("CONFIRMING...")
+					.add(self.getDiscardSelectionElements())
 					.add(self.getKeeperCardElements())
 					.off("click");
 

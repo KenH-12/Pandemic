@@ -21,7 +21,7 @@ import {
 	getInfectionCardTextStyle,
 	useRoleColorForRelatedActionButtons,
 	showLoadingGif,
-	showActionButtonLoadingGifAfterMs
+	updateConfirmButtonText
 } from "./utilities/pandemicUtils.js";
 import { strings } from "./strings.js";
 import getDimension from "./dimensions.js";
@@ -1008,7 +1008,7 @@ const actionInterfacePopulator = {
 	{
 		const { $actionInterface } = actionInterfacePopulator,
 			$discardPrompt = $(`<div class='discardSelections'></div>`),
-			buttonClass = "btnConfirmAction",
+			buttonClass = "btnConfirm",
 			isEventCard = typeof cardKeys === "string" && isEventCardKey(cardKeys),
 			isContingencyCard = isEventCard && isContingencyCardKey(cardKeys);
 
@@ -1039,7 +1039,10 @@ const actionInterfacePopulator = {
 		if (typeof onConfirm === "function")
 			$btnConfirm.click(function()
 			{
-				$btnConfirm.off("click").addClass("btnDisabled");
+				$btnConfirm.off("click")
+					.addClass("btnDisabled")
+					.html("CONFIRMING...");
+				
 				onConfirm();
 			});
 
@@ -1058,6 +1061,7 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.appendOptionButtons("city", destinationKeys,
 			function($clicked)
 			{
+				actionInterfacePopulator.replaceInstructions("Destination:");
 				movementAction(eventTypes.driveFerry, getCity($clicked.data("key")));
 			});
 		return true;
@@ -1070,6 +1074,7 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.appendOptionButtons("city", destinationKeys,
 			function($clicked)
 			{
+				actionInterfacePopulator.replaceInstructions("Destination:");
 				movementAction(shuttleFlight, getCity($clicked.data("key")));
 			});
 		return true;
@@ -1152,7 +1157,7 @@ const actionInterfacePopulator = {
 				{
 					cardKeys: destination.key,
 					buttonText: "CONFIRM",
-					onConfirm: function() { movementAction(directFlight, destination) }
+					onConfirm: () => movementAction(directFlight, destination)
 				});
 			return true;
 		}
@@ -1180,7 +1185,8 @@ const actionInterfacePopulator = {
 		
 		const player = getActivePlayer(),
 			playerIsOperationsExpert = player.role === "Operations Expert",
-			currentCity = player.getLocation();
+			currentCity = player.getLocation(),
+			onConfirm = () => buildResearchStation(stationRelocationKey)
 		
 		let newSubtitle;
 		if (stationRelocationKey)
@@ -1194,7 +1200,7 @@ const actionInterfacePopulator = {
 			locatePawnOnRoleTagClick($actionInterface);
 			
 			const $btnConfirm = $("<div class='button'>CONFIRM</div>");
-			$btnConfirm.click(function() { buildResearchStation(stationRelocationKey) });
+			$btnConfirm.click(onConfirm);
 			$actionInterface.append($btnConfirm);
 		}
 		else
@@ -1205,7 +1211,7 @@ const actionInterfacePopulator = {
 			{
 				cardKeys: currentCity.key,
 				buttonText: "CONFIRM",
-				onConfirm: function() { buildResearchStation(stationRelocationKey) }
+				onConfirm
 			});
 		}
 
@@ -1236,7 +1242,16 @@ const actionInterfacePopulator = {
 					markTreatableDiseaseCubes($cubesOfColor.last());
 				},
 				function() { unmarkTreatableDiseaseCubes($cubes) })
-				.click(function(){ treatDisease(false, getColorClass($(this))) });
+				.click(function()
+				{
+					const $this = $(this);
+
+					$this.off("click").addClass("selected disabled")
+						.siblings(".diseaseCube").fadeTo(200, 0.001);
+					
+					actionInterfacePopulator.replaceInstructions(`Treating disease...`);
+					treatDisease(false, getColorClass($this));
+				});
 
 			delayExecution(resizeTreatDiseaseOptions, 1);
 			return true;
@@ -1373,7 +1388,11 @@ const actionInterfacePopulator = {
 	{
 		const $btnConfirm = $("<div class='button btnConfirm'>CONFIRM</div>");
 
-		$btnConfirm.click(passActions);
+		$btnConfirm.click(function()
+			{
+				updateConfirmButtonText($btnConfirm, "PASSING...");
+				passActions();
+			});
 		oscillateButtonBackgroundColor($btnConfirm);
 
 		actionInterfacePopulator.$actionInterface.append($btnConfirm);
@@ -1490,12 +1509,7 @@ const actionInterfacePopulator = {
 			actionInterfacePopulator.appendDiscardPrompt(
 			{
 				cardKeys: eventTypes.airlift.cardKey,
-				onConfirm: function()
-				{
-					resetActionPrompt();
-					gameData.promptingEventType = false;
-					airlift(playerToAirlift, destination);
-				}
+				onConfirm: () => airlift(playerToAirlift, destination)
 			});
 
 			bindRoleCardHoverEvents();
@@ -2086,6 +2100,9 @@ async function airlift(playerToAirlift, destination)
 			destinationKey: destination.key
 		});
 	
+	resetActionPrompt();
+	gameData.promptingEventType = false;
+
 	await discardOrRemoveEventCard(events.shift());
 
 	setDuration("pawnAnimation", 1000);
@@ -2373,7 +2390,8 @@ async function requestAction(eventType, dataToPost)
 		indicateActionsLeft({ zeroRemaining: true });
 	
 	console.log(`requestAction(${eventType.code})`);
-	const response = await postData(`serverCode/actionPages/${eventType.actionPathName}.php`, {
+	const { $loadingGif, resetActionButtonImg } = showLoadingGif(eventType),
+		response = await postData(`serverCode/actionPages/${eventType.actionPathName}.php`, {
 			...{
 				actionCode: eventType.code,
 				currentStep: gameData.currentStep.name,
@@ -2381,6 +2399,11 @@ async function requestAction(eventType, dataToPost)
 			},
 			...dataToPost
 		});
+	
+	if (typeof resetActionButtonImg === "function")
+		resetActionButtonImg();
+	else if ($loadingGif.length)
+		$loadingGif.remove();
 	
 	console.log(response);
 	const {
@@ -2425,7 +2448,6 @@ async function passActions()
 	
 	const { pass } = eventTypes;
 
-	showLoadingGif($("#actionInterface").find(".btnConfirm").off("click").html("PASSING..."));
 	await requestAction(pass);
 	resetActionPrompt();
 
@@ -2536,8 +2558,7 @@ async function buildResearchStation(relocationKey)
 	const player = getActivePlayer(),
 		playerIsOperationsExpert = player.role === "Operations Expert",
 		city = player.getLocation(),
-		eventType = eventTypes.buildResearchStation,
-		$loadingGif = showLoadingGif($(".btnConfirmAction").html("CONFIRMING..."));
+		eventType = eventTypes.buildResearchStation;
 	
 	await requestAction(eventType,
 		{
@@ -2545,7 +2566,6 @@ async function buildResearchStation(relocationKey)
 			relocationKey: relocationKey || 0
 		});
 	
-	$loadingGif.addClass("hidden");
 	// Operations Expert special ability:
 	// "As an action, build a research station in his current city without discarding a city card"
 	if (!playerIsOperationsExpert)
@@ -2624,8 +2644,6 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		return invalidMovement(originCity);
 	
 	// Move appears to be valid
-	
-	resetActionPrompt();
 	disableActions();
 
 	if (!movementTypeRequiresDiscard(eventType))
@@ -2649,8 +2667,10 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		// The only uninferable discard key of any movement action:
 		if (operationsFlightDiscardKey)
 			dataToPost.discardKey = operationsFlightDiscardKey;
-
+		
 		const events = await requestAction(eventType, dataToPost);
+		resetActionPrompt();
+
 		await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
 		setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
@@ -2746,43 +2766,19 @@ async function treatDisease($cube, diseaseColor)
 	diseaseColor = diseaseColor || getColorClass($cube);
 
 	const city = getActivePlayer().getLocation(),
-		eventType = eventTypes.treatDisease,
-		usingActionPrompt = !$("#actionPrompt").hasClass("hidden");
-	
-	let resetActionButtonImg;
-	if (usingActionPrompt)
-	{
-		const { $actionInterface } = actionInterfacePopulator;
-
-		delayExecution(function()
-			{
-				if (!$("#actionPrompt").hasClass("hidden"))
-				{
-					$actionInterface.find(".instructions").html(`Treating disease in ${city.name}...`)
-						.siblings(".diseaseCube").off("click").addClass("disabled").not(`.${diseaseColor}`).fadeTo(200, .001);
-					
-					showLoadingGif($actionInterface);
-				}
-			}, 1000);
-	}
-	else
-		resetActionButtonImg = showActionButtonLoadingGifAfterMs($("#btnTreatDisease"));
+		eventType = eventTypes.treatDisease;
 	
 	const events = await requestAction(eventType, { cityKey: city.key, diseaseColor });
-	
-	if (typeof resetActionButtonImg === "function")
-		resetActionButtonImg();
-	
 	resetActionPrompt();
 		
 	let numToRemove,
-		eradicated = false;
+		eradicationOccured = false;
 	for (let event of events)
 	{
 		if (event instanceof TreatDisease)
 			numToRemove = event.prevCubeCount - event.newCubeCount;
 		else if (event instanceof Eradication)
-			eradicated = true;
+			eradicationOccured = true;
 	}
 	
 	await removeCubesFromBoard(city,
@@ -2794,7 +2790,7 @@ async function treatDisease($cube, diseaseColor)
 	
 	appendEventHistoryIconOfType(eventType);
 
-	if (eradicated)
+	if (eradicationOccured)
 		await eradicationEvent(diseaseColor);
 	
 	proceed();
@@ -2921,7 +2917,7 @@ function getDestination(eventType, { player, dispatching } = {})
 async function drawStep()
 {
 	const $container = $("#cardDrawContainer"),
-		$btn = $container.find(".button").html("DRAW 2 CARDS");
+		$btn = $container.find(".button").removeClass("btnDisabled").html("DRAW 2 CARDS");
 	
 	getActivePlayer().disablePawn();
 	$container.find(".playerCard").remove();
@@ -2943,11 +2939,9 @@ async function drawStep()
 	disableEventCards();
 	eventHistory.disableUndo();
 
-	const $loadigGif = showLoadingGif($btn.off("click").addClass("btnDisabled").html("DRAWING...")),
-		events = await requestAction(eventTypes.cardDraw);
-	
+	updateConfirmButtonText($btn, "DRAWING...");
+	const events = await requestAction(eventTypes.cardDraw);
 	$btn.addClass("hidden");
-	$loadigGif.remove();
 
 	const cardKeys = await animateDrawStep(events[0]);
 	if (!cardKeys) return false;
@@ -5233,10 +5227,7 @@ function getPlayerWithTooManyCards()
 async function confirmDiscards(discardKeys)
 {
 	const player = getPlayerWithTooManyCards(),
-		eventType = eventTypes.discard,
-		$btnConfirm = $(".discardPrompt").find(".btnConfirm").off("click").addClass("btnDisabled");
-	
-	showLoadingGif($btnConfirm.html("DISCARDING..."));
+		eventType = eventTypes.discard;
 	
 	await requestAction(eventType,
 		{
@@ -5418,7 +5409,7 @@ async function infectionStep()
 				$btn.html(`INFECT ${infectionRate - infectionCount} CITIES`);
 			
 			enableEventCards();
-			oscillateButtonBackgroundColor($btn.removeClass("hidden"));
+			oscillateButtonBackgroundColor($btn.removeClass("hidden btnDisabled"));
 			await buttonClickPromise($btn);
 			$btn.addClass("btnDisabled");
 		}
@@ -5429,10 +5420,9 @@ async function infectionStep()
 		disableEventCards();
 		eventHistory.disableUndo();
 
-		$loadingGif = showLoadingGif($btn.html("INFECTING..."));
+		updateConfirmButtonText($btn, "INFECTING...");
 		events = await requestAction(infectCity);
-		$btn.addClass("hidden").removeClass("btnDisabled");
-		$loadingGif.remove();
+		$btn.addClass("hidden");
 		
 		card = events.shift();
 		card.infectionIndex = infectionCount;
@@ -6116,11 +6106,18 @@ function placeDiseaseCube(city, diseaseColor, cubeSupplyOffset)
 
 function newCityButton(city)
 {
-	const $btn = $(`<div class='button actionPromptOption' data-key='${city.key}'>${city.name}</div>`);
+	const optionClass = "actionPromptOption",
+		$btn = $(`<div class='button ${optionClass}' data-key='${city.key}'>${city.name}</div>`);
 	
 	$btn.hover(function() { showTravelPathArrow({ destination: city }) },
-	function() { hideTravelPathArrow() })
-	.click(function() { $(this).off("mousenter mouseleave") }); // Prevents the travel path arrow from being hidden.
+			function() { hideTravelPathArrow() })
+		.click(function()
+		{
+			$(`.${optionClass}`).not(`[data-key='${city.key}']`).remove();
+			
+			$(this).off("mousenter mouseleave") // Prevents the travel path arrow from being hidden.
+				.addClass("whiteText");
+		}); 
 
 	return $btn;
 }
@@ -6164,7 +6161,6 @@ function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAut
 async function discoverACure(cardKeys)
 {
 	disableActions();
-	showLoadingGif($(".btnConfirm").html("DISCOVERING CURE..."));
 
 	const player = getActivePlayer();
 	await player.panel.expandIfCollapsed();
