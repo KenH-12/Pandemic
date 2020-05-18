@@ -40,12 +40,15 @@ function getCurrentStepName($mysqli, $game)
     return $stepName;
 }
 
-function getActiveRole($mysqli, $game)
+function getActiveRole($pdo, $game)
 {
-    $roleID = $mysqli->query("SELECT turn AS 'roleID' FROM vw_gamestate WHERE game = $game")
-                    ->fetch_assoc()["roleID"];
+    $stmt = $pdo->prepare("SELECT turn AS 'roleID' FROM vw_gamestate WHERE game = ?");
+    $stmt->execute([$game]);
 
-    return $roleID;
+    if ($stmt->rowCount() !== 1)
+        throwException($pdo, "Failed to retrieve active role");
+
+    return $stmt->fetch()["roleID"];
 }
 
 function getActionEventTypes()
@@ -343,11 +346,11 @@ function nextStep($pdo, $game, $currentStep, $currentTurnRoleID)
     else
         $nextStep = "action 1";
     
-    $stmt = $pdo->prepare("UPDATE vw_gamestate
-                            SET step = udf_getStepID(:nextStep)
-                            WHERE game = :game
-                            AND turn = :turn
-                            AND stepName = :currentStep");
+    $stmt = $pdo->prepare("UPDATE game
+                            SET stepID = udf_getStepID(:nextStep)
+                            WHERE gameID = :game
+                            AND turnRoleID = :turn
+                            AND stepID = udf_getStepID(:currentStep)");
     $stmt->execute([
         "nextStep" => $nextStep,
         "game" => $game,
@@ -414,9 +417,11 @@ function updateStep($pdo, $game, $currentStep, $nextStep, $currentTurnRoleID)
     return $nextStep;
 }
 
-function getPlayerCardType($mysqli, $cardKey)
+function getPlayerCardType($pdo, $cardKey)
 {
-    $color = $mysqli->query("SELECT diseaseColor FROM city WHERE cityKey = '$cardKey'")->fetch_assoc()["diseaseColor"];
+    $stmt = $pdo->prepare("SELECT diseaseColor FROM city WHERE cityKey = ?");
+    $stmt->execute([$cardKey]);
+    $color = $stmt->fetch()["diseaseColor"];
 
     if (!$color)
         return false;
@@ -740,47 +745,40 @@ function updateRoleLocation($pdo, $game, $role, $originKey, $destinationKey)
         throwException($pdo, "Failed to update pawn location from '$originKey' to '$destinationKey'");
 }
 
-function validateOperationsFlight($mysqli, $game, $role, $discardKey)
+function validateOperationsFlight($pdo, $game, $role, $discardKey)
 {
     // The specified discard must be a City card.
-    if (getPlayerCardType($mysqli, $discardKey) != "city")
+    if (getPlayerCardType($pdo, $discardKey) !== "city")
         throwException($pdo, "Invalid Operations Flight: the discard must be a City card.");
     
     // The player must be the Operations Expert.
-    if (getRoleName($mysqli, $role) != "Operations Expert")
+    if (getRoleName($pdo, $role) !== "Operations Expert")
         throwException($pdo, "Invalid Operations Flight: invalid role.");
 
     // The player cannot have already performed Operations Flight this turn.
-    $turnNum = getTurnNumber($mysqli, $game);
-    $eventType = "of";
-    $opFlightUnavailable
-        = $mysqli->query("SELECT COUNT(*) AS 'numOpFlightsThisTurn'
-                            FROM vw_event
-                            WHERE game = $game
-                            AND turnNum = $turnNum
-                            AND eventType = '$eventType'")
-                ->fetch_assoc()["numOpFlightsThisTurn"] > 0;
-    
-    if ($opFlightUnavailable)
+    $OPERATIONS_FLIGHT_CODE = "of";
+    if (countEventsOfTurn($pdo, $game, $OPERATIONS_FLIGHT_CODE) > 0)
         throwException($pdo, "Invalid Operations Flight: this action can be performed only once per turn.");
 }
 
 // Returns an array of roles whose pawns are currently at the specified destination.
 // Validates Rendezvous event requests by throwing an PDOException if 0 pawns are at the specified destination.
-function getRolesAtRendezvousDestination($mysqli, $game, $role, $destinationKey)
+function getRolesAtRendezvousDestination($pdo, $game, $role, $destinationKey)
 {
     // The Dispatcher can move any pawn to any city containing another pawn.
     $rolesAtDestination = array();
-    $result = $mysqli->query("SELECT rID
+    $stmt = $pdo->prepare("SELECT rID
                             FROM vw_player
-                            WHERE game = $game
-                            AND location = '$destinationKey'
-                            AND rID != $role");
+                            WHERE game = ?
+                            AND location = ?
+                            AND rID != ?");
+    $stmt->execute([$game, $destinationKey, $role]);
     
-    if ($result->num_rows == 0)
+    if ($stmt->rowCount() === 0)
         throwException($pdo, "Invalid Rendezvous: there must be at least one pawn at the specified destination.");
     
-    while ($row = mysqli_fetch_assoc($result))
+    $roles = $stmt->fetchAll();
+    foreach ($roles as $row)
         array_push($rolesAtDestination, $row["rID"]);
     
     return $rolesAtDestination;

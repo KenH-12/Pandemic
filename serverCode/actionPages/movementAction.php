@@ -2,43 +2,44 @@
 	try
 	{
 		session_start();
-		require "../connect.php";
-		include "../utilities.php";
 	
 		if (!isset($_SESSION["game"]))
 			throw new Exception("game not found");
 		
-		if (!isset($_POST["role"]))
+		require "../connect.php";
+		require "../utilities.php";
+
+		$details = json_decode(file_get_contents("php://input"), true);
+
+		if (!isset($details["role"]))
 			throw new Exception("game not found");
 		
-		if (!isset($_POST["currentStep"]))
+		if (!isset($details["currentStep"]))
 			throw new Exception("game not found");
 		
-		if (!isset($_POST["actionCode"]))
+		if (!isset($details["actionCode"]))
 			throw new Exception("game not found");
 		
-		if (!isset($_POST["originKey"]))
+		if (!isset($details["originKey"]))
 			throw new Exception("game not found");
 		
-		if (!isset($_POST["destinationKey"]))
+		if (!isset($details["destinationKey"]))
 			throw new Exception("game not found");
 		
 		$game = $_SESSION["game"];
-		$role = $_POST["role"];
-		$currentStep = $_POST["currentStep"];
-		$actionCode = $_POST["actionCode"];
-		$originKey = $_POST["originKey"];
-		$destinationKey = $_POST["destinationKey"];
-		
-		$mysqli->autocommit(FALSE);
+		$role = $details["role"];
+		$currentStep = $details["currentStep"];
+		$actionCode = $details["actionCode"];
+		$originKey = $details["originKey"];
+		$destinationKey = $details["destinationKey"];
 		
 		// The Dispatcher can move another player's pawn as if it were his own.
 		// In such cases, $activeRole will be the Dispatcher, and $role will be the dispatched role.
-		$activeRole = getActiveRole($mysqli, $game);
+		$activeRole = getActiveRole($pdo, $game);
 		$isDispatchEvent = false;
 		if ($role != $activeRole)
 		{
-			if (getRoleName($mysqli, $activeRole) === "Dispatcher")
+			if (getRoleName($pdo, $activeRole) === "Dispatcher")
 				$isDispatchEvent = true;
 			else
 				throw new Exception("Dispatch failed: invalid role");
@@ -46,19 +47,21 @@
 		
 		// Drive/Ferry allows the player to move to a city that's
 		// connected to their current city by a white line.
-		if ($actionCode === "dr" && !citiesAreConnected($mysqli, $originKey, $destinationKey))
+		if ($actionCode === "dr" && !citiesAreConnected($pdo, $originKey, $destinationKey))
 			throw new Exception("Invalid Drive/Ferry: the current city is not connected by a white line to the destination");
 		
 		// Shuttle Flights require there to be a research station at both the current location and the destination.
 		// Operations Flights require a research station at the current location.
 		if ($actionCode === "sf" || $actionCode === "of")
 		{
-			if (!cityHasResearchStation($mysqli, $game, $originKey))
+			if (!cityHasResearchStation($pdo, $game, $originKey))
 				throw new Exception("Invalid movement: the movement type requires the origin city to have a research station.");
 			
-			if ($actionCode === "sf" && !cityHasResearchStation($mysqli, $game, $destinationKey))
+			if ($actionCode === "sf" && !cityHasResearchStation($pdo, $game, $destinationKey))
 				throw new Exception("Invalid Shuttle Flight: the destination city must have a research station.");
 		}
+
+		$pdo->beginTransaction();
 		
 		// A few movement types require the player to discard a city card:
 		$typesRequiringDiscard = array("df", "cf", "of");
@@ -71,65 +74,67 @@
 			else if ($actionCode === "of") // Operations Flights have a number of requirements...
 			{
 				// The player must specify and discard any city card.
-				if (!isset($_POST["discardKey"]))
+				if (!isset($details["discardKey"]))
 					throw new Exception("Invalid Operations Flight: discard not specified.");
 				
-				$cardKey = $_POST["discardKey"];
-				validateOperationsFlight($mysqli, $game, $role, $cardKey);
+				$cardKey = $details["discardKey"];
+				validateOperationsFlight($pdo, $game, $role, $cardKey);
 			}
 			
 			// Whether a normal movement action or a dispatch event, the active role is the discarder.
-			discardPlayerCards($mysqli, $game, $activeRole, $cardKey);
+			discardPlayerCards($pdo, $game, $activeRole, $cardKey);
 		}
+
+		$eventDetails = "$originKey,$destinationKey";
 
 		// One of the Dispatcher's special abilities, informally referred to as "rendezvous" ("rv"),
 		// allows them to move any pawn to a city containing another pawn.
 		if ($actionCode === "rv")
 		{
-			$rolesAtDestination = getRolesAtRendezvousDestination($mysqli, $game, $role, $destinationKey);
+			$rolesAtDestination = getRolesAtRendezvousDestination($pdo, $game, $role, $destinationKey);
 			$isDispatchEvent = true;
-		}
 
-		updateRoleLocation($mysqli, $game, $role, $originKey, $destinationKey);
-		
-		$response["nextStep"] = nextStep($mysqli, $game, $currentStep, $activeRole);
-		
-		$eventDetails = "$originKey,$destinationKey";
-
-		if ($isDispatchEvent) // Dispatch event details include the dispatched $role and the $actionCode as the movement type.
-		{
 			$eventDetails = "$role,$eventDetails,$actionCode";
 
 			if ($actionCode === "rv")
 				$eventDetails .= "," . implode("", $rolesAtDestination);
 			
-			$actionCode = "dp";	
+			$actionCode = "dp";
 		}
 		else if ($actionCode === "of") // Operatons Flight's discard is uninferable
 			$eventDetails .= ",$cardKey";
 		
-		$response["events"][] = recordEvent($mysqli, $game, $actionCode, $eventDetails, $activeRole);
+		updateRoleLocation($pdo, $game, $role, $originKey, $destinationKey);
+		
+		$response["nextStep"] = nextStep($pdo, $game, $currentStep, $activeRole);
+		
+		$response["events"][] = recordEvent($pdo, $game, $actionCode, $eventDetails, $activeRole);
 
-		if (getRoleName($mysqli, $role) === "Medic")
+		if (getRoleName($pdo, $role) === "Medic")
 		{
-			$autoTreatEvents = getAutoTreatDiseaseEvents($mysqli, $game, $destinationKey);
+			$autoTreatEvents = getAutoTreatDiseaseEvents($pdo, $game, $destinationKey);
 
 			if ($autoTreatEvents)
 				$response["events"] = array_merge($response["events"], $autoTreatEvents);
 		}
 	}
+	catch(PDOException $e)
+	{
+		$response["failure"] = "Movement action failed: PDOException: " . $e->getMessage();
+	}
 	catch(Exception $e)
 	{
-		$response["failure"] = $e->getMessage();
+		$response["failure"] = "Movement action failed: " . $e->getMessage();
 	}
 	finally
 	{
-		if (isset($response["failure"]))
-			$mysqli->rollback();
-		else
-			$mysqli->commit();
-		
-		$mysqli->close();
+		if ($pdo->inTransaction())
+		{
+			if (isset($response["failure"]))
+				$pdo->rollback();
+			else
+				$pdo->commit();
+		}
 
 		echo json_encode($response);
 	}
