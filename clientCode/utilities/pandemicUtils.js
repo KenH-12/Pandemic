@@ -181,11 +181,19 @@ function showLoadingGif(eventType)
 		buttonGetters = [
 			() => $rightPanel.find(".btnConfirm:visible"),
 			() => $rightPanel.find(".btnContinue:visible"),
-			() => $actionPrompt.find(".playerCard"),
+			() => {
+				const $btn = $actionPrompt.find(".playerCard");
+				
+				if ($btn && eventType.code === eventTypes.shareKnowledge.code)
+					return $btn.parent();
+				
+				return $btn;
+			},
 			() => $actionPrompt.find(".actionPromptOption"),
 			() => {
 				const $btn = $actionPrompt.find(".diseaseCube.selected");
-				if ($btn.length) return $btn.parent()
+				if ($btn.length)
+					return $btn.parent()
 			}
 		];
 	

@@ -1346,8 +1346,12 @@ const actionInterfacePopulator = {
 			const $cardOptions = $(".shareableCards").children(".playerCard");
 			$cardOptions.click(function()
 			{
-				$cardOptions.off("click");
-				shareKnowledge(player, participant, $(this).data("key"));
+				const $this = $(this);
+				$this.off("click").siblings(".playerCard").remove();
+				$this.siblings("p").html("Confirming...")
+					.parent().siblings("shareableCards").remove();
+
+				shareKnowledge(player, participant, $this.data("key"));
 			});
 		}
 
@@ -2471,7 +2475,6 @@ function getValidShareKnowledgeParticipants(player)
 async function shareKnowledge(activePlayer, participant, cardKey)
 {
 	disableActions();
-	resetActionPrompt();
 	
 	const eventType = eventTypes.shareKnowledge;
 	let giver, receiver;
@@ -2493,6 +2496,7 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 			receiver: receiver.rID,
 			cardKey: cardKey
 		});
+	resetActionPrompt();
 
 	await Promise.all([
 		giver.panel.expandIfCollapsed(),
