@@ -913,18 +913,18 @@ function moveEventCardToPrevPile($mysqli, $game, $cardKey, $eventToUndo)
    return $prevPile === "contingency";
 }
 
-function countEpidemicsDrawnOnTurn($mysqli, $game, $turnNum)
+function countEpidemicsDrawnOnTurn($pdo, $game, $turnNum)
 {
     $CARD_DRAW_EVENT_CODE = "cd";
 
-    $cardDrawDetails = $mysqli->query("SELECT details
-                                        FROM vw_event
-                                        WHERE game = $game
-                                        AND turnNum = $turnNum
-                                        AND eventType = '$CARD_DRAW_EVENT_CODE'")->fetch_assoc()["details"];
-    
-    // The details of a card draw event are the two card keys separated by a comma.
-    $cardKeys = explode(",", $cardDrawDetails);
+    $stmt = $pdo->prepare("SELECT details
+                            FROM vw_event
+                            WHERE game = ?
+                            AND turnNum = ?
+                            AND eventType = '$CARD_DRAW_EVENT_CODE'");
+    $stmt->execute([$game, $turnNum]);
+    // The details of a card draw event are the two comma-separated card keys.
+    $cardKeys = explode(",", $stmt->fetch()["details"]);
 
     $numEpidemics = 0;
     for ($i = 0; $i < count($cardKeys); $i++)
