@@ -183,8 +183,8 @@ function showLoadingGif(eventType)
 			() => $rightPanel.find(".btnContinue:visible"),
 			() => {
 				const $btn = $actionPrompt.find(".playerCard");
-				
-				if ($btn && eventType.code === eventTypes.shareKnowledge.code)
+
+				if ($btn.length && eventType.code === eventTypes.shareKnowledge.code)
 					return $btn.parent();
 				
 				return $btn;
@@ -192,8 +192,11 @@ function showLoadingGif(eventType)
 			() => $actionPrompt.find(".actionPromptOption"),
 			() => {
 				const $btn = $actionPrompt.find(".diseaseCube.selected");
-				if ($btn.length)
-					return $btn.parent()
+				return $btn.length ? $btn.parent() : $btn;
+			},
+			() => {
+				if (eventType.code === eventTypes.infectCity.code)
+					return $("#infectCitiesContainer").children().last();
 			}
 		];
 	
