@@ -195,8 +195,17 @@ function showLoadingGif(eventType)
 				return $btn.length ? $btn.parent() : $btn;
 			},
 			() => {
-				if (eventType.code === eventTypes.infectCity.code)
+				const { infectCity, epidemicIncrease, epidemicInfect, epidemicIntensify } = eventTypes;
+				
+				if (eventType.code === infectCity.code)
 					return $("#infectCitiesContainer").children().last();
+				
+				const epidemicStepCodes = [epidemicIncrease.code, epidemicInfect.code, epidemicIntensify.code];
+
+				if (epidemicStepCodes.includes(eventType.code))
+					return $("#epidemicContainer").children().last();
+				
+				return "";
 			}
 		];
 	
