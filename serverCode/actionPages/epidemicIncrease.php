@@ -2,21 +2,24 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["role"]))
+        require "../connect.php";
+        require "../utilities.php";
+
+        $details = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($details["role"]))
             throw new Exception("Role not set.");
 
-        if (!isset($_POST["currentStep"]))
+        if (!isset($details["currentStep"]))
             throw new Exception("Current step not set.");
         
         $game = $_SESSION["game"];
-        $role = $_POST["role"];
-        $currentStep = $_POST["currentStep"];
+        $role = $details["role"];
+        $currentStep = $details["currentStep"];
 
         $NEXT_STEP = "epInfect";
 
@@ -24,37 +27,45 @@
         // "MOVE THE INFECTION RATE MARKER FORWARD 1 SPACE."
         $EVENT_CODE = "ec";
         
-        $mysqli->autocommit(FALSE);
-        
         // Update epidemicCount and infectionRate
-        $newEpidemicCount = $mysqli->query("SELECT epidemicCount
-                                            FROM vw_gamestate
-                                            WHERE game = $game")->fetch_assoc()["epidemicCount"] + 1;
+        $stmt = $pdo->prepare("SELECT epidemicCount
+                                FROM vw_gamestate
+                                WHERE game = ?");
+        $stmt->execute([$game]);
+        $newEpidemicCount = $stmt->fetch()["epidemicCount"] + 1;
         
-        $mysqli->query("UPDATE vw_gamestate
-                        SET epidemicCount = $newEpidemicCount,
-                            infRate = getInfectionRate($newEpidemicCount)
-                        WHERE game = $game");
+        $pdo->beginTransaction();
         
-        if ($mysqli->affected_rows != 1)
-            throw new Exception("Failed to update epidemic count / infection rate: " . $mysqli->error);
+        $stmt = $pdo->prepare("UPDATE game
+                                SET epidemicsDrawn = $newEpidemicCount,
+                                    infectionRate = udf_getInfectionRate($newEpidemicCount)
+                                WHERE gameID = ?");
+        $stmt->execute([$game]);
+        
+        if ($stmt->rowCount() !== 1)
+            throwException($pdo, "Failed to update epidemic count / infection rate");
 
-        $response["events"] = recordEvent($mysqli, $game, $EVENT_CODE, "$newEpidemicCount");
+        $response["events"] = recordEvent($pdo, $game, $EVENT_CODE, "$newEpidemicCount");
 
-        $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $NEXT_STEP, $role);
+        $response["nextStep"] = updateStep($pdo, $game, $currentStep, $NEXT_STEP, $role);
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Epidemic Increase failed: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
-        $response["failure"] = $e->getMessage();
+        $response["failure"] = "Epidemic Increase failed: " . $e->getMessage();
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
-        
-        $mysqli->close();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
 
         echo json_encode($response);
     }
