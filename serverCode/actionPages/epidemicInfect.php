@@ -2,21 +2,24 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
+        
+        require "../connect.php";
+        require "../utilities.php";
 
-        if (!isset($_POST["role"]))
+        $details = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($details["role"]))
             throw new Exception("Role not set.");
 
-        if (!isset($_POST["currentStep"]))
+        if (!isset($details["currentStep"]))
             throw new Exception("Current step not set.");
         
         $game = $_SESSION["game"];
-        $role = $_POST["role"];
-        $currentStep = $_POST["currentStep"];
+        $role = $details["role"];
+        $currentStep = $details["currentStep"];
         
         $NEXT_STEP = "epIntensify";
         
@@ -25,31 +28,30 @@
         $EVENT_CODE = "ef";
 
          // Get the bottom card from the infection deck.
-         $bottomCard = $mysqli->query("SELECT cardKey, color
-                                        FROM vw_infectionCard
-                                        WHERE game = $game
-                                        AND pile = 'deck'
-                                        AND cardIndex = (SELECT MIN(cardIndex)
-                                                        FROM vw_infectionCard
-                                                        WHERE game = $game
-                                                        AND pile = 'deck')")->fetch_assoc();
+         $stmt = $pdo->prepare("SELECT MIN(cardIndex), cardKey, color
+                                FROM vw_infectioncard
+                                WHERE game = ?
+                                AND pile = 'deck'
+                                AND cardIndex IS NOT NULL");
+        $stmt->execute([$game]);
+        $bottomCard = $stmt->fetch();
 
         $cardKey = $bottomCard["cardKey"];
         $color = $bottomCard["color"];
 
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
 
-        discardInfectionCards($mysqli, $game, $cardKey);
+        discardInfectionCards($pdo, $game, $cardKey);
 
         // Add 3 cubes to the corresponding city, unless the infection will be prevented somehow.
-        $cubeCountBeforeInfection = getCubeCount($mysqli, $game, $cardKey, getCubeColumnName($color));
-        $infectionPrevention = checkInfectionPrevention($mysqli, $game, $cardKey, $color);
+        $cubeCountBeforeInfection = getCubeCount($pdo, $game, $cardKey, $color);
+        $infectionPrevention = checkInfectionPrevention($pdo, $game, $cardKey, $color);
         $cubesToAdd = $infectionPrevention == "0" ? 3 : 0;
         
-        $details = "$cardKey,$cubeCountBeforeInfection,$infectionPrevention";
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $details);
+        $eventDetails = "$cardKey,$cubeCountBeforeInfection,$infectionPrevention";
+        $response["events"][] = recordEvent($pdo, $game, $EVENT_CODE, $eventDetails);
 
-        $infectionResult = addCubesToCity($mysqli, $game, $cardKey, $color, $cubesToAdd);
+        $infectionResult = addCubesToCity($pdo, $game, $cardKey, $color, $cubesToAdd);
         
         if ($cubesToAdd > 0)
         {
@@ -58,25 +60,30 @@
                 $response["events"] = array_merge($response["events"], $infectionResult["outbreakEvents"]);
 
             // Adding disease cubes to the board can cause the game to end in defeat.
-            if (getGameEndCause($mysqli, $game) === "cubes")
+            if (getGameEndCause($pdo, $game) === "cubes")
                 $response["gameEndCause"] = "cubes";
         }
 
         if (!isset($response["gameEndCause"]))
-            $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $NEXT_STEP, $role);
+            $response["nextStep"] = updateStep($pdo, $game, $currentStep, $NEXT_STEP, $role);
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Epidemic Infect failed: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
-        $response["failure"] = $e->getMessage();
+        $response["failure"] = "Epidemic Infect failed: " . $e->getMessage();
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
-        
-        $mysqli->close();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
 
         echo json_encode($response);
     }
