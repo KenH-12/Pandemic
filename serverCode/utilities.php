@@ -243,7 +243,7 @@ function outbreak($pdo, $game, $originCityKey, $diseaseColor)
             return $events;
         }
 
-        $stmt = $pdo->prepare("UPDATE vw_gamestate SET outbreakCount = $outbreakCount WHERE game = ?");
+        $stmt = $pdo->prepare("UPDATE game SET numOutbreaks = $outbreakCount WHERE gameID = ?");
         $stmt->execute([$game]);
         
         if ($stmt->rowCount() !== 1)
@@ -944,8 +944,8 @@ function getEpidemicIntensifyCardKeys($pdo, $eventID)
                         WHERE eventID = ?
                         ORDER BY cardIndex DESC");
     $stmt->execute([$eventID]);
-    
-    while ($row = $stmt->fetchAll())
+    $cardKeys = $stmt->fetchAll();
+    foreach ($cardKeys as $row)
         $cardKeys[] = $row["cityKey"];
     
     return $cardKeys;
