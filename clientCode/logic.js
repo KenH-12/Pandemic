@@ -1185,8 +1185,7 @@ const actionInterfacePopulator = {
 		
 		const player = getActivePlayer(),
 			playerIsOperationsExpert = player.role === "Operations Expert",
-			currentCity = player.getLocation(),
-			onConfirm = () => buildResearchStation(stationRelocationKey)
+			currentCity = player.getLocation();
 		
 		let newSubtitle;
 		if (stationRelocationKey)
@@ -1199,8 +1198,11 @@ const actionInterfacePopulator = {
 			actionInterfacePopulator.appendSpecialAbilityRule(eventTypes.buildResearchStation);
 			locatePawnOnRoleTagClick($actionInterface);
 			
-			const $btnConfirm = $("<div class='button'>CONFIRM</div>");
-			$btnConfirm.click(onConfirm);
+			const $btnConfirm = $("<div class='button btnConfirm'>CONFIRM</div>");
+			$btnConfirm.click(function() {
+				updateConfirmButtonText($btnConfirm, "CONFIRMING...");
+				buildResearchStation(stationRelocationKey);
+			});
 			$actionInterface.append($btnConfirm);
 		}
 		else
@@ -1211,7 +1213,7 @@ const actionInterfacePopulator = {
 			{
 				cardKeys: currentCity.key,
 				buttonText: "CONFIRM",
-				onConfirm
+				onConfirm: () => buildResearchStation(stationRelocationKey)
 			});
 		}
 
@@ -1349,7 +1351,7 @@ const actionInterfacePopulator = {
 				const $this = $(this);
 				$this.off("click").siblings(".playerCard").remove();
 				$this.siblings("p").html("Confirming...")
-					.parent().siblings("shareableCards").remove();
+					.parent().siblings(".shareableCards, .actionInterfaceDivision").remove();
 
 				shareKnowledge(player, participant, $this.data("key"));
 			});
@@ -1417,15 +1419,18 @@ const actionInterfacePopulator = {
 			gameData.promptingEventType = false;
 		
 		const player = getActivePlayer(),
-			useableCardKeys = player.cardKeys.filter(key => isCityKey(key));
+			useableCardKeys = player.cardKeys.filter(key => isCityKey(key)),
+			destinationString = `Destination: ${destination.name}`;
 		
-		actionInterfacePopulator.replaceInstructions(`Destination: ${destination.name}
-			<br />Select a card to discard:`);
+		actionInterfacePopulator.replaceInstructions(`${destinationString}<br />Select a card to discard:`);
 
-		actionInterfacePopulator.appendOptionButtons("playerCard", useableCardKeys, function($clicked)
-		{
-			movementAction(operationsFlight, destination, { operationsFlightDiscardKey: $clicked.data("key") });
-		});
+		actionInterfacePopulator.appendOptionButtons("playerCard", useableCardKeys,
+			function($clicked)
+			{
+				$clicked.off("click").siblings(".playerCard").remove();
+				actionInterfacePopulator.replaceInstructions(`${destinationString}<br />Confirming...`);
+				movementAction(operationsFlight, destination, { operationsFlightDiscardKey: $clicked.data("key") });
+			});
 
 		return true;
 	},
