@@ -165,34 +165,34 @@ function activePlayerCanTakeFromResearcher()
 
 function showLoadingGif(eventType)
 {
-	let $btn = $(".actionButton:visible");
+	let $anchor = $(".actionButton:visible");
 
-	if ($btn.length)
+	if ($anchor.length)
 	{
-		$btn = $btn.filter(`#btn${toPascalCase(eventType.name.replace("/",""))}`);
+		$anchor = $anchor.filter(`#btn${toPascalCase(eventType.name.replace("/",""))}`);
 		return {
-			resetActionButtonImg: showActionButtonLoadingGifAfterMs($btn),
+			resetActionButtonImg: showActionButtonLoadingGifAfterMs($anchor),
 			$loadingGif: false
 		}
 	}
 	
 	const  $rightPanel = $("#rightPanel"),
 		$actionPrompt = $("#actionPrompt"),
-		buttonGetters = [
+		anchorElementGetters = [
 			() => $rightPanel.find(".btnConfirm:visible"),
 			() => $rightPanel.find(".btnContinue:visible"),
 			() => {
-				const $btn = $actionPrompt.find(".playerCard");
+				const $anchor = $actionPrompt.find(".playerCard");
 
-				if ($btn.length && eventType.code === eventTypes.shareKnowledge.code)
-					return $btn.parent();
+				if ($anchor.length && eventType.code === eventTypes.shareKnowledge.code)
+					return $anchor.parent();
 				
-				return $btn;
+				return $anchor;
 			},
 			() => $actionPrompt.find(".actionPromptOption"),
 			() => {
-				const $btn = $actionPrompt.find(".diseaseCube.selected");
-				return $btn.length ? $btn.parent() : $btn;
+				const $anchor = $actionPrompt.find(".diseaseCube.selected");
+				return $anchor.length ? $anchor.parent() : $anchor;
 			},
 			() => {
 				const { infectCity, epidemicIncrease, epidemicInfect, epidemicIntensify } = eventTypes;
@@ -206,16 +206,17 @@ function showLoadingGif(eventType)
 					return $("#epidemicContainer").children().last();
 				
 				return "";
-			}
+			},
+			() => $("#stepIndicator") // default anchor
 		];
 	
-	for (let getButton of buttonGetters)
+	for (let getAnchorElement of anchorElementGetters)
 	{
-		$btn = getButton();
-		if ($btn.length)
+		$anchor = getAnchorElement();
+		if ($anchor.length)
 		{
 			return {
-				$loadingGif: $(`<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>`).insertAfter($btn),
+				$loadingGif: $(`<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>`).insertAfter($anchor),
 				resetActionButtonImg: false
 			}
 		}

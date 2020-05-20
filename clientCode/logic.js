@@ -1901,11 +1901,12 @@ async function animateForecastPlacement($cardContainer)
 
 async function oneQuietNight()
 {
-	resetActionPrompt();
 	disableActions();
 
 	const eventType = eventTypes.oneQuietNight,
 		events = await requestAction(eventType);
+	
+	resetActionPrompt();
 	
 	await discardOrRemoveEventCard(events.shift());
 
@@ -5362,11 +5363,8 @@ function isOneQuietNight()
 
 async function skipInfectionStepForOneQuietNight()
 {
-	await Promise.all(
-	[
-		requestAction(eventTypes.skipInfectionStep),
-		animateOneQuietNight()
-	]);
+	await requestAction(eventTypes.skipInfectionStep);
+	await animateOneQuietNight()
 
 	indicateOneQuietNightStep({ off: true });
 	nextTurn();
