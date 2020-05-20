@@ -6,28 +6,29 @@
         if (!isset($_SESSION["game"]))
             throw new Exception("game not found");
 
-        require "../connect.php";
-        require "../utilities.php";
+        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+        require "$rootDir/Pandemic/serverCode/connect.php";
+        require "$rootDir/Pandemic/serverCode/utilities.php";
 
-        $details = json_decode(file_get_contents("php://input"), true);
+        $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($details["currentStep"]))
+        if (!isset($data["currentStep"]))
             throw new Exception("current step not set");
         
-        if (!isset($details["role"]))
+        if (!isset($data["role"]))
             throw new Exception("role not set");
         
-        if (!isset($details["discardingRole"]))
+        if (!isset($data["discardingRole"]))
             throw new Exception("discarding role not set");
         
-        if (!isset($details["cardKeys"]))
+        if (!isset($data["cardKeys"]))
             throw new Exception("card keys not set");
         
         $game = $_SESSION["game"];
-        $currentStep = $details["currentStep"];
-        $currentTurnRole = $details["role"];
-        $discardingRole = $details["discardingRole"];
-        $cardKeys = $details["cardKeys"];
+        $currentStep = $data["currentStep"];
+        $currentTurnRole = $data["role"];
+        $discardingRole = $data["discardingRole"];
+        $cardKeys = $data["cardKeys"];
         
         if ($currentStep === "discard")
             $nextStep = "infect cities";

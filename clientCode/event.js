@@ -196,7 +196,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	cardDraw: {
 		name: "Draw 2 Cards",
 		code: "cd",
-		actionPathName: "drawPlayerCards",
+		actionPathName: "playSteps/drawPlayerCards",
 		propertyNames: ["cardKeys"],
 		rules: [
 			"After a role does 4 actions, they must draw 2 cards from the player deck; any city cards or event cards drawn are added to their hand.",
@@ -208,7 +208,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	epidemicIncrease: {
 		name: "Epidemic Increase",
 		code: "ec",
-		actionPathName: "epidemicIncrease",
+		actionPathName: "playSteps/epidemicIncrease",
 		propertyNames: ["epidemicCount"],
 		rules: [
 			"The infection rate marker is moved forward 1 space on the Infection Rate Track.",
@@ -218,7 +218,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	epidemicInfect: {
 		name: "Epidemic Infect",
 		code: "ef",
-		actionPathName: "epidemicInfect",
+		actionPathName: "playSteps/epidemicInfect",
 		propertyNames: ["cityKey", "prevCubeCount", "preventionCode"],
 		rules: [
 			"The <i>bottom</i> card of the Infection Deck is flipped over and 3 disease cubes of the matching color are placed on the named city.",
@@ -231,7 +231,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	epidemicIntensify: {
 		name: "Epidemic Intensify",
 		code: "et",
-		actionPathName: "epidemicIntensify",
+		actionPathName: "playSteps/epidemicIntensify",
 		propertyNames: ["numDiscardsShuffled"],
 		rules: ["The cards in the Infection Discard Pile are shuffled and then placed on top of the Infection Deck."]
 	},
@@ -239,7 +239,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Discard",
 		displayName: "Discard To 7 Cards",
 		code: "ds",
-		actionPathName: "discardPlayerCards",
+		actionPathName: "playSteps/discardPlayerCards",
 		propertyNames: ["cardKeys"],
 		rules: ["If a role ever has more than 7 cards in their hand (after first resolving any Epidemic cards they may have drawn), they must discard cards or play Event cards until they have 7 cards in their hand."]
 	},
@@ -247,7 +247,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Infect City",
 		pluralName: "Infect Cities",
 		code: "ic",
-		actionPathName: "infectCity",
+		actionPathName: "playSteps/infectCity",
 		propertyNames: ["cityKey", "preventionCode"],
 		rules: [
 			"During the Infect Cities step, infection cards are flipped over one at a time from the top of the infection deck. The number of infection cards flipped over is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
@@ -316,7 +316,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "Select a card from INFECTION DISCARDS to remove from the game.",
 		propertyNames: ["cardKey", "infectionDiscardIndex"],
-		actionPathName: "resilientPopulation"
+		actionPathName: "eventCards/resilientPopulation"
 	},
 	oneQuietNight: {
 		name: "One Quiet Night",
@@ -326,11 +326,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 			strings.eventCardPlayabilityRule,
 			"Skip the next Infect Cities step (do not flip over any Infection cards)."
 		],
-		actionPathName: "oneQuietNight"
+		actionPathName: "eventCards/oneQuietNight"
 	},
 	skipInfectionStep: { // this is here as a simple way to use the actionPathName in the requestAction function.
 		code: "",
-		actionPathName: "skipInfectionStep",
+		actionPathName: "eventCards/skipInfectionStep",
 		noIcon: true
 	},
 	forecast: {
@@ -343,7 +343,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"Put them back on top."
 		],
 		propertyNames: ["cardKeys"],
-		actionPathName: "forecastDraw"
+		actionPathName: "eventCards/forecastDraw"
 	},
 	forecastPlacement: {
 		name: "Forecast",
@@ -355,7 +355,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		instructions: "Drag and drop to rearrange the cards.",
 		propertyNames: ["cardKeys"],
-		actionPathName: "forecastPlacement",
+		actionPathName: "eventCards/forecastPlacement",
 		noIcon: true
 	},
 	airlift: {
@@ -365,7 +365,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: [strings.eventCardPlayabilityRule, "Move any 1 pawn to any city."],
 		instructions: "To airlift a pawn, drag and drop it onto the destination city.",
 		propertyNames: ["airliftedRoleID", "originKey", "destinationKey"],
-		actionPathName: "airlift"
+		actionPathName: "eventCards/airlift"
 	},
 	governmentGrant: {
 		name: "Government Grant",
@@ -374,7 +374,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: [strings.eventCardPlayabilityRule, "Add 1 research station to any city."],
 		instructions: "Drag and drop a research station from the research station supply onto the city of your choice.",
 		propertyNames: ["cityKey", "relocationKey"],
-		actionPathName: "buildResearchStation"
+		actionPathName: "buildResearchStation" // since gov' grant's logic is so similar
 	},
 	gameEnd: {
 		name: "Game End",

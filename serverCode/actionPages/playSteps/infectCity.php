@@ -6,16 +6,17 @@
 		if (!isset($_SESSION["game"]))
 			throw new Exception("game not found.");
 		
-		require "../connect.php";
-		require "../utilities.php";
+		$rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+		require "$rootDir/Pandemic/serverCode/connect.php";
+		require "$rootDir/Pandemic/serverCode/utilities.php";
 
-		$details = json_decode(file_get_contents("php://input"), true);
+		$data = json_decode(file_get_contents("php://input"), true);
 
-		if (!isset($details["role"]))
+		if (!isset($data["role"]))
 			throw new Exception("required values not set.");
 				
 		$game = $_SESSION["game"];
-		$role = $details["role"];
+		$role = $data["role"];
 		
 		$CURRENT_STEP = "infect cities";
 		$NEXT_STEP = "action 1";

@@ -6,20 +6,21 @@
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
         
-        require "../connect.php";
-        require "../utilities.php";
+        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+        require "$rootDir/Pandemic/serverCode/connect.php";
+        require "$rootDir/Pandemic/serverCode/utilities.php";
 
-        $details = json_decode(file_get_contents("php://input"), true);
+        $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($details["role"]))
+        if (!isset($data["role"]))
             throw new Exception("Role not set.");
 
-        if (!isset($details["currentStep"]))
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
         $game = $_SESSION["game"];
-        $role = $details["role"];
-        $currentStep = $details["currentStep"];
+        $role = $data["role"];
+        $currentStep = $data["currentStep"];
         
         $NEXT_STEP = "epIntensify";
         

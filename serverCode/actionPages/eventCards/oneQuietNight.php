@@ -2,11 +2,15 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
+        
+        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+        require "$rootDir/Pandemic/serverCode/connect.php";
+        require "$rootDir/Pandemic/serverCode/utilities.php";
+
+        $data = json_decode(file_get_contents("php://input"), true);
 
         if (!isset($_POST["currentStep"]))
             throw new Exception("Current step not set.");

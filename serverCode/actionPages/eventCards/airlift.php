@@ -6,32 +6,33 @@
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        require "../connect.php";
-        require "../utilities.php";
+        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+        require "$rootDir/Pandemic/serverCode/connect.php";
+        require "$rootDir/Pandemic/serverCode/utilities.php";
 
-        $airliftDetails = json_decode(file_get_contents("php://input"), true);
+        $data = json_decode(file_get_contents("php://input"), true);
         
-        if (!isset($airliftDetails["currentStep"]))
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($airliftDetails["role"]))
+        if (!isset($data["role"]))
             throw new Exception("Role not set.");
 
-        if (!isset($airliftDetails["roleToAirlift"]))
+        if (!isset($data["roleToAirlift"]))
             throw new Exception("Role to airlift not set.");
 
-        if (!isset($airliftDetails["originKey"]))
+        if (!isset($data["originKey"]))
             throw new Exception("Origin city not set.");
 
-        if (!isset($airliftDetails["destinationKey"]))
+        if (!isset($data["destinationKey"]))
             throw new Exception("Destination city not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $airliftDetails["currentStep"];
-        $activeRole = $airliftDetails["role"];
-        $roleToAirlift = $airliftDetails["roleToAirlift"];
-        $originKey = $airliftDetails["originKey"];
-        $destinationKey = $airliftDetails["destinationKey"];
+        $currentStep = $data["currentStep"];
+        $activeRole = $data["role"];
+        $roleToAirlift = $data["roleToAirlift"];
+        $originKey = $data["originKey"];
+        $destinationKey = $data["destinationKey"];
         
         $EVENT_CODE = "ar";
         $CARD_KEY = "airl";
