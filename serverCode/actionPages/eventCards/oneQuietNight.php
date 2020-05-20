@@ -12,57 +12,54 @@
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($_POST["currentStep"]))
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["role"]))
+        if (!isset($data["role"]))
             throw new Exception("Role not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["role"];
+        $currentStep = $data["currentStep"];
+        $activeRole = $data["role"];
         
         $EVENT_CODE = "oq";
         $CARD_KEY = "oneq";
 
-        if (oneQuietNightScheduledThisTurn($mysqli, $game))
+        if (oneQuietNightScheduledThisTurn($pdo, $game))
             throw new Exception("One Quiet Night cannot be played more than once in a single turn.");
         
-        checkEventCardLegality($mysqli, $game, $CARD_KEY);
+        checkEventCardLegality($pdo, $game, $CARD_KEY);
         
-        $discardingRole = getEventCardHolder($mysqli, $game, $CARD_KEY);
+        $discardingRole = getEventCardHolder($pdo, $game, $CARD_KEY);
         
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
         
-        discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
-        $discardingRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
+        discardOrRemoveEventCard($pdo, $game, $discardingRole, $CARD_KEY);
+        $discardingRole = convertRoleFromPossibleContingency($pdo, $discardingRole);
 
         // No useful information to include here,
         // but eventDetails are usually critically important, so they are not nullable.
         $eventDetails = "";
         
-        $turnNum = getTurnNumber($mysqli, $game);
+        $turnNum = getTurnNumber($pdo, $game);
         // If the "infect cities" step is already in progress,
         // then One Quiet Night cannot be played until the next turn.
         // If at least one infection card has already been flipped over, the client should prevent the card from being played.
-        if ($currentStep === "infect cities")
-        {
-            $infectionStepInProgress = $mysqli->query("SELECT COUNT(*) AS 'numEvents'
-                                                        FROM vw_event
-                                                        WHERE game = $game
-                                                        AND turnNum = $turnNum
-                                                        AND eventType = 'ic'")->fetch_assoc()["numEvents"];
-
-            if ($infectionStepInProgress)
-                throw new Exception("this card cannot be played while the Infect Cities step is in progress.");
-        }
+        $INFECT_CITY_EVENT_CODE = "ic";
+        if ($currentStep === "infect cities"
+            && countEventsOfTurn($pdo, $game, $INFECT_CITY_EVENT_CODE) > 0)
+            throw new Exception("this card cannot be played while the Infect Cities step is in progress.");
         
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails, $discardingRole);
+        $response["events"][] = recordEvent($pdo, $game, $EVENT_CODE, $eventDetails, $discardingRole);
 
-        $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $discardingRole, $activeRole);
+        $proceedToNextStep = eventCardSatisfiedDiscard($pdo, $game, $currentStep, $discardingRole, $activeRole);
 
         if ($proceedToNextStep)
             $response["proceedFromDiscardToStep"] = $proceedToNextStep;
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "One Quiet Night failed: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
@@ -70,12 +67,13 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
-        
-        $mysqli->close();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
 
         echo json_encode($response);
     }

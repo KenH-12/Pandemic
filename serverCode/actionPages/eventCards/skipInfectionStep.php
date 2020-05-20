@@ -12,23 +12,27 @@
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($_POST["currentStep"]))
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["role"]))
+        if (!isset($data["role"]))
             throw new Exception("Role not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $role = $_POST["role"];
+        $currentStep = $data["currentStep"];
+        $role = $data["role"];
 
         if ($currentStep !== "infect cities")
             throw new Exception("wrong step.");
 
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
 
         $NEXT_STEP = "action 1";
-        $response["nextStep"] = updateStep($mysqli, $game, $currentStep, $NEXT_STEP, $role);
+        $response["nextStep"] = updateStep($pdo, $game, $currentStep, $NEXT_STEP, $role);
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Failed to skip infection step: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
@@ -36,12 +40,13 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
-        
-        $mysqli->close();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
 
         echo json_encode($response);
     }
