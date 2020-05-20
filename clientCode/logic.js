@@ -1700,17 +1700,15 @@ async function forecastDraw(forecastEventToLoad)
 	$("#btnCancelAction").off("click").addClass("hidden");
 	disableActions();
 	eventHistory.enableBackButton();
-	$(".discardSelections").remove();
 
-	indicatePromptingEventCard();
+	const eventType = eventTypes.forecast,
+		forecastEvent = forecastEventToLoad || (await requestAction(eventTypes.forecast)).shift();
 
-	const eventType = eventTypes.forecast;
-	actionInterfacePopulator.$actionInterface.children(".eventCardFull").remove();
+	actionInterfacePopulator.$actionInterface.children(".eventCardFull").add(".discardSelections").remove();
 	actionInterfacePopulator.$actionInterface.prepend(`<div class='actionTitle'>
 														${getEventIconHtml(eventType)}<h2>${eventType.name.toUpperCase()}</h2>
 													</div>`);
-	
-	const forecastEvent = forecastEventToLoad || (await requestAction(eventTypes.forecast)).shift();
+	indicatePromptingEventCard();
 
 	// If loading an unresolved forecast, the event card will already be in the discard pile.
 	if (!forecastEventToLoad)
@@ -1719,15 +1717,17 @@ async function forecastDraw(forecastEventToLoad)
 	await animateForecastDraw(forecastEvent.cardKeys);
 	appendEventHistoryIconOfType(eventTypes.forecast);
 	
-	const $btnDone = $("<div class='button'>DONE</div>");
+	const $btnDone = $("<div class='button btnConfirm'>DONE</div>");
 
 	// Subtitle remains hidden until the cards are revealed, then it's displayed along with $btnDone
 	actionInterfacePopulator
 		.showSubtitle()
 		.$actionInterface.append($btnDone);
 
-	await buttonClickPromise($btnDone, { afterClick: "hide" });
-	forecastPlacement(forecastEvent);
+	await buttonClickPromise($btnDone);
+	$btnDone.off("click").addClass("btnDisabled").html("CONFIRMING...");
+
+	forecastPlacement(forecastEvent, $btnDone);
 }
 
 function animateForecastDraw(cardKeys)
@@ -1815,7 +1815,7 @@ function enableForecastSorting($cardContainer)
 	});
 }
 
-async function forecastPlacement(forecastEvent)
+async function forecastPlacement(forecastEvent, $btnDone)
 {
 	const $cardContainer = $("#forecastCards"),
 		cardKeys = [];
@@ -1828,11 +1828,10 @@ async function forecastPlacement(forecastEvent)
 	// Reversing achieves the order in which the cards will be placed back on the deck.
 	cardKeys.reverse();
 
-	await Promise.all(
-	[
-		requestAction(eventTypes.forecastPlacement, { cardKeys, forecastingRole: forecastEvent.role }),
-		animateForecastPlacement($cardContainer)
-	]);
+	await requestAction(eventTypes.forecastPlacement, { cardKeys, forecastingRole: forecastEvent.role });
+	$btnDone.addClass("hidden");
+
+	await animateForecastPlacement($cardContainer);
 	await eventHistory.scrollToEnd();
 
 	actionInterfacePopulator.$actionInterface.slideUp(function()
