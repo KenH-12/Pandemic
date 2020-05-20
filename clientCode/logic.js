@@ -1492,6 +1492,8 @@ const actionInterfacePopulator = {
 
 		actionInterfacePopulator.appendOptionButtons("playerCard", cardKeys, function($clicked)
 		{
+			$clicked.off("click").siblings(".playerCard").remove();
+			actionInterfacePopulator.replaceInstructions("Confirming...");
 			planContingency($clicked.data("key"));
 		});
 
@@ -1646,17 +1648,15 @@ function getContingencyOptionCardKeys()
 async function planContingency(cardKey)
 {
 	disableActions();
-	resetActionPrompt();
 	
 	const contingencyPlanner = getActivePlayer(),
 		eventType = eventTypes.planContingency,
 		$eventCard = $("#playerDiscardContainer").find(`.playerCard[data-key='${cardKey}']`).off("mouseenter mouseleave");
 
-	await Promise.all([
-		requestAction(eventType, { cardKey }),
-		contingencyPlanner.panel.animateReceiveCard($eventCard, { isContingencyCard: true })
-	]);
+	await requestAction(eventType, { cardKey });
+	resetActionPrompt();
 
+	await contingencyPlanner.panel.animateReceiveCard($eventCard, { isContingencyCard: true })
 	contingencyPlanner.contingencyKey = cardKey;
 
 	appendEventHistoryIconOfType(eventType);
