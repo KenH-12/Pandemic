@@ -22,7 +22,7 @@ eventTypes = {
 		code: "dr",
 		rules: ["Move to a city connected by a white line to the one you are in."],
 		instructions: "Select a Destination:",
-		actionPathName: "movementAction",
+		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey"]
 	},
 	directFlight: {
@@ -33,7 +33,7 @@ eventTypes = {
 		dispatchInstructions: `To dispatch a pawn via Direct Flight,
 discard the city card that matches the destination city.
 The card must come from the Dispatcher&#39;s hand.`,
-		actionPathName: "movementAction",
+		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey"]
 	},
 	charterFlight: {
@@ -44,7 +44,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		dispatchInstructions: `To dispatch a pawn via Charter Flight,
 discard the city card that matches the pawn&#39;s current location.
 The card must come from the Dispatcher&#39;s hand.`,
-		actionPathName: "movementAction",
+		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey"]
 	},
 	chooseFlightType: {
@@ -57,7 +57,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "sf",
 		rules: ["Move from a city with a research station to any other city that has a research station."],
 		instructions: "Select a Destination:",
-		actionPathName: "movementAction",
+		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey"]
 	},
 	buildResearchStation: {
@@ -68,7 +68,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"If the research station supply is empty, take a research station from anywhere on the board."
 		],
 		instructions: "",
-		actionPathName: "buildResearchStation",
+		actionPathName: "actions/buildResearchStation",
 		propertyNames: ["cityKey", "relocationKey"],
 		relatedRoleName: "Operations Expert",
 		relatedRoleRule: "The Operations Expert can do this action without discarding."
@@ -82,7 +82,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"<i>take</i> the city card that matches the city you are in from another player.",
 			"The other player must also be in the city with you."
 		],
-		actionPathName: "shareKnowledge",
+		actionPathName: "actions/shareKnowledge",
 		propertyNames: ["cardKey", "giverRoleID", "receiverRoleID"],
 		relatedRoleName: "Researcher",
 		relatedRoleRule: "The Researcher may <i>give</i> a city card without needing to be in the city that matches the card."
@@ -95,7 +95,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"If the disease has been cured, remove all cubes of that color from the city you are in."
 		],
 		instructions: "Select a Disease Color:",
-		actionPathName: "treatDisease",
+		actionPathName: "actions/treatDisease",
 		propertyNames: ["cityKey", "diseaseColor", "prevCubeCount", "newCubeCount"],
 		relatedRoleName: "Medic",
 		relatedRoleRule: "The Medic removes all cubes of one color when doing this action."
@@ -119,7 +119,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"<br/>",
 			strings.victoryCondition
 		],
-		actionPathName: "discoverCure",
+		actionPathName: "actions/discoverCure",
 		propertyNames: ["cardKeys"],
 		relatedRoleName: "Scientist",
 		relatedRoleRule: "The Scientist needs only 4 cards of the same color to do this action."
@@ -141,7 +141,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"When the stored Event card is played, <i>remove it</i> from the game."
 		],
 		instructions: "Select an Event card to store:",
-		actionPathName: "planContingency"
+		actionPathName: "actions/planContingency"
 	},
 	dispatchPawn: {
 		name: "Dispatch Pawn",
@@ -166,13 +166,13 @@ The card must come from the Dispatcher&#39;s hand.`,
 		shuttleFlightRules: ["Dispatch a pawn from a city with a research station to any other city that has a research station."],
 		abbreviatedRulesetLength: 3,
 		instructions: "To dispatch a pawn, drag and drop it onto a city.",
-		actionPathName: "movementAction",
+		actionPathName: "actions/movementAction",
 		propertyNames: ["dispatchedRoleID", "originKey", "destinationKey", "movementTypeCode", "rolesAtRendezvousDestination"]
 	},
 	rendezvous: {
 		name: "Rendezvous",
 		code: "rv",
-		actionPathName: "movementAction",
+		actionPathName: "actions/movementAction",
 		noIcon: true
 	},
 	operationsFlight: {
@@ -181,7 +181,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		capableRoleName: "Operations Expert",
 		rules: ["<i>Once per turn</i>, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
-		actionPathName: "movementAction",
+		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey", "discardKey"]
 	},
 	pass: {
@@ -190,7 +190,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		propertyNames: [],
 		rules: [`Forfeit your remaining actions for this turn and proceed to the "Draw 2 cards" step.`],
 		instructions: "Pass on your remaining actions for this turn?",
-		actionPathName: "passActions",
+		actionPathName: "actions/passActions",
 		propertyNames: ["numActionsForfeited"]
 	},
 	cardDraw: {

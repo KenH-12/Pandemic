@@ -9,12 +9,30 @@ disabled pawns receive the "grab" cursor when another pawn is enabled
 
 the cancel button is still clickable when awaiting discover a cure request
 
+the infection rate tooltip within the indicator container is not hoverable
+
+at the very start of a game, the undo action button tooltip says '"Initial Infection" events cannot be undone'
 TO DO
 -----
+if flight options are presented
+	disable/gray out the ones that weren't used
+
 test...
 	outbreaks caused by infect city
 	game end conditions
 	the infect cities loading gif when auto-infecting single/multiple
+	operations flight
+	dispatch
+
+show loading gif for
+	automatic events
+		infect city
+		epidemic
+			increase
+			infect
+			intensify
+			next
+
 
 after loading for x ms, show some error message
 

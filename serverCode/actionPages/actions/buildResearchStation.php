@@ -6,8 +6,9 @@
         if (!isset($_SESSION["game"]))
             throw new Exception("game not found");
         
-        require "../connect.php";
-        require "../utilities.php";
+        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+        require "$rootDir/Pandemic/serverCode/connect.php";
+        require "$rootDir/Pandemic/serverCode/utilities.php";
 
         $data = json_decode(file_get_contents("php://input"), true);
 

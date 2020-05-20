@@ -14,13 +14,17 @@ BEGIN
 	IF numPlayers >= 2 AND numPlayers <= 4
 		AND numEpidemics >= 4 AND numEpidemics <= 6
 	THEN
+		DELETE FROM epidemicintensify;
 		DELETE FROM eventhistory;
 		DELETE FROM player;
 		DELETE FROM location;
+		DELETE FROM pandemic;
 		DELETE FROM game;
 		
 		INSERT INTO game (epidemicCards) VALUES (numEpidemics);
 		SET gID = LAST_INSERT_ID();
+		
+		INSERT INTO pandemic (gameID) VALUES (gID);
 		
 		WHILE playerCounter < numPlayers
 		DO
@@ -39,11 +43,6 @@ BEGIN
 	CALL proc_arrangePlayerCards(gID);
 	CALL proc_infectNineCities(gID);
 	CALL proc_update_turnOrder(gID);
-	
-	-- Ready to begin turn 1
-	UPDATE game
-	SET turnNumber = 1
-	WHERE gameID = gID;
 	
 	END IF;
 END
