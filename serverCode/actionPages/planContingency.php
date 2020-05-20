@@ -2,69 +2,76 @@
     try
     {
         session_start();
-        require "../connect.php";
-        include "../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["role"]))
+        require "../connect.php";
+        require "../utilities.php";
+
+        $details = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($details["role"]))
             throw new Exception("Required values not set.");
         
-        if (!isset($_POST["currentStep"]))
+        if (!isset($details["currentStep"]))
             throw new Exception("Required values not set.");
         
-        if (!isset($_POST["cardKey"]))
+        if (!isset($details["cardKey"]))
             throw new Exception("Required values not set.");
         
         $game = $_SESSION["game"];
-        $role = $_POST["role"];
-        $currentStep = $_POST["currentStep"];
-        $cardKey = $_POST["cardKey"];
+        $role = $details["role"];
+        $currentStep = $details["currentStep"];
+        $cardKey = $details["cardKey"];
 
         $EVENT_CARD_COLOR = "e";
         $EVENT_CODE = "pc";
 
-        if (getRoleName($mysqli, $role) !== "Contingency Planner")
+        if (getRoleName($pdo, $role) !== "Contingency Planner")
             throw new Exception("Only the Contingency Planner may perform this action.");
         
-        if (getContingencyCardKey($mysqli, $game))
+        if (getContingencyCardKey($pdo, $game))
             throw new Exception("There can be only 1 contingency card at a time.");
 
-        $isEventCardKey = $mysqli->query("SELECT color
-                                        FROM vw_playerCard
-                                        WHERE game = $game
-                                        AND cardKey = '$cardKey'")
-                                ->fetch_assoc()["color"] === $EVENT_CARD_COLOR;
+        $stmt = $pdo->prepare("SELECT diseaseColor
+                                FROM city
+                                WHERE cityKey = ?");
+        $stmt->execute([$cardKey]);
         
-        if (!$isEventCardKey)
+        if ($stmt->fetch()["diseaseColor"] !== $EVENT_CARD_COLOR)
             throw new Exception("The specified card must be an Event card.");
 
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
 
         // moveCardsToPile will ensure that the specified event card is coming from the Player Discard Pile.
         $cardType = "player";
         $currentPile = "discard";
         $newPile = "contingency";
-        moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKey);
+        moveCardsToPile($pdo, $game, $cardType, $currentPile, $newPile, $cardKey);
         
         $eventDetails = $cardKey;
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails, $role);
+        $response["events"][] = recordEvent($pdo, $game, $EVENT_CODE, $eventDetails, $role);
 
-        $response["nextStep"] = nextStep($mysqli, $game, $currentStep, $role);
+        $response["nextStep"] = nextStep($pdo, $game, $currentStep, $role);
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Plan Contingency failed: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
-        $response["failure"] = "Failed to plan contingency: " . $e->getMessage();
+        $response["failure"] = "Plan Contingency failed: " . $e->getMessage();
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
-        
-        $mysqli->close();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
 
         echo json_encode($response);
     }
