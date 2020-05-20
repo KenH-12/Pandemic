@@ -815,13 +815,13 @@ function checkEventCardLegality($pdo, $game, $eventCardKey)
 }
 
 // A Forecast event manifests in the db as a pair of events: the draw, and the placement.
-// Therefore if the number of draw/placement this turn is 1, there must be an unresolved draw awaiting placement.
+// Therefore if the number of draw/placement this turn is odd, there must be an unresolved draw awaiting placement.
 function forecastIsInProgress($pdo, $game)
 {
     $FORECAST_DRAW_CODE = "fd";
     $FORECAST_PLACEMENT_CODE = "fp";
 
-    $numForecastEvents = countEventsOfTurn($pdo, $game, array($FORECAST_DRAW_CODE, $FORECAST_PLACEMENT_CODE)) == 1;
+    return countEventsOfTurn($pdo, $game, array($FORECAST_DRAW_CODE, $FORECAST_PLACEMENT_CODE)) % 2 === 1;
 }
 
 function getEventCardHolder($pdo, $game, $cardKey)

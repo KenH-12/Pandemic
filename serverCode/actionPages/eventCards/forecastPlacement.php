@@ -12,43 +12,43 @@
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($_POST["currentStep"]))
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["role"]))
+        if (!isset($data["role"]))
             throw new Exception("Role not set.");
 
-        if (!isset($_POST["cardKeys"]))
+        if (!isset($data["cardKeys"]))
             throw new Exception("Card order not set.");
 
-        if (!isset($_POST["forecastingRole"]))
+        if (!isset($data["forecastingRole"]))
             throw new Exception("Forecasting role not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["role"];
-        $cardKeys = $_POST["cardKeys"];
-        $forecastingRole = $_POST["forecastingRole"];
+        $currentStep = $data["currentStep"];
+        $activeRole = $data["role"];
+        $cardKeys = $data["cardKeys"];
+        $forecastingRole = $data["forecastingRole"];
         
         $EVENT_CODE = "fp";
         $NUM_CARDS = 6;
 
-        if (!forecastIsInProgress($mysqli, $game))
+        if (!forecastIsInProgress($pdo, $game))
             throw new Exception("Forecast draw event was not found");
 
         if (count($cardKeys) !== $NUM_CARDS)
             throw new Exception("Incorrect number of cards.");
         
-        $mysqli->autocommit(FALSE);
-        
-        $infectionCards = $mysqli->query("SELECT cardKey, cardIndex
-                                        FROM vw_infectioncard
-                                        WHERE game = $game
-                                        AND pile = 'deck'
-                                        ORDER BY cardIndex DESC
-                                        LIMIT $NUM_CARDS");
+        $stmt = $pdo->prepare("SELECT cardKey, cardIndex
+                                FROM vw_infectioncard
+                                WHERE game = ?
+                                AND pile = 'deck'
+                                ORDER BY cardIndex DESC
+                                LIMIT $NUM_CARDS");
+        $stmt->execute([$game]);
+        $infectionCards = $stmt->fetchAll();
 
-        while ($row = mysqli_fetch_assoc($infectionCards))
+        foreach ($infectionCards as $row)
         {
             $key = $row["cardKey"];
             if (!in_array($key, $cardKeys))
@@ -57,28 +57,34 @@
             $cardIndex = $row["cardIndex"];
         }
 
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare("UPDATE vw_infectionCard
+                                SET cardIndex = ?
+                                WHERE game = ?
+                                AND cardKey = ?");
+        
         for ($i = 0; $i < count($cardKeys); $i++)
         {
-            $key = $cardKeys[$i];
-
-            $mysqli->query("UPDATE vw_infectionCard
-                            SET cardIndex = $cardIndex
-                            WHERE game = $game
-                            AND cardKey = '$key'");
+            $stmt->execute([$cardIndex, $game, $cardKeys[$i]]);
             
-            if ($mysqli->error)
-                throw new Exception("Failed to update cardIndex ('$key', $cardIndex): " . $mysqli->error);
+            if ($pdo->errorInfo()[0] != "00000")
+                throwException($pdo, "Failed to update card index.");
             
             $cardIndex++;
         }
         
         $eventDetails = implode(",", array_reverse($cardKeys));
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails);
+        $response["events"][] = recordEvent($pdo, $game, $EVENT_CODE, $eventDetails);
 
-        $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $forecastingRole, $activeRole);
+        $proceedToNextStep = eventCardSatisfiedDiscard($pdo, $game, $currentStep, $forecastingRole, $activeRole);
 
         if ($proceedToNextStep)
             $response["proceedFromDiscardToStep"] = $proceedToNextStep;
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Forecast placement failed: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
@@ -86,13 +92,14 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>

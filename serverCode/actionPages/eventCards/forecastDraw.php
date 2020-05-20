@@ -12,44 +12,51 @@
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($_POST["currentStep"]))
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["role"]))
+        if (!isset($data["role"]))
             throw new Exception("Role not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["role"];
+        $currentStep = $data["currentStep"];
+        $activeRole = $data["role"];
         
         $EVENT_CODE = "fd";
         $CARD_KEY = "fore";
         $NUM_CARDS_TO_DRAW = 6;
 
-        checkEventCardLegality($mysqli, $game, $CARD_KEY);
+        checkEventCardLegality($pdo, $game, $CARD_KEY);
         
-        $discardingRole = getEventCardHolder($mysqli, $game, $CARD_KEY);
+        $discardingRole = getEventCardHolder($pdo, $game, $CARD_KEY);
         
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
         
-        discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
-        $discardingRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
+        discardOrRemoveEventCard($pdo, $game, $discardingRole, $CARD_KEY);
+        $discardingRole = convertRoleFromPossibleContingency($pdo, $discardingRole);
 
-        $infectionCards = $mysqli->query("SELECT cardKey
-                                        FROM vw_infectioncard
-                                        WHERE game = $game
-                                        AND pile = 'deck'
-                                        ORDER BY cardIndex DESC
-                                        LIMIT $NUM_CARDS_TO_DRAW");
+        $stmt = $pdo->prepare("SELECT cardKey
+                                FROM vw_infectioncard
+                                WHERE game = ?
+                                AND pile = 'deck'
+                                ORDER BY cardIndex DESC
+                                LIMIT $NUM_CARDS_TO_DRAW");
+        $stmt->execute([$game]);
 
-        while ($row = mysqli_fetch_assoc($infectionCards))
+        if ($stmt->rowCount() !== $NUM_CARDS_TO_DRAW)
+            throw new Exception("fewer than $NUM_CARDS_TO_DRAW cards were drawn.");
+
+        $infectionCards = $stmt->fetchAll();
+
+        foreach ($infectionCards as $row)
             $cardKeys[] = $row["cardKey"];
         
-        if (count($cardKeys) !== $NUM_CARDS_TO_DRAW)
-            throw new Exception("fewer than " . $NUM_CARDS_TO_DRAW . " cards were drawn: (" . implode(",", $cardKeys) . ")");
-        
         $eventDetails = implode(",", $cardKeys);
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails, $discardingRole);
+        $response["events"][] = recordEvent($pdo, $game, $EVENT_CODE, $eventDetails, $discardingRole);
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Forecast draw failed: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
@@ -57,13 +64,14 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>
