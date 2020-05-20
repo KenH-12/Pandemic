@@ -1579,7 +1579,7 @@ const actionInterfacePopulator = {
 
 		if (cardKeyToRemove)
 		{
-			const newSubtitle = `Remove ${getCity(cardKeyToRemove).name}'s infection card from the game?`;
+			const newSubtitle = `Remove the ${getCity(cardKeyToRemove).name} infection card from the game?`;
 
 			actionInterfacePopulator.replaceInstructions(newSubtitle)
 				.appendDiscardPrompt(
@@ -2016,12 +2016,13 @@ function hideResilientPopulationArrow({ selectionWasMade, reset } = {})
 async function resilientPopulation(cardKeyToRemove)
 {
 	resetInfectionDiscardClicksAndTooltips();
-	resetActionPrompt();
 	disableActions();
 	disableInfectionDiscardHoverEvents();
 
 	const eventType = eventTypes.resilientPopulation,
 		events = await requestAction(eventType, { cardKeyToRemove });
+
+	resetActionPrompt();
 
 	await discardOrRemoveEventCard(events.shift());
 	await resilientPopulationAnimation(cardKeyToRemove);

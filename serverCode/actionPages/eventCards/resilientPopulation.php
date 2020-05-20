@@ -12,49 +12,54 @@
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($_POST["currentStep"]))
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["role"]))
+        if (!isset($data["role"]))
             throw new Exception("Role not set.");
 
-        if (!isset($_POST["cardKeyToRemove"]))
+        if (!isset($data["cardKeyToRemove"]))
             throw new Exception("Card to remove not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["role"];
-        $cardKeyToRemove = $_POST["cardKeyToRemove"];
+        $currentStep = $data["currentStep"];
+        $activeRole = $data["role"];
+        $cardKeyToRemove = $data["cardKeyToRemove"];
         
         $EVENT_CODE = "rp";
         $CARD_KEY = "resi";
 
-        checkEventCardLegality($mysqli, $game, $CARD_KEY);
-        $discardingRole = getEventCardHolder($mysqli, $game, $CARD_KEY);
+        checkEventCardLegality($pdo, $game, $CARD_KEY);
+        $discardingRole = getEventCardHolder($pdo, $game, $CARD_KEY);
         
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
         
-        discardOrRemoveEventCard($mysqli, $game, $discardingRole, $CARD_KEY);
-        $discardingRole = convertRoleFromPossibleContingency($mysqli, $discardingRole);
-
-        // The cardIndex within the infection discard pile is recorded in case the Resilient Population event gets undone later.
-        $infectionDiscardIndex = $mysqli->query("SELECT cardIndex
-                                                FROM vw_infectionCard
-                                                WHERE game = $game
-                                                AND cardKey = '$cardKeyToRemove'")->fetch_assoc()["cardIndex"];
+        discardOrRemoveEventCard($pdo, $game, $discardingRole, $CARD_KEY);
+        $discardingRole = convertRoleFromPossibleContingency($pdo, $discardingRole);
 
         $cardType = "infection";
         $currentPile = "discard";
         $newPile = "removed";
-        moveCardsToPile($mysqli, $game, $cardType, $currentPile, $newPile, $cardKeyToRemove);
+        moveCardsToPile($pdo, $game, $cardType, $currentPile, $newPile, $cardKeyToRemove);
+        
+        // The cardIndex within the infection discard pile is recorded in case the Resilient Population event gets undone later.
+        $stmt = $pdo->prepare("SELECT cardIndex
+                                FROM vw_infectionCard
+                                WHERE game = ?
+                                AND cardKey = ?");
+        $stmt->execute([$game, $cardKeyToRemove]);
+        $eventDetails = $cardKeyToRemove . "," . $stmt->fetch()["cardIndex"];
+        
+        $response["events"][] = recordEvent($pdo, $game, $EVENT_CODE, $eventDetails, $discardingRole);
 
-        $eventDetails = "$cardKeyToRemove,$infectionDiscardIndex";
-        $response["events"][] = recordEvent($mysqli, $game, $EVENT_CODE, $eventDetails, $discardingRole);
-
-        $proceedToNextStep = eventCardSatisfiedDiscard($mysqli, $game, $currentStep, $discardingRole, $activeRole);
+        $proceedToNextStep = eventCardSatisfiedDiscard($pdo, $game, $currentStep, $discardingRole, $activeRole);
 
         if ($proceedToNextStep)
             $response["proceedFromDiscardToStep"] = $proceedToNextStep;
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Resilient Population failed: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
@@ -62,12 +67,13 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
-        
-        $mysqli->close();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
 
         echo json_encode($response);
     }
