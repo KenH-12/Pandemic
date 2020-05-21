@@ -78,6 +78,9 @@ export default class Tooltip
 
     checkHoverState()
     {
+        if (!this.hoverEventsAreBound)
+            return false;
+        
         const { hoverElementSelector } = this,
             $hovered = $(":hover").filter(hoverElementSelector);
         
