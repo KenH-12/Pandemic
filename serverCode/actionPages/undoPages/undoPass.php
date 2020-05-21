@@ -2,34 +2,42 @@
     try
     {
         session_start();
-        require "../../connect.php";
-        include "../../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["currentStep"]))
+        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+        require "$rootDir/Pandemic/serverCode/connect.php";
+        require "$rootDir/Pandemic/serverCode/utilities.php";
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["activeRole"]))
+        if (!isset($data["activeRole"]))
             throw new Exception("Role not set.");
         
-        if (!isset($_POST["eventID"]))
+        if (!isset($data["eventID"]))
             throw new Exception("Event id not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["activeRole"];
-        $eventID = $_POST["eventID"];
+        $currentStep = $data["currentStep"];
+        $activeRole = $data["activeRole"];
+        $eventID = $data["eventID"];
 
-        $event = getEventById($mysqli, $game, $eventID);
-        validateEventCanBeUndone($mysqli, $game, $event);
+        $event = getEventById($pdo, $game, $eventID);
+        validateEventCanBeUndone($pdo, $game, $event);
 
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
        
-        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep, $event);
+        $response["prevStepName"] = previousStep($pdo, $game, $activeRole, $currentStep, $event);
         $response["undoneEventIds"] = array($eventID);
-        deleteEvent($mysqli, $game, $eventID);
+        deleteEvent($pdo, $game, $eventID);
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Failed to undo Pass Actions: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
@@ -37,13 +45,14 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>
