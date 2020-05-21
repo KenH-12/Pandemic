@@ -2,29 +2,33 @@
     try
     {
         session_start();
-        require "../../connect.php";
-        include "../../utilities.php";
 
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["currentStep"]))
+        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+        require "$rootDir/Pandemic/serverCode/connect.php";
+        require "$rootDir/Pandemic/serverCode/utilities.php";
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["activeRole"]))
+        if (!isset($data["activeRole"]))
             throw new Exception("Role not set.");
 
-        if (!isset($_POST["actionCode"]))
+        if (!isset($data["actionCode"]))
             throw new Exception("Action code not set.");
         
-        if (!isset($_POST["eventID"]))
+        if (!isset($data["eventID"]))
             throw new Exception("Event id not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["activeRole"];
-        $actionCode = $_POST["actionCode"];
-        $eventID = $_POST["eventID"];
+        $currentStep = $data["currentStep"];
+        $activeRole = $data["activeRole"];
+        $actionCode = $data["actionCode"];
+        $eventID = $data["eventID"];
 
         $DRIVE_FERRY = "dr";
         $DIRECT_FLIGHT = "df";
@@ -33,8 +37,8 @@
         $OPERATIONS_FLIGHT = "of";
         $DISPATCH = "dp";
 
-        $event = getEventById($mysqli, $game, $eventID);
-        validateEventCanBeUndone($mysqli, $game, $event);
+        $event = getEventById($pdo, $game, $eventID);
+        validateEventCanBeUndone($pdo, $game, $event);
 
         $movementType = $event["eventType"];
         $role = $event["role"];
@@ -63,22 +67,26 @@
         else
             $discardKey = false;
         
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
         
-        updateRoleLocation($mysqli, $game, $roleToMove, $destinationKey, $originKey);
+        updateRoleLocation($pdo, $game, $roleToMove, $destinationKey, $originKey);
         
         // If a card was discarded to perform the action, put it back in the role's hand.
         if ($discardKey)
-            moveCardsToPile($mysqli, $game, "player", "discard", $role, $discardKey);
+            moveCardsToPile($pdo, $game, "player", "discard", $role, $discardKey);
 
         $response["undoneEventIds"] = array($eventID);
         // If the medic moved as a result of the action, undo any resulting auto-treat disease and eradication events.
-        if (getRoleName($mysqli, $roleToMove) === "Medic"
-            && $triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
+        if (getRoleName($pdo, $roleToMove) === "Medic"
+            && $triggeredEventIds = undoEventsTriggeredByEvent($pdo, $game, $eventID))
             $response["undoneEventIds"] = array_merge($response["undoneEventIds"], $triggeredEventIds);
 
-        deleteEvent($mysqli, $game, $eventID);
-        $response["prevStepName"] = previousStep($mysqli, $game, $activeRole, $currentStep);
+        deleteEvent($pdo, $game, $eventID);
+        $response["prevStepName"] = previousStep($pdo, $game, $activeRole, $currentStep);
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Failed to undo movement action: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
@@ -86,13 +94,14 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>
