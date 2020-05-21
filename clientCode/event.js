@@ -14,6 +14,7 @@ import {
 	getColorWord,
 	newDiseaseCubeElement
 } from "./utilities/pandemicUtils.js";
+import { postData } from "./utilities/fetchUtils.js";
 
 const dispatchDiscardRule = "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
 eventTypes = {
@@ -629,26 +630,14 @@ class UndoableEvent extends Event
 {
 	requestUndo(additionalDataToPost = {})
 	{
-		return new Promise((resolve, reject) =>
+		return postData(`serverCode/actionPages/undoPages/${this.undoerFileName || `undo${toPascalCase(this.name)}`}.php`,
 		{
-			$.post(`serverCode/actionPages/undoPages/${this.undoerFileName || `undo${toPascalCase(this.name)}`}.php`,
-			{
-				...{
-					activeRole: getActivePlayer().rID,
-					currentStep: gameData.currentStep.name,
-					eventID: this.id
-				},
-				...additionalDataToPost
+			...{
+				activeRole: getActivePlayer().rID,
+				currentStep: gameData.currentStep.name,
+				eventID: this.id
 			},
-			function(response)
-			{
-				const result = JSON.parse(response);
-				
-				if (result.failure)
-					reject(result.failure);
-				else
-					resolve(result);
-			});
+			...additionalDataToPost
 		});
 	}
 }
