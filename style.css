@@ -544,16 +544,16 @@ span.r, p.r {color: #ef282a; background: none !important }
 #eventHistoryContainer
 {
 	width: 27.5%;
-	border: 1px solid #fff;
-	border-left: none;
-	border-bottom: none;
+	z-index: 2;
 }
-#eventHistoryContainer > div
+#eventHistoryContainer > div:not(#undoingIndicator)
 {
 	display: inline-block;
 	vertical-align: top;
+	border-top: 1px solid #fff;
 	border-left: 1px solid #fff;
 }
+#eventHistory { background-color: #252525 }
 .eventHistoryButton
 {
 	width: 6%;
@@ -566,6 +566,22 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 9%;
 	font-size: 26px;
 	font-weight: 700;
+	border-right: 1px solid #fff;
+}
+#undoingIndicator
+{
+	text-align: right;
+	font-family: 'Ropa sans';
+	font-size: 18px;
+}
+#undoingIndicator > *
+{
+	margin-top: 2%;
+	vertical-align: bottom;
+}
+#undoingIndicator img
+{
+	width: 9%;
 }
 .eventHistoryButton:hover
 {
@@ -578,7 +594,6 @@ span.r, p.r {color: #ef282a; background: none !important }
 	cursor: default;
 	background-color: #064058 !important;
 }
-#btnUndo.btnDisabled:hover { cursor: not-allowed }
 #eventHistory
 {
 	width: 79%;

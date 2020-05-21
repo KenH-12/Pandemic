@@ -150,7 +150,9 @@
 							<img src='images/pieces/outbreaksMarker.png' alt='Outbreaks Marker'/>
 						</div>
 
-						<div id='eventHistoryContainer' class='bottomPanelDiv'>
+						<div id='eventHistoryContainer'>
+							<div id='undoingIndicator'></div>
+
 							<div class='eventHistoryButton btnBack btnDisabled'>&#x2B9C;</div>
 							<div id='eventHistory'></div>
 							<div class='eventHistoryButton btnForward btnDisabled'>&#x2B9E;</div>

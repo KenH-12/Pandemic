@@ -31,6 +31,7 @@ class EventHistory
         this.$btnBack = this.$container.find(".btnBack");
         this.$btnForward = this.$container.find(".btnForward");
         this.$btnUndo = this.$container.find("#btnUndo");
+        this.$undoingIndicator = this.$container.children("#undoingIndicator");
 
         this.scrollLeft = 0;
         this.scrollDuration = 300;
@@ -261,7 +262,11 @@ class EventHistory
         this.$btnUndo
             .off("click")
             .removeClass("btnDisabled")
-            .click(function() { undoAction() });
+            .click(function()
+            {
+                eventHistoryButtonTooltip.hide().unbindHoverEvents();
+                undoAction();
+            });
         
         eventHistoryButtonTooltip.checkHoverState();
     }
@@ -291,6 +296,37 @@ class EventHistory
                 return true;
         }
         return false;
+    }
+
+    async indicateUndoIsInProgress()
+    {
+        const $elements = $("<span>Undoing last action...</span><img src='images/loading.gif' />").css("opacity", 0.01);
+        this.$undoingIndicator.append($elements);
+
+        await animationPromise({
+            $elements,
+            desiredProperties: { opacity: 1 },
+            duration: 200
+        });
+
+        removeInlineStylePropertiesFrom($elements, "opacity");
+    }
+
+    async indicateFinishedUndoing()
+    {
+        const { $undoingIndicator } = this,
+            opacity = 0.01,
+            $elements = $undoingIndicator.children("img").css({ opacity }).siblings();
+
+        await animationPromise({
+            $elements,
+            desiredProperties: { opacity },
+            duration: 200
+        });
+        
+        $undoingIndicator.empty();
+
+        eventHistoryButtonTooltip.bindHoverEvents().checkHoverState();
     }
 }
 

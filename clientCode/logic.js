@@ -3215,10 +3215,9 @@ function positionRemovedInfectionCardsContainer()
 
 function resizeBottomPanelElements()
 {
-	const $eventHistoryContainer = $("#eventHistoryContainer"),
-		{ boardHeight, topPanelHeight } = gameData,
+	const { boardHeight, topPanelHeight } = gameData,
 		panelOffsetTop = boardHeight - topPanelHeight;
-	$(".bottomPanelDiv").not($eventHistoryContainer)
+	$(".bottomPanelDiv")
 		.height(topPanelHeight)
 		.offset({ top: panelOffsetTop });
 
@@ -3228,12 +3227,14 @@ function resizeBottomPanelElements()
 		.height(topPanelHeight + titleHeight)
 		.offset({ top: panelOffsetTop - titleHeight });
 	
-	const ehContainerHeight = topPanelHeight * 0.4,
+	const $eventHistoryContainer = $("#eventHistoryContainer"),
+		ehHeight = $eventHistoryContainer.children("#eventHistory").width()*.15,
+		ehContainerHeight = ehHeight*2.05,
 		boardHeightForgiveness = 3;
 	$eventHistoryContainer.height(ehContainerHeight)
 		.offset({ top: boardHeight - ehContainerHeight })
-		.children().height(ehContainerHeight)
-		.css("line-height", ehContainerHeight*1.07 + "px");
+		.children().height(ehHeight)
+		.not("#undoingIndicator").css("line-height", ehHeight*1.1 + "px");
 	
 	if (boardHeight - boardHeightForgiveness <= $(window).height())
 		ensureDivPositionIsWithinWindowHeight($eventHistoryContainer, { windowPadding: 0 });
@@ -8014,6 +8015,8 @@ async function undoAction()
 		removeDiscardPrompt();
 	else
 		resetActionPrompt({ actionCancelled: true });
+	
+	await eventHistory.indicateUndoIsInProgress();
 
 	const {
 			undoneEventIds,
@@ -8026,6 +8029,8 @@ async function undoAction()
 	await animateUndoEvents(undoneEventIds, wasContingencyCard);
 	eventHistory.events.length = eventIndex;
 	
+	eventHistory.indicateFinishedUndoing();
+
 	if (prevStepName)
 	{
 		// If a One Quiet Night event skipped the 'infect cities' step,
@@ -8066,72 +8071,69 @@ function getLastUndoableEvent()
 	return { event: false };
 }
 
-function animateUndoEvents(undoneEventIds, wasContingencyCard)
+async function animateUndoEvents(undoneEventIds, wasContingencyCard)
 {
-	return new Promise(async resolve =>
-	{
-		if (!undoneEventIds)
-			return resolve();
-		
-		disableInfectionDiscardHoverEvents();
-		disablePlayerDiscardHoverEvents();
-		
-		const { events } = eventHistory;
-		let event;
-		
-		for (let id of undoneEventIds.reverse())
-		{
-			for (let i = events.length - 1; i >= 0; i--)
-			{
-				event = events[i];
-				if (event.id == id)
-					break;
-			}
+	if (!undoneEventIds)
+		return Promise.resolve();
 	
-			if (wasContingencyCard && !event.wasTriggered)
-			{
-				await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
-				await sleep(getDuration("shortInterval"));
-			}
-
-			if (event instanceof MovementAction
-				|| event instanceof Discard
-				|| event instanceof DiscoverACure
-				|| event instanceof Airlift
-				|| event instanceof OneQuietNight)
-				await event.animateUndo(wasContingencyCard);
-			else if (event instanceof DiseaseCubeRemoval)
-				await event.animateUndo(placeDiseaseCubes);
-			else if (event instanceof ResearchStationPlacement)
-				await event.animateUndo(animateResearchStationBackToSupply, wasContingencyCard);
-			else if (event instanceof PlanContingency)
-				await event.animateUndo(animateDiscardPlayerCard);
-			else if (event instanceof OneQuietNight)
-			{
-				await event.animateUndo(wasContingencyCard);
-				indicateOneQuietNightStep({ off: true });
-			}
-			else if (event instanceof ResilientPopulation)
-				await event.animateUndo(wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
-			else if (typeof event.animateUndo === "function")
-				await event.animateUndo();
-			
-			if (wasContingencyCard && !event.wasTriggered) await collapsePlayerDiscardPile();
-
-			if (event instanceof ForecastPlacement)
-			{
-				event.detachFromDrawEvent();
-				eventHistory.enableBackButton();
-			}
-			else
-				await eventHistory.removeIcon(event);
+	disableInfectionDiscardHoverEvents();
+	disablePlayerDiscardHoverEvents();
+	
+	const { events } = eventHistory;
+	let event;
+	
+	for (let id of undoneEventIds.reverse())
+	{
+		for (let i = events.length - 1; i >= 0; i--)
+		{
+			event = events[i];
+			if (event.id == id)
+				break;
 		}
 
-		enableInfectionDiscardHoverEvents();
-		enablePlayerDiscardHoverEvents();
+		if (wasContingencyCard && !event.wasTriggered)
+		{
+			await expandPlayerDiscardPile({ showRemovedCardsContainer: true });
+			await sleep(getDuration("shortInterval"));
+		}
 
-		resolve();
-	});
+		if (event instanceof MovementAction
+			|| event instanceof Discard
+			|| event instanceof DiscoverACure
+			|| event instanceof Airlift
+			|| event instanceof OneQuietNight)
+			await event.animateUndo(wasContingencyCard);
+		else if (event instanceof DiseaseCubeRemoval)
+			await event.animateUndo(placeDiseaseCubes);
+		else if (event instanceof ResearchStationPlacement)
+			await event.animateUndo(animateResearchStationBackToSupply, wasContingencyCard);
+		else if (event instanceof PlanContingency)
+			await event.animateUndo(animateDiscardPlayerCard);
+		else if (event instanceof OneQuietNight)
+		{
+			await event.animateUndo(wasContingencyCard);
+			indicateOneQuietNightStep({ off: true });
+		}
+		else if (event instanceof ResilientPopulation)
+			await event.animateUndo(wasContingencyCard, expandInfectionDiscardPile, collapseInfectionDiscardPile);
+		else if (typeof event.animateUndo === "function")
+			await event.animateUndo();
+		
+		if (wasContingencyCard && !event.wasTriggered) await collapsePlayerDiscardPile();
+
+		if (event instanceof ForecastPlacement)
+		{
+			event.detachFromDrawEvent();
+			eventHistory.enableBackButton();
+		}
+		else
+			await eventHistory.removeIcon(event);
+	}
+
+	enableInfectionDiscardHoverEvents();
+	enablePlayerDiscardHoverEvents();
+
+	return Promise.resolve();
 }
 
 setup();
