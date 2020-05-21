@@ -2,59 +2,67 @@
     try
     {
         session_start();
-        require "../../connect.php";
-        include "../../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["currentStep"]))
+        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+        require "$rootDir/Pandemic/serverCode/connect.php";
+        require "$rootDir/Pandemic/serverCode/utilities.php";
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["activeRole"]))
+        if (!isset($data["activeRole"]))
             throw new Exception("Role not set.");
         
-        if (!isset($_POST["eventID"]))
+        if (!isset($data["eventID"]))
             throw new Exception("Event id not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["activeRole"];
-        $eventID = $_POST["eventID"];
+        $currentStep = $data["currentStep"];
+        $activeRole = $data["activeRole"];
+        $eventID = $data["eventID"];
 
         $ONE_QUIET_NIGHT_CARDKEY = "oneq";
 
-        $event = getEventById($mysqli, $game, $eventID);
-        validateEventCanBeUndone($mysqli, $game, $event);
+        $event = getEventById($pdo, $game, $eventID);
+        validateEventCanBeUndone($pdo, $game, $event);
 
         $role = $event["role"];
         $eventTurnNum = $event["turnNum"];
 
-        $turnNum = getTurnNumber($mysqli, $game);
+        $turnNum = getTurnNumber($pdo, $game);
 
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
 
-        $response["wasContingencyCard"] = moveEventCardToPrevPile($mysqli, $game, $ONE_QUIET_NIGHT_CARDKEY, $event);
-        $roleHasTooManyCards = roleHasTooManyCards($mysqli, $game, $role);
+        $response["wasContingencyCard"] = moveEventCardToPrevPile($pdo, $game, $ONE_QUIET_NIGHT_CARDKEY, $event);
+        $roleHasTooManyCards = roleHasTooManyCards($pdo, $game, $role);
 
         // It's possible to undo One Quiet Night after the 'infect cities' step has been skipped and the next turn has begun,
         // but only if nothing has been done in said next turn.
         if ($turnNum != $eventTurnNum)
         {
             $prevStepName = $roleHasTooManyCards ? "discard" : "infect cities";
-            $response["prevTurnRoleID"] = goToStepBeforeOneQuietNight($mysqli, $game, $prevStepName);
+            $response["prevTurnRoleID"] = goToStepBeforeOneQuietNight($pdo, $game, $prevStepName);
             
             $response["prevTurnNum"] = $eventTurnNum;
             $response["prevStepName"] = $prevStepName;
         }
         else if ($roleHasTooManyCards)
         {
-            $prevStep = getPreviousDiscardStepName($mysqli, $game);
-            $response["prevStepName"] = updateStep($mysqli, $game, $currentStep, $prevStep, $activeRole);
+            $prevStep = getPreviousDiscardStepName($pdo, $game);
+            $response["prevStepName"] = updateStep($pdo, $game, $currentStep, $prevStep, $activeRole);
         }
 
         $response["undoneEventIds"] = array($eventID);
-        deleteEvent($mysqli, $game, $eventID);
+        deleteEvent($pdo, $game, $eventID);
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Failed to undo One Quiet Night: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
@@ -62,13 +70,14 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>
