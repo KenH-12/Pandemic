@@ -1154,13 +1154,13 @@ function deleteEvent($pdo, $game, $eventID)
         throwException($pdo, "Failed to delete event");
 }
 
-function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eventToUndo = false)
+function previousStep($pdo, $game, $currentTurnRoleID, $currentStepName, $eventToUndo = false)
 {
     $DISCARD = "ds";
     $PASS_ACTIONS = "pa";
     
     if ($eventToUndo && $eventToUndo["eventType"] === $DISCARD)
-        $prevStepName = getPreviousDiscardStepName($mysqli, $game);
+        $prevStepName = getPreviousDiscardStepName($pdo, $game);
     else if ($currentStepName === "hand limit")
         $prevStepName = "action " . (countEventsOfTurn($pdo, $game, getActionEventTypes()));
     else if ($eventToUndo && $eventToUndo["eventType"] === $PASS_ACTIONS)
@@ -1174,13 +1174,14 @@ function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eve
     else
         throwException($pdo, "Cannot revert to previous step from '$currentStepName' step.");
     
-    $mysqli->query("UPDATE vw_gamestate
-                    SET step = getStepID('$prevStepName')
-                    WHERE game = $game
-                    AND stepName = '$currentStepName'
-                    AND turn = $currentTurnRoleID");
+    $stmt = $pdo->prepare("UPDATE game
+                            SET stepID = udf_getStepID('$prevStepName')
+                            WHERE gameID = ?
+                            AND stepID = udf_getStepID(?)
+                            AND turnRoleID = ?");
+    $stmt->execute([$game, $currentStepName, $currentTurnRoleID]);
     
-    if ($mysqli->affected_rows != 1)
+    if ($stmt->rowCount() !== 1)
         throwException($pdo, "Failed to revert to previous '$prevStepName' step from '$currentStepName' step");
     
     return $prevStepName;
@@ -1207,29 +1208,33 @@ function getPreviousDiscardStepName($pdo, $game)
     return "hand limit";
 }
 
-function goToStepBeforeOneQuietNight($mysqli, $game, $prevStepName)
+function goToStepBeforeOneQuietNight($pdo, $game, $prevStepName)
 {
     // The card draw event of the previous turn is a good place to ensure that we retrieve the correct prevTurnRoleID.
-    $prevTurnNum = getTurnNumber($mysqli, $game) - 1;
+    $prevTurnNum = getTurnNumber($pdo, $game) - 1;
     $CARD_DRAW = "cd";
-    $prevTurnRoleID = $mysqli->query("SELECT role AS 'prevTurnRoleID'
-                                    FROM vw_event
-                                    WHERE game = $game
-                                    AND turnNum = $prevTurnNum
-                                    AND eventType = '$CARD_DRAW'")->fetch_assoc()["prevTurnRoleID"];
+
+    $stmt = $pdo->prepare("SELECT role AS 'prevTurnRoleID'
+                            FROM vw_event
+                            WHERE game = ?
+                            AND turnNum = $prevTurnNum
+                            AND eventType = '$CARD_DRAW'");
+    $stmt->execute([$game]);
+    $prevTurnRoleID = $stmt->fetch()["prevTurnRoleID"];
     
     // Decrement the turn number,
     // set the turn to the prevTurnRoleID,
     // and set the step to that which preceded the skipping of the 'infect cities' step by One Quiet Night
     // (could be 'infect cities' or 'discard').
-    $mysqli->query("UPDATE vw_gamestate
-                    SET turnNum = $prevTurnNum,
-                        turn = $prevTurnRoleID,
-                        step = getStepID('$prevStepName')
-                    WHERE game = $game
-                    AND stepName = 'action 1'");
+    $stmt = $pdo->prepare("UPDATE game
+                            SET turnNumber = $prevTurnNum,
+                                turnRoleID = $prevTurnRoleID,
+                                stepID = udf_getStepID(?)
+                            WHERE gameID = ?
+                            AND stepID = udf_getStepID('action 1')");
+    $stmt->execute([$prevStepName, $game]);
     
-    if ($mysqli->affected_rows != 1)
+    if ($stmt->rowCount() !== 1)
         throwException($pdo, "could not revert to the step which preceded the skipped 'infect cities' step of the previous turn.");
     
     return $prevTurnRoleID;
