@@ -375,7 +375,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: [strings.eventCardPlayabilityRule, "Add 1 research station to any city."],
 		instructions: "Drag and drop a research station from the research station supply onto the city of your choice.",
 		propertyNames: ["cityKey", "relocationKey"],
-		actionPathName: "buildResearchStation" // since gov' grant's logic is so similar
+		actionPathName: "actions/buildResearchStation" // since gov' grant's logic is so similar
 	},
 	gameEnd: {
 		name: "Game End",
