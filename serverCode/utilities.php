@@ -729,7 +729,7 @@ function getAutoTreatDiseaseEvents($pdo, $game, $cityKey, $diseaseColor = false)
 
 function updateRoleLocation($pdo, $game, $role, $originKey, $destinationKey)
 {
-    $stmt = $pdo->prepare("UPDATE pandemic.vw_player
+    $stmt = $pdo->prepare("UPDATE vw_player
                         SET location = :destinationKey
                         WHERE game = :game
                         AND rID = :rID
@@ -898,17 +898,20 @@ function eventCardSatisfiedDiscard($pdo, $game, $currentStep, $discardingRole, $
 // Event cards can be played from a role's hand,
 // or via the Contingency Planners's special ability which removes the card from the game instead of discarding it.
 // Returns true if the card was placed back in the 'contingency' pile, otherwise returns false.
-function moveEventCardToPrevPile($mysqli, $game, $cardKey, $eventToUndo)
+function moveEventCardToPrevPile($pdo, $game, $cardKey, $eventToUndo)
 {
-    $currentPile = $mysqli->query("SELECT pile
-                                    FROM vw_playerCard
-                                    WHERE game = $game
-                                    AND cardKey = '$cardKey'")->fetch_assoc()["pile"];
+    $stmt = $pdo->prepare("SELECT pile
+                            FROM vw_playerCard
+                            WHERE game = ?
+                            AND cardKey = ?");
+    $stmt->execute([$game, $cardKey]);
+
+    $currentPile = $stmt->fetch()["pile"];
     
     // The event card may have been removed by the Contingency Planner's special ability.
     $prevPile = $currentPile === "removed" ? "contingency" : $eventToUndo["role"];
     
-    moveCardsToPile($mysqli, $game, "player", $currentPile, $prevPile, $cardKey);
+    moveCardsToPile($pdo, $game, "player", $currentPile, $prevPile, $cardKey);
 
    return $prevPile === "contingency";
 }
@@ -1045,18 +1048,19 @@ function getGameEndCause($pdo, $game)
     return $result->fetch()["endCause"];
 }
 
-function getEventById($mysqli, $game, $eventID)
+function getEventById($pdo, $game, $eventID)
 {
-    $result = $mysqli->query("SELECT * FROM vw_event WHERE game = $game AND id = $eventID");
+    $stmt = $pdo->prepare("SELECT * FROM vw_event WHERE game = ? AND id = ?");
+    $stmt->execute([$game, $eventID]);
     
-    if ($result->num_rows === 0)
+    if ($stmt->rowCount() === 0)
         throwException($pdo, "the event does not exist.");
     
-    return $result->fetch_assoc();
+    return $stmt->fetch();
 }
 
 // Throws an PDOException if undoing $event is not allowed.
-function validateEventCanBeUndone($mysqli, $game, $event)
+function validateEventCanBeUndone($pdo, $game, $event)
 {
     $disallowedEventTypes = array("sh", "ii", "cd", "ic", "ec", "ef", "et", "ob", "oi", "fd", "ge");
 
@@ -1064,52 +1068,44 @@ function validateEventCanBeUndone($mysqli, $game, $event)
     if (in_array($eventType, $disallowedEventTypes))
         throwException($pdo, "events of type '$eventType' cannot be undone.");
     
-    $eventID = $event["id"];
-    $eventsAfterEvent = $mysqli->query("SELECT eventType FROM vw_event
-                                        WHERE game = $game
-                                        AND id > $eventID");
+    $stmt = $pdo->prepare("SELECT eventType FROM vw_event WHERE game = ? AND id > ?");
+    $stmt->execute([$game, $event["id"]]);
+    $eventsAfterEvent = $stmt->fetchAll();
     
     $disallowedEventsOccured = false;
     $notLastUndoableEvent = false;
     $undoableTriggeredEventTypes = array("at", "er");
-    while ($row = mysqli_fetch_assoc($eventsAfterEvent))
+    foreach ($eventsAfterEvent as $row)
     {
         $eventType = $row["eventType"];
+        
         if (in_array($eventType, $disallowedEventTypes))
-        {
-            $disallowedEventsOccured = true;
-            break; // because this condition takes precendence over the $notLastUndoableEvent condition.
-        }
+            throwException($pdo, "one or more events which cannot be undone occured after the event in question.");
         
         if (!in_array($eventType, $undoableTriggeredEventTypes))
-            $notLastUndoableEvent = true;
+            throwException($pdo, "one or more undoable events occured after the event in question.");
     }
-
-    if ($disallowedEventsOccured)
-        throwException($pdo, "one or more events which cannot be undone occured after the event in question.");
-        
-    if ($notLastUndoableEvent)
-        throwException($pdo, "one or more undoable events occured after the event in question.");
 }
 
-function undoEventsTriggeredByEvent($mysqli, $game, $triggerEventID)
+function undoEventsTriggeredByEvent($pdo, $game, $triggerEventID)
 {
     $AUTO_TREAT_DISEASE = "at";
     $ERADICATION = "er";
     
-    $eventsAfterEvent = $mysqli->query("SELECT * FROM vw_event
-                                        WHERE game = $game
-                                        AND id > $triggerEventID");
+    $stmt = $pdo->prepare("SELECT * FROM vw_event WHERE game = ? AND id > ?");
+    $stmt->execute([$game, $triggerEventID]);
+
+    $eventsAfterEvent = $stmt->fetchAll();
     
     $undoneEventIds = array();
-    while ($event = mysqli_fetch_assoc($eventsAfterEvent))
+    foreach ($eventsAfterEvent as $event)
     {
         $eventType = $event["eventType"];
 
         if ($eventType === $AUTO_TREAT_DISEASE)
-            array_push($undoneEventIds, undoAutoTreatDiseaseEvent($mysqli, $game, $event));
+            array_push($undoneEventIds, undoAutoTreatDiseaseEvent($pdo, $game, $event));
         else if ($eventType === $ERADICATION)
-            array_push($undoneEventIds, undoEradicationEvent($mysqli, $game, $event));
+            array_push($undoneEventIds, undoEradicationEvent($pdo, $game, $event));
         else
             throwException($pdo, "Failed to undo events triggered by event -- unexpected event type found: '$eventType'");
     }
@@ -1117,7 +1113,7 @@ function undoEventsTriggeredByEvent($mysqli, $game, $triggerEventID)
     return $undoneEventIds;
 }
 
-function undoAutoTreatDiseaseEvent($mysqli, $game, $event)
+function undoAutoTreatDiseaseEvent($pdo, $game, $event)
 {
     $eventID = $event["id"];
     $eventDetails = explode(",", $event["details"]);
@@ -1125,36 +1121,36 @@ function undoAutoTreatDiseaseEvent($mysqli, $game, $event)
     $diseaseColor = $eventDetails[1];
     $numCubesRemoved = $eventDetails[2];
     
-    addCubesToCity($mysqli, $game, $cityKey, $diseaseColor, $numCubesRemoved);
-    deleteEvent($mysqli, $game, $eventID);
+    addCubesToCity($pdo, $game, $cityKey, $diseaseColor, $numCubesRemoved);
+    deleteEvent($pdo, $game, $eventID);
 
     return $eventID;
 }
 
-function undoEradicationEvent($mysqli, $game, $event)
+function undoEradicationEvent($pdo, $game, $event)
 {
     $column = $event["details"] . "StatusID";
     $eventID = $event["id"];
 
-    $mysqli->query("UPDATE pandemic
-                    SET $column = getDiseaseStatusID('cured')
-                    WHERE gameID = $game");
+    $stmt = $pdo->prepare("UPDATE pandemic
+                            SET $column = getDiseaseStatusID('cured')
+                            WHERE gameID = ?");
+    $stmt->execute([$game]);
 
-    if ($mysqli->affected_rows != 1)
+    if ($stmt->rowCount() !== 1)
         throwException($pdo, "Failed to undo Eradication event");
     
-    deleteEvent($mysqli, $game, $eventID);
+    deleteEvent($pdo, $game, $eventID);
 
     return $eventID;
 }
 
-function deleteEvent($mysqli, $game, $eventID)
+function deleteEvent($pdo, $game, $eventID)
 {
-    $mysqli->query("DELETE FROM vw_event
-                    WHERE game = $game
-                    AND id = $eventID");
+    $stmt = $pdo->prepare("DELETE FROM vw_event WHERE game = ? AND id = ?");
+    $stmt->execute([$game, $eventID]);
 
-    if ($mysqli->affected_rows != 1)
+    if ($stmt->rowCount() !== 1)
         throwException($pdo, "Failed to delete event");
 }
 
@@ -1190,15 +1186,18 @@ function previousStep($mysqli, $game, $currentTurnRoleID, $currentStepName, $eve
     return $prevStepName;
 }
 
-function getPreviousDiscardStepName($mysqli, $game)
+function getPreviousDiscardStepName($pdo, $game)
 {
     $CARD_DRAW = "cd";
-    $turnNum = getTurnNumber($mysqli, $game);
-    $cardsWereDrawnThisTurn = $mysqli->query("SELECT COUNT(*) AS 'numEvents'
-                                            FROM vw_event
-                                            WHERE game = $game
-                                            AND turnNum = $turnNum
-                                            AND eventType = '$CARD_DRAW'")->fetch_assoc()["numEvents"] > 0;
+    $turnNum = getTurnNumber($pdo, $game);
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS 'numEvents'
+                            FROM vw_event
+                            WHERE game = ?
+                            AND turnNum = $turnNum
+                            AND eventType = '$CARD_DRAW'");
+    $stmt->execute([$game]);
+    $cardsWereDrawnThisTurn = $stmt->fetch()["numEvents"] > 0;
     
     // The "discard" step is used when a role's hand limit is exceeded after the 'card draw' step.
     if ($cardsWereDrawnThisTurn)

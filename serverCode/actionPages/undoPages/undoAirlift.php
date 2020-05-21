@@ -2,30 +2,34 @@
     try
     {
         session_start();
-        require "../../connect.php";
-        include "../../utilities.php";
         
         if (!isset($_SESSION["game"]))
             throw new Exception("Game not found.");
 
-        if (!isset($_POST["currentStep"]))
+        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
+        require "$rootDir/Pandemic/serverCode/connect.php";
+        require "$rootDir/Pandemic/serverCode/utilities.php";
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data["currentStep"]))
             throw new Exception("Current step not set.");
         
-        if (!isset($_POST["activeRole"]))
+        if (!isset($data["activeRole"]))
             throw new Exception("Role not set.");
         
-        if (!isset($_POST["eventID"]))
+        if (!isset($data["eventID"]))
             throw new Exception("Event id not set.");
         
         $game = $_SESSION["game"];
-        $currentStep = $_POST["currentStep"];
-        $activeRole = $_POST["activeRole"];
-        $eventID = $_POST["eventID"];
+        $currentStep = $data["currentStep"];
+        $activeRole = $data["activeRole"];
+        $eventID = $data["eventID"];
         
         $AIRLIFT_CARDKEY = "airl";
 
-        $event = getEventById($mysqli, $game, $eventID);
-        validateEventCanBeUndone($mysqli, $game, $event);
+        $event = getEventById($pdo, $game, $eventID);
+        validateEventCanBeUndone($pdo, $game, $event);
 
         $role = $event["role"];
         $eventDetails = explode(",", $event["details"]);
@@ -33,24 +37,28 @@
         $originKey = $eventDetails[1];
 		$destinationKey = $eventDetails[2];
 
-        $mysqli->autocommit(FALSE);
+        $pdo->beginTransaction();
         
-        updateRoleLocation($mysqli, $game, $airliftedRole, $destinationKey, $originKey);
-        $response["wasContingencyCard"] = moveEventCardToPrevPile($mysqli, $game, $AIRLIFT_CARDKEY, $event);
+        updateRoleLocation($pdo, $game, $airliftedRole, $destinationKey, $originKey);
+        $response["wasContingencyCard"] = moveEventCardToPrevPile($pdo, $game, $AIRLIFT_CARDKEY, $event);
 
         $response["undoneEventIds"] = array($eventID);
         // If the medic moved as a result of the airlift, undo any resulting auto-treat disease and eradication events.
-        if (getRoleName($mysqli, $airliftedRole) === "Medic"
-            && $triggeredEventIds = undoEventsTriggeredByEvent($mysqli, $game, $eventID))
+        if (getRoleName($pdo, $airliftedRole) === "Medic"
+            && $triggeredEventIds = undoEventsTriggeredByEvent($pdo, $game, $eventID))
             $response["undoneEventIds"] = array_merge($response["undoneEventIds"], $triggeredEventIds);
 
-        deleteEvent($mysqli, $game, $eventID);
+        deleteEvent($pdo, $game, $eventID);
 
-        if (roleHasTooManyCards($mysqli, $game, $role))
+        if (roleHasTooManyCards($pdo, $game, $role))
         {
-            $prevStep = getPreviousDiscardStepName($mysqli, $game);
-            $response["prevStepName"] = updateStep($mysqli, $game, $currentStep, $prevStep, $activeRole);
+            $prevStep = getPreviousDiscardStepName($pdo, $game);
+            $response["prevStepName"] = updateStep($pdo, $game, $currentStep, $prevStep, $activeRole);
         }
+    }
+    catch(PDOException $e)
+    {
+        $response["failure"] = "Failed to undo Airlift: PDOException: " . $e->getMessage();
     }
     catch(Exception $e)
     {
@@ -58,13 +66,14 @@
     }
     finally
     {
-        if (isset($response["failure"]))
-            $mysqli->rollback();
-        else
-            $mysqli->commit();
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
         
-        $mysqli->close();
-
         echo json_encode($response);
     }
 ?>
