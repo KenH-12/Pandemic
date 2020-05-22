@@ -514,9 +514,11 @@ function disableActions()
 {
 	const $actionsContainer = $("#actionsContainer");
 
-	$actionsContainer.find(".button").not("#btnCancelAction")
+	$actionsContainer.find(".button")
 		.off("click")
-		.addClass("btnDisabled");
+		.addClass("btnDisabled")
+		.filter("#btnCancelAction")
+		.addClass("hidden");
 
 	disableDiseaseCubeEvents();
 	disableEventCards();
@@ -785,7 +787,7 @@ function enableBtnCancelAction()
 			resetActionPrompt({ actionCancelled: true });
 			resumeCurrentStep();
 		})
-		.removeClass("hidden");
+		.removeClass("hidden btnDisabled");
 }
 
 function resetActionPrompt({ actionCancelled } = {})
@@ -1167,7 +1169,8 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.appendOptionButtons("playerCard", cardKeys, 
 			function($clicked)
 			{
-				$clicked.off("mouseleave"); // prevents the call to hideTravelPathArrow
+				$clicked.off("click mouseleave").siblings(".playerCard").remove(); // unbinding mouseleave prevents the call to hideTravelPathArrow
+				actionInterfacePopulator.replaceInstructions("Destination:");
 				movementAction(directFlight, getCity($clicked.data("key")));
 			})
 			.$actionInterface.find(".playerCard")
@@ -1696,8 +1699,7 @@ function forecastInProgress()
 async function forecastDraw(forecastEventToLoad)
 {
 	gameData.promptingEventType = eventTypes.forecastPlacement;
-	
-	$("#btnCancelAction").off("click").addClass("hidden");
+
 	disableActions();
 	eventHistory.enableBackButton();
 
