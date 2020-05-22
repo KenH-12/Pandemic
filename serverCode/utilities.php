@@ -32,12 +32,14 @@ function getTurnNumber($pdo, $game)
     return $stmt->fetch()["turnNum"];
 }
 
-function getCurrentStepName($mysqli, $game)
+function getCurrentStepName($pdo, $game)
 {
-    $stepName = $mysqli->query("SELECT stepName
-                                FROM vw_gamestate
-                                WHERE game = $game")->fetch_assoc()["stepName"];
-    return $stepName;
+    $stmt = $pdo->prepare("SELECT stepName
+                            FROM vw_gamestate
+                            WHERE game = ?");
+    $stmt->execute([$game]);
+    
+    return $stmt->fetch()["stepName"];
 }
 
 function getActiveRole($pdo, $game)

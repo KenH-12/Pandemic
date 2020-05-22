@@ -15,6 +15,9 @@ at the very start of a game, the undo action button tooltip says '"Initial Infec
 
 after undoing the discard event which preceded a skipped Infect Cities step,
 	the Infect Cities play step should indicate that One Quiet Night will occur that turn
+		additionally, after the Infect Cities play step should be updated after undoing One Quiet Night
+	
+the research station supply count is not visible
 
 TO DO
 -----
