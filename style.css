@@ -283,7 +283,7 @@ html,
 	z-index: 4;
 	width: 1.6%;
 }
-.pawn.ui-draggable { cursor: grab }
+.pawn.ui-draggable:not(.ui-draggable-disabled) { cursor: grab }
 .pawnArrow,
 #resilientPopulationArrow,
 #governmentGrantArrow
