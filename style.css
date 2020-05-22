@@ -790,6 +790,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 20%;
 	margin-left: 5%;
 }
+#researchStationSupplyCount
+{
+	display: inline-block;
+	color: #fff;
+	font-size: 22px;
+	margin-left: 31.5%;
+}
 
 .noGlow { transition: filter 0.3s }
 .smallGlow,
@@ -817,12 +824,6 @@ span.r, p.r {color: #ef282a; background: none !important }
 .warning-critical-smallGlow
 { transition: filter .25s }
 
-#researchStationSupplyCount
-{
-	display: inline-block;
-	color: #fff;
-	margin-left: 31.5%;
-}
 #playerDeckContainer
 {
 	width: 14%;
