@@ -970,11 +970,11 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 #outbreaksMarker
 {
-	transform: rotate(45deg);
 	top: 54.4%;
 	left: 2.8%;
 	width: 3%;
 }
+#outbreaksMarker img { transform: rotate(45deg) }
 .outbreaksHighlight.top
 {
 	width: 100%;
