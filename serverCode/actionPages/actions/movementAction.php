@@ -33,46 +33,52 @@
 		$actionCode = $details["actionCode"];
 		$originKey = $details["originKey"];
 		$destinationKey = $details["destinationKey"];
+
+		$isRendezvous = $actionCode === "rv";
+		$isDriveFerry = $actionCode === "dr";
+		$isShuttleFlight = $actionCode === "sf";
+		$isOperationsFlight = $actionCode === "of";
+		$isDirectFlight = $actionCode === "df";
+		$isCharterFlight = $actionCode === "cf";
 		
 		// The Dispatcher can move another player's pawn as if it were his own.
 		// In such cases, $activeRole will be the Dispatcher, and $role will be the dispatched role.
 		$activeRole = getActiveRole($pdo, $game);
 		$isDispatchEvent = false;
-		if ($role != $activeRole)
+		if ($role != $activeRole || $isRendezvous)
 		{
 			if (getRoleName($pdo, $activeRole) === "Dispatcher")
 				$isDispatchEvent = true;
 			else
-				throw new Exception("Dispatch failed: invalid role");
+				throw new Exception("Dispatch failed: action attempted by invalid role");
 		}
 		
 		// Drive/Ferry allows the player to move to a city that's
 		// connected to their current city by a white line.
-		if ($actionCode === "dr" && !citiesAreConnected($pdo, $originKey, $destinationKey))
+		if ($isDriveFerry && !citiesAreConnected($pdo, $originKey, $destinationKey))
 			throw new Exception("Invalid Drive/Ferry: the current city is not connected by a white line to the destination");
 		
 		// Shuttle Flights require there to be a research station at both the current location and the destination.
 		// Operations Flights require a research station at the current location.
-		if ($actionCode === "sf" || $actionCode === "of")
+		if ($isShuttleFlight || $isOperationsFlight)
 		{
 			if (!cityHasResearchStation($pdo, $game, $originKey))
 				throw new Exception("Invalid movement: the movement type requires the origin city to have a research station.");
 			
-			if ($actionCode === "sf" && !cityHasResearchStation($pdo, $game, $destinationKey))
+			if ($isShuttleFlight && !cityHasResearchStation($pdo, $game, $destinationKey))
 				throw new Exception("Invalid Shuttle Flight: the destination city must have a research station.");
 		}
 
 		$pdo->beginTransaction();
 		
 		// A few movement types require the player to discard a city card:
-		$typesRequiringDiscard = array("df", "cf", "of");
-		if (in_array($actionCode, $typesRequiringDiscard))
+		if ($isDirectFlight || $isCharterFlight || $isOperationsFlight)
 		{
-			if ($actionCode === "df") // Direct Flights require the player to discard the card that matches the destination
+			if ($isDirectFlight) // Direct Flights require the player to discard the card that matches the destination
 				$cardKey = $destinationKey;
-			else if ($actionCode === "cf") // Charter Flights require the player to discard the card that matches their current location
+			else if ($isCharterFlight) // Charter Flights require the player to discard the card that matches their current location
 				$cardKey = $originKey;
-			else if ($actionCode === "of") // Operations Flights have a number of requirements...
+			else if ($isOperationsFlight) // Operations Flights have a number of requirements...
 			{
 				// The player must specify and discard any city card.
 				if (!isset($details["discardKey"]))
@@ -88,21 +94,18 @@
 
 		$eventDetails = "$originKey,$destinationKey";
 
-		// One of the Dispatcher's special abilities, informally referred to as "rendezvous" ("rv"),
-		// allows them to move any pawn to a city containing another pawn.
-		if ($actionCode === "rv")
+		if ($isDispatchEvent) // Dispatch event details include the dispatched $role and the $actionCode as the movement type.
 		{
-			$rolesAtDestination = getRolesAtRendezvousDestination($pdo, $game, $role, $destinationKey);
-			$isDispatchEvent = true;
-
 			$eventDetails = "$role,$eventDetails,$actionCode";
 
-			if ($actionCode === "rv")
-				$eventDetails .= "," . implode("", $rolesAtDestination);
+			// One of the Dispatcher's special abilities, informally referred to as "rendezvous" ("rv"),
+			// allows them to move any pawn to a city containing another pawn.
+			if ($isRendezvous)
+				$eventDetails .= "," . implode("", getRolesAtRendezvousDestination($pdo, $game, $role, $destinationKey));
 			
 			$actionCode = "dp";
 		}
-		else if ($actionCode === "of") // Operatons Flight's discard is uninferable
+		else if ($isOperationsFlight) // Operatons Flight's discard is uninferable
 			$eventDetails .= ",$cardKey";
 		
 		updateRoleLocation($pdo, $game, $role, $originKey, $destinationKey);
