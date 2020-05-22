@@ -38,7 +38,7 @@ function getCurrentStepName($pdo, $game)
                             FROM vw_gamestate
                             WHERE game = ?");
     $stmt->execute([$game]);
-    
+
     return $stmt->fetch()["stepName"];
 }
 
@@ -859,13 +859,12 @@ function discardOrRemoveEventCard($pdo, $game, $discardingRole, $cardKey)
 function getContingencyCardKey($pdo, $game)
 {
     $stmt = $pdo->prepare("SELECT cardKey
-                        FROM vw_playerCard
-                        WHERE game = ?
-                        AND pile = 'contingency'
-                        LIMIT 1");
+                            FROM vw_playerCard
+                            WHERE game = ?
+                            AND pile = 'contingency'");
     $stmt->execute([$game]);
     
-    if (!$stmt->fetchColumn())
+    if ($stmt->rowCount() === 0)
         return false;
     
     return $stmt->fetch()["cardKey"];

@@ -1322,7 +1322,8 @@ span.r, p.r {color: #ef282a; background: none !important }
 	margin-bottom: 3px;
 	cursor: pointer !important;
 }
-.discardPrompt p:not(.instructions)
+.cardsToKeep > p,
+.discardSelections > p
 {
 	margin: 0 2% 3px 2%;
 }
@@ -1333,7 +1334,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	padding: 0;
 	min-height: 45px;
 }
-.discardSelections .specialAbilityTag { width: 94% }
+.discardSelections .specialAbilityTag { width: 96% }
 .discardPrompt .cardsToKeep
 {
 	min-height: 45px;
