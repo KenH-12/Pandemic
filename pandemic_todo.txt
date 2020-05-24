@@ -5,8 +5,6 @@ the right panel scrollbar does not appear when the action buttons exceed the pag
 
 the infection rate tooltip within the indicator container is not hoverable
 
-at the very start of a game, the undo action button tooltip says '"Initial Infection" events cannot be undone'
-
 after undoing the discard event which preceded a skipped Infect Cities step,
 	the Infect Cities play step should indicate that One Quiet Night will occur that turn
 		additionally, after the Infect Cities play step should be updated after undoing One Quiet Night

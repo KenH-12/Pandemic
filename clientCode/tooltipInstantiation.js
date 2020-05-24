@@ -24,7 +24,6 @@ import {
 	getColorClass
 } from "./utilities/pandemicUtils.js";
 import { eventHistory } from "./eventHistory.js";
-import { cubeSupplies } from "./cubeSupply.js";
 
 export default function instantiateTooltips()
 {
@@ -245,16 +244,16 @@ function bindEventHistoryButtonHoverEvents()
 
 		if ($hoveredElement.attr("id") === "btnUndo")
 		{
-			if (isEnabled)
+			if (isEnabled || gameData.currentStep.name === "setup")
 				return "Undo last action";
 
 			if (eventHistory.lastEventCanBeUndone())
 				return "Cannot undo at this time...";
 			
 			const { events } = eventHistory,
-				lastEventName = events[events.length - 1].name;
+				lastEvent = events[events.length - 1];
 			
-			return `"${lastEventName}" events cannot be undone`;
+			return `"${lastEvent.displayName || lastEvent.name}" events<br/>cannot be undone`;
 		}
 
 		return `${ isEnabled ? "See" : "No" } ${ $hoveredElement.hasClass("btnBack") ? "older" : "newer" } events`;
