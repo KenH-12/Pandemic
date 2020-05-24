@@ -3131,24 +3131,31 @@ async function animateCardsToHand($cards)
 	return panel.animateReceiveCard($cards.first(), targetProperties);
 }
 
-function resizeAll()
+async function resizeAll()
 {
 	console.log("resizeAll()");
-	return new Promise(resolve =>
-	{
-		resizeBoard();
+
+	const devToolsWasOpen = !gameData.devToolsIsClosed;
+	gameData.checkDevToolsOpenState();
+
+	resizeBoard();
+	resizeTopPanelElements();
+
+	// If the resize event was triggered by the closing of the developer tools,
+	// the first call to resizeTopPanelElements yields an incorrect topPanelHeight.
+	if (devToolsWasOpen && gameData.devToolsIsClosed)
 		resizeTopPanelElements();
-		resizeBottomPanelElements();
-		resizeRightPanelElements();
-		repositionMarkers();
-		resizeAndRepositionPieces();
-		positionPawnArrows();
-		repositionSpecialEventBanner();
+	
+	resizeBottomPanelElements();
+	resizeRightPanelElements();
+	repositionMarkers();
+	resizeAndRepositionPieces();
+	positionPawnArrows();
+	repositionSpecialEventBanner();
 
-		gameData.windowWidth = gameData.boardWidth + gameData.panelWidth;
-
-		resolve();
-	});
+	gameData.windowWidth = gameData.boardWidth + gameData.panelWidth;
+	
+	return Promise.resolve();
 }
 $(window).resize(function(){ waitForFinalEvent(function(){resizeAll(true)}, 500, "resize"); });
 
@@ -3168,7 +3175,7 @@ function resizeTopPanelElements()
 		$topPanelDivs = $topPanel.children("div");
 	
 	$topPanelDivs.css("height", "auto");
-	gameData.topPanelHeight = $("#topPanel").height();
+	gameData.topPanelHeight = $topPanel.height();
 	$topPanelDivs.height(gameData.topPanelHeight);
 	resizeCubeSupplies();
 	gameData.infectionDeckOffset = $("#infectionDeckContainer img").offset();

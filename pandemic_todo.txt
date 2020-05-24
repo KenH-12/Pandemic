@@ -3,8 +3,6 @@ BUGS
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page loading
 
-if the developer tools are opened and then closed, the topPanelHeight is incorrect after the resize event
-
 the infection rate tooltip within the indicator container is not hoverable
 
 at the very start of a game, the undo action button tooltip says '"Initial Infection" events cannot be undone'

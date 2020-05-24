@@ -27,7 +27,9 @@ const gameData = {
 	pendingClusters: new Set(),
 	fastForwarding: false,
 	HAND_LIMIT: 7,
-	playerCardAnimationInterval: 0.4
+	playerCardAnimationInterval: 0.4,
+	devToolsIsClosed: true,
+	checkDevToolsOpenState: () => gameData.devToolsIsClosed = !devToolsIsOpen()
 }
 
 // Given the name of a role, returns the corresponding Player object.

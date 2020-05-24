@@ -198,3 +198,17 @@ function emailIsInvalid(email)
 {
 	return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.toLowerCase());
 }
+
+function devToolsIsOpen()
+{
+	const element = new Image();
+	let isOpen = false;
+
+	Object.defineProperty(element, 'id', {
+		get: () => isOpen = true
+	});
+
+	console.log(element);
+
+	return isOpen;
+}
