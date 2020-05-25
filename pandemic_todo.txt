@@ -1,14 +1,16 @@
 BUGS
 ----
-the right panel scrollbar does not appear when the action buttons exceed the page height
-	or does it...? perhaps just not on page loading
+area divs don't get removed
 
-after undoing the discard event which preceded a skipped Infect Cities step,
-	the Infect Cities play step should indicate that One Quiet Night will occur that turn
-		additionally, after the Infect Cities play step should be updated after undoing One Quiet Night
+the undo action button should not be enabled during the one quiet night animation
 
 TO DO
 -----
+allow scrolling
+
+don't use discardSelections for event cards
+	make sure that the contingency special ability rule is positioned properly above the btnConfirm
+
 loading gifs should appear after a short delay (if the connection is fast enough, they will not appear at all)
 
 if flight options are presented

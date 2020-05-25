@@ -8050,6 +8050,9 @@ async function undoAction()
 			gameData.turn = prevTurnRoleID;
 
 			$("#actionsContainer").slideUp();
+
+			if (isOneQuietNight())
+				indicateOneQuietNightStep();
 		}
 		
 		setCurrentStep(prevStepName);
@@ -8109,8 +8112,7 @@ async function animateUndoEvents(undoneEventIds, wasContingencyCard)
 		if (event instanceof MovementAction
 			|| event instanceof Discard
 			|| event instanceof DiscoverACure
-			|| event instanceof Airlift
-			|| event instanceof OneQuietNight)
+			|| event instanceof Airlift)
 			await event.animateUndo(wasContingencyCard);
 		else if (event instanceof DiseaseCubeRemoval)
 			await event.animateUndo(placeDiseaseCubes);
