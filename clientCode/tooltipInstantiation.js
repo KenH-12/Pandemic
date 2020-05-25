@@ -42,12 +42,13 @@ export default function instantiateTooltips()
 	bindPlayStepHoverEvents();
 }
 
+const containerSelector = "#boardContainer";
+
 function bindPlayerDeckHoverEvents()
 {
 	const positionRelativeToSelector = "#playerDeckContainer",
 		infoIconSelector = `${positionRelativeToSelector} .info`,
 		juxtaposition = "top",
-		containerSelector = "#boardContainer",
 		getPlayerDeckInfo = function()
 		{
 			const { numPlayerCardsRemaining, numEpidemics, epidemicCount } = gameData,
@@ -103,8 +104,7 @@ function bindCubeSuppliesInfoHoverEvents()
 {
 	const { diseaseCubeSupplyInfo, insufficientCubesWarning } = strings,
 		cubeSuppliesSelector = "#cubeSupplies",
-		juxtaposition = "bottom",
-		containerSelector = "#boardContainer";
+		juxtaposition = "bottom";
 	
 	new Tooltip({
 		content: `${diseaseCubeSupplyInfo}<p>${insufficientCubesWarning}</p>`,
@@ -163,13 +163,26 @@ function updateInfectionDeckTooltip()
 
 function bindInfectionRateInfoHoverEvents()
 {
+	const tooltipCssClass = "infectionRateTooltip";
+
 	new Tooltip({
 		getContent: () => `<p class='largeText'>Infection Rate: ${gameData.infectionRate}</p>${strings.infectionRateInfo}`,
-		hoverElementSelector: "#infectionRateMarker img, #stepIndicator .info",
-		getJuxtaposition: ({ $hoveredElement }) => $hoveredElement.closest("#stepIndicator").length ? "left" : "bottom",
-		containerSelector: "#boardContainer",
-		cssClassString: "infectionRateTooltip",
+		hoverElementSelector: "#infectionRateMarker img",
+		juxtaposition: "bottom",
+		containerSelector,
+		cssClassString: tooltipCssClass,
 		allowTooltipHovering: true,
+		afterShow: ({ $tooltip }) => bindEpidemicCardHoverEvents($tooltip)
+	}).bindHoverEvents();
+
+	new Tooltip({
+		content: strings.infectionRateInfo,
+		hoverElementSelector: "#stepIndicator .info",
+		juxtaposition: "left",
+		containerSelector,
+		cssClassString: tooltipCssClass,
+		allowTooltipHovering: true,
+		tooltipHoveringForgiveness: { right: 10 },
 		afterShow: ({ $tooltip }) => bindEpidemicCardHoverEvents($tooltip)
 	}).bindHoverEvents();
 
@@ -179,9 +192,9 @@ function bindInfectionRateInfoHoverEvents()
 				const eventType = getEventType($hoveredElement.attr("data-eventType"));
 				return getEventTypeTooltipContent(eventType, { pluralNameForm: true });
 			},
-		hoverElementSelector: ".infectionRateTooltip .hoverInfo:not(.epidemicInfo)",
+		hoverElementSelector: `.${tooltipCssClass} .hoverInfo:not(.epidemicInfo)`,
 		juxtaposition: "bottom",
-		containerSelector: "#boardContainer",
+		containerSelector,
 		cssClassString: "eventTypeTooltip"
 	}).bindHoverEvents();
 }
@@ -198,8 +211,7 @@ function bindOutbreakMarkerHoverEvents()
 				<p>${strings.tooManyOutbreaksWarning}</p>`;
 		},
 		juxtaposition = "right",
-		obMarkerTooltipClassName = "outbreaksMarkerTooltip",
-		containerSelector = "#boardContainer";
+		obMarkerTooltipClassName = "outbreaksMarkerTooltip";
 	
 	new Tooltip({
 		getContent,
@@ -233,7 +245,7 @@ const eventHistoryButtonTooltip = new Tooltip({
 	hoverElementSelector: ".eventHistoryButton",
 	cssClassString: "eventHistoryButtonTooltip",
 	juxtaposition: "top",
-	containerSelector: "#boardContainer",
+	containerSelector,
 	windowPadding: 1
 });
 function bindEventHistoryButtonHoverEvents()
@@ -264,7 +276,7 @@ function bindEventHistoryButtonHoverEvents()
 
 const eventDetailsTooltip = new Tooltip({
 	hoverElementSelector: "#eventHistory > div",
-	containerSelector: "#boardContainer",
+	containerSelector,
 	juxtaposition: "top",
 	cssClassString: "eventDetails",
 	allowTooltipHovering: true,
@@ -311,7 +323,6 @@ function bindEventDetailsHoverEvents()
 {
 	const eventTypeInfoSelector = ".eventDetails .eventTypeInfo",
 		hoverInfoSelector = ".eventDetails .hoverInfo",
-		containerSelector = "#boardContainer",
 		juxtaposition = "right",
 		cssClassString = "eventTypeTooltip";
 
@@ -384,8 +395,7 @@ function bindCuredDiseaseInfoHoverEvents()
 					<br/>
 					<span class='largeText'>Cures Discovered: ${4 - gameData.cures.remaining}</span>`;
 		},
-		juxtaposition = "top",
-		containerSelector = "#boardContainer";
+		juxtaposition = "top";
 	
 	new Tooltip({
 			getContent,
@@ -419,7 +429,7 @@ function bindResearchStationInfoHoverEvents()
 		hoverElementSelector: `${positionRelativeToSelector} > .title .info`,
 		positionRelativeToSelector,
 		juxtaposition: "top",
-		containerSelector: "#boardContainer",
+		containerSelector,
 		cssClassString: "rsInfo",
 		allowTooltipHovering: true,
 		tooltipHoveringForgiveness: { bottom: 30 }
@@ -431,7 +441,7 @@ function bindResearchStationInfoHoverEvents()
 		positionRelativeToSelector: ".rsInfo",
 		juxtaposition: "right",
 		alignArrowWithHoveredElement: true,
-		containerSelector: "#boardContainer",
+		containerSelector,
 		cssClassString: "eventTypeTooltip"
 	}).bindHoverEvents();
 }
@@ -439,7 +449,6 @@ function bindResearchStationInfoHoverEvents()
 function bindActionButtonHoverEvents()
 {
 	const $actionButtons = $("#rightPanel").find(".actionButton"),
-		containerSelector = "#boardContainer",
 		getContent = function(tooltip)
 			{
 				const $btn = $(tooltip.positionRelativeToSelector),
@@ -555,7 +564,7 @@ function bindEpidemicCardHoverEvents($container)
 			function()
 			{
 				$(this).removeAttr("id");
-				$("#boardContainer").children(".epidemicFull").remove();
+				$(containerSelector).children(".epidemicFull").remove();
 			});
 }
 
@@ -564,7 +573,7 @@ function unbindEpidemicCardHoverEvents($container)
 	$container.find(".playerCard.epidemic")
 		.off("mouseenter mouseleave");
 	
-	$("#boardContainer").children(".epidemicFull").remove();
+	$(containerSelector).children(".epidemicFull").remove();
 }
 
 async function showFullEpidemicCard($hoveredElement)
@@ -637,7 +646,7 @@ function bindPlayStepHoverEvents()
 		playStepTooltip = new Tooltip({
 			hoverElementSelector: `${playStepInfoSelector}:not(.${hiddenClass}):not(${epidemicInfoSelector})`,
 			getContent,
-			containerSelector: "#boardContainer",
+			containerSelector,
 			positionRelativeToSelector,
 			alignArrowWithHoveredElement: true,
 			cssClassString: "playStepTooltip eventTypeTooltip"
@@ -666,7 +675,7 @@ function bindPlayStepHoverEvents()
 
 function getHoverElementsWhichInterfereWithDragging()
 {
-	return $("#boardContainer").find(".info, .marker, #eventHistory > div");
+	return $(containerSelector).find(".info, .marker, #eventHistory > div");
 }
 
 function disableTooltipsWhileDragging()

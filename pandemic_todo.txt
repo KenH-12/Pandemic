@@ -3,8 +3,6 @@ BUGS
 the right panel scrollbar does not appear when the action buttons exceed the page height
 	or does it...? perhaps just not on page loading
 
-the infection rate tooltip within the indicator container is not hoverable
-
 after undoing the discard event which preceded a skipped Infect Cities step,
 	the Infect Cities play step should indicate that One Quiet Night will occur that turn
 		additionally, after the Infect Cities play step should be updated after undoing One Quiet Night
