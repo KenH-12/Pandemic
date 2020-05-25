@@ -205,13 +205,18 @@ export default class City
 
 	getOccupants(players)
 	{
+		const pawnPlacementIsPending = gameData.currentStep.name === "setup" && $("#boardContainer").children(".pawn.atla").length === 0;
+		
+		if (pawnPlacementIsPending)
+			return [];
+		
 		return getFilteredMemberArray(players,
 			player => player.cityKey === this.key);
 	}
 
 	// Positions any pawns and disease cubes on this city into a cluster.
 	// Returns a Promise with after the most relevant animation duration.
-	cluster({
+	async cluster({
             animatePawns,
 			$pawnToExclude,
 			animateCubes,
@@ -321,7 +326,7 @@ export default class City
 		if (checksPanelOcclusion)
 			checkMovementResultsForPanelOcclusion(this, movementResultsToCheckForOcclusion);
 
-		// Return a Promise with the most relevant duration.
+		// await the most relevant duration before resolving the Promise.
 		let ms = 0;
 		if (animateResearchStation) // Station animation takes the longest.
 			ms = getDuration("stationPlacement");
@@ -330,10 +335,11 @@ export default class City
 		else if (animatePawns)
 			ms = pawnAnimationDuration;
 
-		return sleep(ms);
+		await sleep(ms);
+		return Promise.resolve();
 	}
 
-	clusterResearchStation({
+	async clusterResearchStation({
 			animateResearchStation,
 			stationInitialOffset,
 			desiredStationOffset,
@@ -359,7 +365,8 @@ export default class City
 		else
 			$researchStation.offset(desiredStationOffset);
 		
-		return sleep(duration);
+		await sleep(duration);
+		return Promise.resolve();
 	}
 
 	getResearchStationOffset()
@@ -373,44 +380,41 @@ export default class City
 		return rsOffset;
 	}
 
-	clusterDiseaseCubes({ animate, desiredDiseaseCubeOffsets } = {})
+	async clusterDiseaseCubes({ animate, desiredDiseaseCubeOffsets } = {})
 	{
-		return new Promise(async resolve =>
+		const $cubes = $(`.diseaseCube.${this.key}`),
+			duration = animate ? getDuration("cubePlacement") : 0,
+			easing = easings.cubePlacement;
+		
+		if (!$cubes.length)
+			return Promise.resolve();
+		
+		if (!desiredDiseaseCubeOffsets)
 		{
-			const $cubes = $(`.diseaseCube.${this.key}`),
-				duration = animate ? getDuration("cubePlacement") : 0,
-				easing = easings.cubePlacement;
-			
-			if (!$cubes.length)
-				return resolve();
-			
-			if (!desiredDiseaseCubeOffsets)
-			{
-				desiredDiseaseCubeOffsets = this.getDiseaseCubeOffsets($cubes);
+			desiredDiseaseCubeOffsets = this.getDiseaseCubeOffsets($cubes);
 
-				if (this.checksPanelOcclusion)
-					checkMovementResultsForPanelOcclusion(this, formatCubeOffsetsForPanelOcclusionCheck(desiredDiseaseCubeOffsets), gameData);
-			}
-	
-			let $cubesOfColor, coords;
-			for (let color in desiredDiseaseCubeOffsets)
-			{
-				$cubesOfColor = $cubes.filter(`.${color}`);
-	
-				for (let i = 0; i < $cubesOfColor.length; i++)
-				{
-					coords = desiredDiseaseCubeOffsets[color][i];
+			if (this.checksPanelOcclusion)
+				checkMovementResultsForPanelOcclusion(this, formatCubeOffsetsForPanelOcclusionCheck(desiredDiseaseCubeOffsets), gameData);
+		}
 
-					if (animate)
-						$cubesOfColor.eq(i).animate(coords, getDuration(duration), easing);
-					else
-						$cubesOfColor.eq(i).offset(coords);
-				}
+		let $cubesOfColor, coords;
+		for (let color in desiredDiseaseCubeOffsets)
+		{
+			$cubesOfColor = $cubes.filter(`.${color}`);
+
+			for (let i = 0; i < $cubesOfColor.length; i++)
+			{
+				coords = desiredDiseaseCubeOffsets[color][i];
+
+				if (animate)
+					$cubesOfColor.eq(i).animate(coords, getDuration(duration), easing);
+				else
+					$cubesOfColor.eq(i).offset(coords);
 			}
-			
-			await sleep(getDuration(duration));
-			resolve();
-		});
+		}
+		
+		await sleep(getDuration(duration));
+		return Promise.resolve();
 	}
 
 	getDiseaseCubeOffsets($cubes)
