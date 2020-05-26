@@ -1,6 +1,6 @@
 "use strict";
 
-import { cities } from "./city.js";
+import { cities, removeAreaDivs } from "./city.js";
 import { getDuration } from "./durations.js";
 
 // Only the northernmost cities which are directly under player panels need to be checked for occlusion.
@@ -134,48 +134,45 @@ export default class PlayerPanel
             initialWidth = $card.width(),
             panel = this;
 
-		return new Promise(resolve =>
-		{
-			if ($card.hasClass("epidemic"))
-				return resolve();
+		if ($card.hasClass("epidemic"))
+            return Promise.resolve();
 
-			let $insertAfterElement;
-			if (isContingencyCard) // Contingency cards are placed within the .role div
-			{
-                const $role = this.$panel.children(".role");
-                $role.addClass("storingEventCard");
+        let $insertAfterElement;
+        if (isContingencyCard) // Contingency cards are placed within the .role div
+        {
+            const $role = this.$panel.children(".role");
+            $role.addClass("storingEventCard");
+            
+            $card.off("mouseenter mouseleave")
+                .removeClass("removed")
+                .addClass("contingency");
+            
+            $insertAfterElement = $role.children().first();
+        }
+        else
+            $insertAfterElement = this.$panel.children(".role, .playerCard").last();
+        
+        $card.appendTo("#rightPanel") // The animation is smoother if the $card is first appended to #rightPanel.
+            .addClass("drawing")
+            .css(
+            {
+                ...{
+                    position: "absolute",
+                    zIndex: "5",
+                    width: initialWidth
+                },
+                ...initialOffset
+            })
+            .animate(targetProperties, getDuration("dealCard"),
+            function()
+            {
+                $card.removeAttr("style")
+                    .insertAfter($insertAfterElement)
+                    .removeClass("drawing");
                 
-                $card.off("mouseenter mouseleave")
-					.removeClass("removed")
-                    .addClass("contingency");
-                
-				$insertAfterElement = $role.children().first();
-			}
-			else
-				$insertAfterElement = this.$panel.children(".role, .playerCard").last();
-			
-			$card.appendTo("#rightPanel") // The animation is smoother if the $card is first appended to #rightPanel.
-                .addClass("drawing")
-                .css(
-				{
-					...{
-						position: "absolute",
-						zIndex: "5",
-						width: initialWidth
-					},
-					...initialOffset
-				})
-				.animate(targetProperties, getDuration("dealCard"),
-				function()
-				{
-                    $card.removeAttr("style")
-                        .insertAfter($insertAfterElement)
-                        .removeClass("drawing");
-                    
-                    panel.checkOcclusion();
-					resolve();
-				});
-		});
+                panel.checkOcclusion();
+                return Promise.resolve();
+            });
     }
     
     getCardTargetProperties({ isContingencyCard } = {})
@@ -209,13 +206,13 @@ export default class PlayerPanel
             result.$piece.offset(result.newOffset);
         }
         
-        this.checkOcclusion(city);
+        this.checkOcclusion({ citiesToCheck: city, allowAreaDivReuse: true });
 
         for (let result of resultsToCheck)
             result.$piece.offset(result.currentOffset);
     }
     
-    checkOcclusion(citiesToCheck)
+    checkOcclusion({ citiesToCheck, allowAreaDivReuse } = {})
 	{
         const wasCollapsed = this.$panel.hasClass("collapsed");
         this.expandIfCollapsed({ duration: 0 });
@@ -228,6 +225,9 @@ export default class PlayerPanel
 		else
 			for (let key of cityKeysToCheckForOcclusion)
                 this.addOrRemoveOcclusion(cities[key]);
+        
+        if (!allowAreaDivReuse)
+            removeAreaDivs();
         
         if (wasCollapsed)
             this.collapse({ duration: 0 });
@@ -244,13 +244,10 @@ export default class PlayerPanel
 	occludes(city)
 	{
         const panel = this.$panel[0],
-			$cityArea = city.getAreaDiv();
-
-		if (elementsOverlap(panel, $cityArea[0]))
-		{
-            $cityArea.remove();
-			return true;
-		}
+            $cityArea = city.getAreaDiv();
+        
+        if (elementsOverlap(panel, $cityArea[0]))
+            return true;
 
 		let occlusionDetected = false;
 		$("#boardContainer").children(`.${city.key}`).each(function()

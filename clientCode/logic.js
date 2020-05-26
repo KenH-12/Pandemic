@@ -43,6 +43,7 @@ import {
 	pinpointCityFromCard,
 	pinpointCity,
 	resetPinpointRectangles,
+	removeAreaDivs,
 	researchStationKeys,
 	updateResearchStationSupplyCount,
 	getResearchStationSupplyCount,
@@ -3368,7 +3369,9 @@ function managePlayerPanelOcclusion(citiesToCheck)
 	const { players } = gameData;
 
 	for (let rID in players)
-		players[rID].panel.checkOcclusion(citiesToCheck);
+		players[rID].panel.checkOcclusion(citiesToCheck, { allowAreaDivReuse: false });
+	
+	removeAreaDivs();
 }
 
 class Player
@@ -3569,48 +3572,44 @@ class Player
 			|| isEventCardKey(this.contingencyKey);
 	}
 
-	giveCard(cardKey, receiver)
+	async giveCard(cardKey, receiver)
 	{
-		return new Promise(async resolve =>
-		{
-			await Promise.all([
-				this.panel.expandIfCollapsed(),
-				receiver.panel.expandIfCollapsed()
-			]);
-			
-			const $card = this.panel.getCard(cardKey),
-				initialProperties = $card.offset(),
-				$insertAfterMe = receiver.$panel.children(".role, .playerCard").last(),
-				desiredOffset = $insertAfterMe.offset(),
-				giver = this;
+		await Promise.all([
+			this.panel.expandIfCollapsed(),
+			receiver.panel.expandIfCollapsed()
+		]);
+		
+		const $card = this.panel.getCard(cardKey),
+			initialProperties = $card.offset(),
+			$insertAfterMe = receiver.$panel.children(".role, .playerCard").last(),
+			desiredOffset = $insertAfterMe.offset(),
+			giver = this;
 
-			initialProperties.width = $card.width();
-			desiredOffset.top += $insertAfterMe.height();
-			
-			$card.appendTo("body")
-				.css(
-				{
-					...initialProperties,
-					...{
-						"position": "absolute",
-						"z-index": "5"
-					}
-				})
-				.animate(desiredOffset,
-				getDuration("dealCard"),
-				function()
-				{
-					$card.removeAttr("style").insertAfter($insertAfterMe);
+		initialProperties.width = $card.width();
+		desiredOffset.top += $insertAfterMe.height();
+		
+		$card.appendTo("body")
+			.css(
+			{
+				...initialProperties,
+				...{
+					"position": "absolute",
+					"z-index": "5"
+				}
+			})
+			.animate(desiredOffset, getDuration("dealCard"),
+			function()
+			{
+				$card.removeAttr("style").insertAfter($insertAfterMe);
 
-					giver.removeCardsFromHand(cardKey);
-					receiver.addCardKeysToHand(cardKey);
+				giver.removeCardsFromHand(cardKey);
+				receiver.addCardKeysToHand(cardKey);
 
-					giver.panel.checkOcclusion();
-					receiver.panel.checkOcclusion();
+				giver.panel.checkOcclusion({ allowAreaDivReuse: true });
+				receiver.panel.checkOcclusion();
 
-					resolve();
-				});
-		});
+				return Promise.resolve();
+			});
 	}
 
 	// Appends either a single cardKey or an array of cardKeys to this Player's cardKeys array.

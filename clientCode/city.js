@@ -108,8 +108,16 @@ export default class City
 
 	getAreaDiv()
 	{
-		const $areaDiv = $(`<div class='areaDiv ${this.key}'></div>`),
-			offset = this.getOffset(),
+		// Area divs are often reused for occlusion checks by different PlayerPanels
+		// and are always removed after a check (or group of checks),
+		// so if one already exists then we can return it without needing to reposition.
+		let $areaDiv = $(`.areaDiv.${this.key}`); 
+		if ($areaDiv.length)
+			return $areaDiv;
+		
+		$areaDiv = $(`<div class='areaDiv ${this.key}'></div>`);
+		
+		const offset = this.getOffset(),
 			{ cityWidth } = gameData,
 			halfCityWidth = cityWidth / 2;
 
@@ -394,7 +402,7 @@ export default class City
 			desiredDiseaseCubeOffsets = this.getDiseaseCubeOffsets($cubes);
 
 			if (this.checksPanelOcclusion)
-				checkMovementResultsForPanelOcclusion(this, formatCubeOffsetsForPanelOcclusionCheck(desiredDiseaseCubeOffsets), gameData);
+				checkMovementResultsForPanelOcclusion(this, formatCubeOffsetsForPanelOcclusionCheck(desiredDiseaseCubeOffsets));
 		}
 
 		let $cubesOfColor, coords;
@@ -1642,6 +1650,8 @@ function checkMovementResultsForPanelOcclusion(city, resultsToCheck)
 
 	for (let rID in players)
 		players[rID].panel.checkMovementResultsForOcclusion(city, resultsToCheck);
+	
+	removeAreaDivs();
 }
 
 // Disease cube offsets are created as an object with a property for each color of disease cube the city contains.
@@ -1667,6 +1677,11 @@ function formatCubeOffsetsForPanelOcclusionCheck(diseaseCubeOffsets)
 	return offsets;
 }
 
+function removeAreaDivs()
+{
+	$("#boardContainer").children(".areaDiv").remove();
+}
+
 export {
     cities,
 	getCity,
@@ -1675,6 +1690,7 @@ export {
 	pinpointCityFromCard,
 	pinpointCity,
 	resetPinpointRectangles,
+	removeAreaDivs,
     researchStationKeys,
     updateResearchStationSupplyCount,
 	getResearchStationSupplyCount,

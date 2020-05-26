@@ -992,22 +992,19 @@ class PlanContingency extends UndoableEvent
 				${this.eventCard.getPlayerCard({ noTooltip: true })}`;
 	}
 	
-	animateUndo(animateDiscardPlayerCard)
+	async animateUndo(animateDiscardPlayerCard)
 	{
-		return new Promise(async resolve =>
-		{
-			const contingencyPlanner = this.player,
-				$card = contingencyPlanner.$panel.find(".playerCard.eventCard.contingency");
-			
-			$card.closest(".role").removeClass("storingEventCard");
-			await animateDiscardPlayerCard($card.removeClass("contingency unavailable"));
-			contingencyPlanner.panel.checkOcclusion();
-			contingencyPlanner.contingencyKey = false;
+		const contingencyPlanner = this.player,
+			$card = contingencyPlanner.$panel.find(".playerCard.eventCard.contingency");
+		
+		$card.closest(".role").removeClass("storingEventCard");
+		await animateDiscardPlayerCard($card.removeClass("contingency unavailable"));
+		contingencyPlanner.panel.checkOcclusion();
+		contingencyPlanner.contingencyKey = false;
 
-			bindEventCardHoverEvents();
+		bindEventCardHoverEvents();
 
-			resolve();
-		});
+		return Promise.resolve();
 	}
 }
 

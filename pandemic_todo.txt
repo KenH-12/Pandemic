@@ -1,7 +1,5 @@
 BUGS
 ----
-area divs don't get removed
-
 the undo action button should not be enabled during the one quiet night animation
 
 TO DO
