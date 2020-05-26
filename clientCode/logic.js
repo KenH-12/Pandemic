@@ -1935,7 +1935,7 @@ function indicateOneQuietNightStep({ off } = {})
 		.html(html);
 }
 
-async function animateOneQuietNight()
+function animateOneQuietNight()
 {
 	$("#stepIndicator").html("One Quiet Night");
 	
@@ -5245,6 +5245,8 @@ function getPlayerWithTooManyCards()
 
 async function confirmDiscards(discardKeys)
 {
+	disableActions();
+	
 	const player = getPlayerWithTooManyCards(),
 		eventType = eventTypes.discard;
 	
@@ -5372,8 +5374,10 @@ function isOneQuietNight()
 
 async function skipInfectionStepForOneQuietNight()
 {
+	disableActions();
+
 	await requestAction(eventTypes.skipInfectionStep);
-	await animateOneQuietNight()
+	await animateOneQuietNight();
 
 	indicateOneQuietNightStep({ off: true });
 	nextTurn();

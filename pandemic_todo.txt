@@ -1,6 +1,5 @@
 BUGS
 ----
-the undo action button should not be enabled during the one quiet night animation
 
 TO DO
 -----
