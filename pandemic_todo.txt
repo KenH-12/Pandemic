@@ -3,11 +3,6 @@ BUGS
 
 TO DO
 -----
-allow scrolling
-
-don't use discardSelections for event cards
-	make sure that the contingency special ability rule is positioned properly above the btnConfirm
-
 loading gifs should appear after a short delay (if the connection is fast enough, they will not appear at all)
 
 if flight options are presented
@@ -16,19 +11,7 @@ if flight options are presented
 test...
 	outbreaks caused by infect city
 	game end conditions
-	the infect cities loading gif when auto-infecting single/multiple
 	operations flight
-	dispatch
-
-show loading gif for
-	automatic events
-		infect city
-		epidemic
-			increase
-			infect
-			intensify
-			next
-
 
 after loading for x ms, show some error message
 

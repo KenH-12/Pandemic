@@ -860,7 +860,8 @@ function promptAction(actionProperties)
 	const $actionPrompt = $("#actionPrompt"),
 		$actionsContainer = $actionPrompt.parent(),
 		$actionCategories = $actionsContainer.children(".actionCategory"),
-		interfaceIsRequired = populateActionInterface(actionProperties);
+		interfaceIsRequired = populateActionInterface(actionProperties),
+		hidden = "hidden";
 	
 	$actionCategories.off("click");
 		
@@ -872,15 +873,19 @@ function promptAction(actionProperties)
 		if (!eventTypeIsBeingPrompted(eventTypes.forecastPlacement)) // Forecast can't be cancelled once the cards are drawn.
 			enableBtnCancelAction();
 		
-		$actionCategories.addClass("hidden");
-		$actionPrompt.removeClass("hidden").removeAttr("style");
+		$actionCategories.addClass(hidden);
+		$actionPrompt.removeClass(hidden).removeAttr("style");
+
+		const $instructions = $actionPrompt.find(".instructions");
+		if ($instructions.html().length === 0)
+			$instructions.addClass(hidden);
 
 		// Event cards can be played during some non-action steps.
 		if (!actionStepInProgress())
-			$actionsContainer.siblings(".interface").addClass("hidden");
+			$actionsContainer.siblings(".interface").addClass(hidden);
 	}
 
-	$actionsContainer.removeClass("hidden").removeAttr("style");
+	$actionsContainer.removeClass(hidden).removeAttr("style");
 	setRightPanelScrollability();
 }
 
@@ -954,7 +959,7 @@ const actionInterfacePopulator = {
 	{
 		const $instructions = actionInterfacePopulator.$actionInterface.find("p.instructions");
 
-		$instructions.eq(nthOption).html(newInstructions);
+		$instructions.eq(nthOption).html(newInstructions).removeClass("hidden");
 
 		return actionInterfacePopulator;
 	},
@@ -1010,16 +1015,16 @@ const actionInterfacePopulator = {
 	appendDiscardPrompt({ cardKeys, promptMsg, buttonText, onConfirm } = {})
 	{
 		const { $actionInterface } = actionInterfacePopulator,
-			$discardPrompt = $(`<div class='discardSelections'></div>`),
 			buttonClass = "btnConfirm",
 			isEventCard = typeof cardKeys === "string" && isEventCardKey(cardKeys),
+			$container = isEventCard ? $actionInterface : $(`<div class='discardSelections'></div>`),
 			isContingencyCard = isEventCard && isContingencyCardKey(cardKeys);
 
 		if (isEventCard)
 		{
 			if (isContingencyCard)
 			{
-				promptMsg = `${getPlayer("Contingency Planner").newSpecialAbilityTag()}<br />`;
+				promptMsg = `${getPlayer("Contingency Planner").newSpecialAbilityTag()}`;
 				buttonText = "PLAY AND REMOVE EVENT CARD";
 			}
 			else
@@ -1027,16 +1032,16 @@ const actionInterfacePopulator = {
 		}
 
 		if (promptMsg)
-			$discardPrompt.append(`<p>${promptMsg}</p>`);
+			$container.append(`<p>${promptMsg}</p>`);
 
 		if (!(typeof cardKeys === "string" && isEventCardKey(cardKeys)))
 			for (let key of ensureIsArray(cardKeys))
-				$discardPrompt.append(newPlayerCard(getCityOrEventCardObject(key)));
+				$container.append(newPlayerCard(getCityOrEventCardObject(key)));
 		
-		bindCityLocatorClickEvents({ $containingElement: $discardPrompt });
+		bindCityLocatorClickEvents({ $containingElement: $container });
 
 		const $btnConfirm = $(`<div class='button ${buttonClass}'>${buttonText || "DISCARD"}</div>`);
-		$discardPrompt.append($btnConfirm);
+		$container.append($btnConfirm);
 		oscillateButtonBackgroundColor($btnConfirm);
 
 		if (typeof onConfirm === "function")
@@ -1049,9 +1054,9 @@ const actionInterfacePopulator = {
 				onConfirm();
 			});
 
-		$actionInterface.append($discardPrompt);
+		$actionInterface.append($container);
 
-		bindEventCardHoverEvents($discardPrompt);
+		bindEventCardHoverEvents($container);
 		if (isContingencyCard)
 			bindRoleCardHoverEvents();
 
