@@ -163,10 +163,11 @@ function updateInfectionDeckTooltip()
 
 function bindInfectionRateInfoHoverEvents()
 {
-	const tooltipCssClass = "infectionRateTooltip";
+	const tooltipCssClass = "infectionRateTooltip",
+		{ infectionRateInfo } = strings;
 
 	new Tooltip({
-		getContent: () => `<p class='largeText'>Infection Rate: ${gameData.infectionRate}</p>${strings.infectionRateInfo}`,
+		getContent: () => `<p class='largeText'>Infection Rate: ${gameData.infectionRate}</p>${infectionRateInfo}`,
 		hoverElementSelector: "#infectionRateMarker img",
 		juxtaposition: "bottom",
 		containerSelector,
@@ -176,7 +177,7 @@ function bindInfectionRateInfoHoverEvents()
 	}).bindHoverEvents();
 
 	new Tooltip({
-		content: strings.infectionRateInfo,
+		content: infectionRateInfo,
 		hoverElementSelector: "#stepIndicator .info",
 		juxtaposition: "left",
 		containerSelector,
@@ -193,7 +194,9 @@ function bindInfectionRateInfoHoverEvents()
 				return getEventTypeTooltipContent(eventType, { pluralNameForm: true });
 			},
 		hoverElementSelector: `.${tooltipCssClass} .hoverInfo:not(.epidemicInfo)`,
-		juxtaposition: "bottom",
+		positionRelativeToSelector: `.${tooltipCssClass}`,
+		alignArrowWithHoveredElement: true,
+		juxtaposition: "left",
 		containerSelector,
 		cssClassString: "eventTypeTooltip"
 	}).bindHoverEvents();
