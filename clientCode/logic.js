@@ -1386,7 +1386,7 @@ const actionInterfacePopulator = {
 				$this.siblings("p").html("Confirming...")
 					.parent().siblings(".shareableCards, .actionInterfaceDivision").remove();
 
-				shareKnowledge(player, participant, $this.data("key"));
+				shareKnowledge(player, participant, $this);
 			});
 		}
 
@@ -1460,7 +1460,7 @@ const actionInterfacePopulator = {
 			{
 				$clicked.off("click").siblings(".playerCard").remove();
 				actionInterfacePopulator.removeUnchosenFlightTypes(operationsFlight)
-					.replaceInstructions(`${destinationString}<br />Confirming...`);
+					.replaceInstructions(`${destinationString}<br />Discard:`);
 				
 				movementAction(operationsFlight, destination, { operationsFlightDiscardKey: $clicked.data("key") });
 			});
@@ -2500,11 +2500,14 @@ function getValidShareKnowledgeParticipants(player)
 		return playersInSameCity.filter(p => p.canGiveKnowledge());
 }
 
-async function shareKnowledge(activePlayer, participant, cardKey)
+async function shareKnowledge(activePlayer, participant, $cardToShare)
 {
 	disableActions();
 	
-	const eventType = eventTypes.shareKnowledge;
+	const cardKey = $cardToShare.data("key"),
+		eventType = eventTypes.shareKnowledge,
+		$status = $cardToShare.siblings("p");
+	
 	let giver, receiver;
 
 	if (activePlayer.isHoldingCardKey(cardKey))
@@ -2524,14 +2527,17 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 			receiver: receiver.rID,
 			cardKey: cardKey
 		});
+	$status.html("Sharing...");
 
 	await Promise.all([
 		giver.panel.expandIfCollapsed(),
 		receiver.panel.expandIfCollapsed()
 	]);
 	await giver.giveCard(cardKey, receiver);
-	appendEventHistoryIconOfType(eventType);
-	
+	await appendEventHistoryIconOfType(eventType);
+	$status.html("Done");
+	await sleep(getDuration("shortInterval"));
+
 	proceed();
 }
 
