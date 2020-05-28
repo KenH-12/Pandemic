@@ -110,37 +110,36 @@ class EventHistory
         });
 
         $newIcon.removeAttr("style");
+        
+        return Promise.resolve();
     }
 
-    scrollToEnd({ addingNewIcon, leaveButtonsDisabled, removingIcon } = {})
+    async scrollToEnd({ addingNewIcon, leaveButtonsDisabled, removingIcon } = {})
     {
-        return new Promise(async resolve =>
-        {
-            const overflow = this.getOverflow();
-            
-            if (addingNewIcon && overflow <= 0)
-                return this.slideInNewIcon();
-            
-            this.disableForwardButton();
-            eventDetailsTooltip.hide().unbindHoverEvents();
-            
-            await animationPromise({
-                $elements: this.$iconContainer,
-                desiredProperties: { scrollLeft: overflow },
-                duration: this.scrollDuration,
-                easing: this.scrollEasing
-            });
-
-            this.scrollLeft = overflow;
-            
-            if (!leaveButtonsDisabled && overflow > 0)
-                this.enableBackButton();
-
-            if (!removingIcon)
-                eventDetailsTooltip.bindHoverEvents().checkHoverState();
-
-            resolve();
+        const overflow = this.getOverflow();
+        
+        if (addingNewIcon && overflow <= 0)
+            return this.slideInNewIcon();
+        
+        this.disableForwardButton();
+        eventDetailsTooltip.hide().unbindHoverEvents();
+        
+        await animationPromise({
+            $elements: this.$iconContainer,
+            desiredProperties: { scrollLeft: overflow },
+            duration: this.scrollDuration,
+            easing: this.scrollEasing
         });
+
+        this.scrollLeft = overflow;
+        
+        if (!leaveButtonsDisabled && overflow > 0)
+            this.enableBackButton();
+
+        if (!removingIcon)
+            eventDetailsTooltip.bindHoverEvents().checkHoverState();
+
+        return Promise.resolve();
     }
 
     getOverflow()

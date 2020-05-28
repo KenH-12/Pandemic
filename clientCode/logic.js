@@ -282,7 +282,7 @@ function appendEventHistoryIcons()
 	eventHistory.scrollToEnd();
 }
 
-function appendEventHistoryIconOfType(targetEventType)
+async function appendEventHistoryIconOfType(targetEventType)
 {
 	let event,
 		oneOrMoreIconsWereAppended = false;
@@ -300,7 +300,9 @@ function appendEventHistoryIconOfType(targetEventType)
 	}
 
 	if (oneOrMoreIconsWereAppended)
-		eventHistory.scrollToEnd({ addingNewIcon: true });
+		await eventHistory.scrollToEnd({ addingNewIcon: true });
+	
+	return Promise.resolve();
 }
 
 function appendEventHistoryIcon(event)
