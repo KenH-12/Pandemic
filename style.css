@@ -718,8 +718,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 	display: inline-block;
 	vertical-align: top;
 }
-.eventDetails .column:first-of-type p:first-of-type { margin-top: 18px; }
-.eventDetails .column:last-of-type { padding-left: 2px }
+.eventDetails .column:first-of-type { width: 80% }
+.eventDetails .column:last-of-type
+{
+	padding-left: 2px;
+	width: 20%;
+	overflow: visible;
+}
 .eventDetails .column:last-of-type p:first-of-type { border-bottom: 1px solid #fff }
 .eventDetails .hand { padding: 5px 0 }
 .eventDetails .populationRank
