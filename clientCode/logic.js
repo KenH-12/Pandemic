@@ -909,18 +909,18 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.$actionInterface.children().remove();
 		return actionInterfacePopulator;
 	},
-	appendDescriptiveElements(eventType, { showEventCardDescription } = {})
+	appendDescriptiveElements(eventType)
 	{
 		if (eventType.code === eventTypes.chooseFlightType.code)
 			return;
 		
 		const { $actionInterface } = actionInterfacePopulator;
 		
-		if (!showEventCardDescription && isEventCardKey(eventType.cardKey))
+		if (isEventCardKey(eventType.cardKey))
 			return $actionInterface.append(eventCards[eventType.cardKey].getFullCard())
 				.append(`<p class='instructions'>${eventType.instructions || ""}</p>`);
 		
-		const $actionTitleContainer = $(`<div class='actionTitle'></div>`),
+		const $actionTitleContainer = $(`<div class='actionTitle' data-eventType='${eventType.code}'></div>`),
 			$rules = $("<div class='rules'></div>");
 
 		let actionTitleContents = `<h2>${ eventType.name.toUpperCase() }</h2>`;
@@ -1012,7 +1012,7 @@ const actionInterfacePopulator = {
 		
 		return actionInterfacePopulator;
 	},
-	appendDiscardPrompt({ cardKeys, promptMsg, buttonText, onConfirm } = {})
+	appendDiscardPrompt({ cardKeys, promptMsg, buttonText, onConfirm, flightType } = {})
 	{
 		const { $actionInterface } = actionInterfacePopulator,
 			buttonClass = "btnConfirm",
@@ -1051,6 +1051,8 @@ const actionInterfacePopulator = {
 					.addClass("btnDisabled")
 					.html("CONFIRMING...");
 				
+				actionInterfacePopulator.removeUnchosenFlightTypes(flightType);
+				
 				onConfirm();
 			});
 
@@ -1060,6 +1062,22 @@ const actionInterfacePopulator = {
 		if (isContingencyCard)
 			bindRoleCardHoverEvents();
 
+		return actionInterfacePopulator;
+	},
+	removeUnchosenFlightTypes(chosenFlightType)
+	{
+		if (!chosenFlightType)
+			return actionInterfacePopulator;
+		
+		const titleSelector = `.actionTitle[data-eventType='${chosenFlightType.code}']`,
+			$chosenFlightTypeTitle = actionInterfacePopulator.$actionInterface.find(titleSelector),
+			$nextInterfaceDivision = $chosenFlightTypeTitle.nextAll(".actionInterfaceDivision").first();
+			
+		$chosenFlightTypeTitle.prevAll().remove();
+
+		if ($nextInterfaceDivision.length)
+			$nextInterfaceDivision.prev().nextAll().remove();
+		
 		return actionInterfacePopulator;
 	},
 	[eventTypes.driveFerry.name]()
@@ -1147,6 +1165,7 @@ const actionInterfacePopulator = {
 			.replaceInstructions(`Destination: ${destination.name}<br/>Discard:`, nthOption)
 			.appendDiscardPrompt(
 			{
+				flightType: charterFlight,
 				cardKeys: currentCity.key,
 				buttonText: "CONFIRM",
 				onConfirm: function() { movementAction(charterFlight, destination) }
@@ -1163,6 +1182,7 @@ const actionInterfacePopulator = {
 				.replaceInstructions(`Destination: ${destination.name}<br/>Discard:`, nthOption)
 				.appendDiscardPrompt(
 				{
+					flightType: directFlight,
 					cardKeys: destination.key,
 					buttonText: "CONFIRM",
 					onConfirm: () => movementAction(directFlight, destination)
@@ -1431,13 +1451,13 @@ const actionInterfacePopulator = {
 			useableCardKeys = player.cardKeys.filter(key => isCityKey(key)),
 			destinationString = `Destination: ${destination.name}`;
 		
-		actionInterfacePopulator.replaceInstructions(`${destinationString}<br />Select a card to discard:`);
-
-		actionInterfacePopulator.appendOptionButtons("playerCard", useableCardKeys,
-			function($clicked)
+		actionInterfacePopulator.replaceInstructions(`${destinationString}<br />Select a card to discard:`)
+			.appendOptionButtons("playerCard", useableCardKeys, function($clicked)
 			{
 				$clicked.off("click").siblings(".playerCard").remove();
-				actionInterfacePopulator.replaceInstructions(`${destinationString}<br />Confirming...`);
+				actionInterfacePopulator.removeUnchosenFlightTypes(operationsFlight)
+					.replaceInstructions(`${destinationString}<br />Confirming...`);
+				
 				movementAction(operationsFlight, destination, { operationsFlightDiscardKey: $clicked.data("key") });
 			});
 
@@ -1458,6 +1478,7 @@ const actionInterfacePopulator = {
 				actionInterfacePopulator
 					.appendDiscardPrompt(
 					{
+						flightType: directFlight,
 						cardKeys: destination.key,
 						promptMsg: `<span class='largeText'>via ${getDispatchInstructionTooltip(directFlight)}?</span><br/><br/>Discard:`,
 						buttonText: "CONFIRM",
@@ -1466,6 +1487,7 @@ const actionInterfacePopulator = {
 					.appendDivision()
 					.appendDiscardPrompt(
 					{
+						flightType: charterFlight,
 						cardKeys: playerToDispatch.cityKey,
 						promptMsg: `<span class='largeText'>via ${getDispatchInstructionTooltip(charterFlight)}?</span><br/><br/>Discard:`,
 						buttonText: "CONFIRM",

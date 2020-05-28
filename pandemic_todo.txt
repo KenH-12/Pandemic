@@ -5,9 +5,6 @@ TO DO
 -----
 loading gifs should appear after a short delay (if the connection is fast enough, they will not appear at all)
 
-if flight options are presented
-	disable/gray out the ones that weren't used
-
 test...
 	outbreaks caused by infect city
 	game end conditions
