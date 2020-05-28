@@ -476,11 +476,13 @@ function highlightTurnProcedureStep(stepName)
 
 function resumeCurrentStep()
 {
+	resetActionPrompt();
 	gameData.currentStep.resume();
 }
 
 function proceed()
 {
+	resetActionPrompt();
 	gameData.currentStep.proceed();
 }
 
@@ -1685,7 +1687,6 @@ async function planContingency(cardKey)
 		$eventCard = $("#playerDiscardContainer").find(`.playerCard[data-key='${cardKey}']`).off("mouseenter mouseleave");
 
 	await requestAction(eventType, { cardKey });
-	resetActionPrompt();
 
 	await contingencyPlanner.panel.animateReceiveCard($eventCard, { isContingencyCard: true })
 	contingencyPlanner.contingencyKey = cardKey;
@@ -1864,11 +1865,7 @@ async function forecastPlacement(forecastEvent, $btnDone)
 	await animateForecastPlacement($cardContainer);
 	await eventHistory.scrollToEnd();
 
-	actionInterfacePopulator.$actionInterface.slideUp(function()
-	{
-		resetActionPrompt();
-		resumeCurrentStep();
-	});
+	actionInterfacePopulator.$actionInterface.slideUp(() => resumeCurrentStep());
 }
 
 async function animateForecastPlacement($cardContainer)
@@ -1934,8 +1931,6 @@ async function oneQuietNight()
 
 	const eventType = eventTypes.oneQuietNight,
 		events = await requestAction(eventType);
-	
-	resetActionPrompt();
 	
 	await discardOrRemoveEventCard(events.shift());
 
@@ -2051,8 +2046,6 @@ async function resilientPopulation(cardKeyToRemove)
 	const eventType = eventTypes.resilientPopulation,
 		events = await requestAction(eventType, { cardKeyToRemove });
 
-	resetActionPrompt();
-
 	await discardOrRemoveEventCard(events.shift());
 	await resilientPopulationAnimation(cardKeyToRemove);
 	appendEventHistoryIconOfType(eventType);
@@ -2140,7 +2133,6 @@ async function airlift(playerToAirlift, destination)
 			destinationKey: destination.key
 		});
 	
-	resetActionPrompt();
 	gameData.promptingEventType = false;
 
 	await discardOrRemoveEventCard(events.shift());
@@ -2246,7 +2238,6 @@ function promptGovernmentGrantStationRelocation()
 
 async function governmentGrant(targetCity, relocationKey)
 {
-	resetActionPrompt();
 	disableActions();
 	
 	const eventType = eventTypes.governmentGrant,
@@ -2489,9 +2480,8 @@ async function passActions()
 	const { pass } = eventTypes;
 
 	await requestAction(pass);
-	resetActionPrompt();
-
 	appendEventHistoryIconOfType(pass);
+
 	proceed();
 }
 
@@ -2532,7 +2522,6 @@ async function shareKnowledge(activePlayer, participant, cardKey)
 			receiver: receiver.rID,
 			cardKey: cardKey
 		});
-	resetActionPrompt();
 
 	await Promise.all([
 		giver.panel.expandIfCollapsed(),
@@ -2613,8 +2602,6 @@ async function buildResearchStation(relocationKey)
 		await movePlayerCardsToDiscards({ player, $card: player.panel.getCard(city.key) });
 		player.removeCardsFromHand(city.key);
 	}
-
-	resetActionPrompt();
 
 	if (relocationKey)
 	{
@@ -2709,7 +2696,6 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 			dataToPost.discardKey = operationsFlightDiscardKey;
 		
 		const events = await requestAction(eventType, dataToPost);
-		resetActionPrompt();
 
 		await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
@@ -2809,7 +2795,6 @@ async function treatDisease($cube, diseaseColor)
 		eventType = eventTypes.treatDisease;
 	
 	const events = await requestAction(eventType, { cityKey: city.key, diseaseColor });
-	resetActionPrompt();
 		
 	let numToRemove,
 		eradicationOccured = false;
@@ -6226,7 +6211,6 @@ async function discoverACure(cardKeys)
 		autoTreatEvents = events.filter(e => e.isOfType(autoTreatDisease)),
 		eradicationEvents = events.filter(e => e.isOfType(eradication));
 	
-	resetActionPrompt();
 	player.removeCardsFromHand(cardKeys);
 
 	// If there was an eradication event, there are 2 possible causes:
