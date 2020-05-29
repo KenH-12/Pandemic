@@ -2598,7 +2598,7 @@ function promptResearchStationRelocation()
 	return true;
 }
 
-async function buildResearchStation(relocationKey)
+function buildResearchStation(relocationKey)
 {
 	disableActions();
 	
@@ -2607,31 +2607,34 @@ async function buildResearchStation(relocationKey)
 		city = player.getLocation(),
 		eventType = eventTypes.buildResearchStation;
 	
-	await requestAction(eventType,
+	requestAction(eventType,
 		{
 			locationKey: city.key,
 			relocationKey: relocationKey || 0
-		});
-	
-	// Operations Expert special ability:
-	// "As an action, build a research station in his current city without discarding a city card"
-	if (!playerIsOperationsExpert)
-	{
-		await movePlayerCardsToDiscards({ player, $card: player.panel.getCard(city.key) });
-		player.removeCardsFromHand(city.key);
-	}
+		})
+		.then(async () =>
+		{
+			// Operations Expert special ability:
+			// "As an action, build a research station in his current city without discarding a city card"
+			if (!playerIsOperationsExpert)
+			{
+				await movePlayerCardsToDiscards({ player, $card: player.panel.getCard(city.key) });
+				player.removeCardsFromHand(city.key);
+			}
 
-	if (relocationKey)
-	{
-		$("#boardContainer").children(".researchStation").not("#placeholderStation").removeClass("mediumGlow");
-		await getCity(relocationKey).relocateResearchStationTo(city);
-		hideTravelPathArrow();
-	}
-	else
-		await city.buildResearchStation(promptAction, { animate: true });
-	
-	appendEventHistoryIconOfType(eventType);
-	proceed();
+			if (relocationKey)
+			{
+				$("#boardContainer").children(".researchStation").not("#placeholderStation").removeClass("mediumGlow");
+				await getCity(relocationKey).relocateResearchStationTo(city);
+				hideTravelPathArrow();
+			}
+			else
+				await city.buildResearchStation(promptAction, { animate: true });
+			
+			appendEventHistoryIconOfType(eventType);
+			proceed();
+		})
+		.catch(promptRefresh);
 }
 
 function movementAction(eventType, destination, { playerToDispatch, operationsFlightDiscardKey } = {})
