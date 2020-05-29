@@ -251,6 +251,23 @@ function updateConfirmButtonText($btnConfirm, newText)
 	$btnConfirm.off("click").addClass("btnDisabled").html(newText);
 }
 
+function promptRefresh()
+{
+	const $rightPanel = $("#rightPanel");
+
+	$rightPanel.children().addClass("hidden");
+
+	$(`<div id='errorContainer'>
+		<h3>Oops!</h3>
+		<h3>Something went wrong...</h3>
+		<p>Your game has been saved and the developer has been notified of this error.</p>
+		<p>To continue your game, <a href=''>refresh</a> the page.</p>
+	</div>`).appendTo($rightPanel);
+
+	$("#boardContainer").children().addClass("hidden");
+	$("#boardImg").fadeTo(1000, 0.4);
+}
+
 export {
 	getInfectionRate,
 	getColorClass,
@@ -263,5 +280,6 @@ export {
 	useRoleColorForRelatedActionButtons,
 	activePlayerCanTakeFromResearcher,
 	showLoadingGif,
-	updateConfirmButtonText
+	updateConfirmButtonText,
+	promptRefresh
 }

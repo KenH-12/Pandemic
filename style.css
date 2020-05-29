@@ -1988,3 +1988,21 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 {
 	width: 24px;
 }
+
+#errorContainer
+{
+	padding: 3%;
+	font-family: 'Ropa sans', sans-serif;
+	font-weight: 400;
+}
+#errorContainer h3
+{
+	font-size: 22px;
+	margin-bottom: 5px;
+}
+#errorContainer a,
+#errorContainer a:visited
+{
+	color: var(--epidemic-green)
+}
+a:hover { cursor: pointer }

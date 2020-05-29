@@ -21,7 +21,8 @@ import {
 	getInfectionCardTextStyle,
 	useRoleColorForRelatedActionButtons,
 	showLoadingGif,
-	updateConfirmButtonText
+	updateConfirmButtonText,
+	promptRefresh
 } from "./utilities/pandemicUtils.js";
 import { strings } from "./strings.js";
 import getDimension from "./dimensions.js";
@@ -2716,10 +2717,10 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		
 		proceed();
 	}
-	catch(error)
+	catch(err)
 	{
-		console.error(error);
-		abortMovementAction(player);
+		console.error(err);
+		promptRefresh();
 	}
 }
 
@@ -2865,17 +2866,6 @@ function finishActionStep()
 		$("#actionsContainer").slideUp();
 	
 	proceed();
-}
-
-function abortMovementAction(player)
-{
-	player.getLocation().cluster();
-
-	// TODO: handle different types of failure
-	// such as the location or turn being incorrect,
-	// or the player not having the required cards.
-
-	// consider resetting the player's pawn and cards
 }
 
 function getMovementDetails()
