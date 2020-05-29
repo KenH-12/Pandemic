@@ -2791,7 +2791,7 @@ function movementActionDiscard(eventType, destination, { playerToDispatch, opera
 	});
 }
 
-async function treatDisease($cube, diseaseColor)
+function treatDisease($cube, diseaseColor)
 {
 	disableActions();
 	
@@ -2800,31 +2800,34 @@ async function treatDisease($cube, diseaseColor)
 	const city = getActivePlayer().getLocation(),
 		eventType = eventTypes.treatDisease;
 	
-	const events = await requestAction(eventType, { cityKey: city.key, diseaseColor });
+	requestAction(eventType, { cityKey: city.key, diseaseColor })
+		.then(async events =>
+		{
+			let numToRemove,
+				eradicationOccured = false;
+			for (let event of events)
+			{
+				if (event instanceof TreatDisease)
+					numToRemove = event.prevCubeCount - event.newCubeCount;
+				else if (event instanceof Eradication)
+					eradicationOccured = true;
+			}
+			
+			await removeCubesFromBoard(city,
+			{
+				$clickedCube: $cube,
+				color: diseaseColor,
+				numToRemove
+			});
+			
+			appendEventHistoryIconOfType(eventType);
 		
-	let numToRemove,
-		eradicationOccured = false;
-	for (let event of events)
-	{
-		if (event instanceof TreatDisease)
-			numToRemove = event.prevCubeCount - event.newCubeCount;
-		else if (event instanceof Eradication)
-			eradicationOccured = true;
-	}
-	
-	await removeCubesFromBoard(city,
-	{
-		$clickedCube: $cube,
-		color: diseaseColor,
-		numToRemove
-	});
-	
-	appendEventHistoryIconOfType(eventType);
-
-	if (eradicationOccured)
-		await eradicationEvent(diseaseColor);
-	
-	proceed();
+			if (eradicationOccured)
+				await eradicationEvent(diseaseColor);
+			
+			proceed();
+		})
+		.catch(promptRefresh);
 }
 
 function eradicationEvent(diseaseColor)
