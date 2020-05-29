@@ -2503,7 +2503,7 @@ function getValidShareKnowledgeParticipants(player)
 		return playersInSameCity.filter(p => p.canGiveKnowledge());
 }
 
-async function shareKnowledge(activePlayer, participant, $cardToShare)
+function shareKnowledge(activePlayer, participant, $cardToShare)
 {
 	disableActions();
 	
@@ -2524,24 +2524,28 @@ async function shareKnowledge(activePlayer, participant, $cardToShare)
 		receiver = activePlayer;
 	}
 
-	await requestAction(eventType,
+	requestAction(eventType,
 		{
 			giver: giver.rID,
 			receiver: receiver.rID,
 			cardKey: cardKey
-		});
-	$status.html("Sharing...");
+		})
+		.then(async () =>
+		{
+			$status.html("Sharing...");
 
-	await Promise.all([
-		giver.panel.expandIfCollapsed(),
-		receiver.panel.expandIfCollapsed()
-	]);
-	await giver.giveCard(cardKey, receiver);
-	await appendEventHistoryIconOfType(eventType);
-	$status.html("Done");
-	await sleep(getDuration("shortInterval"));
-
-	proceed();
+			await Promise.all([
+				giver.panel.expandIfCollapsed(),
+				receiver.panel.expandIfCollapsed()
+			]);
+			await giver.giveCard(cardKey, receiver);
+			await appendEventHistoryIconOfType(eventType);
+			$status.html("Done");
+			await sleep(getDuration("shortInterval"));
+		
+			proceed();
+		})
+		.catch(promptRefresh);
 }
 
 function promptResearchStationRelocation()
