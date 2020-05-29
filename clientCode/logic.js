@@ -2478,16 +2478,19 @@ function requestAction(eventType, dataToPost)
 	});
 }
 
-async function passActions()
+function passActions()
 {
 	disableActions();
 	
 	const { pass } = eventTypes;
 
-	await requestAction(pass);
-	appendEventHistoryIconOfType(pass);
-
-	proceed();
+	requestAction(pass)
+		.then(() =>
+		{
+			appendEventHistoryIconOfType(pass);
+			proceed();
+		})
+		.catch(promptRefresh);
 }
 
 function getValidShareKnowledgeParticipants(player)
