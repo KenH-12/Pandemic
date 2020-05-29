@@ -2416,9 +2416,9 @@ function getDispatchInstructionTooltip(eventType)
 	return "";
 }
 
-async function requestAction(eventType, dataToPost)
+function requestAction(eventType, dataToPost)
 {
-	try
+	return new Promise((resolve, reject) =>
 	{
 		if (eventType.code !== eventTypes.pass.code)
 			indicateActionsLeft({ addend: -1 });
@@ -2426,39 +2426,37 @@ async function requestAction(eventType, dataToPost)
 			indicateActionsLeft({ zeroRemaining: true });
 		
 		console.log(`requestAction(${eventType.code})`);
-		const { $loadingGif, resetActionButtonImg } = showLoadingGif(eventType),
-			response = await postData(`serverCode/actionPages/${eventType.actionPathName}.php`, {
-				...{
-					actionCode: eventType.code,
-					currentStep: gameData.currentStep.name,
-					role: getActivePlayer().rID
-				},
-				...dataToPost
-			});
-		
-		if (typeof resetActionButtonImg === "function")
-			resetActionButtonImg();
-		else if ($loadingGif.length)
-			$loadingGif.remove();
-		
-		console.log(response);
-		const {
-			events,
-			nextStep,
-			proceedFromDiscardToStep, // in case playing an event card satisfied the discard requirement.
-			turnNum,
-			numPlayerCardsRemaining,
-			gameEndCause,
-			failure
-		} = response;
-		
-		if (failure)
+		const { $loadingGif, resetActionButtonImg } = showLoadingGif(eventType);
+	
+		postData(`serverCode/actionPages/${eventType.actionPathName}.php`, {
+			...{
+				actionCode: eventType.code,
+				currentStep: gameData.currentStep.name,
+				role: getActivePlayer().rID
+			},
+			...dataToPost
+		})
+		.then(response =>
 		{
-			indicateActionsLeft({ addend: 1 });
-			return Promise.reject(failure);
-		}
-		else
-		{
+			if (typeof resetActionButtonImg === "function")
+				resetActionButtonImg();
+			else if ($loadingGif.length)
+				$loadingGif.remove();
+			
+			console.log(response);
+
+			if (response.failure)
+				return reject(new Error(response.failure));
+
+			const {
+				events,
+				nextStep,
+				proceedFromDiscardToStep, // in case playing an event card satisfied the discard requirement.
+				turnNum,
+				numPlayerCardsRemaining,
+				gameEndCause
+			} = response;
+			
 			// Only some actions report back with the turn number and the next step.
 			if (turnNum)
 				gameData.turnNum = turnNum;
@@ -2474,14 +2472,10 @@ async function requestAction(eventType, dataToPost)
 			if (gameEndCause)
 				gameData.gameEndCause = gameEndCause;
 			
-			return Promise.resolve(events ? parseEvents(events) : false);
-		}
-	}
-	catch(err)
-	{
-		console.error(err);
-		promptRefresh();
-	}
+			resolve(events ? parseEvents(events) : false);
+		})
+		.catch(reject)
+	});
 }
 
 async function passActions()
@@ -2633,7 +2627,7 @@ async function buildResearchStation(relocationKey)
 	proceed();
 }
 
-async function movementAction(eventType, destination, { playerToDispatch, operationsFlightDiscardKey } = {})
+function movementAction(eventType, destination, { playerToDispatch, operationsFlightDiscardKey } = {})
 {
 	const { promptingEventType } = gameData,
 		player = playerToDispatch || getActivePlayer(),
@@ -2710,18 +2704,21 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 	if (operationsFlightDiscardKey)
 		dataToPost.discardKey = operationsFlightDiscardKey;
 	
-	const events = await requestAction(eventType, dataToPost);
-
-	await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
-
-	setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
-	await player.updateLocation(destination);
-	appendEventHistoryIconOfType(playerToDispatch || eventType.code === eventTypes.rendezvous.code ? eventTypes.dispatchPawn : eventType);
-
-	if (events.length > 1)
-		await animateAutoTreatDiseaseEvents(events);
-	
-	proceed();
+	requestAction(eventType, dataToPost)
+		.then(async events =>
+		{
+			await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
+		
+			setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
+			await player.updateLocation(destination);
+			appendEventHistoryIconOfType(playerToDispatch || eventType.code === eventTypes.rendezvous.code ? eventTypes.dispatchPawn : eventType);
+		
+			if (events.length > 1)
+				await animateAutoTreatDiseaseEvents(events);
+			
+			proceed();
+		})
+		.catch(promptRefresh);
 }
 
 async function invalidMovement(originCity)
