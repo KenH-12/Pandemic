@@ -60,4 +60,6 @@ async function checkFatalError(response)
 
     if (fatalError)
         return Promise.reject(new Error(fatalError));
+    
+    return Promise.resolve(response);
 }
