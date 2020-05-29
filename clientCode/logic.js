@@ -2418,61 +2418,69 @@ function getDispatchInstructionTooltip(eventType)
 
 async function requestAction(eventType, dataToPost)
 {
-	if (eventType.code !== eventTypes.pass.code)
-		indicateActionsLeft({ addend: -1 });
-	else
-		indicateActionsLeft({ zeroRemaining: true });
-	
-	console.log(`requestAction(${eventType.code})`);
-	const { $loadingGif, resetActionButtonImg } = showLoadingGif(eventType),
-		response = await postData(`serverCode/actionPages/${eventType.actionPathName}.php`, {
-			...{
-				actionCode: eventType.code,
-				currentStep: gameData.currentStep.name,
-				role: getActivePlayer().rID
-			},
-			...dataToPost
-		});
-	
-	if (typeof resetActionButtonImg === "function")
-		resetActionButtonImg();
-	else if ($loadingGif.length)
-		$loadingGif.remove();
-	
-	console.log(response);
-	const {
-		events,
-		nextStep,
-		proceedFromDiscardToStep, // in case playing an event card satisfied the discard requirement.
-		turnNum,
-		numPlayerCardsRemaining,
-		gameEndCause,
-		failure
-	} = response;
-	
-	if (failure)
+	try
 	{
-		indicateActionsLeft({ addend: 1 });
-		return Promise.reject(failure);
-	}
-	else
-	{
-		// Only some actions report back with the turn number and the next step.
-		if (turnNum)
-			gameData.turnNum = turnNum;
-			
-		if (nextStep)
-			gameData.nextStep = nextStep;
-		else if (proceedFromDiscardToStep)
-			bypassDiscardStep(proceedFromDiscardToStep);
-
-		if (numPlayerCardsRemaining)
-			gameData.numPlayerCardsRemaining = numPlayerCardsRemaining;
-
-		if (gameEndCause)
-			gameData.gameEndCause = gameEndCause;
+		if (eventType.code !== eventTypes.pass.code)
+			indicateActionsLeft({ addend: -1 });
+		else
+			indicateActionsLeft({ zeroRemaining: true });
 		
-		return Promise.resolve(events ? parseEvents(events) : false);
+		console.log(`requestAction(${eventType.code})`);
+		const { $loadingGif, resetActionButtonImg } = showLoadingGif(eventType),
+			response = await postData(`serverCode/actionPages/${eventType.actionPathName}.php`, {
+				...{
+					actionCode: eventType.code,
+					currentStep: gameData.currentStep.name,
+					role: getActivePlayer().rID
+				},
+				...dataToPost
+			});
+		
+		if (typeof resetActionButtonImg === "function")
+			resetActionButtonImg();
+		else if ($loadingGif.length)
+			$loadingGif.remove();
+		
+		console.log(response);
+		const {
+			events,
+			nextStep,
+			proceedFromDiscardToStep, // in case playing an event card satisfied the discard requirement.
+			turnNum,
+			numPlayerCardsRemaining,
+			gameEndCause,
+			failure
+		} = response;
+		
+		if (failure)
+		{
+			indicateActionsLeft({ addend: 1 });
+			return Promise.reject(failure);
+		}
+		else
+		{
+			// Only some actions report back with the turn number and the next step.
+			if (turnNum)
+				gameData.turnNum = turnNum;
+				
+			if (nextStep)
+				gameData.nextStep = nextStep;
+			else if (proceedFromDiscardToStep)
+				bypassDiscardStep(proceedFromDiscardToStep);
+
+			if (numPlayerCardsRemaining)
+				gameData.numPlayerCardsRemaining = numPlayerCardsRemaining;
+
+			if (gameEndCause)
+				gameData.gameEndCause = gameEndCause;
+			
+			return Promise.resolve(events ? parseEvents(events) : false);
+		}
+	}
+	catch(err)
+	{
+		console.error(err);
+		promptRefresh();
 	}
 }
 
@@ -2688,40 +2696,32 @@ async function movementAction(eventType, destination, { playerToDispatch, operat
 		showTravelPathArrow({ player, destination });
 	}
 	
-	try
-	{
-		const dataToPost = {
-			originKey: player.cityKey,
-			destinationKey: destination.key
-		};
-		
-		// The active player's role is used by default.
-		// The dispatched role must be used instead for dispatch events.
-		if (playerToDispatch)
-			dataToPost.role = playerToDispatch.rID;
+	const dataToPost = {
+		originKey: player.cityKey,
+		destinationKey: destination.key
+	};
+	
+	// The active player's role is used by default.
+	// The dispatched role must be used instead for dispatch events.
+	if (playerToDispatch)
+		dataToPost.role = playerToDispatch.rID;
 
-		// The only uninferable discard key of any movement action:
-		if (operationsFlightDiscardKey)
-			dataToPost.discardKey = operationsFlightDiscardKey;
-		
-		const events = await requestAction(eventType, dataToPost);
+	// The only uninferable discard key of any movement action:
+	if (operationsFlightDiscardKey)
+		dataToPost.discardKey = operationsFlightDiscardKey;
+	
+	const events = await requestAction(eventType, dataToPost);
 
-		await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
+	await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
 
-		setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
-		await player.updateLocation(destination);
-		appendEventHistoryIconOfType(playerToDispatch || eventType.code === eventTypes.rendezvous.code ? eventTypes.dispatchPawn : eventType);
+	setDuration("pawnAnimation", eventType.code === eventTypes.driveFerry.code ? 500 : 1000);
+	await player.updateLocation(destination);
+	appendEventHistoryIconOfType(playerToDispatch || eventType.code === eventTypes.rendezvous.code ? eventTypes.dispatchPawn : eventType);
 
-		if (events.length > 1)
-			await animateAutoTreatDiseaseEvents(events);
-		
-		proceed();
-	}
-	catch(err)
-	{
-		console.error(err);
-		promptRefresh();
-	}
+	if (events.length > 1)
+		await animateAutoTreatDiseaseEvents(events);
+	
+	proceed();
 }
 
 async function invalidMovement(originCity)
@@ -8018,65 +8018,73 @@ function removeRepresentationsOfDiscardedEventCards($discardPile)
 
 async function undoAction()
 {
-	const { event, eventIndex } = getLastUndoableEvent();
-
-	if (!event)
-		return false;
-	
-	disableActions();
-	await eventHistory.scrollToEnd({ leaveButtonsDisabled: true });
-
-	if (currentStepIs("draw"))
-		$("#cardDrawContainer").addClass("hidden").find(".button").off("click");
-	else if (currentStepIs("epIntensify"))
-		$("#epidemicContainer").find(".button").off("click").addClass("btnDisabled");
-	else if (currentStepIs("infect cities"))
-		$("#infectCitiesContainer").addClass("hidden").find(".button").off("click");
-	else if (currentStepIs("hand limit"))
-		removeDiscardPrompt();
-	else
-		resetActionPrompt({ actionCancelled: true });
-	
-	await eventHistory.indicateUndoIsInProgress();
-
-	const {
-			undoneEventIds,
-			wasContingencyCard,
-			prevStepName,
-			prevTurnNum,
-			prevTurnRoleID
-		} = await event.requestUndo();
-
-	await animateUndoEvents(undoneEventIds, wasContingencyCard);
-	eventHistory.events.length = eventIndex;
-	
-	eventHistory.indicateFinishedUndoing();
-
-	if (prevStepName)
+	try
 	{
-		// If a One Quiet Night event skipped the 'infect cities' step,
-		// revert to the 'infect cities' step of the previous turn.
-		if (prevTurnNum && prevTurnRoleID)
-		{
-			gameData.turnNum = prevTurnNum;
-			gameData.turn = prevTurnRoleID;
+		const { event, eventIndex } = getLastUndoableEvent();
 
-			$("#actionsContainer").slideUp();
-
-			if (isOneQuietNight())
-				indicateOneQuietNightStep();
-		}
+		if (!event)
+			return false;
 		
-		setCurrentStep(prevStepName);
-		proceed();
+		disableActions();
+		await eventHistory.scrollToEnd({ leaveButtonsDisabled: true });
+
+		if (currentStepIs("draw"))
+			$("#cardDrawContainer").addClass("hidden").find(".button").off("click");
+		else if (currentStepIs("epIntensify"))
+			$("#epidemicContainer").find(".button").off("click").addClass("btnDisabled");
+		else if (currentStepIs("infect cities"))
+			$("#infectCitiesContainer").addClass("hidden").find(".button").off("click");
+		else if (currentStepIs("hand limit"))
+			removeDiscardPrompt();
+		else
+			resetActionPrompt({ actionCancelled: true });
+		
+		await eventHistory.indicateUndoIsInProgress();
+
+		const {
+				undoneEventIds,
+				wasContingencyCard,
+				prevStepName,
+				prevTurnNum,
+				prevTurnRoleID
+			} = await event.requestUndo();
+
+		await animateUndoEvents(undoneEventIds, wasContingencyCard);
+		eventHistory.events.length = eventIndex;
+		
+		eventHistory.indicateFinishedUndoing();
+
+		if (prevStepName)
+		{
+			// If a One Quiet Night event skipped the 'infect cities' step,
+			// revert to the 'infect cities' step of the previous turn.
+			if (prevTurnNum && prevTurnRoleID)
+			{
+				gameData.turnNum = prevTurnNum;
+				gameData.turn = prevTurnRoleID;
+
+				$("#actionsContainer").slideUp();
+
+				if (isOneQuietNight())
+					indicateOneQuietNightStep();
+			}
+			
+			setCurrentStep(prevStepName);
+			proceed();
+		}
+		else if (forecastInProgress())
+		{
+			gameData.currentStep.indicate();
+			indicatePromptingEventCard();
+		}
+		else
+			resumeCurrentStep();
 	}
-	else if (forecastInProgress())
+	catch(err)
 	{
-		gameData.currentStep.indicate();
-		indicatePromptingEventCard();
+		console.error(err);
+		promptRefresh();
 	}
-	else
-		resumeCurrentStep();
 }
 
 function getLastUndoableEvent()
