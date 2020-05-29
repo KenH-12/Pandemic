@@ -151,7 +151,7 @@ export default class DiscardPrompt
 					.add(self.getKeeperCardElements())
 					.off("click");
 
-				self.onConfirm(self.getDiscardSelectionKeys());
+				self.onConfirm(self.getDiscardSelectionKeys(), $btn);
 			})
 			.removeClass("btnDisabled");
 		

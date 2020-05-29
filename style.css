@@ -1311,7 +1311,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	font-size: 28px;
 	text-align: center;
 }
-.discardPrompt { padding: 0 5% 5px 5% }
+.discardPrompt { padding: 5px 5% }
 .cardsToKeep > .instructions
 {
 	font-size: 14px;

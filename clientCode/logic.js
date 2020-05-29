@@ -6198,50 +6198,52 @@ function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAut
 	return $cureMarker;
 }
 
-async function discoverACure(cardKeys)
+async function discoverACure(cardKeys, $btnConfirm)
 {
 	disableActions();
 
-	const player = getActivePlayer();
-	await player.panel.expandIfCollapsed();
+	const player = getActivePlayer(),
+		diseaseColor = getDiseaseColor(cardKeys[0]),
+		{ discoverACure, eradication, autoTreatDisease } = eventTypes;
 	
-	const diseaseColor = getDiseaseColor(cardKeys[0]),
-		{ discoverACure, eradication, autoTreatDisease } = eventTypes,
-		{ 0: events } = await Promise.all([
-			requestAction(discoverACure,
-			{
-				cityKey: player.cityKey,
-				diseaseColor: diseaseColor,
-				cardKeys: cardKeys
-			}),
-			movePlayerCardsToDiscards({ player, cardKeys })
-		]),
-		autoTreatEvents = events.filter(e => e.isOfType(autoTreatDisease)),
-		eradicationEvents = events.filter(e => e.isOfType(eradication));
-	
-	player.removeCardsFromHand(cardKeys);
+	requestAction(discoverACure,
+		{
+			cityKey: player.cityKey,
+			diseaseColor,
+			cardKeys
+		})
+		.then(async events =>
+		{
+			const autoTreatEvents = events.filter(e => e.isOfType(autoTreatDisease)),
+				eradicationEvents = events.filter(e => e.isOfType(eradication)),
+				// If there was an eradication event, there are 2 possible causes:
+				// 1. There were 0 cubes of the disease color on the board when the cure was discovered.
+				//		(the eradication was triggered solely by the cure being discovered)
+				// 2. The only remaining cubes of the disease color on the board were removed by an auto-treat disease event.
+				//		(the eradication was triggered by the auto-treat event which was triggered by discovering the cure)
+				// Therefore if there are no auto-treat events, the cause is number 1.
+				newDiseaseStatus = eradicationEvents.length && !autoTreatEvents.length ? "eradicated" : "cured",
+				{ cures, gameEndCause } = gameData;
+			
+			$btnConfirm.html("DISCARDING...");
+			await player.panel.expandIfCollapsed();
+			await movePlayerCardsToDiscards({ player, cardKeys });
+			player.removeCardsFromHand(cardKeys);
+			
+			$btnConfirm.html("DISCOVERED CURE!");
+			cures[diseaseColor] = newDiseaseStatus;
+			cures.remaining--;
+			await animateDiscoverCure(diseaseColor, newDiseaseStatus);
 
-	// If there was an eradication event, there are 2 possible causes:
-	// 1. There were 0 cubes of the disease color on the board when the cure was discovered.
-	//		(the eradication was triggered solely by the cure being discovered)
-	// 2. The only remaining cubes of the disease color on the board were removed by an auto-treat disease event.
-	//		(the eradication was triggered by the auto-treat event which was triggered by discovering the cure)
-	// Therefore if there are no auto-treat events, the cause is number 1.
-	const newDiseaseStatus = eradicationEvents.length && !autoTreatEvents.length ? "eradicated" : "cured",
-		{ cures, gameEndCause } = gameData;
-	
-	cures[diseaseColor] = newDiseaseStatus;
-	cures.remaining--;
-	
-	await animateDiscoverCure(diseaseColor, newDiseaseStatus);
+			if (gameEndCause)
+				return endGame();
 
-	if (gameEndCause)
-		return endGame();
+			if (autoTreatEvents.length)
+				await animateAutoTreatDiseaseEvents([ ...autoTreatEvents, ...eradicationEvents ]);
 
-	if (autoTreatEvents.length)
-		await animateAutoTreatDiseaseEvents([ ...autoTreatEvents, ...eradicationEvents ]);
-
-	proceed();
+			proceed();
+		})
+		.catch(promptRefresh);
 }
 
 async function outOfPlayerCardsDefeatAnimation($cardDrawContainer)
