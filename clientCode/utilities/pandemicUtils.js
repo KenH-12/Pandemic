@@ -251,20 +251,38 @@ function updateConfirmButtonText($btnConfirm, newText)
 	$btnConfirm.off("click").addClass("btnDisabled").html(newText);
 }
 
-function promptRefresh()
+function promptRefresh(error)
 {
-	const $rightPanel = $("#rightPanel");
+	console.error(error);
+	
+	const $rightPanel = $("#rightPanel"),
+		refreshString = "<a href=''>refresh</a> the page";
 
-	$rightPanel.children().addClass("hidden");
+	let title,
+		details,
+		recommendedAction;
+	
+	if (error.message.includes("Maximum execution time"))
+	{
+		title = "It's taking longer than usual to connect...";
+		details = "Please check your internet connection before you continue.";
+		recommendedAction = `Your game has been saved — when you are ready to continue, ${refreshString}.`;
+	}
+	else
+	{
+		title = "Oops!</h3><h3>Something went wrong...";
+		details = "Your game has been saved and the developer has been notified of this error.";
+		recommendedAction = `To continue your game, ${refreshString}.`;
+	}
+
+	$rightPanel.add("#boardContainer").children().addClass("hidden");
 
 	$(`<div id='errorContainer'>
-		<h3>Oops!</h3>
-		<h3>Something went wrong...</h3>
-		<p>Your game has been saved and the developer has been notified of this error.</p>
-		<p>To continue your game, <a href=''>refresh</a> the page.</p>
+		<h3>${title}</h3>
+		<p>${details}</p>
+		<p>${recommendedAction}</p>
 	</div>`).appendTo($rightPanel);
-
-	$("#boardContainer").children().addClass("hidden");
+	
 	$("#boardImg").fadeTo(1000, 0.4);
 }
 
