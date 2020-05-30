@@ -1653,7 +1653,7 @@ const actionInterfacePopulator = {
 	{
 		if (forecastEventToLoad)
 		{
-			forecastDraw(forecastEventToLoad);
+			forecastDraw({ forecastEventToLoad });
 			return true;
 		}
 		
@@ -1663,7 +1663,7 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.appendDiscardPrompt(
 		{
 			cardKeys: eventType.cardKey,
-			onConfirm: () => forecastDraw()
+			onConfirm: ($btnConfirm) => forecastDraw({ $btnConfirm })
 		});
 		return true;
 	}
@@ -1729,40 +1729,51 @@ function forecastInProgress()
 	return false;
 }
 
-async function forecastDraw(forecastEventToLoad)
+function forecastDraw({ forecastEventToLoad, $btnConfirm } = {})
 {
 	gameData.promptingEventType = eventTypes.forecastPlacement;
 
 	disableActions();
 	eventHistory.enableBackButton();
 
-	const eventType = eventTypes.forecast,
-		forecastEvent = forecastEventToLoad || (await requestAction(eventTypes.forecast)).shift();
-
-	actionInterfacePopulator.$actionInterface.children(".eventCardFull").add(".discardSelections").remove();
-	actionInterfacePopulator.$actionInterface.prepend(`<div class='actionTitle'>
-														${getEventIconHtml(eventType)}<h2>${eventType.name.toUpperCase()}</h2>
-													</div>`);
-	indicatePromptingEventCard();
-
-	// If loading an unresolved forecast, the event card will already be in the discard pile.
-	if (!forecastEventToLoad)
-		await discardOrRemoveEventCard(forecastEvent);
+	const { forecast } = eventTypes;
 	
-	await animateForecastDraw(forecastEvent.cardKeys);
-	appendEventHistoryIconOfType(eventTypes.forecast);
-	
-	const $btnDone = $("<div class='button btnConfirm'>DONE</div>");
+	// Essentially casting any forecastEventToLoad in the format expected from requestAction,
+	// thereby allowing the two cases to be handled identically within the callback.
+	(forecastEventToLoad ? Promise.resolve([forecastEventToLoad]) : requestAction(forecast))
+		.then(async events =>
+		{
+			const forecastEvent = events[0];
+		
+			// If loading an unresolved forecast, the event card will already be in the discard pile.
+			if (!forecastEventToLoad)
+			{
+				await discardOrRemoveEventCard(forecastEvent, $btnConfirm);
+				$btnConfirm.remove();
+			}
 
-	// Subtitle remains hidden until the cards are revealed, then it's displayed along with $btnDone
-	actionInterfacePopulator
-		.showSubtitle()
-		.$actionInterface.append($btnDone);
-
-	await buttonClickPromise($btnDone);
-	$btnDone.off("click").addClass("btnDisabled").html("CONFIRMING...");
-
-	forecastPlacement(forecastEvent, $btnDone);
+			actionInterfacePopulator.$actionInterface.children(".eventCardFull").add(".discardSelections").remove();
+			actionInterfacePopulator.$actionInterface.prepend(`<div class='actionTitle'>
+																${getEventIconHtml(forecast)}<h2>${forecast.name.toUpperCase()}</h2>
+															</div>`);
+			indicatePromptingEventCard();
+			
+			await animateForecastDraw(forecastEvent.cardKeys);
+			appendEventHistoryIconOfType(forecast);
+			
+			const $btnDone = $("<div class='button btnConfirm'>DONE</div>");
+		
+			// Subtitle remains hidden until the cards are revealed, then it's displayed along with $btnDone
+			actionInterfacePopulator
+				.showSubtitle()
+				.$actionInterface.append($btnDone);
+		
+			await buttonClickPromise($btnDone);
+			$btnDone.off("click").addClass("btnDisabled").html("CONFIRMING...");
+		
+			forecastPlacement(forecastEvent, $btnDone);
+		})
+		.catch(promptRefresh);
 }
 
 function animateForecastDraw(cardKeys)
@@ -1850,7 +1861,7 @@ function enableForecastSorting($cardContainer)
 	});
 }
 
-async function forecastPlacement(forecastEvent, $btnDone)
+function forecastPlacement(forecastEvent, $btnDone)
 {
 	const $cardContainer = $("#forecastCards"),
 		cardKeys = [];
@@ -1863,13 +1874,17 @@ async function forecastPlacement(forecastEvent, $btnDone)
 	// Reversing achieves the order in which the cards will be placed back on the deck.
 	cardKeys.reverse();
 
-	await requestAction(eventTypes.forecastPlacement, { cardKeys, forecastingRole: forecastEvent.role });
-	$btnDone.addClass("hidden");
+	requestAction(eventTypes.forecastPlacement, { cardKeys, forecastingRole: forecastEvent.role })
+		.then(async () =>
+		{
+			$btnDone.addClass("hidden");
 
-	await animateForecastPlacement($cardContainer);
-	await eventHistory.scrollToEnd();
-
-	actionInterfacePopulator.$actionInterface.slideUp(() => resumeCurrentStep());
+			await animateForecastPlacement($cardContainer);
+			await eventHistory.scrollToEnd();
+		
+			actionInterfacePopulator.$actionInterface.slideUp(() => resumeCurrentStep());
+		})
+		.catch(promptRefresh);
 }
 
 async function animateForecastPlacement($cardContainer)
@@ -2324,14 +2339,16 @@ async function discardOrRemoveEventCard(event, $btnConfirm)
 
 	if (isContingencyCardKey(cardKey))
 	{
-		$btnConfirm.html("REMOVING EVENT CARD...");
+		if ($btnConfirm) $btnConfirm.html("REMOVING EVENT CARD...");
+
 		await animateContingencyCardRemoval();
 		player.contingencyKey = false;
 		event.cardWasRemoved = true;
 	}
 	else
 	{
-		$btnConfirm.html("DISCARDING...");
+		if ($btnConfirm) $btnConfirm.html("DISCARDING...");
+
 		await movePlayerCardsToDiscards({ player, $card });
 		player.removeCardsFromHand(cardKey);
 	}
