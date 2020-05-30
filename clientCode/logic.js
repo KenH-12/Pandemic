@@ -1643,10 +1643,9 @@ const actionInterfacePopulator = {
 			actionInterfacePopulator.appendDiscardPrompt(
 			{
 				cardKeys: eventTypes.oneQuietNight.cardKey,
-				onConfirm: () => oneQuietNight()
+				onConfirm: ($btnConfirm) => oneQuietNight($btnConfirm)
 			});
 		}
-		
 		
 		return true;
 	},
@@ -1930,20 +1929,21 @@ async function animateForecastPlacement($cardContainer)
 	}
 }
 
-async function oneQuietNight()
+async function oneQuietNight($btnConfirm)
 {
 	disableActions();
 
-	const eventType = eventTypes.oneQuietNight,
-		events = await requestAction(eventType);
-	
-	await discardOrRemoveEventCard(events.shift());
+	const eventType = eventTypes.oneQuietNight;
 
-	if (isOneQuietNight())
-		indicateOneQuietNightStep();
-
-	appendEventHistoryIconOfType(eventType);
-	resumeCurrentStep();
+	requestAction(eventType)
+		.then(events => discardOrRemoveEventCard(events[0], $btnConfirm))
+		.then(() =>
+		{
+			indicateOneQuietNightStep();
+			appendEventHistoryIconOfType(eventType);
+			resumeCurrentStep();
+		})
+		.catch(promptRefresh);
 }
 
 function indicateOneQuietNightStep({ off } = {})
@@ -2053,8 +2053,7 @@ function resilientPopulation(cardKeyToRemove, $btnConfirm)
 	requestAction(eventType, { cardKeyToRemove })
 		.then(async events =>
 		{
-			$btnConfirm.html("DISCARDING...");
-			await discardOrRemoveEventCard(events.shift());
+			await discardOrRemoveEventCard(events[0], $btnConfirm);
 
 			$btnConfirm.html("REMOVING INFECTION CARD...");
 			await resilientPopulationAnimation(cardKeyToRemove);
@@ -2149,8 +2148,7 @@ function airlift(playerToAirlift, destination, $btnConfirm)
 		{
 			gameData.promptingEventType = false;
 			
-			$btnConfirm.html("DISCARDING...");
-			await discardOrRemoveEventCard(events.shift());
+			await discardOrRemoveEventCard(events.shift(), $btnConfirm);
 		
 			$btnConfirm.html("AIRLIFTING...");
 			setDuration("pawnAnimation", 1000);
@@ -2267,8 +2265,7 @@ function governmentGrant(targetCity, relocationKey, $btnConfirm)
 		})
 		.then(async events =>
 		{
-			$btnConfirm.html("DISCARDING...");
-			await discardOrRemoveEventCard(events.shift());
+			await discardOrRemoveEventCard(events[0], $btnConfirm);
 
 			$btnConfirm.html("PLACING STATION...");
 			if (relocationKey)
@@ -2317,30 +2314,29 @@ function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyTo
 	});
 }
 
-function discardOrRemoveEventCard(event)
+async function discardOrRemoveEventCard(event, $btnConfirm)
 {
-	return new Promise(async resolve =>
+	const cardKey = event.eventCard.key,
+		$card = $("#playerPanelContainer").find(`.playerCard[data-key='${cardKey}']`),
+		player = gameData.players[event.role];
+	
+	$card.removeClass("unavailable");
+
+	if (isContingencyCardKey(cardKey))
 	{
-		const cardKey = event.eventCard.key,
-			$card = $("#playerPanelContainer").find(`.playerCard[data-key='${cardKey}']`),
-			player = gameData.players[event.role];
-		
-		$card.removeClass("unavailable");
+		$btnConfirm.html("REMOVING EVENT CARD...");
+		await animateContingencyCardRemoval();
+		player.contingencyKey = false;
+		event.cardWasRemoved = true;
+	}
+	else
+	{
+		$btnConfirm.html("DISCARDING...");
+		await movePlayerCardsToDiscards({ player, $card });
+		player.removeCardsFromHand(cardKey);
+	}
 
-		if (isContingencyCardKey(cardKey))
-		{
-			await animateContingencyCardRemoval();
-			player.contingencyKey = false;
-			event.cardWasRemoved = true;
-		}
-		else
-		{
-			await movePlayerCardsToDiscards({ player, $card });
-			player.removeCardsFromHand(cardKey);
-		}
-
-		resolve();
-	});
+	return Promise.resolve();
 }
 
 function animateContingencyCardRemoval()
