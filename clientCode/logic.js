@@ -1058,7 +1058,7 @@ const actionInterfacePopulator = {
 				
 				actionInterfacePopulator.removeUnchosenFlightTypes(flightType);
 				
-				onConfirm();
+				onConfirm($btnConfirm);
 			});
 
 		$actionInterface.append($container);
@@ -1556,7 +1556,7 @@ const actionInterfacePopulator = {
 			actionInterfacePopulator.appendDiscardPrompt(
 			{
 				cardKeys: eventTypes.airlift.cardKey,
-				onConfirm: () => airlift(playerToAirlift, destination)
+				onConfirm: ($btnConfirm) => airlift(playerToAirlift, destination, $btnConfirm)
 			});
 
 			bindRoleCardHoverEvents();
@@ -2126,32 +2126,38 @@ async function tryAirlift(playerToAirlift)
 	await playerToAirlift.getLocation().cluster();
 }
 
-async function airlift(playerToAirlift, destination)
+function airlift(playerToAirlift, destination, $btnConfirm)
 {
 	disableActions();
 	
-	const eventType = eventTypes.airlift,
-		events = await requestAction(eventType,
+	const eventType = eventTypes.airlift;
+
+	requestAction(eventType,
 		{
 			roleToAirlift: playerToAirlift.rID,
 			originKey: playerToAirlift.cityKey,
 			destinationKey: destination.key
-		});
-	
-	gameData.promptingEventType = false;
-
-	await discardOrRemoveEventCard(events.shift());
-
-	setDuration("pawnAnimation", 1000);
-	await playerToAirlift.updateLocation(destination);
-	appendEventHistoryIconOfType(eventType);
-
-	// If any events are left after shifting the airliftEvent, they are auto-treat disease events.
-	if (events.length)
-		await animateAutoTreatDiseaseEvents(events);
-	
-	enablePawnEvents();
-	resumeCurrentStep();
+		})
+		.then(async events => 
+		{
+			gameData.promptingEventType = false;
+			
+			$btnConfirm.html("DISCARDING...");
+			await discardOrRemoveEventCard(events.shift());
+		
+			$btnConfirm.html("AIRLIFTING...");
+			setDuration("pawnAnimation", 1000);
+			await playerToAirlift.updateLocation(destination);
+			appendEventHistoryIconOfType(eventType);
+		
+			// If any events are left after shifting the airliftEvent, they are auto-treat disease events.
+			if (events.length)
+				await animateAutoTreatDiseaseEvents(events);
+			
+			enablePawnEvents();
+			resumeCurrentStep();
+		})
+		.catch(promptRefresh);
 }
 
 async function appendGrantStation()
@@ -8032,7 +8038,7 @@ function removeRepresentationsOfDiscardedEventCards($discardPile)
 	const $discardedEventCards = $discardPile.find(".eventCard");
 
 	for (let i = 0; i < $discardedEventCards.length; i++)
-		$(`.eventCardFull[data-key='${$discardedEventCards.eq(i).attr("data-key")}']`).remove();
+		$("#boardContainer").children(`.eventCardFull[data-key='${$discardedEventCards.eq(i).attr("data-key")}']`).remove();
 }
 
 async function undoAction()
