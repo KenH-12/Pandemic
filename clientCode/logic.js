@@ -2971,34 +2971,38 @@ async function drawStep()
 
 	disableEventCards();
 	eventHistory.disableUndo();
-
 	updateConfirmButtonText($btn, "DRAWING...");
-	const events = await requestAction(eventTypes.cardDraw);
-	$btn.addClass("hidden");
 
-	const cardKeys = await animateDrawStep(events[0]);
-	if (!cardKeys) return false;
-
-	if (gameData.nextStep === "epIncrease")
-	{
-		let title;
-		
-		if (numEpidemicsToResolve() === 1)
+	requestAction(eventTypes.cardDraw)
+		.then(async events =>
 		{
-			gameData.epidemicCount++;
-			title = "EPIDEMIC!"
-		}
-		else
-		{
-			gameData.epidemicCount += 2;
-			title = "DOUBLE EPIDEMIC!!";
-		}
-		
-		await specialEventAlert({ title, eventClass: "epidemic", visibleMs: 1250 });
-	}
+			$btn.addClass("hidden");
 
-	await sleep(750);
-	finishDrawStep(cardKeys);
+			const cardKeys = await animateDrawStep(events[0]);
+			if (!cardKeys) return false;
+
+			if (gameData.nextStep === "epIncrease")
+			{
+				let title;
+				
+				if (numEpidemicsToResolve() === 1)
+				{
+					gameData.epidemicCount++;
+					title = "EPIDEMIC!"
+				}
+				else
+				{
+					gameData.epidemicCount += 2;
+					title = "DOUBLE EPIDEMIC!!";
+				}
+				
+				await specialEventAlert({ title, eventClass: "epidemic", visibleMs: 1250 });
+			}
+
+			await sleep(750);
+			finishDrawStep(cardKeys);
+		})
+		.catch(promptRefresh);
 }
 
 async function animateDrawStep(cardDrawEvent)
