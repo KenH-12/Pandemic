@@ -13,13 +13,13 @@
         $details = json_decode(file_get_contents("php://input"), true);
 
         if (!isset($details["role"]))
-            throw new Exception("Required values not set.");
+            throw new Exception("Role not set.");
         
         if (!isset($details["currentStep"]))
-            throw new Exception("Required values not set.");
+            throw new Exception("Current step not set.");
         
         if (!isset($details["cardKey"]))
-            throw new Exception("Required values not set.");
+            throw new Exception("Card not set.");
         
         $game = $_SESSION["game"];
         $role = $details["role"];

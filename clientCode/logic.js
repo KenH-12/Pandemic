@@ -1689,13 +1689,15 @@ async function planContingency(cardKey)
 		eventType = eventTypes.planContingency,
 		$eventCard = $("#playerDiscardContainer").find(`.playerCard[data-key='${cardKey}']`).off("mouseenter mouseleave");
 
-	await requestAction(eventType, { cardKey });
-
-	await contingencyPlanner.panel.animateReceiveCard($eventCard, { isContingencyCard: true })
-	contingencyPlanner.contingencyKey = cardKey;
-
-	appendEventHistoryIconOfType(eventType);
-	proceed();
+	requestAction(eventType, { cardKey })
+		.then(() => contingencyPlanner.panel.animateReceiveCard($eventCard, { isContingencyCard: true }))
+		.then(() =>
+		{
+			contingencyPlanner.contingencyKey = cardKey;
+			appendEventHistoryIconOfType(eventType);
+			proceed();
+		})
+		.catch(promptRefresh);
 }
 
 function isContingencyCardKey(cardKey)
