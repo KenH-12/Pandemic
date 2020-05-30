@@ -1584,7 +1584,7 @@ const actionInterfacePopulator = {
 				.appendDiscardPrompt(
 				{
 					cardKeys: eventTypes.governmentGrant.cardKey,
-					onConfirm: () => governmentGrant(targetCity, relocationKey)
+					onConfirm: ($btnConfirm) => governmentGrant(targetCity, relocationKey, $btnConfirm)
 				});
 
 			return true;
@@ -2247,30 +2247,36 @@ function promptGovernmentGrantStationRelocation()
 	return true;
 }
 
-async function governmentGrant(targetCity, relocationKey)
+async function governmentGrant(targetCity, relocationKey, $btnConfirm)
 {
 	disableActions();
 	
-	const eventType = eventTypes.governmentGrant,
-		events = await requestAction(eventType,
+	const eventType = eventTypes.governmentGrant;
+
+	requestAction(eventType,
 		{
 			locationKey: targetCity.key,
 			relocationKey: relocationKey || 0
-		});
-	
-	await discardOrRemoveEventCard(events.shift());
+		})
+		.then(async events =>
+		{
+			$btnConfirm.html("DISCARDING...");
+			await discardOrRemoveEventCard(events.shift());
 
-	if (relocationKey)
-	{
-		await getCity(relocationKey).relocateResearchStationTo(targetCity);
-		turnOffResearchStationHighlights();
-	}
-	else
-		await targetCity.buildResearchStation(promptAction, { animate: true, isGovernmentGrant: true });
-	
-	hideTravelPathArrow();
-	appendEventHistoryIconOfType(eventType);
-	resumeCurrentStep();
+			$btnConfirm.html("PLACING STATION...");
+			if (relocationKey)
+			{
+				await getCity(relocationKey).relocateResearchStationTo(targetCity);
+				turnOffResearchStationHighlights();
+			}
+			else
+				await targetCity.buildResearchStation(promptAction, { animate: true, isGovernmentGrant: true });
+			
+			hideTravelPathArrow();
+			appendEventHistoryIconOfType(eventType);
+			resumeCurrentStep();
+		})
+		.catch(promptRefresh);
 }
 
 function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyToExclude } = {})
