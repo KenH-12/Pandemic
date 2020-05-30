@@ -1621,7 +1621,7 @@ const actionInterfacePopulator = {
 				.appendDiscardPrompt(
 				{
 					cardKeys: eventType.cardKey,
-					onConfirm: () => resilientPopulation(cardKeyToRemove)
+					onConfirm: ($btnConfirm) => resilientPopulation(cardKeyToRemove, $btnConfirm)
 				});
 		}
 		else
@@ -2042,23 +2042,30 @@ function hideResilientPopulationArrow({ selectionWasMade, reset } = {})
 		$arrow.removeClass(doNotShow);
 }
 
-async function resilientPopulation(cardKeyToRemove)
+function resilientPopulation(cardKeyToRemove, $btnConfirm)
 {
 	resetInfectionDiscardClicksAndTooltips();
 	disableActions();
 	disableInfectionDiscardHoverEvents();
 
-	const eventType = eventTypes.resilientPopulation,
-		events = await requestAction(eventType, { cardKeyToRemove });
+	const eventType = eventTypes.resilientPopulation;
+	
+	requestAction(eventType, { cardKeyToRemove })
+		.then(async events =>
+		{
+			$btnConfirm.html("DISCARDING...");
+			await discardOrRemoveEventCard(events.shift());
 
-	await discardOrRemoveEventCard(events.shift());
-	await resilientPopulationAnimation(cardKeyToRemove);
-	appendEventHistoryIconOfType(eventType);
-
-	resizeInfectionDiscardElements();
-	enableInfectionDiscardHoverEvents();
-	hideResilientPopulationArrow({ reset: true });
-	resumeCurrentStep();
+			$btnConfirm.html("REMOVING INFECTION CARD...");
+			await resilientPopulationAnimation(cardKeyToRemove);
+			appendEventHistoryIconOfType(eventType);
+		
+			resizeInfectionDiscardElements();
+			enableInfectionDiscardHoverEvents();
+			hideResilientPopulationArrow({ reset: true });
+			resumeCurrentStep();
+		})
+		.catch(promptRefresh);
 }
 
 function resetInfectionDiscardClicksAndTooltips()
@@ -2247,7 +2254,7 @@ function promptGovernmentGrantStationRelocation()
 	return true;
 }
 
-async function governmentGrant(targetCity, relocationKey, $btnConfirm)
+function governmentGrant(targetCity, relocationKey, $btnConfirm)
 {
 	disableActions();
 	
