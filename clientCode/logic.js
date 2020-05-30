@@ -5438,8 +5438,7 @@ async function infectionStep()
 	$container.removeClass("hidden");
 
 	// Prompt and perform infections until the infection rate is reached
-	let eventCardsCanBePlayed,
-		$loadingGif;
+	let eventCardsCanBePlayed;
 	while (infectionCount < infectionRate)
 	{
 		// Event cards cannot be played while resolving infection cards,
@@ -5465,7 +5464,9 @@ async function infectionStep()
 		eventHistory.disableUndo();
 
 		updateConfirmButtonText($btn, "INFECTING...");
-		events = await requestAction(infectCity);
+		events = await requestAction(infectCity).catch(promptRefresh);
+		if (!events) return false;
+
 		$btn.addClass("hidden");
 		
 		card = events.shift();
