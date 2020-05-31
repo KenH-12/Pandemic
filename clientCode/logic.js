@@ -5430,15 +5430,18 @@ function isOneQuietNight()
 	return getEventsOfTurn(eventTypes.oneQuietNight).length > 0;
 }
 
-async function skipInfectionStepForOneQuietNight()
+function skipInfectionStepForOneQuietNight()
 {
 	disableActions();
 
-	await requestAction(eventTypes.skipInfectionStep);
-	await animateOneQuietNight();
-
-	indicateOneQuietNightStep({ off: true });
-	nextTurn();
+	requestAction(eventTypes.skipInfectionStep)
+		.then(async () =>
+		{
+			await animateOneQuietNight();
+			indicateOneQuietNightStep({ off: true });
+			nextTurn();
+		})
+		.catch(promptRefresh);
 }
 
 async function infectionStep()
