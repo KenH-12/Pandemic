@@ -4841,12 +4841,14 @@ async function epidemicIncrease()
 	disableEventCards();
 	await highlightEpidemicStep($epidemic, "increase");
 	
-	const { 0: event } = await requestAction(eventType);
-
-	await moveInfectionRateMarker({ newEpidemicCount: event.epidemicCount, animate: true });
-	appendEventHistoryIconOfType(eventType);
-
-	proceed();
+	requestAction(eventType)
+		.then(event => moveInfectionRateMarker({ newEpidemicCount: event.epidemicCount, animate: true }))
+		.then(() =>
+		{
+			appendEventHistoryIconOfType(eventType);
+			proceed();
+		})
+		.catch(promptRefresh);
 }
 
 async function epidemicInfect()
@@ -4859,58 +4861,58 @@ async function epidemicInfect()
 
 	await highlightEpidemicStep($epidemic, "infect");
 
-	const { 0: events } = await Promise.all(
-		[
-			requestAction(eventType),
-			sleep(interval) // minumum wait time so things don't happen too quickly
-		]),
-		{ cityKey, prevCubeCount, preventionCode } = events.shift(), // epInfect event
-		triggeredOutbreakEvents = events, // any remaining events were triggered by the infection.
-		$MAX_NUM_CUBES = 3,	
-		card = {
-			cityKey,
-			city: getCity(cityKey),
-			numCubes: $MAX_NUM_CUBES - prevCubeCount,
-			preventionCode: preventionCode,
-			infectionIndex: 0
-		};
-
-	getInfectionContainer().append(newInfectionCardTemplate());
-	positionInfectionPanelComponents();
-	await dealFaceDownInfCard(card, { dealFromBottomOfDeck: true });
-	await revealInfectionCard(card);
-
-	const { color } = card.city;
-
-	if (preventionCode === infectionPreventionCodes.notPrevented)
-	{
-		await placeDiseaseCubes(card);
-		appendEventHistoryIconOfType(eventType);
-
-		if (diseaseCubeLimitExceeded(color))
-			return diseaseCubeDefeatAnimation(color);
-	}
-	else
-	{
-		await infectionPreventionAnimation(card);
-		appendEventHistoryIconOfType(eventType);
-	}
-
-	if (triggeredOutbreakEvents.length)
-	{
-		await resolveOutbreaks(triggeredOutbreakEvents);
-		if (tooManyOutbreaksOccured())
-			return outbreakDefeatAnimation();
+	requestAction(eventType)
+		.then(async events =>
+		{
+			const { cityKey, prevCubeCount, preventionCode } = events.shift(), // epInfect event
+				triggeredOutbreakEvents = events, // any remaining events were triggered by the infection.
+				$MAX_NUM_CUBES = 3,	
+				card = {
+					cityKey,
+					city: getCity(cityKey),
+					numCubes: $MAX_NUM_CUBES - prevCubeCount,
+					preventionCode: preventionCode,
+					infectionIndex: 0
+				};
 		
-		if (diseaseCubeLimitExceeded(color))
-			return diseaseCubeDefeatAnimation(color);
-	}
+			getInfectionContainer().append(newInfectionCardTemplate());
+			positionInfectionPanelComponents();
+			await dealFaceDownInfCard(card, { dealFromBottomOfDeck: true });
+			await revealInfectionCard(card);
 		
-	await sleep(interval);
-	await discardInfectionCard($("#epidemicContainer").find(".infectionCard"), 400);
-	await sleep(interval);
-
-	proceed();
+			const { color } = card.city;
+		
+			if (preventionCode === infectionPreventionCodes.notPrevented)
+			{
+				await placeDiseaseCubes(card);
+				appendEventHistoryIconOfType(eventType);
+		
+				if (diseaseCubeLimitExceeded(color))
+					return diseaseCubeDefeatAnimation(color);
+			}
+			else
+			{
+				await infectionPreventionAnimation(card);
+				appendEventHistoryIconOfType(eventType);
+			}
+		
+			if (triggeredOutbreakEvents.length)
+			{
+				await resolveOutbreaks(triggeredOutbreakEvents);
+				if (tooManyOutbreaksOccured())
+					return outbreakDefeatAnimation();
+				
+				if (diseaseCubeLimitExceeded(color))
+					return diseaseCubeDefeatAnimation(color);
+			}
+				
+			await sleep(interval);
+			await discardInfectionCard($("#epidemicContainer").find(".infectionCard"), 400);
+			await sleep(interval);
+		
+			proceed();
+		})
+		.catch(promptRefresh);
 }
 
 async function epidemicIntensify()
@@ -4936,19 +4938,17 @@ async function epidemicIntensify()
 	eventHistory.disableUndo();
 	disableEventCards();
 
-	await Promise.all([
-		requestAction(eventType),
-		animateEpidemicIntensify()
-	]);
-	resetInfectionDeckSize();
-	appendEventHistoryIconOfType(eventType);
-	
-	$epidemic.children(".highlighted").removeClass("highlighted");
-	
-	disableEventCards();
-	await finishIntensifyStep($epidemic);
-
-	proceed();
+	requestAction(eventType)
+		.then(animateEpidemicIntensify)
+		.then(() =>
+		{
+			resetInfectionDeckSize();
+			appendEventHistoryIconOfType(eventType);
+			$epidemic.children(".highlighted").removeClass("highlighted");
+		})
+		.then(() => finishIntensifyStep($epidemic))
+		.then(proceed)
+		.catch(promptRefresh);
 }
 
 function finishIntensifyStep($epidemic)
