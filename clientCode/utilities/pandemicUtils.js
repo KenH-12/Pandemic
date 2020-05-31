@@ -203,7 +203,7 @@ function showLoadingGif(eventType)
 				const epidemicStepCodes = [epidemicIncrease.code, epidemicInfect.code, epidemicIntensify.code];
 
 				if (epidemicStepCodes.includes(eventType.code))
-					return $("#epidemicContainer").children().last();
+					return $(".epidemicFull").find(".highlighted").children("h3").children();
 				
 				return "";
 			},
@@ -215,8 +215,13 @@ function showLoadingGif(eventType)
 		$anchor = getAnchorElement();
 		if ($anchor.length)
 		{
+			const $img = $("<img src='images/loading.gif' alt='loading' />"),
+				$loadingGif = $anchor.closest(".epidemicFull").length ? $img : $(`<div class='loadingGif'></div>`).append($img);
+			
+			$loadingGif.insertAfter($anchor);
+			
 			return {
-				$loadingGif: $(`<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>`).insertAfter($anchor),
+				$loadingGif,
 				resetActionButtonImg: false
 			}
 		}

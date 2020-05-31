@@ -373,15 +373,15 @@
 							<div class='epidemicFull hidden'>
 								<h2>EPIDEMIC</h2>
 								<div class='increase hidden'>
-									<h3>1 — INCREASE</h3>
+									<h3><span>1 — INCREASE</span></h3>
 									<p>MOVE THE INFECTION RATE MARKER FORWARD 1 SPACE.</P>
 								</div>
 								<div class='infect hidden'>
-									<h3>2 — INFECT</h3>
+									<h3><span>2 — INFECT</span></h3>
 									<p>DRAW THE BOTTOM CARD FROM THE INFECTION DECK AND PUT 3 CUBES ON THAT CITY. DISCARD THAT CARD.</p>
 								</div>
 								<div class='intensify hidden'>
-									<h3>3 — INTENSIFY</h3>
+									<h3><span>3 — INTENSIFY</span></h3>
 									<p>SHUFFLE THE CARDS IN THE INFECTION DISCARD PILE AND PUT THEM ON TOP OF THE INFECTION DECK.</p>
 								</div>
 							</div>
@@ -389,15 +389,15 @@
 							<div class='epidemicFull hidden'>
 								<h2>EPIDEMIC</h2>
 								<div class='increase hidden'>
-									<h3>1 — INCREASE</h3>
+									<h3><span>1 — INCREASE</span></h3>
 									<p>MOVE THE INFECTION RATE MARKER FORWARD 1 SPACE.</P>
 								</div>
 								<div class='infect hidden'>
-									<h3>2 — INFECT</h3>
+									<h3><span>2 — INFECT</span></h3>
 									<p>DRAW THE BOTTOM CARD FROM THE INFECTION DECK AND PUT 3 CUBES ON THAT CITY. DISCARD THAT CARD.</p>
 								</div>
 								<div class='intensify hidden'>
-									<h3>3 — INTENSIFY</h3>
+									<h3><span>3 — INTENSIFY</span></h3>
 									<p>SHUFFLE THE CARDS IN THE INFECTION DISCARD PILE AND PUT THEM ON TOP OF THE INFECTION DECK.</p>
 								</div>
 							</div>

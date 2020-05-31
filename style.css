@@ -1145,6 +1145,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 	transition: background-color 0.5s;
 }
 .epidemicFull h3 { font-size: 16px }
+.epidemicFull h3 > * { vertical-align: middle }
+.epidemicFull h3 img
+{
+	width: 16px;
+	margin-left: 8px;
+}
 #epidemicContainer .epidemicFull > div:not(.highlighted) h3
 {
 	color: rgb(189, 189, 189);

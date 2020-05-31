@@ -1,14 +1,13 @@
 BUGS
 ----
+prompting an action, then doing an immediately-executed action causes the loading gif to appear in the action prompt
+as if the prompted action is being executed
 
 TO DO
 -----
-loading gifs should appear after a short delay (if the connection is fast enough, they will not appear at all)
+don't repeat setup animation after refresh if it already completed or was skipped
 
-test...
-	outbreaks caused by infect city
-	game end conditions
-	operations flight
+loading gifs should appear after a short delay (if the connection is fast enough, they will not appear at all)
 
 after loading for x ms, show some error message
 
@@ -44,7 +43,7 @@ event history
 
 handle errors
 	if the game is not set, redirect to either home or login
-	retrieveEventHistory
+	setup
 
 add tests
 
