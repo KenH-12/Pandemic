@@ -13,19 +13,19 @@
 		$details = json_decode(file_get_contents("php://input"), true);
 
 		if (!isset($details["role"]))
-			throw new Exception("game not found");
+			throw new Exception("role not set.");
 		
 		if (!isset($details["currentStep"]))
-			throw new Exception("game not found");
+			throw new Exception("current step not set.");
 		
 		if (!isset($details["actionCode"]))
-			throw new Exception("game not found");
+			throw new Exception("movement type not set.");
 		
 		if (!isset($details["originKey"]))
-			throw new Exception("game not found");
+			throw new Exception("origin not set.");
 		
 		if (!isset($details["destinationKey"]))
-			throw new Exception("game not found");
+			throw new Exception("destination not set.");
 		
 		$game = $_SESSION["game"];
 		$role = $details["role"];
