@@ -811,13 +811,12 @@ function resetActionPrompt({ actionCancelled } = {})
 	if (actionCancelled)
 	{
 		const activePlayer = getActivePlayer(),
-			{ airlift, governmentGrant, resilientPopulation } = eventTypes,
-			animatePawns = true;
+			{ airlift, governmentGrant, resilientPopulation } = eventTypes;
 		
 		if (activePlayer.role === "Dispatcher" || eventTypeIsBeingPrompted(airlift))
-			clusterAll({ pawns: true });
+			clusterAll({ pawns: true, doNotAnimatePawns: true });
 		else
-			activePlayer.getLocation().cluster({ animatePawns });
+			activePlayer.getLocation().cluster();
 
 		if (eventTypeIsBeingPrompted(governmentGrant))
 		{
@@ -913,6 +912,66 @@ const actionInterfacePopulator = {
 	{
 		actionInterfacePopulator.$actionInterface.children().remove();
 		return actionInterfacePopulator;
+	},
+	closeIrrelevantPrompts(relevantEventType, { destination })
+	{
+		const { $actionInterface } = actionInterfacePopulator;
+
+		if (!$actionInterface.filter(":visible").length)
+			return false;
+		
+		const {
+				driveFerry,
+				shuttleFlight,
+				dispatchPawn,
+				treatDisease
+			} = eventTypes,
+			immediatelyExecutedEventTypeCodes = [
+				driveFerry.code,
+				shuttleFlight.code,
+				dispatchPawn.code,
+				treatDisease.code
+			];
+		
+		if (!immediatelyExecutedEventTypeCodes.includes(relevantEventType.code))
+			return false;
+
+		const $promptedActionTitles = $actionInterface.children(".actionTitle").children("h2"),
+			relevantEventTypeName = relevantEventType.name.toUpperCase();
+
+		let promptingRelevantEventType = false;
+		if (relevantEventType.code !== dispatchPawn.code)
+		{
+			for (let i = 0; i < $promptedActionTitles.length; i++)
+			{
+				if ($promptedActionTitles.eq(i).html() === relevantEventTypeName)
+				{
+					promptingRelevantEventType = true;
+					break;
+				}
+			}
+		}
+
+		if (!promptingRelevantEventType)
+		{
+			resetActionPrompt({ actionCancelled: true });
+			$(".actionCategory").removeClass("hidden");
+			return false;
+		}
+
+		if ([driveFerry.code, shuttleFlight.code].includes(relevantEventType.code))
+		{
+			if (destination)
+			{
+				actionInterfacePopulator.replaceInstructions("Destination:");
+				$actionInterface.find(".actionPromptOption").off("click").addClass("btnDisabled")
+					.not(`[data-key='${destination.key}']`).remove();
+			}
+		}
+		else if (relevantEventType.code === treatDisease.code)
+		{
+			// TODO
+		}
 	},
 	appendDescriptiveElements(eventType)
 	{
@@ -2298,7 +2357,7 @@ function governmentGrant(targetCity, relocationKey, $btnConfirm)
 		.catch(promptRefresh);
 }
 
-function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyToExclude } = {})
+function clusterAll({ pawns, doNotAnimatePawns, playerToExcludePawn, researchStations, stationKeyToExclude } = {})
 {
 	const rIdToExclude = playerToExcludePawn ? playerToExcludePawn.rID : false;
 	
@@ -2322,7 +2381,7 @@ function clusterAll({ pawns, playerToExcludePawn, researchStations, stationKeyTo
 
 	executePendingClusters(
 	{
-		animatePawns: pawns,
+		animatePawns: doNotAnimatePawns ? false : pawns,
 		$pawnToExclude: playerToExcludePawn ? playerToExcludePawn.$pawn : false,
 		animateResearchStation: researchStations,
 		stationKeyToExclude
@@ -2727,6 +2786,7 @@ function movementAction(eventType, destination, { playerToDispatch, operationsFl
 	
 	// Move appears to be valid
 	disableActions();
+	actionInterfacePopulator.closeIrrelevantPrompts(playerToDispatch ? eventTypes.dispatchPawn : eventType, { destination });
 
 	if (!movementTypeRequiresDiscard(eventType))
 	{
