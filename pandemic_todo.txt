@@ -1,7 +1,6 @@
 BUGS
 ----
-prompting an action, then doing an immediately-executed action causes the loading gif to appear in the action prompt
-as if the prompted action is being executed
+epidemicIntensify event details are broken
 
 TO DO
 -----

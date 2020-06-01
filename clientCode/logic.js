@@ -913,7 +913,7 @@ const actionInterfacePopulator = {
 		actionInterfacePopulator.$actionInterface.children().remove();
 		return actionInterfacePopulator;
 	},
-	closeIrrelevantPrompts(relevantEventType, { destination })
+	closeIrrelevantPrompts(relevantEventType, { destination, diseaseColor })
 	{
 		const { $actionInterface } = actionInterfacePopulator;
 
@@ -970,7 +970,11 @@ const actionInterfacePopulator = {
 		}
 		else if (relevantEventType.code === treatDisease.code)
 		{
-			// TODO
+			$actionInterface.children(".diseaseCube").off("click")
+				.filter(`.${diseaseColor}`).addClass("selected disabled")
+				.siblings(".diseaseCube").css("opacity", 0.001);
+			
+			actionInterfacePopulator.replaceInstructions(`Treating disease...`);
 		}
 	},
 	appendDescriptiveElements(eventType)
@@ -1339,10 +1343,12 @@ const actionInterfacePopulator = {
 				function() { unmarkTreatableDiseaseCubes($cubes) })
 				.click(function()
 				{
+					$actionInterface.children(".diseaseCube").off("click");
+					
 					const $this = $(this);
 
-					$this.off("click").addClass("selected disabled")
-						.siblings(".diseaseCube").fadeTo(200, 0.001);
+					$this.addClass("selected disabled")
+						.siblings(".diseaseCube").css("opacity", 0.001);
 					
 					actionInterfacePopulator.replaceInstructions(`Treating disease...`);
 					treatDisease(false, getColorClass($this));
@@ -4697,8 +4703,11 @@ function enableDiseaseCubeEvents()
 		{
 			if (!$btnTreatDisease.hasClass("btnDisabled"))
 			{
+				const $this = $(this);
+				
+				actionInterfacePopulator.closeIrrelevantPrompts(eventTypes.treatDisease, { diseaseColor: getColorClass($this) });
 				unmarkTreatableDiseaseCubes($cubes);
-				treatDisease($(this));
+				treatDisease($this);
 			}
 		});
 	
