@@ -2509,7 +2509,7 @@ function getDispatchInstructionTooltip(eventType)
 	return "";
 }
 
-function requestAction(eventType, dataToPost)
+function requestAction(eventType, dataToPost, { isDispatchRequest } = {})
 {
 	return new Promise((resolve, reject) =>
 	{
@@ -2519,7 +2519,7 @@ function requestAction(eventType, dataToPost)
 			indicateActionsLeft({ zeroRemaining: true });
 		
 		console.log(`requestAction(${eventType.code})`);
-		const { $loadingGif, resetActionButtonImg } = showLoadingGif(eventType);
+		const { $loadingGif, resetActionButtonImg } = showLoadingGif(isDispatchRequest ? eventTypes.dispatchPawn : eventType);
 	
 		postData(`serverCode/actionPages/${eventType.actionPathName}.php`, {
 			...{
@@ -2808,7 +2808,7 @@ function movementAction(eventType, destination, { playerToDispatch, operationsFl
 	if (operationsFlightDiscardKey)
 		dataToPost.discardKey = operationsFlightDiscardKey;
 	
-	requestAction(eventType, dataToPost)
+	requestAction(eventType, dataToPost, { isDispatchRequest: playerToDispatch })
 		.then(async events =>
 		{
 			await movementActionDiscard(eventType, destination, { playerToDispatch, operationsFlightDiscardKey });
