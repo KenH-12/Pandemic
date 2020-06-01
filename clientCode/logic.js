@@ -6233,7 +6233,7 @@ function placeDiseaseCube(city, diseaseColor, cubeSupplyOffset)
 		const $cube = appendNewCubeToBoard(diseaseColor, city.key, { prepareAnimation: true })
 			.offset(cubeSupplyOffset);
 		
-		city.incrementCubeCount();
+		city.incrementCubeCount(diseaseColor);
 
 		if (!gameData.fastForwarding)
 		{
