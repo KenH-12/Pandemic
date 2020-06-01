@@ -948,8 +948,8 @@ function getEpidemicIntensifyCardKeys($pdo, $eventID)
                         WHERE eventID = ?
                         ORDER BY cardIndex DESC");
     $stmt->execute([$eventID]);
-    $cardKeys = $stmt->fetchAll();
-    foreach ($cardKeys as $row)
+    $results = $stmt->fetchAll();
+    foreach ($results as $row)
         $cardKeys[] = $row["cityKey"];
     
     return $cardKeys;

@@ -1,6 +1,5 @@
 BUGS
 ----
-epidemicIntensify event details are broken
 
 TO DO
 -----
