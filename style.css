@@ -85,7 +85,9 @@ input[type='text'] { cursor: text }
 {
 	font-size: 20px;
 }
-#lobby input, #btnAttemptAccess { height: 24px }
+#lobby input:not([type='radio']),
+#btnAttemptAccess
+{ height: 24px }
 #lobby .content > h1, #lobby h2
 {
 	font-family: 'Audiowide';
@@ -175,10 +177,8 @@ input[type='text'] { cursor: text }
 {
 	font-size: 18px;
 }
-input[type='radio']
-{
-	margin: 10px 5px 0 0;
-}
+#lobby .subtitle { font-size: 20px }
+input[type='radio'] { margin: 10px 5px 0 0 }
 select
 {
 	margin-left: 5px;
