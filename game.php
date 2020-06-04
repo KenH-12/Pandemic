@@ -1,9 +1,11 @@
 <?php
-	require "serverCode/connect.php";
-	$gID = $pdo->query("SELECT MAX(gameID) AS gID FROM pandemic.game")->fetch()["gID"];
-
 	session_start();
-	$_SESSION["game"] = $gID;
+
+	if (!isset($_SESSION["uID"]) || !isset($_SESSION["game"]))
+	{
+		header("Location: index.php");
+		die();
+	}
 
 	$MAX_RESEARCH_STATION_COUNT = 6;
 	$MAX_CUBE_SUPPLY_COUNT = 24;

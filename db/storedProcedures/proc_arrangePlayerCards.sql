@@ -147,5 +147,6 @@ BEGIN
 		END LOOP arrange_cards;
 	CLOSE card_cursor;
 	
-	CALL proc_insert_StartingHands(gID);
+	CALL proc_insert_startingHands(gID);
+	CALL proc_update_turnOrder(gID);
 END

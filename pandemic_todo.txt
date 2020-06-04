@@ -3,11 +3,12 @@ BUGS
 
 TO DO
 -----
-don't repeat setup animation after refresh if it already completed or was skipped
+menus
+	show loading gif when awaiting response
+	enter button should submit
 
-loading gifs should appear after a short delay (if the connection is fast enough, they will not appear at all)
-
-after loading for x ms, show some error message
+starting a game
+	names need to be removed from PlayerPanels when in single player mode
 
 account creation
 	button to check username availability
@@ -26,6 +27,7 @@ when a city or contained piece is hovered, show the city name in a larger font
 
 starting a new game
 	select difficulty
+		if the user has won a game, the default difficulty should be normal (or perhaps the highest beaten difficulty)
 	select roles?
 when the game is over
 	navigate back to home screen
@@ -61,6 +63,9 @@ for multiplayer games, require permission for certain actions
 	share knowledge
 	dispatch pawn
 	airlift
+
+server migration
+	redirect urls
 
 IDEAS
 -----
@@ -104,6 +109,10 @@ split data.currentStep into an object containing 'next' and 'current' keys
 
 SMALL FIXES
 -----------
+don't repeat setup animation after refresh if it already completed or was skipped
+
+loading gifs should appear after a short delay (if the connection is fast enough, they will not appear at all)
+
 if auto-infecting cities, fetch all infections in one request
 
 use Promise.resolve() instead of Return new Promise...

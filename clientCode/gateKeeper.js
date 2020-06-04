@@ -275,7 +275,6 @@ function createGame()
     
     postData("serverCode/actionPages/createGame.php",
         {
-            uID,
             numEpidemics,
             numRoles
         })
@@ -284,14 +283,12 @@ function createGame()
             if (response.failure)
                 return gameCreationFailed(response.failure);
 
-            $("#lobby").remove();
-            $("body").append(response.doc);
-            $("head").append("<script type='module' src='clientCode/logic.js'></script>");
+            window.location.replace("game.php");
         })
         .catch(e => console.error(e));
 }
 
 function gameCreationFailed(reason)
 {
-    alert("Failed to create game: " + reason);
+    alert(reason);
 }
