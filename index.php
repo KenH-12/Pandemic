@@ -9,16 +9,10 @@
                     <link href='https://fonts.googleapis.com/css?family=Exo+2:800|Electrolize|Audiowide|Oswald:400,700|B612+Mono|Ropa+Sans&display=swap' rel='stylesheet'>
                     <link rel='stylesheet' type='text/css' href='style.css'>
                     <script src='clientCode/jquery-1.11.2.min.js'></script>
-                    <script src='clientCode/jquery-ui.min.js'></script>
                     <script src='clientCode/jquery.easing.1.3.js'></script>
                     <script src='clientCode/utilities/miscUtils.js'></script>
-                    <script src='clientCode/utilities/stringUtils.js'></script>
-                    <script src='clientCode/utilities/tooltipUtils.js'></script>
-                    <script src='clientCode/utilities/geometryUtils.js'></script>
                     <script src='clientCode/utilities/animationUtils.js'></script>
-                    <script src='clientCode/setup.js'></script>
                     <script src='clientCode/gateKeeper.js' type='module'></script>
-                    
                 </head>
                 <body>
                     <div id='lobby'>
@@ -30,7 +24,6 @@
                         </div>
                         
                         <div class='content'>
-
                             <form id='frmLogIn'>
                                 <label for='txtUsername'>Username or Email:</label>
                                 <input id='txtUsername' type='text' />

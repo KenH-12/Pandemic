@@ -26,7 +26,9 @@
         if (!password_verify($data["password"], $hash))
             throw new Exception("Invalid password");
         
+        session_start();
         $_SESSION["uID"] = $userID;
+
         $response["success"] = true;
     }
     catch(PDOException $e)
