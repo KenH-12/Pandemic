@@ -14,7 +14,7 @@ DROP TABLE IF EXISTS diseaseStatus;
 DROP TABLE IF EXISTS game;
 DROP TABLE IF EXISTS step;
 DROP TABLE IF EXISTS gameEndCause;
-DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS role;
 DROP TABLE IF EXISTS cardpile;
 DROP TABLE IF EXISTS cityconnection;
@@ -89,11 +89,11 @@ SELECT
 FROM pandemic
 INNER JOIN game ON game.gameID = pandemic.gameID;
 
-CREATE TABLE USER
+CREATE TABLE `user`
 (
 	userID				INT AUTO_INCREMENT,
 	username				VARCHAR(20) NOT NULL,
-	pass					VARCHAR(30) NOT NULL,
+	pass					VARCHAR(255) NOT NULL,
 	email					VARCHAR(320) NOT NULL,
 	accountActivated	BOOL DEFAULT 0,
 	lastActive			DATETIME,
