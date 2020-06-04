@@ -1,40 +1,116 @@
 import ValidationError from "./utilities/validationError.js";
+import { postData, fetchHtml } from "./utilities/fetchUtils.js";
+
+const fieldSelectors = {
+    usernameSelector: "#txtUsername",
+    passwordSelector: "#txtPassword",
+    btnLogInSelector: "#btnLogIn",
+    confirmPasswordSelector: "#txtConfirmPassword",
+    emailSelector: "#txtEmail",
+    accessCodeSelector: "#txtAccessCode"
+}
 
 $(function()
 {
-    $("#btnLogIn").click(async function()
-    {
-        await transitionPageContentTo("mainMenu.php");
-        $("#btnPlay").click(function() { createGame() });
-    });
+    $("#btnLogIn").click(attemptLogin);
 
-    $("#btnAttemptAccess").click(async function()
-    {
-        const accessCode = $("#txtAccessCode").val();
-
-        if (!accessCode.length)
-        {
-            new ValidationError("#txtAccessCode", "An access code is required to create an account.", "accessCodeError").show();
-            hideValidationErrorsOnChangeEvent("#txtAccessCode");
-
-            return false;
-        }
-        
-        // more client-side validation perhaps
-        // validate access code on server-side
-
-        await transitionPageContentTo("accountCreation.php");
-        $("#btnCreateAccount").click(function()
-        {
-            const account = new UserAccountCreator();
-
-            if (account.detailsAreValid())
-                return account.create();
-            
-            hideValidationErrorsOnChangeEvent("input");
-        });
-    });
+    $("#btnAttemptAccess").click(attemptAccess);
 });
+
+function attemptLogin()
+{
+    const { usernameSelector, passwordSelector} = fieldSelectors,
+        credentials = {
+            username: $(usernameSelector).val(),
+            password: $(passwordSelector).val()
+        }
+    
+   if (usernameOrPasswordIsEmpty(credentials))
+        return false;
+
+    postData("serverCode/actionPages/login.php", credentials)
+        .then(async response =>
+        {
+            if (response && response.failure)
+                return invalidCredentials(response.failure);
+            
+            await transitionPageContentTo("mainMenu.php");
+            $("#btnPlay").click(function() { createGame() });
+        })
+        .catch(e => console.error(e));
+}
+
+async function attemptAccess()
+{
+    const { accessCodeSelector } = fieldSelectors,
+        accessCode = $(accessCodeSelector).val();
+
+    if (!accessCode.length)
+    {
+        new ValidationError(accessCodeSelector, "An access code is required to create an account.", "accessCodeError").show();
+        hideValidationErrorsOnChangeEvent(accessCodeSelector);
+
+        return false;
+    }
+    
+    // more client-side validation perhaps
+    // validate access code on server-side
+
+    await transitionPageContentTo("accountCreation.php");
+    $("#btnCreateAccount").click(function()
+    {
+        const account = new UserAccountCreator();
+
+        if (account.detailsAreValid())
+            return account.create();
+        
+        hideValidationErrorsOnChangeEvent("input");
+    });
+}
+
+function usernameOrPasswordIsEmpty(credentials)
+{
+    const { usernameSelector, passwordSelector } = fieldSelectors;
+    
+    let emptyFieldExists = false;
+    if (!credentials.username.length)
+    {
+        new ValidationError(usernameSelector, "Enter your username or email address.").show();
+        hideValidationErrorsOnChangeEvent(usernameSelector);
+        emptyFieldExists = true;
+    }
+
+    if (!credentials.password.length)
+    {
+        new ValidationError(passwordSelector, "Enter your password.").show();
+        hideValidationErrorsOnChangeEvent(passwordSelector);
+        emptyFieldExists = true;
+    }
+
+    return emptyFieldExists;
+}
+
+function invalidCredentials(reason)
+{
+    const { btnLogin, passwordSelector, usernameSelector } = fieldSelectors;
+    
+    let selector = btnLogin,
+        errorMsg = "Invalid username or password.";
+
+    if (reason.includes("Invalid password"))
+    {
+        selector = passwordSelector;
+        errorMsg = "Incorrect password.";
+    }
+    else if (reason.includes("Username does not exist"))
+    {
+        selector = usernameSelector;
+        errorMsg = "That username does not exist.";
+    }
+
+    new ValidationError(selector, errorMsg).show();
+    hideValidationErrorsOnChangeEvent(selector);
+}
 
 async function transitionPageContentTo(pageUrl)
 {
@@ -64,19 +140,11 @@ async function transitionPageContentTo(pageUrl)
     return Promise.resolve();
 }
 
-function createGame()
-{
-    const numEpidemics = $("[name='radDifficulty']:checked").val(),
-        numRoles = $("#ddlNumRoles").val(),
-        randomizeRoles = $("#chkRandomizeRoles").prop("checked");
-    
-    // initiate game in db
-    // load game script
-}
-
 function hideValidationErrorsOnChangeEvent(selector)
 {
-    $(selector).off("change").change(function()
+    const eventNames = "change keyup";
+
+    $(selector).off(eventNames).on(eventNames, function()
     {
         const $errorMsg = $(this).next();
         if ($errorMsg.hasClass("validationError"))
@@ -96,44 +164,55 @@ class UserAccountCreator
 
     setDetails()
     {
-        this.username = $("#txtUsername").val();
-        this.password = $("#txtPassword").val();
-        this.passwordConfirmation = $("#txtConfirmPassword").val();
-        this.email = $("#txtEmailAddress").val();
+        const {
+            usernameSelector,
+            passwordSelector,
+            confirmPasswordSelector,
+            emailSelector
+        } = fieldSelectors;
+        
+        this.details = {
+            username: $(usernameSelector).val(),
+            password: $(passwordSelector).val(),
+            passwordConfirmation: $(confirmPasswordSelector).val(),
+            email: $(emailSelector).val()
+        }
     }
 
     detailsAreValid()
     {
         const {
-              username,
-              password,
-              passwordConfirmation,
-              email  
-            } = this,
-            txtUsernameSelector = "#txtUsername",
-            txtPasswordSelector = "#txtPassword",
-            txtConfirmPasswordSelector = "#txtConfirmPassword",
-            txtEmailSelector = "#txtEmailAddress",
+                usernameSelector,
+                passwordSelector,
+                confirmPasswordSelector,
+                emailSelector
+            } = fieldSelectors,
+            {
+                username,
+                password,
+                passwordConfirmation,
+                email  
+            } = this.details,
             errors = [];
 
         if (!username.length)
-            errors.push(new ValidationError(txtUsernameSelector, "Username is required."));
+            errors.push(new ValidationError(usernameSelector, "Username is required."));
         else if (username.length < 2)
-            errors.push(new ValidationError(txtUsernameSelector, "Username must include at least 2 characters."));
+            errors.push(new ValidationError(usernameSelector, "Username must include at least 2 characters."));
         
         if (!password.length)
-            errors.push(new ValidationError(txtPasswordSelector, "Password is required."));
+            errors.push(new ValidationError(passwordSelector, "Password is required."));
         else if (password.length < 8)
-            errors.push(new ValidationError(txtPasswordSelector, "Password must include at least 8 characters."));
+            errors.push(new ValidationError(passwordSelector, "Password must include at least 8 characters."));
         else if (!passwordConfirmation.length)
-            errors.push(new ValidationError(txtConfirmPasswordSelector, "Please confirm your password."));
+            errors.push(new ValidationError(confirmPasswordSelector, "Please confirm your password."));
         else if (password !== passwordConfirmation)
-            errors.push(new ValidationError(txtConfirmPasswordSelector, "Passwords do not match."));
+            errors.push(new ValidationError(confirmPasswordSelector, "Passwords do not match."));
 
         if (!email.length)
-            errors.push(new ValidationError(txtEmailSelector, "Email is required."));
+            errors.push(new ValidationError(emailSelector, "Email is required."));
         else if (emailIsInvalid(email))
-            errors.push(new ValidationError(txtEmailSelector, "Please enter a valid email address."));
+            errors.push(new ValidationError(emailSelector, "Please enter a valid email address."));
 
         if (errors.length)
         {
@@ -146,8 +225,73 @@ class UserAccountCreator
         return true;
     }
 
-    create()
+    async create()
     {
-        console.log("createAccount()");
+        postData("serverCode/actionPages/createAccount.php", this.details)
+            .then(response =>
+            {
+                if (response.failure)
+                    return this.accountCreationFailed(response.failure);
+                
+                alert("success");
+            })
+            .catch(e => console.error(e));
     }
+
+    accountCreationFailed(reason)
+    {
+        console.error("account creation failed: ", reason);
+        if (reason.includes("already exists"))
+        {
+            console.log("already exists");
+            const { usernameSelector, emailSelector } = fieldSelectors;
+
+            if (reason.includes("Username"))
+            {
+                console.log("username");
+                new ValidationError(usernameSelector, "That username is already taken.").show();
+                hideValidationErrorsOnChangeEvent(usernameSelector);
+            }
+            else if (reason.includes("Email"))
+            {
+                console.log("email");
+                new ValidationError(emailSelector, "That email address is already associated with an account.").show();
+                hideValidationErrorsOnChangeEvent(emailSelector);
+            }
+        }
+        else
+        {
+            console.error(reason);
+            new ValidationError("#btnCreateAccount", "An error occured.");
+            hideValidationErrorsOnChangeEvent("input");
+        }
+    }
+}
+
+function createGame()
+{
+    const numEpidemics = $("[name='radDifficulty']:checked").val(),
+        numRoles = $("#ddlNumRoles").val();
+    
+    postData("serverCode/actionPages/createGame.php",
+        {
+            uID,
+            numEpidemics,
+            numRoles
+        })
+        .then(response =>
+        {
+            if (response.failure)
+                return gameCreationFailed(response.failure);
+
+            $("#lobby").remove();
+            $("body").append(response.doc);
+            $("head").append("<script type='module' src='clientCode/logic.js'></script>");
+        })
+        .catch(e => console.error(e));
+}
+
+function gameCreationFailed(reason)
+{
+    alert("Failed to create game: " + reason);
 }
