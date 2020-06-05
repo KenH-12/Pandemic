@@ -7740,25 +7740,19 @@ function getPopulationRankOffsetAdjustments($exampleCard)
 function showStartingHandPopulations()
 {
 	const $containers = $(".roleContainer");
-	let $cards = $containers.children(".playerCard");
+	let $cards = $containers.children(".playerCard").not(".eventCard");
 	const $aCard = $cards.first(),
 		initialCardHeight = $aCard.height();
 
-	let $card;
 	for (let { key, population } of gameData.startingHandPopulations)
 	{
-		$card = $cards.filter(`[data-key='${key}']`);
-
-		if (isEventCardKey(key))
-			$cards = $cards.not($card);
-		else
-			$card.append(`<span class='population'>Population: ${numberWithCommas(population)}</span>`);
+		$cards.filter(`[data-key='${key}']`)
+			.append(`<span class='population'>Population: ${numberWithCommas(population)}</span>`);
 	}
 
 	$containers.add($aCard).css("height", "auto");
 	const expandedCardHeight = $aCard.height();
 	$aCard.height(initialCardHeight);
-
 	return animationPromise(
 	{
 		$elements: $cards,
