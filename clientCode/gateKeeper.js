@@ -49,8 +49,19 @@ function attemptLogin()
 async function showMainMenu({ animate } = { animate: true })
 {
     await transitionPageContentTo("mainMenu.php", { animate });
-    $("#btnPlay").click(createGame);
     $("#lobby").removeAttr("class data-loggedIn");
+
+    if ($("#gameInProgress").length)
+    {
+        let $this;
+        $(".roleTag").each(function()
+        {
+            $this = $(this);
+            $this.addClass(toCamelCase($this.html()));
+        })
+    }
+    $("#btnPlay").click(createGame);
+    
 }
 
 async function attemptAccess()

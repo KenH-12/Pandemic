@@ -15,6 +15,7 @@
                     <script src='clientCode/jquery.easing.1.3.js'></script>
                     <script src='clientCode/utilities/miscUtils.js'></script>
                     <script src='clientCode/utilities/animationUtils.js'></script>
+                    <script src='clientCode/utilities/stringUtils.js'></script>
                     <script src='clientCode/gateKeeper.js' type='module'></script>
                 </head>
                 <body>
