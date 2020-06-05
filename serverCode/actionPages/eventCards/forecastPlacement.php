@@ -68,7 +68,7 @@
         {
             $stmt->execute([$cardIndex, $game, $cardKeys[$i]]);
             
-            if ($pdo->errorInfo()[0] != "00000")
+            if (queryCausedError($pdo))
                 throwException($pdo, "Failed to update card index.");
             
             $cardIndex++;

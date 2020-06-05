@@ -1,4 +1,9 @@
 <?php
+function queryCausedError($pdo)
+{
+    return $pdo->errorInfo()[0] != "00000";
+}
+
 function throwException($pdo, $msg)
 {
     throw new Exception("$msg: " . implode(", ", $pdo->errorInfo()));
