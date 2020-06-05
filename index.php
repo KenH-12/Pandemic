@@ -1,4 +1,7 @@
 <?php
+    session_start();
+    $loggedIn = isset($_SESSION["uID"]);
+    
     $doc = "<!DOCTYPE html>
             <html lang='en' class='blueGradient'>
                 <head>
@@ -15,7 +18,7 @@
                     <script src='clientCode/gateKeeper.js' type='module'></script>
                 </head>
                 <body>
-                    <div id='lobby'>
+                    <div id='lobby' class='hidden' data-loggedIn='$loggedIn'>
                         <div id='header'>
                             <div>
                                 <h1>PANDEMIC</h1>

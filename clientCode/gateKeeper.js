@@ -12,9 +12,16 @@ const fieldSelectors = {
 
 $(function()
 {
-    $("#btnLogIn").click(attemptLogin);
+    const $lobby = $("#lobby"),
+        loggedInAttr = "data-loggedIn";
 
+    if ($lobby.attr(loggedInAttr))
+        return showMainMenu({ animate: false });
+        
+    $("#btnLogIn").click(attemptLogin);
     $("#btnAttemptAccess").click(attemptAccess);
+    
+    $lobby.removeAttr(`class ${loggedInAttr}`);
 });
 
 function attemptLogin()
@@ -29,15 +36,21 @@ function attemptLogin()
         return false;
 
     postData("serverCode/actionPages/login.php", credentials)
-        .then(async response =>
+        .then(response =>
         {
             if (response && response.failure)
                 return invalidCredentials(response.failure);
             
-            await transitionPageContentTo("mainMenu.php");
-            $("#btnPlay").click(function() { createGame() });
+            showMainMenu();
         })
         .catch(e => console.error(e));
+}
+
+async function showMainMenu({ animate } = { animate: true })
+{
+    await transitionPageContentTo("mainMenu.php", { animate });
+    $("#btnPlay").click(createGame);
+    $("#lobby").removeAttr("class data-loggedIn");
 }
 
 async function attemptAccess()
@@ -112,30 +125,36 @@ function invalidCredentials(reason)
     hideValidationErrorsOnChangeEvent(selector);
 }
 
-async function transitionPageContentTo(pageUrl)
+async function transitionPageContentTo(pageUrl, { animate } = { animate: true })
 {
     const html = await fetchHtml(pageUrl),
         $content = $("#lobby").children(".content"),
         width = $("#header").width(),
         duration = 300;
 
-    await animationPromise({
-        $elements: $content,
-        desiredProperties: { marginLeft: -width },
-        duration,
-        easing: "easeInQuint"
-    });
+    if (animate)
+    {
+        await animationPromise({
+            $elements: $content,
+            desiredProperties: { marginLeft: -width },
+            duration,
+            easing: "easeInQuint"
+        });
+    }
 
     $content.children().remove();
     $content.append(html);
 
-    await animationPromise({
-        $elements: $content,
-        desiredProperties: { marginLeft: 0 },
-        duration,
-        easing: "easeOutQuart"
-    });
-    removeInlineStylePropertiesFrom($content);
+    if (animate)
+    {
+        await animationPromise({
+            $elements: $content,
+            desiredProperties: { marginLeft: 0 },
+            duration,
+            easing: "easeOutQuart"
+        });
+        removeInlineStylePropertiesFrom($content);
+    }
     
     return Promise.resolve();
 }
