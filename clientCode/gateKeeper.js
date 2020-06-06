@@ -67,7 +67,17 @@ async function showMainMenu({ animate } = {})
         $("#btnAbandonGame").click(promptAbandonGame);
     }
     else
-        $("#btnPlay").click(createGame);
+    {
+        $("#btnPlay").click(function()
+        {
+            $(this).off("click").addClass("btnDisabled")
+                .html("CREATING GAME...")
+                .append(`<div class='loadingGif'>
+                            <img src='images/loading.gif' alt='loading' />
+                        </div>`);
+            createGame();
+        });
+    }
 }
 
 async function attemptAccess()

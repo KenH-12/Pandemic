@@ -189,10 +189,24 @@ select
 {
 	font-family: 'Audiowide', 'Ropa sans', sans-serif !important;
 	font-size: 26px;
+	line-height: 26px;
+	height: 46px;
 	width: var(--lobby-content-width);
+	overflow: visible;
 	margin-left: 0;
-	padding: 5px 0;
+	padding: 10px 0;
 	border-radius: var(--lobby-control-border-radius);
+}
+#lobby .button .loadingGif
+{
+	width: 80%;
+	margin-left: 10%;
+	margin-top: 16px;
+}
+#lobby .button.btnDisabled
+{
+	background-color: #0a597a;
+	color: #aaa;
 }
 #gameInProgress { width: var(--lobby-content-width) }
 #gameInProgress > div:not(.button)
