@@ -52,9 +52,6 @@
             
             $stmt = $pdo->query("SELECT turnNum FROM vw_gamestate WHERE game = $game");
             $numTurns = $stmt->fetch()["turnNum"];
-
-            if ($numTurns > 0)
-                $numTurns--;
             
             $content = "<div id='gameInProgress'>
                             <h3>GAME IN PROGRESS:</h3>
@@ -78,6 +75,8 @@
                             <div id='btnResumeGame' class='button'>RESUME</div>
                             <div id='btnAbandonGame' class='button'>ABANDON</div>
                         </div>";
+            
+            $_SESSION["game"] = $game;
         }
         else
         {

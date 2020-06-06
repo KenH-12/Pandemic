@@ -202,7 +202,7 @@ select
 	margin: 15px;
 	margin-left: 0;
 }
-#gameInProgress > h3
+#gameInProgress h3
 {
 	font-weight: 400;
 	font-family: 'Audiowide', sans-serif;
@@ -228,7 +228,9 @@ select
 	width: 40%;
 	font-size: 20px;
 }
-#btnResumeGame { margin-right: 2% }
+#btnResumeGame,
+#btnConfirmAbandon
+{ margin-right: 2% }
 #btnAbandonGame { background-color: rgb(204, 26, 29) }
 #btnAbandonGame:hover { background-color: #ef282a;}
 

@@ -46,8 +46,11 @@ function attemptLogin()
         .catch(e => console.error(e));
 }
 
-async function showMainMenu({ animate } = { animate: true })
+async function showMainMenu({ animate } = {})
 {
+    if (animate !== false)
+        animate = true;
+    
     await transitionPageContentTo("mainMenu.php", { animate });
     $("#lobby").removeAttr("class data-loggedIn");
 
@@ -58,10 +61,13 @@ async function showMainMenu({ animate } = { animate: true })
         {
             $this = $(this);
             $this.addClass(toCamelCase($this.html()));
-        })
+        });
+
+        $("#btnResumeGame").click(() => window.location.replace("game.php"));
+        $("#btnAbandonGame").click(promptAbandonGame);
     }
-    $("#btnPlay").click(createGame);
-    
+    else
+        $("#btnPlay").click(createGame);
 }
 
 async function attemptAccess()
@@ -136,8 +142,11 @@ function invalidCredentials(reason)
     hideValidationErrorsOnChangeEvent(selector);
 }
 
-async function transitionPageContentTo(pageUrl, { animate } = { animate: true })
+async function transitionPageContentTo(pageUrl, { animate } = {})
 {
+    if (animate !== false)
+        animate = true;
+    
     const html = await fetchHtml(pageUrl),
         $content = $("#lobby").children(".content"),
         width = $("#header").width(),
@@ -321,4 +330,29 @@ function createGame()
 function gameCreationFailed(reason)
 {
     alert(reason);
+}
+
+function promptAbandonGame()
+{
+    const $container = $("#gameInProgress"),
+        $originalButtons = $container.find(".button").addClass("hidden"),
+        btnConfirmId = "btnConfirmAbandon",
+        btnCancelId = "btnCancelAbandon",
+        $confirmationElements = $(`<h3>ABANDON GAME?</h3>
+                                    <div class='button' id='${btnConfirmId}'>OK</div>
+                                    <div class='button' id='${btnCancelId}'>CANCEL</div>`).appendTo($container);
+    
+    $(`#${btnConfirmId}`).click(abandonGame);
+    $(`#${btnCancelId}`).click(() =>
+    {
+        $confirmationElements.remove();
+        $originalButtons.removeClass("hidden");
+    });
+}
+
+function abandonGame()
+{
+    postData("serverCode/actionPages/deleteGame.php", {})
+        .then(showMainMenu)
+        .catch(e => console.error(e));
 }
