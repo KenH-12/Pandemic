@@ -3,6 +3,7 @@ import { postData, fetchHtml } from "./utilities/fetchUtils.js";
 import { strings } from "./strings.js";
 
 const fieldSelectors = {
+    lobbySelector: "#lobby",
     usernameSelector: "#txtUsername",
     passwordSelector: "#txtPassword",
     btnLogInSelector: "#btnLogIn",
@@ -13,13 +14,14 @@ const fieldSelectors = {
 
 $(function()
 {
-    const $lobby = $("#lobby"),
+    const { lobbySelector, btnLogInSelector } = fieldSelectors,
+        $lobby = $(lobbySelector),
         loggedInAttr = "data-loggedIn";
 
     if ($lobby.attr(loggedInAttr))
         return showMainMenu({ animate: false });
         
-    $("#btnLogIn").click(attemptLogin);
+    $(btnLogInSelector).click(attemptLogin);
     $("#btnAttemptAccess").click(attemptAccess);
     
     $lobby.removeAttr(`class ${loggedInAttr}`);
@@ -53,7 +55,7 @@ async function showMainMenu({ animate } = {})
         animate = true;
     
     await transitionPageContentTo("mainMenu.php", { animate });
-    $("#lobby").removeAttr("class data-loggedIn");
+    $(fieldSelectors.lobbySelector).removeAttr("class data-loggedIn");
 
     if ($("#gameInProgress").length)
     {
@@ -157,7 +159,7 @@ async function transitionPageContentTo(pageUrl, { animate } = {})
         animate = true;
     
     const html = await fetchHtml(pageUrl),
-        $content = $("#lobby").children(".content"),
+        $content = $(fieldSelectors.lobbySelector).children(".content"),
         width = $("#header").width(),
         duration = 300;
 
@@ -329,22 +331,11 @@ function createGame()
         .then(response =>
         {
             if (response.failure)
-                return gameCreationFailed(response.failure);
+                return serverOperationFailed(response.failure);
 
             window.location.replace("game.php");
         })
         .catch(e => console.error(e));
-}
-
-function gameCreationFailed(reason)
-{
-    if (reason.includes("not logged in"))
-        window.location.reload(false);
-    else
-    {
-        new ValidationError("#btnPlay", "An error occured. <a href=''>Refresh</a> the page and try again.").show();
-        $("#btnPlay").remove();
-    }
 }
 
 function promptAbandonGame()
@@ -379,6 +370,23 @@ function promptAbandonGame()
 function abandonGame()
 {
     postData("serverCode/actionPages/deleteGame.php", {})
-        .then(showMainMenu)
+        .then(response =>
+        {
+            if (response.failure)
+                return serverOperationFailed(response.failure);
+            
+            showMainMenu();
+        })
         .catch(e => console.error(e));
+}
+
+function serverOperationFailed(reason)
+{
+    if (reason.includes("not logged in"))
+        window.location.reload(false);
+    else
+    {
+        $(".content").remove();
+        new ValidationError("#header", "An error occured. <a href=''>Refresh</a> the page and try again.").show();
+    }
 }
