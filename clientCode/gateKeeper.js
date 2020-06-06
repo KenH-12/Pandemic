@@ -1,5 +1,6 @@
 import ValidationError from "./utilities/validationError.js";
 import { postData, fetchHtml } from "./utilities/fetchUtils.js";
+import { strings } from "./strings.js";
 
 const fieldSelectors = {
     usernameSelector: "#txtUsername",
@@ -72,9 +73,7 @@ async function showMainMenu({ animate } = {})
         {
             $(this).off("click").addClass("btnDisabled")
                 .html("CREATING GAME...")
-                .append(`<div class='loadingGif'>
-                            <img src='images/loading.gif' alt='loading' />
-                        </div>`);
+                .append(strings.loadingGifHtml);
             createGame();
         });
     }
@@ -351,17 +350,28 @@ function gameCreationFailed(reason)
 function promptAbandonGame()
 {
     const $container = $("#gameInProgress"),
+        $title = $container.children("h3").first(),
+        originalTitle = $title.html(),
         $originalButtons = $container.find(".button").addClass("hidden"),
-        btnConfirmId = "btnConfirmAbandon",
-        btnCancelId = "btnCancelAbandon",
-        $confirmationElements = $(`<h3>ABANDON GAME?</h3>
-                                    <div class='button' id='${btnConfirmId}'>OK</div>
-                                    <div class='button' id='${btnCancelId}'>CANCEL</div>`).appendTo($container);
+        $btnConfirm = $("<div class='button' id='btnConfirmAbandon'>OK</div>").appendTo($container),
+        $btnCancel = $("<div class='button' id='btnCancelAbandon'>CANCEL</div>").appendTo($container);
     
-    $(`#${btnConfirmId}`).click(abandonGame);
-    $(`#${btnCancelId}`).click(() =>
+    $title.html("ABANDON GAME?");
+
+    $btnConfirm.click(function()
     {
-        $confirmationElements.remove();
+        $btnConfirm.off("click")
+            .addClass("btnDisabled")
+            .append(strings.loadingGifHtml);
+        
+        $btnCancel.remove();
+
+        abandonGame();
+    });
+    $btnCancel.click(() =>
+    {
+        $btnConfirm.add($btnCancel).remove();
+        $title.html(originalTitle);
         $originalButtons.removeClass("hidden");
     });
 }

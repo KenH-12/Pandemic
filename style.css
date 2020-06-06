@@ -203,6 +203,7 @@ select
 	margin-left: 10%;
 	margin-top: 16px;
 }
+#lobby .button .loadingGif img { width: 30px }
 #lobby .button.btnDisabled
 {
 	background-color: #0a597a;
@@ -236,6 +237,7 @@ select
 	margin-top: 5px;
 	cursor: default;
 }
+#gameInProgress .roleTag:hover { text-decoration: none }
 #gameInProgress .button
 {
 	display: inline-block;
