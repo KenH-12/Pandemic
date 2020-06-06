@@ -13,10 +13,10 @@
             throw new Exception("User not logged in.");
         
         if (!isset($data["numEpidemics"]))
-            throw new Exception("Difficulty not set.");
+            throw new Exception("required value not set: difficulty");
 
         if (!isset($data["numRoles"]))
-            throw new Exception("Number of roles not set.");
+            throw new Exception("required value not set: number of roles");
         
         $uID = $_SESSION["uID"];
         $numEpidemics = $data["numEpidemics"];

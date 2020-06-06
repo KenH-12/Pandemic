@@ -339,7 +339,13 @@ function createGame()
 
 function gameCreationFailed(reason)
 {
-    alert(reason);
+    if (reason.includes("not logged in"))
+        window.location.reload(false);
+    else
+    {
+        new ValidationError("#btnPlay", "An error occured. <a href=''>Refresh</a> the page and try again.").show();
+        $("#btnPlay").remove();
+    }
 }
 
 function promptAbandonGame()

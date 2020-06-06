@@ -2060,8 +2060,8 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	font-size: 22px;
 	margin-bottom: 5px;
 }
-#errorContainer a,
-#errorContainer a:visited
+a,
+a:visited
 {
 	color: var(--epidemic-green)
 }
