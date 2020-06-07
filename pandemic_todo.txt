@@ -3,34 +3,37 @@ BUGS
 
 TO DO
 -----
-menus
-	show loading gif when awaiting response
-	enter button should submit
-
-starting a game
-	names need to be removed from PlayerPanels when in single player mode
+access codes
+	code generation
+	handle valid codes
+	loading gif
+	handle invalid codes
+	handle server errors
 
 account creation
+	enter button should submit
+	loading gif
+	handle server errors
+	send confirmation email
+		account confirmation page
 	button to check username availability
 	show password strength with each keypress
 
 main menu
-	if a game associated with the access key is in progress, give the options: resume / new game
+	if the user has won a game, the default difficulty should be normal (or perhaps the last selected difficulty)
 	role selection -- perhaps this can be saved for last since random roles is fine
 		use + / - buttons to add and remove roles
 		show a pawn for each role
 		when 'randomize roles' is checked, show pawns with "?" on them
 
+names need to be removed from PlayerPanels when in single player mode
+
+when the game is over
+	navigate back to home scree
+
 load other js files only when necessary
 
-when a city or contained piece is hovered, show the city name in a larger font
-
-starting a new game
-	select difficulty
-		if the user has won a game, the default difficulty should be normal (or perhaps the highest beaten difficulty)
-	select roles?
-when the game is over
-	navigate back to home screen
+when a city or contained piece is hovered, show the city name in a larger fontn
 
 menu
 	rules / instructions / FAQ
@@ -42,7 +45,6 @@ event history
 	outbreak spread paths?
 
 handle errors
-	if the game is not set, redirect to either home or login
 	setup
 
 add tests

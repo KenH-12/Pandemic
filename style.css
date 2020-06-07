@@ -1558,6 +1558,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .button-secondary-color { transition: background-color 0.6s }
 
 .button:hover,
+.button:focus,
 .btnSkip:hover,
 #btnUndo:hover
 { background-color: #1799d1 }
@@ -1576,7 +1577,9 @@ span.r, p.r {color: #ef282a; background: none !important }
 	background-color: #064058;
 	cursor: default;
 }
-.btnDisabled:hover { background-color: #064058 }
+.btnDisabled:hover,
+.btnDisabled:focus
+{ background-color: #064058 }
 
 .loadingGif
 {

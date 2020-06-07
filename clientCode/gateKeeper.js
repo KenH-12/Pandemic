@@ -7,6 +7,7 @@ const fieldSelectors = {
     usernameSelector: "#txtUsername",
     passwordSelector: "#txtPassword",
     btnLogInSelector: "#btnLogIn",
+    btnAttemptAccessSelector: "#btnAttemptAccess",
     confirmPasswordSelector: "#txtConfirmPassword",
     emailSelector: "#txtEmail",
     accessCodeSelector: "#txtAccessCode"
@@ -21,31 +22,53 @@ $(function()
         return showMainMenu({ animate: false });
     
     $lobby.removeAttr(`class ${loggedInAttr}`);
-    bindLoginPageClickEvents();
+    bindLoginPageEvents();
 });
 
-function bindLoginPageClickEvents()
+function bindLoginPageEvents()
 {
-    const $btnLogin = $(fieldSelectors.btnLogInSelector),
-        $btnAttemptAccess = $("#btnAttemptAccess");
+    const {
+            btnLogInSelector,
+            usernameSelector,
+            passwordSelector,
+            btnAttemptAccessSelector,
+            accessCodeSelector
+        } = fieldSelectors,
+        $btnLogin = $(btnLogInSelector),
+        $btnAttemptAccess = $(btnAttemptAccessSelector);
     
     $btnLogin.add($btnAttemptAccess).off("click")
         .removeClass("btnDisabled")
         .children(".loadingGif").remove();
     
-    $btnLogin.html("Log In").click(attemptLogin);
-    $btnAttemptAccess.click(attemptAccess);
+    let $elementsToBind = $btnLogin.html("Log In").click(attemptLogin).add(usernameSelector).add(passwordSelector);
+    bindKeypressEventListener($elementsToBind.off("keypress"), 13, attemptLogin);
+    
+    $elementsToBind = $btnAttemptAccess.click(attemptAccess).add(accessCodeSelector);
+    bindKeypressEventListener($elementsToBind.off("keypress"), 13, attemptAccess);
 }
 
-function unbindLoginPageClickEvents()
+function unbindLoginPageEvents()
 {
-    $(fieldSelectors.btnLogInSelector).add("#btnAttemptAccess")
-        .off("click").addClass("btnDisabled");
+    const {
+        btnLogInSelector,
+        usernameSelector,
+        passwordSelector,
+        btnAttemptAccessSelector,
+        accessCodeSelector
+    } = fieldSelectors;
+
+    $(btnLogInSelector).add(btnAttemptAccessSelector)
+        .off("click").addClass("btnDisabled")
+        .add(usernameSelector)
+        .add(passwordSelector)
+        .add(accessCodeSelector)
+        .off("keypress");
 }
 
 function attemptLogin()
 {
-    unbindLoginPageClickEvents();
+    unbindLoginPageEvents();
 
     const {
             usernameSelector,
@@ -71,7 +94,7 @@ function attemptLogin()
             {
                 if (invalidCredentials(response.failure))
                 {
-                    bindLoginPageClickEvents();
+                    bindLoginPageEvents();
                     return false;
                 }
 

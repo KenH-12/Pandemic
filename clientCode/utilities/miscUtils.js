@@ -212,3 +212,16 @@ function devToolsIsOpen()
 
 	return isOpen;
 }
+
+function bindKeypressEventListener($elements, keyCode, fn)
+{
+	$elements.keypress(function(event)
+	{
+		if (event.which === keyCode || event.keyCode === keyCode)
+		{
+			fn();
+			return false;
+		}
+		return true;
+	});
+}
