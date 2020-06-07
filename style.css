@@ -122,6 +122,14 @@ input[type='text'] { cursor: text }
 {
 	margin-top: 8px;
 }
+#lobby .button:not(#btnAttemptAccess)
+{
+	font-size: 26px;
+	line-height: 26px;
+	height: 46px;
+	overflow: visible;
+	padding: 10px 0;
+}
 #btnLogIn, #btnCreateAccount
 {
 	font-size: 26px;
@@ -188,13 +196,8 @@ select
 #gameInProgress .button
 {
 	font-family: 'Audiowide', 'Ropa sans', sans-serif !important;
-	font-size: 26px;
-	line-height: 26px;
-	height: 46px;
 	width: var(--lobby-content-width);
-	overflow: visible;
 	margin-left: 0;
-	padding: 10px 0;
 	border-radius: var(--lobby-control-border-radius);
 }
 #lobby .button .loadingGif

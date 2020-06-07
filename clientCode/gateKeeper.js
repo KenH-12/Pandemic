@@ -14,22 +14,44 @@ const fieldSelectors = {
 
 $(function()
 {
-    const { lobbySelector, btnLogInSelector } = fieldSelectors,
-        $lobby = $(lobbySelector),
+    const $lobby = $(fieldSelectors.lobbySelector),
         loggedInAttr = "data-loggedIn";
 
     if ($lobby.attr(loggedInAttr))
         return showMainMenu({ animate: false });
-        
-    $(btnLogInSelector).click(attemptLogin);
-    $("#btnAttemptAccess").click(attemptAccess);
     
     $lobby.removeAttr(`class ${loggedInAttr}`);
+    bindLoginPageClickEvents();
 });
+
+function bindLoginPageClickEvents()
+{
+    const $btnLogin = $(fieldSelectors.btnLogInSelector),
+        $btnAttemptAccess = $("#btnAttemptAccess");
+    
+    $btnLogin.add($btnAttemptAccess).off("click")
+        .removeClass("btnDisabled")
+        .children(".loadingGif").remove();
+    
+    $btnLogin.html("Log In").click(attemptLogin);
+    $btnAttemptAccess.click(attemptAccess);
+}
+
+function unbindLoginPageClickEvents()
+{
+    $(fieldSelectors.btnLogInSelector).add("#btnAttemptAccess")
+        .off("click").addClass("btnDisabled");
+}
 
 function attemptLogin()
 {
-    const { usernameSelector, passwordSelector} = fieldSelectors,
+    unbindLoginPageClickEvents();
+
+    const {
+            usernameSelector,
+            passwordSelector,
+            btnLogInSelector
+        } = fieldSelectors,
         credentials = {
             username: $(usernameSelector).val(),
             password: $(passwordSelector).val()
@@ -38,15 +60,27 @@ function attemptLogin()
    if (usernameOrPasswordIsEmpty(credentials))
         return false;
 
+    const $loadingGif = $(strings.loadingGifHtml);
+
+    $(btnLogInSelector).html("Logging In...").append($loadingGif);
+    
     postData("serverCode/actionPages/login.php", credentials)
         .then(response =>
         {
             if (response && response.failure)
-                return invalidCredentials(response.failure);
+            {
+                if (invalidCredentials(response.failure))
+                {
+                    bindLoginPageClickEvents();
+                    return false;
+                }
+
+                return serverOperationFailed(response.failure);
+            }
             
             showMainMenu();
         })
-        .catch(e => console.error(e));
+        .catch(e => serverOperationFailed(e.message));
 }
 
 async function showMainMenu({ animate } = {})
@@ -133,10 +167,10 @@ function usernameOrPasswordIsEmpty(credentials)
 
 function invalidCredentials(reason)
 {
-    const { btnLogin, passwordSelector, usernameSelector } = fieldSelectors;
+    const { passwordSelector, usernameSelector } = fieldSelectors;
     
-    let selector = btnLogin,
-        errorMsg = "Invalid username or password.";
+    let selector,
+        errorMsg;
 
     if (reason.includes("Invalid password"))
     {
@@ -149,8 +183,14 @@ function invalidCredentials(reason)
         errorMsg = "That username does not exist.";
     }
 
-    new ValidationError(selector, errorMsg).show();
-    hideValidationErrorsOnChangeEvent(selector);
+    if (selector)
+    {
+        new ValidationError(selector, errorMsg).show();
+        hideValidationErrorsOnChangeEvent(selector);
+        return true;
+    }
+
+    return false;
 }
 
 async function transitionPageContentTo(pageUrl, { animate } = {})
