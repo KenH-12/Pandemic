@@ -4,7 +4,7 @@
 
                 <form id='frmCreateAccount' autocomplete='off'>
                     <label for='txtUsername'>Username:</label>
-                    <input id='txtUsername' type='text' />
+                    <input id='txtUsername' type='text' maxlength='20' />
 
                     <label for='txtPassword'>Password:</label>
                     <input id='txtPassword' type='password' autocomplete='new-password' />

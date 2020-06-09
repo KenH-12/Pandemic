@@ -18,6 +18,9 @@
         $email = $accountDetails["email"];
         $hash = password_hash($accountDetails["password"], PASSWORD_DEFAULT);
 
+        if (strlen($username) > 20)
+            throw new Exception("Username cannot exceed 20 characters.");
+
         $stmt = $pdo->prepare("SELECT * FROM user WHERE username = ?");
         $stmt->execute([$username]);
 

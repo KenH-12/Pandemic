@@ -16,11 +16,8 @@ account creation
 	send confirmation email
 		account confirmation page
 	username
-		character limit
-		escape special characters
 		button to check availability
 	password
-		escape special characters
 		must have at least 1 capital letter and one number
 		show strength with each keypress
 		forgot your password? process
