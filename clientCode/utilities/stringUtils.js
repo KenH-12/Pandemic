@@ -16,6 +16,11 @@ function getLeadingNumber(string)
 	return Number(numberString);
 }
 
+function isAlphanumeric(string)
+{
+	return /^[a-zA-Z0-9_]*$/.test(string);
+}
+
 function containsWhitespace(string)
 {
 	return /\s/.test(string);

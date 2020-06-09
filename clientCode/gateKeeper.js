@@ -357,6 +357,8 @@ class UserAccountCreator
             errorMsg = "Username is required.";
         else if (containsWhitespace(username))
             errorMsg = "Username cannot include spaces.";
+        else if (!isAlphanumeric(username))
+            errorMsg = "Username must be alphanumeric (letters, numbers, and underscores only).";
         else if (username.length < 2)
             errorMsg = "Username must include at least 2 characters.";
         
