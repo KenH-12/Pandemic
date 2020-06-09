@@ -248,17 +248,29 @@ async function transitionPageContentTo(pageUrl, { animate } = {})
 
 function hideValidationErrorsOnChangeEvent(selector)
 {
-    const eventNames = "change keyup";
+    $(selector).off("change keyup")
+        .on("change", function() { hideAssociatedValidationError($(this)) })
+        .on("keyup", function(event)
+            {
+                // Ignore tab, enter, and arrow keys
+                const keyCodesToIgnore = [9, 13, 37, 38, 39, 40];
 
-    $(selector).off(eventNames).on(eventNames, function()
-    {
-        const $errorMsg = $(this).next();
-        if ($errorMsg.hasClass("validationError"))
-            $errorMsg.remove();
-        
-        if ($(".validationError").length === 1)
-            $(".validationError.errorSummary").addClass("hidden");
-    });
+                if (keyCodesToIgnore.includes(event.which) || keyCodesToIgnore.includes(event.keyCode))
+                    return false;
+                
+                hideAssociatedValidationError($(this));
+            });
+}
+
+function hideAssociatedValidationError($element)
+{
+    const $errorMsg = $element.next();
+
+    if ($errorMsg.hasClass("validationError"))
+        $errorMsg.remove();
+    
+    if ($(".validationError").length === 1)
+        $(".validationError.errorSummary").addClass("hidden");
 }
 
 class UserAccountCreator
@@ -355,6 +367,8 @@ class UserAccountCreator
 
         if (!username.length)
             errorMsg = "Username is required.";
+        else if (!beginsWithLetter(username))
+            errorMsg = "Username must begin with a letter.";
         else if (containsWhitespace(username))
             errorMsg = "Username cannot include spaces.";
         else if (!isAlphanumeric(username))

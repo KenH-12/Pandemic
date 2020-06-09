@@ -16,6 +16,11 @@ function getLeadingNumber(string)
 	return Number(numberString);
 }
 
+function beginsWithLetter(string)
+{
+	return /^[a-zA-Z]$/.test(string[0]);
+}
+
 function isAlphanumeric(string)
 {
 	return /^[a-zA-Z0-9_]*$/.test(string);

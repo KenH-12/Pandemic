@@ -18,12 +18,10 @@ account creation
 	username
 		character limit
 		escape special characters
-		must start with a letter?
 		button to check availability
 	password
 		escape special characters
 		must have at least 1 capital letter and one number
-		character limit?
 		show strength with each keypress
 		forgot your password? process
 
