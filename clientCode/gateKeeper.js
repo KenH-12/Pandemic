@@ -384,7 +384,7 @@ class UserAccountCreator
 
     validatePassword(validationErrors)
     {
-        const { password } = this.details,
+        const { password, passwordConfirmation } = this.details,
             { passwordSelector, confirmPasswordSelector } = fieldSelectors;
         
         let errorMsg,
@@ -430,20 +430,27 @@ class UserAccountCreator
 
     async create()
     {
+        const $btnCreateAccount = $(fieldSelectors.btnCreateAccountSelector)
+                .addClass("btnDisabled")
+                .html("Creating Account..."),
+            $loadingGif = $(strings.loadingGifHtml).appendTo($btnCreateAccount);
+
         postData("serverCode/actionPages/createAccount.php", this.details)
             .then(response =>
             {
+                $loadingGif.remove();
+
                 if (response.failure)
+                {
+                    $btnCreateAccount.removeClass("btnDisabled").html("Create Account");
                     return this.accountCreationFailed(response.failure);
-                
-                alert("success");
+                }
             })
-            .catch(e => console.error(e));
+            .catch(e => serverOperationFailed(e.message));
     }
 
     accountCreationFailed(reason)
     {
-        console.error("account creation failed: ", reason);
         if (reason.includes("already exists"))
         {
             console.log("already exists");
@@ -451,23 +458,17 @@ class UserAccountCreator
 
             if (reason.includes("Username"))
             {
-                console.log("username");
                 new ValidationError(usernameSelector, "That username is already taken.").show();
                 hideValidationErrorsOnChangeEvent(usernameSelector);
             }
             else if (reason.includes("Email"))
             {
-                console.log("email");
                 new ValidationError(emailSelector, "That email address is already associated with an account.").show();
                 hideValidationErrorsOnChangeEvent(emailSelector);
             }
         }
         else
-        {
-            console.error(reason);
-            new ValidationError("#btnCreateAccount", "An error occured.");
-            hideValidationErrorsOnChangeEvent("input");
-        }
+            serverOperationFailed(reason);
     }
 }
 

@@ -6,13 +6,12 @@ TO DO
 access codes
 	code generation
 	handle valid codes
+		code should become session variable until account is created
 	loading gif
 	handle invalid codes
 	handle server errors
 
 account creation
-	loading gif
-	handle server errors
 	send confirmation email
 		account confirmation page
 	username

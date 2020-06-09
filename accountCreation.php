@@ -1,5 +1,6 @@
 <?php
-    $mainMenu = "<h1>Account Creation</h1>
+    $html = "<div class='content'>
+                <h1>Account Creation</h1>
                 <p>Choose your username and password.<br/>An email address is required for account verification and password recovery — you will not receive any unwanted emails.</p>
 
                 <form id='frmCreateAccount' autocomplete='off'>
@@ -17,7 +18,8 @@
 
                     <div id='btnCreateAccount' class='button'>Create Account</div>
                     <p class='validationError errorSummary hidden'>Please fix the above error(s).</p>
-                </form>";
+                </form>
+            </div>";
     
-    echo $mainMenu;
+    echo $html;
 ?>

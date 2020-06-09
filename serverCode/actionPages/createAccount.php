@@ -1,25 +1,21 @@
 <?php
     try
     {
+        require "../connect.php";
         $accountDetails = json_decode(file_get_contents("php://input"), true);
         
         if (!isset($accountDetails["username"]))
-            throw new Exception("Username not set.");
+            throw new Exception("username not set.");
         
         if (!isset($accountDetails["password"]))
-            throw new Exception("Password not set.");
+            throw new Exception("password not set.");
 
         if (!isset($accountDetails["email"]))
             throw new Exception("email not set.");
 
-        require "../connect.php";
-        
         $username = $accountDetails["username"];
         $email = $accountDetails["email"];
         $hash = password_hash($accountDetails["password"], PASSWORD_DEFAULT);
-
-        if (strlen($username) > 20)
-            throw new Exception("Username cannot exceed 20 characters.");
 
         $stmt = $pdo->prepare("SELECT * FROM user WHERE username = ?");
         $stmt->execute([$username]);
