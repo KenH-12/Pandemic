@@ -16,6 +16,11 @@ function getLeadingNumber(string)
 	return Number(numberString);
 }
 
+function containsWhitespace(string)
+{
+	return /\s/.test(string);
+}
+
 function removeWhitespace(string)
 {
 	return string.replace(/ /g,"");

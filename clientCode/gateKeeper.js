@@ -331,48 +331,85 @@ class UserAccountCreator
 
     detailsAreValid()
     {
-        const {
-                usernameSelector,
-                passwordSelector,
-                confirmPasswordSelector,
-                emailSelector
-            } = fieldSelectors,
-            {
-                username,
-                password,
-                passwordConfirmation,
-                email
-            } = this.details,
-            errors = [];
+        const validationErrors = [];
 
-        if (!username.length)
-            errors.push(new ValidationError(usernameSelector, "Username is required."));
-        else if (username.length < 2)
-            errors.push(new ValidationError(usernameSelector, "Username must include at least 2 characters."));
-        
-        if (!password.length)
-            errors.push(new ValidationError(passwordSelector, "Password is required."));
-        else if (password.length < 8)
-            errors.push(new ValidationError(passwordSelector, "Password must include at least 8 characters."));
-        else if (!passwordConfirmation.length)
-            errors.push(new ValidationError(confirmPasswordSelector, "Please confirm your password."));
-        else if (password !== passwordConfirmation)
-            errors.push(new ValidationError(confirmPasswordSelector, "Passwords do not match."));
+        this.validateUsername(validationErrors);
+        this.validatePassword(validationErrors);
+        this.validateEmailAddress(validationErrors);
 
-        if (!email.length)
-            errors.push(new ValidationError(emailSelector, "Email is required."));
-        else if (emailIsInvalid(email))
-            errors.push(new ValidationError(emailSelector, "Please enter a valid email address."));
-
-        if (errors.length)
+        if (validationErrors.length)
         {
-            for (let error of errors)
+            for (let error of validationErrors)
                 error.show();
             
             return false;
         }
 
         return true;
+    }
+
+    validateUsername(validationErrors)
+    {
+        const { username } = this.details;
+        let errorMsg;
+
+        if (!username.length)
+            errorMsg = "Username is required.";
+        else if (containsWhitespace(username))
+            errorMsg = "Username cannot include spaces.";
+        else if (username.length < 2)
+            errorMsg = "Username must include at least 2 characters.";
+        
+        if (errorMsg)
+            validationErrors.push(new ValidationError(fieldSelectors.usernameSelector, errorMsg));
+        
+        return validationErrors;
+    }
+
+    validatePassword(validationErrors)
+    {
+        const { password } = this.details,
+            { passwordSelector, confirmPasswordSelector } = fieldSelectors;
+        
+        let errorMsg,
+            selector = passwordSelector;
+
+        if (!password.length)
+            errorMsg = "Password is required.";
+        else if (containsWhitespace(password))
+            errorMsg = "Password cannot include spaces.";
+        else if (password.length < 8)
+            errorMsg = "Password must include at least 8 characters.";
+        else
+        {
+            selector = confirmPasswordSelector;
+
+            if (!passwordConfirmation.length)
+                errorMsg = "Please confirm your password.";
+            else if (password !== passwordConfirmation)
+                errorMsg = "Passwords do not match.";
+        }
+        
+        if (errorMsg)
+            validationErrors.push(new ValidationError(selector, errorMsg));
+        
+        return validationErrors;
+    }
+
+    validateEmailAddress(validationErrors)
+    {
+        const { email } = this.details;
+        let errorMsg;
+
+        if (!email.length)
+            errorMsg = "Email is required.";
+        else if (emailIsInvalid(email))
+            errorMsg = "Please enter a valid email address.";
+
+        if (errorMsg)
+            validationErrors.push(new ValidationError(fieldSelectors.emailSelector, errorMsg));
+        
+        return validationErrors;
     }
 
     async create()
