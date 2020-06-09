@@ -11,13 +11,23 @@ access codes
 	handle server errors
 
 account creation
-	enter button should submit
 	loading gif
 	handle server errors
 	send confirmation email
 		account confirmation page
-	button to check username availability
-	show password strength with each keypress
+	username
+		no whitespace
+		character limit
+		escape special characters
+		must start with a letter?
+		button to check availability
+	password
+		escape special characters
+		no whitespace
+		must have at least 1 capital letter and one number
+		character limit?
+		show strength with each keypress
+		forgot your password? process
 
 main menu
 	if the user has won a game, the default difficulty should be normal (or perhaps the last selected difficulty)

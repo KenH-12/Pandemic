@@ -9,8 +9,9 @@ const fieldSelectors = {
     btnLogInSelector: "#btnLogIn",
     btnAttemptAccessSelector: "#btnAttemptAccess",
     confirmPasswordSelector: "#txtConfirmPassword",
-    emailSelector: "#txtEmail",
-    accessCodeSelector: "#txtAccessCode"
+    emailSelector: "#txtEmailAddress",
+    accessCodeSelector: "#txtAccessCode",
+    btnCreateAccountSelector: "#btnCreateAccount"
 }
 
 $(function()
@@ -155,15 +156,7 @@ async function attemptAccess()
     // validate access code on server-side
 
     await transitionPageContentTo("accountCreation.php");
-    $("#btnCreateAccount").click(function()
-    {
-        const account = new UserAccountCreator();
-
-        if (account.detailsAreValid())
-            return account.create();
-        
-        hideValidationErrorsOnChangeEvent("input");
-    });
+    new UserAccountCreator().bindEventListeners();
 }
 
 function usernameOrPasswordIsEmpty(credentials)
@@ -270,9 +263,41 @@ function hideValidationErrorsOnChangeEvent(selector)
 
 class UserAccountCreator
 {
-    constructor()
+    bindEventListeners()
     {
-        this.setDetails();
+        const {
+                btnCreateAccountSelector,
+                usernameSelector,
+                passwordSelector,
+                confirmPasswordSelector,
+                emailSelector
+            } = fieldSelectors,
+            self = this,
+            $elements = $(btnCreateAccountSelector).off("click").click(() => self.tryCreateAccount())
+                .add(usernameSelector)
+                .add(passwordSelector)
+                .add(confirmPasswordSelector)
+                .add(emailSelector);
+        
+        bindKeypressEventListener($elements.off("keypress"), 13, () => self.tryCreateAccount());
+    }
+
+    unbindEventListeners()
+    {
+        const {
+            btnCreateAccountSelector,
+            usernameSelector,
+            passwordSelector,
+            confirmPasswordSelector,
+            emailSelector
+        } = fieldSelectors;
+
+        $(btnCreateAccountSelector).off("click")
+            .add(usernameSelector)
+            .add(passwordSelector)
+            .add(confirmPasswordSelector)
+            .add(emailSelector)
+            .off("keypress");
     }
 
     setDetails()
@@ -292,6 +317,18 @@ class UserAccountCreator
         }
     }
 
+    tryCreateAccount()
+    {
+        this.unbindEventListeners();
+        this.setDetails();
+
+        if (this.detailsAreValid())
+            return this.create();
+    
+        this.bindEventListeners();
+        hideValidationErrorsOnChangeEvent("input");
+    }
+
     detailsAreValid()
     {
         const {
@@ -304,7 +341,7 @@ class UserAccountCreator
                 username,
                 password,
                 passwordConfirmation,
-                email  
+                email
             } = this.details,
             errors = [];
 
