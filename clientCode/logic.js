@@ -7854,6 +7854,9 @@ async function revealStartingHands(startingHandsEvent, $roleContainers)
 		for (let card of hand.cards)
 			revealPlayerCard(card.key, $container);
 	}
+
+	// Prevent 'locatable' card hover style.
+	$roleContainers.find(".playerCard").addClass("notLocatable");
 }
 
 function makeRoomForStartingHands(startingHandSize, $roleContainers)
