@@ -17,7 +17,6 @@ account creation
 	username
 		button to check availability
 	password
-		must have at least 1 capital letter and one number
 		show strength with each keypress
 		forgot your password? process
 

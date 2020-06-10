@@ -396,6 +396,8 @@ class UserAccountCreator
             errorMsg = "Password cannot include spaces.";
         else if (password.length < 8)
             errorMsg = "Password must include at least 8 characters.";
+        else if (!(containsCapitalLetter(password) && containsNumber(password)))
+            errorMsg = "Password must include at least one capital letter and one number.";
         else
         {
             selector = confirmPasswordSelector;

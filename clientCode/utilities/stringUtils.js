@@ -18,12 +18,22 @@ function getLeadingNumber(string)
 
 function beginsWithLetter(string)
 {
-	return /^[a-zA-Z]$/.test(string[0]);
+	return /^[a-zA-Z]/.test(string);
 }
 
 function isAlphanumeric(string)
 {
-	return /^[a-zA-Z0-9_]*$/.test(string);
+	return /^\w*$/.test(string);
+}
+
+function containsCapitalLetter(string)
+{
+	return /[A-Z]/.test(string);
+}
+
+function containsNumber(string)
+{
+	return /\d/.test(string);
 }
 
 function containsWhitespace(string)
