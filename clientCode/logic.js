@@ -3615,6 +3615,9 @@ class Player
 
 	pinpointLocation()
 	{
+		if (currentStepIs("setup"))
+			return false;
+		
 		pinpointCity(this.cityKey, { pinpointClass: `${this.camelCaseRole}Border` });
 	}
 
@@ -6862,6 +6865,7 @@ async function setup()
 	}
 	else
 	{
+		$(".playerPanel .role").addClass("locatable");
 		bindPlayerDeckHoverEvents();
 		
 		if (forecastInProgress())
@@ -6940,9 +6944,6 @@ class RoleSlotMachine
 		this.player = player;
 
 		this.$container = $container;
-
-		this.$playerName = $(`<p class='name'>${this.player.name}</div>`);
-		this.$container.append(this.$playerName);
 
 		this.$slotMachine = $(`<div class='slotMachine'>
 								<div class='slotMachineShadow'></div>
@@ -7162,7 +7163,7 @@ class RoleSlotMachine
 			.attr("data-role", this.player.rID);
 		this.$slotMachine.remove();
 
-		$role.insertAfter(this.$playerName)
+		$role.prependTo(this.$container)
 			.removeAttr("style")
 			.hover(function()
 			{
@@ -7283,6 +7284,7 @@ async function beginGame()
 		$containersToShow.removeClass("hidden").removeAttr("style");
 		bindRoleCardHoverEvents();
 		bindPawnEvents();
+		$(".playerPanel .role").addClass("locatable");
 		gameData.currentStep.next();
 		$("#actionsContainer").slideDown(getDuration(400), function()
 		{

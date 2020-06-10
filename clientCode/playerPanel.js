@@ -279,9 +279,8 @@ export default class PlayerPanel
 
 function appendPanelAndBindEventHandlers(panel, player, numPlayers)
 {
-    const { camelCaseRole, name, role } = player,
+    const { camelCaseRole, role } = player,
         $panel = $(`<div class='playerPanel playerPanel-${numPlayers} hidden' id='${camelCaseRole}'>
-                        <div class='name'>${name}</div>
                         <div class='role ${camelCaseRole}'>
                             <p>${role}</p>
                         </div>
@@ -290,6 +289,9 @@ function appendPanelAndBindEventHandlers(panel, player, numPlayers)
                             <div>${panel.upChevron}</div>
                         </div>
                     </div>`).appendTo("#playerPanelContainer");
+    
+    /* if (isMultiplayerGame)
+        $panel.prepend(`<div class='name'>${player.name}</div>`); */
     
     $panel.children(".role")
         .on("click", ":not(.eventCard)", function() { player.pinpointLocation() });

@@ -1332,7 +1332,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template),
 .infectionCard:not(.template),
-.playerPanel .role *:not(.eventCard),
+.playerPanel .role.locatable *:not(.eventCard),
 #roleIndicator,
 .roleTag
 { cursor: url("images/target_black.png"), auto }
@@ -1340,7 +1340,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .eventDetails .locatable { cursor: url("images/target_white.png"), auto }
 .playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template):hover,
 .infectionCard:not(.template):hover .cityName,
-.playerPanel .role *:not(.eventCard):hover,
+.playerPanel .role.locatable *:not(.eventCard):hover,
 #roleIndicator:hover,
 .roleTag:not(.playerOption):hover,
 .playerCard.b:hover,
