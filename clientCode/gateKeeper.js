@@ -146,7 +146,7 @@ async function attemptAccess()
 
     if (!accessCode.length)
     {
-        new ValidationError(accessCodeSelector, "An access code is required to create an account.", "accessCodeError").show();
+        new ValidationError(accessCodeSelector, "An access code is required to create an account.").show();
         hideValidationErrorsOnChangeEvent(accessCodeSelector);
 
         return false;
@@ -209,7 +209,7 @@ function invalidCredentials(reason)
     return false;
 }
 
-async function transitionPageContentTo(pageUrl, { animate } = {})
+async function transitionPageContentTo(pageUrl, { animate, beforeShow } = {})
 {
     if (animate !== false)
         animate = true;
@@ -231,6 +231,9 @@ async function transitionPageContentTo(pageUrl, { animate } = {})
 
     $content.children().remove();
     $content.append(html);
+
+    if (typeof beforeShow === "function")
+        beforeShow();
 
     if (animate)
     {
@@ -335,7 +338,7 @@ class UserAccountCreator
         this.setDetails();
 
         if (this.detailsAreValid())
-            return this.create();
+            return this.createAccount();
     
         this.bindEventListeners();
         hideValidationErrorsOnChangeEvent("input");
@@ -430,7 +433,7 @@ class UserAccountCreator
         return validationErrors;
     }
 
-    async create()
+    createAccount()
     {
         const $btnCreateAccount = $(fieldSelectors.btnCreateAccountSelector)
                 .addClass("btnDisabled")
@@ -447,6 +450,8 @@ class UserAccountCreator
                     $btnCreateAccount.removeClass("btnDisabled").html("Create Account");
                     return this.accountCreationFailed(response.failure);
                 }
+
+                this.promptConfirmationCodeEntry();
             })
             .catch(e => serverOperationFailed(e.message));
     }
@@ -460,7 +465,7 @@ class UserAccountCreator
 
             if (reason.includes("Username"))
             {
-                new ValidationError(usernameSelector, "That username is already taken.").show();
+                new ValidationError(usernameSelector, "That username is not available.").show();
                 hideValidationErrorsOnChangeEvent(usernameSelector);
             }
             else if (reason.includes("Email"))
@@ -471,6 +476,14 @@ class UserAccountCreator
         }
         else
             serverOperationFailed(reason);
+    }
+
+    promptConfirmationCodeEntry()
+    {
+        const beforeShow = () => $(".content").children("p").first()
+            .html(`A verification code has been sent to ${this.details.email}.`);
+        
+        transitionPageContentTo("verifyAccount.php", { beforeShow });
     }
 }
 

@@ -39,10 +39,10 @@
                             </form>
                             
                             <h2>Don't Have an Account?</h2>
-                            <form id='frmAccessCode'>    
+                            <form id='frmAccessCode' class='inlineForm'>    
                                 <label for='txtAccessCode'>Enter Access Code:</label>
                                 <input id='txtAccessCode' type='text' />
-                                <div id='btnAttemptAccess' class='button' tabindex='0'>Continue</div>
+                                <div id='btnAttemptAccess' class='button inlineButton' tabindex='0'>Continue</div>
                             </form>
 
                             <p id='disclaimer' class='smallText'>DISCLAIMER: <span class='italics'>this is a fan-made re-creation which is intended to be a portfolio piece and is not available to the general public.

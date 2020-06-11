@@ -81,12 +81,12 @@ input[type='text'] { cursor: text }
 {
 	margin-bottom: var(--lobby-padding);
 }
-#lobby form > label, #btnAttemptAccess
+#lobby form > label, .inlineButton
 {
 	font-size: 20px;
 }
 #lobby input:not([type='radio']),
-#btnAttemptAccess
+.inlineButton
 { height: 24px }
 #lobby .content > h1, #lobby h2
 {
@@ -106,23 +106,23 @@ input[type='text'] { cursor: text }
 	font-size: 22px;
 	margin: calc(var(--lobby-padding)*2) 0 6px 0;
 }
-#lobby form:not(#frmAccessCode) > *
+#lobby form:not(.inlineForm) > *
 {
 	display: block;
 }
-#lobby form:not(#frmAccessCode) *:not(label)
+#lobby form:not(.inlineForm) *:not(label)
 {
 	border-radius: var(--lobby-control-border-radius);
 }
-#lobby form:not(#frmAccessCode) input, #lobby form .button:not(#btnAttemptAccess)
+#lobby form:not(.inlineForm) input, #lobby form:not(.inlineForm) .button
 {
 	width: calc(var(--lobby-content-width)*0.5);
 }
-#lobby form:not(#frmAccessCode) label
+#lobby form:not(.inlineForm) label
 {
 	margin-top: 8px;
 }
-#lobby .button:not(#btnAttemptAccess)
+#lobby .button:not(#btnAttemptAccess):not(#btnVerifyAccount)
 {
 	font-size: 26px;
 	line-height: 26px;
@@ -136,15 +136,15 @@ input[type='text'] { cursor: text }
 	padding: 4px 0;
 	margin: 16px 0 0 0;
 }
-#frmAccessCode
+.inlineForm
 {
 	white-space: nowrap;
 }
-#frmAccessCode > *
+.inlineForm > *
 {
 	vertical-align: middle;
 }
-#frmAccessCode label { width: calc(var(--lobby-content-width) * 0.3) }
+.inlineForm label { width: calc(var(--lobby-content-width) * 0.3) }
 #lobby .validationError
 {
 	color: #ef282a;
@@ -154,22 +154,22 @@ input[type='text'] { cursor: text }
 {
 	content: "* ";
 }
-.accessCodeError.validationError
+.inlineForm .validationError
 {
 	position: absolute;
 	margin-left: calc(var(--lobby-content-width) * 0.3)
 }
-#txtAccessCode
+.inlineForm input[type='text']
 {
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
 	padding: 0 2px;
 }
-#btnAttemptAccess
+.inlineForm .inlineButton
 {
 	display: inline-block;
-	width: calc(var(--lobby-content-width) * 0.18);
-	padding: 2px 0;
+	width: auto;
+	padding: 2px 8px;
 	margin-left: -3px;
 	border-top-right-radius: var(--lobby-control-border-radius);
 	border-bottom-right-radius: var(--lobby-control-border-radius);
