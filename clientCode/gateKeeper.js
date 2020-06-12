@@ -483,7 +483,7 @@ class UserAccountCreator
         const beforeShow = () => $(".content").children("p").first()
             .html(`A verification code has been sent to ${this.details.email}.`);
         
-        transitionPageContentTo("verifyAccount.php", { beforeShow });
+        transitionPageContentTo("accountVerification.php", { beforeShow });
     }
 }
 
