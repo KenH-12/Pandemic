@@ -2,6 +2,7 @@
     try
     {
         require "../connect.php";
+        require "../utilities.php";
         $accountDetails = json_decode(file_get_contents("php://input"), true);
         
         if (!isset($accountDetails["username"]))
@@ -33,10 +34,29 @@
         $stmt->execute([$username, $email, $hash]);
 
         if ($stmt->rowCount() !== 1)
-        {
-            require "../utilities.php";
             throwException($pdo, "Failed to create account");
-        }
+
+        $uID = $pdo->lastInsertId();
+        $stmt = $pdo->query("SELECT udf_generateVerificationCode($uID) AS 'vCode'");
+        $vCode = $stmt->fetch()["vCode"];
+
+        if ($vCode == "0")
+            throwException($pdo, "Failed to set verification code");
+
+        $to = $email;
+        $subject = "Pandemic Account Verification";
+        $message = "<html>
+                    <head>
+                        <title>Pandemic Account Verification</title>
+                    </head>
+                    <body>
+                        <h3>Hello, $username.</h3>
+                        <h5>Ready to save the world?!</h5>
+                        <p>Verify your Pandemic account using this code: $vCode</p>
+                        <p>(code will expire after 1 hour)</p>
+                    </body>
+                    </html>";
+        $headers = "MIME-Version: 1.0\r\nContent-type: text/html; charset=iso-8859-1";
         
         $response["success"] = true;
     }

@@ -89,13 +89,15 @@ SELECT
 FROM pandemic
 INNER JOIN game ON game.gameID = pandemic.gameID;
 
-CREATE TABLE `user`
+CREATE TABLE `USER`
 (
 	userID				INT AUTO_INCREMENT,
 	username				VARCHAR(20) NOT NULL,
 	pass					VARCHAR(255) NOT NULL,
 	email					VARCHAR(320) NOT NULL,
-	accountActivated	BOOL DEFAULT 0,
+	verificationCode	INT,
+	vCodeExpiry			DATETIME,
+	accountVerified	BOOL DEFAULT 0,
 	lastActive			DATETIME,
 	
 	CONSTRAINT pk_user_userID PRIMARY KEY(userID)
