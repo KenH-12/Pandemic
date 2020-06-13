@@ -122,7 +122,7 @@ input[type='text'] { cursor: text }
 {
 	margin-top: 8px;
 }
-#lobby .button:not(#btnAttemptAccess):not(#btnVerifyAccount)
+#lobby .button:not(#btnAttemptAccess):not(#btnVerify)
 {
 	font-size: 26px;
 	line-height: 26px;
@@ -164,6 +164,8 @@ input[type='text'] { cursor: text }
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
 	padding: 0 2px;
+	width: 80px;
+	text-align: center;
 }
 .inlineForm .inlineButton
 {

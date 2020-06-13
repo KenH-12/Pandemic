@@ -2,7 +2,7 @@ import ValidationError from "./utilities/validationError.js";
 import { postData, fetchHtml } from "./utilities/fetchUtils.js";
 import { strings } from "./strings.js";
 
-const fieldSelectors = {
+const selectors = {
     lobbySelector: "#lobby",
     usernameSelector: "#txtUsername",
     passwordSelector: "#txtPassword",
@@ -11,18 +11,25 @@ const fieldSelectors = {
     confirmPasswordSelector: "#txtConfirmPassword",
     emailSelector: "#txtEmailAddress",
     accessCodeSelector: "#txtAccessCode",
-    btnCreateAccountSelector: "#btnCreateAccount"
+    btnCreateAccountSelector: "#btnCreateAccount",
+    verificationCodeSelector: "#txtVerificationCode",
+    btnVerifySelector: "#btnVerify",
+    lnkResendCodeSelector: "#lnkResendCode"
 }
 
 $(function()
 {
-    const $lobby = $(fieldSelectors.lobbySelector),
-        loggedInAttr = "data-loggedIn";
+    const $lobby = $(selectors.lobbySelector);
 
-    if ($lobby.attr(loggedInAttr))
-        return showMainMenu({ animate: false });
+    if ($lobby.attr("data-loggedIn"))
+    {
+        if ($lobby.attr("data-verified"))
+            return showMainMenu({ animate: false });
+        
+        return promptAccountVerification($lobby.attr("data-email"), { animate: false });
+    }
     
-    $lobby.removeAttr(`class ${loggedInAttr}`);
+    removeAllDataAttributes($lobby.removeAttr("class"));
     bindLoginPageEvents();
 });
 
@@ -34,7 +41,7 @@ function bindLoginPageEvents()
             passwordSelector,
             btnAttemptAccessSelector,
             accessCodeSelector
-        } = fieldSelectors,
+        } = selectors,
         $btnLogin = $(btnLogInSelector),
         $btnAttemptAccess = $(btnAttemptAccessSelector);
     
@@ -57,7 +64,7 @@ function unbindLoginPageEvents()
         passwordSelector,
         btnAttemptAccessSelector,
         accessCodeSelector
-    } = fieldSelectors;
+    } = selectors;
 
     $(btnLogInSelector).add(btnAttemptAccessSelector)
         .off("click").addClass("btnDisabled")
@@ -75,7 +82,7 @@ function attemptLogin()
             usernameSelector,
             passwordSelector,
             btnLogInSelector
-        } = fieldSelectors,
+        } = selectors,
         credentials = {
             username: $(usernameSelector).val(),
             password: $(passwordSelector).val()
@@ -102,6 +109,9 @@ function attemptLogin()
                 return serverOperationFailed(response.failure);
             }
             
+            if (response.accountNeedsVerification)
+                return promptAccountVerification(response.emailAddress);
+            
             showMainMenu();
         })
         .catch(e => serverOperationFailed(e.message));
@@ -113,7 +123,7 @@ async function showMainMenu({ animate } = {})
         animate = true;
     
     await transitionPageContentTo("mainMenu.php", { animate });
-    $(fieldSelectors.lobbySelector).removeAttr("class data-loggedIn");
+    removeAllDataAttributes($(selectors.lobbySelector).removeAttr("class"));
 
     if ($("#gameInProgress").length)
     {
@@ -141,7 +151,7 @@ async function showMainMenu({ animate } = {})
 
 async function attemptAccess()
 {
-    const { accessCodeSelector } = fieldSelectors,
+    const { accessCodeSelector } = selectors,
         accessCode = $(accessCodeSelector).val();
 
     if (!accessCode.length)
@@ -152,8 +162,8 @@ async function attemptAccess()
         return false;
     }
     
-    // more client-side validation perhaps
-    // validate access code on server-side
+    // TODO: more client-side validation perhaps
+    // TODO: validate access code on server-side
 
     await transitionPageContentTo("accountCreation.php");
     new UserAccountCreator().bindEventListeners();
@@ -161,7 +171,7 @@ async function attemptAccess()
 
 function usernameOrPasswordIsEmpty(credentials)
 {
-    const { usernameSelector, passwordSelector } = fieldSelectors;
+    const { usernameSelector, passwordSelector } = selectors;
     
     let emptyFieldExists = false;
     if (!credentials.username.length)
@@ -183,7 +193,7 @@ function usernameOrPasswordIsEmpty(credentials)
 
 function invalidCredentials(reason)
 {
-    const { passwordSelector, usernameSelector } = fieldSelectors;
+    const { passwordSelector, usernameSelector } = selectors;
     
     let selector,
         errorMsg;
@@ -215,7 +225,7 @@ async function transitionPageContentTo(pageUrl, { animate, beforeShow } = {})
         animate = true;
     
     const html = await fetchHtml(pageUrl),
-        $content = $(fieldSelectors.lobbySelector).children(".content"),
+        $content = $(selectors.lobbySelector).children(".content"),
         width = $("#header").width(),
         duration = 300;
 
@@ -286,7 +296,7 @@ class UserAccountCreator
                 passwordSelector,
                 confirmPasswordSelector,
                 emailSelector
-            } = fieldSelectors,
+            } = selectors,
             self = this,
             $elements = $(btnCreateAccountSelector).off("click").click(() => self.tryCreateAccount())
                 .add(usernameSelector)
@@ -305,7 +315,7 @@ class UserAccountCreator
             passwordSelector,
             confirmPasswordSelector,
             emailSelector
-        } = fieldSelectors;
+        } = selectors;
 
         $(btnCreateAccountSelector).off("click")
             .add(usernameSelector)
@@ -322,7 +332,7 @@ class UserAccountCreator
             passwordSelector,
             confirmPasswordSelector,
             emailSelector
-        } = fieldSelectors;
+        } = selectors;
         
         this.details = {
             username: $(usernameSelector).val(),
@@ -380,7 +390,7 @@ class UserAccountCreator
             errorMsg = "Username must include at least 2 characters.";
         
         if (errorMsg)
-            validationErrors.push(new ValidationError(fieldSelectors.usernameSelector, errorMsg));
+            validationErrors.push(new ValidationError(selectors.usernameSelector, errorMsg));
         
         return validationErrors;
     }
@@ -388,7 +398,7 @@ class UserAccountCreator
     validatePassword(validationErrors)
     {
         const { password, passwordConfirmation } = this.details,
-            { passwordSelector, confirmPasswordSelector } = fieldSelectors;
+            { passwordSelector, confirmPasswordSelector } = selectors;
         
         let errorMsg,
             selector = passwordSelector;
@@ -428,14 +438,14 @@ class UserAccountCreator
             errorMsg = "Please enter a valid email address.";
 
         if (errorMsg)
-            validationErrors.push(new ValidationError(fieldSelectors.emailSelector, errorMsg));
+            validationErrors.push(new ValidationError(selectors.emailSelector, errorMsg));
         
         return validationErrors;
     }
 
     createAccount()
     {
-        const $btnCreateAccount = $(fieldSelectors.btnCreateAccountSelector)
+        const $btnCreateAccount = $(selectors.btnCreateAccountSelector)
                 .addClass("btnDisabled")
                 .html("Creating Account..."),
             $loadingGif = $(strings.loadingGifHtml).appendTo($btnCreateAccount);
@@ -451,7 +461,7 @@ class UserAccountCreator
                     return this.accountCreationFailed(response.failure);
                 }
 
-                this.promptConfirmationCodeEntry();
+                promptAccountVerification(this.details.email);
             })
             .catch(e => serverOperationFailed(e.message));
     }
@@ -461,7 +471,7 @@ class UserAccountCreator
         if (reason.includes("already exists"))
         {
             console.log("already exists");
-            const { usernameSelector, emailSelector } = fieldSelectors;
+            const { usernameSelector, emailSelector } = selectors;
 
             if (reason.includes("Username"))
             {
@@ -477,14 +487,112 @@ class UserAccountCreator
         else
             serverOperationFailed(reason);
     }
+}
 
-    promptConfirmationCodeEntry()
+async function promptAccountVerification(emailAddress, { animate } = {})
+{
+    if (animate !== false)
+        animate = true;
+    
+    const beforeShow = () => $(".content").children("p").first()
+        .html(`A verification code has been sent to ${emailAddress}.`);
+    
+    await transitionPageContentTo("accountVerification.php", { beforeShow, animate });
+    bindVerificationPageEvents();
+    removeAllDataAttributes($(selectors.lobbySelector).removeAttr("class"));
+}
+
+function bindVerificationPageEvents()
+{
+    const {
+        verificationCodeSelector,
+        btnVerifySelector,
+        lnkResendCodeSelector
+    } = selectors;
+
+    $(btnVerifySelector).off("click").click(verifyAccount).removeClass("btnDisabled").html("Verify");
+    bindKeypressEventListener($(verificationCodeSelector).off("keypress"), 13, verifyAccount);
+    $(lnkResendCodeSelector).off("click").click(resendVerificationCode);
+}
+
+function unbindVerificationPageEvents()
+{
+    const {
+        verificationCodeSelector,
+        btnVerifySelector,
+        lnkResendCodeSelector
+    } = selectors;
+
+    $(btnVerifySelector).addClass("btnDisabled").html("Verifying...")
+        .add(lnkResendCodeSelector).off("click");
+    $(verificationCodeSelector).off("keypress");
+}
+
+function verifyAccount()
+{
+    unbindVerificationPageEvents();
+    
+    const { verificationCodeSelector } = selectors,
+        verificationCode = $(verificationCodeSelector).val();
+
+    if (!verificationCode.length)
+        return accountVerificationFailed("no code");
+
+    // TODO: show loading gif
+    postData("serverCode/actionPages/verifyAccount.php", { verificationCode })
+        .then(response =>
+        {
+            if (response.failure)
+                return accountVerificationFailed(response.failure);
+            
+            // TODO: show success message briefly
+            
+            showMainMenu();
+        })
+        .catch(e => serverOperationFailed(e.message));
+}
+
+function accountVerificationFailed(reason)
+{
+    console.error(reason);
+    let errorMsg;
+
+    if (reason === "no code")
+        errorMsg = "Please enter the verification code you received.";
+    else if (reason.includes("invalid code"))
+        errorMsg = "Invalid code.";
+    else if (reason.includes("code expired"))
     {
-        const beforeShow = () => $(".content").children("p").first()
-            .html(`A verification code has been sent to ${this.details.email}.`);
+        errorMsg = "Code expired. Try resending a new code.";
+
+        const $instructions = $(".content").children("p").first(),
+            emailAddress = $instructions.html().substring($instructions.html().lastIndexOf(" "));
         
-        transitionPageContentTo("accountVerification.php", { beforeShow });
+        $instructions.html(`Click the "Resend Code" link below to send a new verification code to ${emailAddress}`);
     }
+    else
+        return serverOperationFailed(reason);
+    
+    const { verificationCodeSelector } = selectors;
+
+    new ValidationError(verificationCodeSelector, errorMsg).show();
+    hideValidationErrorsOnChangeEvent(verificationCodeSelector);
+
+    bindVerificationPageEvents();
+}
+
+function resendVerificationCode()
+{
+    // TODO: show loading gif
+    postData("serverCode/actionPages/resendVerificationCode.php")
+        .then(response =>
+        {
+            if (response.failure)
+                return serverOperationFailed(response.failure);
+            
+            // TODO: change instructions to reflect that a new code has been sent
+        })
+        .catch(e => serverOperationFailed(e.message));
 }
 
 function createGame()
@@ -504,7 +612,7 @@ function createGame()
 
             window.location.replace("game.php");
         })
-        .catch(e => console.error(e));
+        .catch(e => serverOperationFailed(e.message));
 }
 
 function promptAbandonGame()
@@ -546,11 +654,12 @@ function abandonGame()
             
             showMainMenu();
         })
-        .catch(e => console.error(e));
+        .catch(e => serverOperationFailed(e.message));
 }
 
 function serverOperationFailed(reason)
 {
+    console.log(reason);
     if (reason.includes("not logged in"))
         window.location.reload(false);
     else

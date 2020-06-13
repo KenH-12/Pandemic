@@ -12,13 +12,15 @@
         
         $username = $data["username"];
 
-        $stmt = $pdo->prepare("SELECT userID FROM user WHERE username = ? OR email = ?");
+        $stmt = $pdo->prepare("SELECT userID, accountVerified, email FROM user WHERE username = ? OR email = ?");
         $stmt->execute([$username, $username]);
 
         if ($stmt->rowCount() === 0)
             throw new Exception("Username does not exist");
         
-        $userID = $stmt->fetch()["userID"];
+        $user = $stmt->fetch();
+        $userID = $user["userID"];
+        $accountNeedsVerification = $user["accountVerified"] != "1";
 
         $stmt = $pdo->query("SELECT pass FROM user WHERE userID = $userID");
         $hash = $stmt->fetch()["pass"];
@@ -29,7 +31,10 @@
         session_start();
         $_SESSION["uID"] = $userID;
 
-        $response["success"] = true;
+        $response["accountNeedsVerification"] = $accountNeedsVerification;
+        
+        if ($accountNeedsVerification)
+            $response["emailAddress"] = $user["email"];
     }
     catch(PDOException $e)
     {

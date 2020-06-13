@@ -18,10 +18,13 @@
         $vCode = $data["verificationCode"];
 
         $stmt = $pdo->prepare("SELECT verificationCode, vCodeExpiry FROM `user` WHERE userID = ?");
-        $stmt->execute([$uID]);
+        $stmt->execute([$userID]);
 
         if ($stmt->rowCount() === 0)
-            throw new Exception("user not found");
+        {
+            unset($_SESSION["uID"]);
+            throw new Exception("user not logged in");
+        }
         
         $row = $stmt->fetch();
 

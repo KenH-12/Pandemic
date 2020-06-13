@@ -3,6 +3,13 @@ BUGS
 
 TO DO
 -----
+the extra functionality in the showMainMenu function should be passed as the beforeShow argument for transitionContentTo 
+
+lock account after n attempts
+	login
+	access code
+	account verification
+
 access codes
 	code generation
 	handle valid codes
@@ -15,9 +22,7 @@ account creation
 	send confirmation email
 		account verification
 			verify code
-			handle errors
 			resend code
-			if a login attempt is made with an unverified account, they should be redirected to account verification
 	username
 		button to check availability
 	password

@@ -153,6 +153,11 @@ function removeInlineStylePropertiesFrom($elements, propertyNames)
 	}
 }
 
+function removeAllDataAttributes($element)
+{
+	$.each($element.data(), i => $element.removeAttr(`data-${i}`));
+}
+
 // Sets the height of all matched elements to the first matched element's width.
 function makeElementsSquare(cssSelector)
 {

@@ -1,6 +1,28 @@
 <?php
     session_start();
     $loggedIn = isset($_SESSION["uID"]);
+    $verified = false;
+    $email = false;
+
+    if ($loggedIn)
+    {
+        require "serverCode/connect.php";
+
+        $stmt = $pdo->prepare("SELECT accountVerified, email FROM `user` WHERE userID = ?");
+        $stmt->execute([$_SESSION["uID"]]);
+
+        if ($stmt->rowCount())
+        {
+            $result = $stmt->fetch();
+            $verified = $result["accountVerified"] == "1";
+            $email = $result["email"];
+        }
+        else
+        {
+            unset($_SESSION["uID"]);
+            $loggedIn = false;
+        }
+    }
     
     $doc = "<!DOCTYPE html>
             <html lang='en' class='blueGradient'>
@@ -19,7 +41,11 @@
                     <script src='clientCode/gateKeeper.js' type='module'></script>
                 </head>
                 <body>
-                    <div id='lobby' class='hidden' data-loggedIn='$loggedIn'>
+                    <div id='lobby' class='hidden'
+                        data-loggedIn='$loggedIn'
+                        data-verified='$verified'
+                        data-email='$email'>
+
                         <div id='header'>
                             <div>
                                 <h1>PANDEMIC</h1>
