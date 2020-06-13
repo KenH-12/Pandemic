@@ -27,6 +27,42 @@ function callDbFunctionSafe($pdo, $fnName, $args)
     return $stmt->fetch()["returnVal"];
 }
 
+function sendVerificationCode($pdo, $userID)
+{
+    $vCode = callDbFunctionSafe($pdo, "udf_generateVerificationCode", $userID);
+
+    if ($vCode == "0")
+        throwException($pdo, "Failed to set verification code");
+    
+    $stmt = $pdo->prepare("SELECT username, email FROM `user` WHERE userID = ?");
+    $stmt->execute([$userID]);
+
+    if ($stmt->rowCount() === 0)
+    {
+        session_start();
+        unset($_SESSION["uID"]);
+        throw new Exception("user not logged in");
+    }
+
+    $result = $stmt->fetch();
+
+    $username = $result["username"];
+    $to = $result["email"];
+    $subject = "Pandemic Account Verification";
+    $message = "<html>
+                <head>
+                    <title>Pandemic Account Verification</title>
+                </head>
+                <body>
+                    <h3>Hello, $username.</h3>
+                    <h5>Ready to save the world?!</h5>
+                    <p>Verify your Pandemic account using this code: $vCode</p>
+                    <p>(code will expire after 1 hour)</p>
+                </body>
+                </html>";
+    $headers = "MIME-Version: 1.0\r\nContent-type: text/html; charset=iso-8859-1";
+}
+
 function getTurnNumber($pdo, $game)
 {
     $stmt = $pdo->prepare("SELECT turnNum
