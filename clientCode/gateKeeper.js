@@ -541,14 +541,15 @@ function verifyAccount()
 
     const $loadingGif = $(strings.loadingGifHtml).insertAfter($btnVerify);
     postData("serverCode/actionPages/verifyAccount.php", { verificationCode })
-        .then(response =>
+        .then(async response =>
         {
             $loadingGif.remove();
 
             if (response.failure)
                 return accountVerificationFailed(response.failure);
             
-            // TODO: show success message briefly
+            $btnVerify.html("Success").css({ color: "#fff", backgroundColor: "#00a94f" });
+            await sleep(1000);
             
             showMainMenu();
         })
