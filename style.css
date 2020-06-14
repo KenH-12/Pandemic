@@ -175,6 +175,14 @@ input[type='text'] { cursor: text }
 	border-top-right-radius: var(--lobby-control-border-radius);
 	border-bottom-right-radius: var(--lobby-control-border-radius);
 }
+.inlineForm .loadingGif
+{
+	display: inline-block;
+	width: 23px;
+	margin-bottom: -3px;
+	margin-left: 2px;
+}
+.inlineForm .loadingGif img { width: 100%; padding: 0 }
 #btnAttemptAccess
 {
 	font-size: 22px;

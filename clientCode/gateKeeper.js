@@ -532,16 +532,19 @@ function verifyAccount()
 {
     unbindVerificationPageEvents();
     
-    const { verificationCodeSelector } = selectors,
-        verificationCode = $(verificationCodeSelector).val();
+    const { verificationCodeSelector, btnVerifySelector } = selectors,
+        verificationCode = $(verificationCodeSelector).val(),
+        $btnVerify = $(btnVerifySelector);
 
     if (!verificationCode.length)
         return accountVerificationFailed("no code");
 
-    // TODO: show loading gif
+    const $loadingGif = $(strings.loadingGifHtml).insertAfter($btnVerify);
     postData("serverCode/actionPages/verifyAccount.php", { verificationCode })
         .then(response =>
         {
+            $loadingGif.remove();
+
             if (response.failure)
                 return accountVerificationFailed(response.failure);
             
