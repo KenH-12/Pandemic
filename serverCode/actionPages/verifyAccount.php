@@ -31,11 +31,12 @@
         if ($row["verificationCode"] != $vCode)
             throw new Exception("invalid code");
         
-        if (strtotime((new DateTime())->format("Y-m-d H:i:s")) > strtotime($row["vCodeExpiry"]))
+        $now = (new DateTime())->setTimezone(new DateTimeZone('America/Toronto'));
+        if (strtotime($now->format("Y-m-d H:i:s")) > strtotime($row["vCodeExpiry"]))
             throw new Exception("code expired");
 
         $stmt = $pdo->prepare("UPDATE `user` SET accountVerified = 1 WHERE userID = ?");
-        $stmt->execute([$uID]);
+        $stmt->execute([$userID]);
 
         if ($stmt->rowCount() !== 1)
             throwException($pdo, "failed to update account status to verified.");

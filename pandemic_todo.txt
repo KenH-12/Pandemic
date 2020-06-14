@@ -19,10 +19,8 @@ access codes
 	handle server errors
 
 account creation
-	send confirmation email
-		account verification
-			verify code
-			resend code
+	test send confirmation email
+	test resend code
 	username
 		button to check availability
 	password

@@ -102,6 +102,7 @@ CREATE TABLE `USER`
 	
 	CONSTRAINT pk_user_userID PRIMARY KEY(userID)
 );
+SET GLOBAL time_zone = '-4:00'; -- Toronto
 
 CREATE TABLE ROLE
 (
