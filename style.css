@@ -164,20 +164,27 @@ input[type='text'] { cursor: text }
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
 	padding: 0 2px;
-	width: 80px;
 	text-align: center;
 }
 .inlineForm .inlineButton
 {
 	display: inline-block;
 	width: auto;
-	padding: 2px 8px;
+	padding: 2px 4px;
 	margin-left: -3px;
 	border-top-right-radius: var(--lobby-control-border-radius);
 	border-bottom-right-radius: var(--lobby-control-border-radius);
 }
+#btnAttemptAccess
+{
+	font-size: 22px;
+	line-height: 22px;
+}
 #disclaimer { width: var(--lobby-content-width) }
 
+#txtVerificationCode,
+#btnVerify
+{ width: 100px }
 .divInputControl
 {
 	display: block;
