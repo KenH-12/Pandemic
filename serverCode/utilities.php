@@ -63,37 +63,9 @@ function sendVerificationCode($pdo, $userID)
     $headers = "MIME-Version: 1.0\r\nContent-type: text/html; charset=iso-8859-1";
 }
 
-function clearFailedLoginAttempts($pdo)
+function recordFailedLoginAttempt($pdo, $usernameOrId, $ipAddress)
 {
-    $ip = getClientIpAddress();
-
-    $stmt = $pdo->prepare("DELETE FROM failedLoginAttempt WHERE ipAddress = ?");
-    $stmt->execute([$ip]);
-}
-
-function recordFailedLoginAttempt($pdo, $usernameOrId)
-{
-    $MAX_ATTEMPTS = 10;
-    $ip = getClientIpAddress();
-
-    $timezone = new DateTimeZone("America/Toronto");
-    $fifteenMinsAgo = (new DateTime("15 minutes ago", $timezone))->format("Y-m-d H:i:s");
-
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS 'numAttempts'
-                            FROM failedLoginAttempt
-                            WHERE ipAddress = ?
-                            AND timeOfAttempt > ?");
-    $stmt->execute([$ip, $fifteenMinsAgo]);
-
-    $numAttempts = $stmt->fetch()["numAttempts"];
-
-    // Don't bother recording more than 10 failed attempts per 15 minute interval.
-    if ($numAttempts >= $MAX_ATTEMPTS)
-        throw new Exception("too many failed attempts");
-
-    // Max not yet reached...
-    
-    // Get the username that was used in the attempt.
+    // Record the username that was used in the attempt.
     if (is_numeric($usernameOrId))
     {
         $stmt = $pdo->prepare("SELECT username from user WHERE userID = ?");
@@ -107,14 +79,47 @@ function recordFailedLoginAttempt($pdo, $usernameOrId)
     else
         $username = $usernameOrId;
     
-    // Record the attempt.
-    $timeOfAttempt = (new DateTime(null, $timezone))->format("Y-m-d H:i:s");
-    $stmt = $pdo->prepare("INSERT INTO failedLoginAttempt (ipAddress, username, timeOfAttempt) VALUES (?, ?, ?)");
-    $stmt->execute([$ip, $username, $timeOfAttempt]);
+    $timeOfAttempt = (new DateTime(null, new DateTimeZone("America/Toronto")))->format("Y-m-d H:i:s");
 
-    // Has the max number of attempts been reached?
-    if ($numAttempts + 1 == $MAX_ATTEMPTS)
+    $stmt = $pdo->prepare("INSERT INTO failedLoginAttempt (ipAddress, username, timeOfAttempt) VALUES (?, ?, ?)");
+    $stmt->execute([$ipAddress, $username, $timeOfAttempt]);
+}
+
+function countFailedAttempts($pdo, $ipAddress)
+{
+    $fifteenMinsAgo = (new DateTime("15 minutes ago", new DateTimeZone("America/Toronto")))->format("Y-m-d H:i:s");
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS 'numAttempts'
+                            FROM failedLoginAttempt
+                            WHERE ipAddress = ?
+                            AND timeOfAttempt > ?");
+    $stmt->execute([$ipAddress, $fifteenMinsAgo]);
+
+    $numAttempts = $stmt->fetch()["numAttempts"];
+
+    throwExceptionIfFailedAttemptLimitReached($numAttempts);
+    
+    return $numAttempts;
+}
+
+function throwExceptionIfFailedAttemptLimitReached($numAttempts)
+{
+    $MAX_ATTEMPTS = 10;
+
+    if ($numAttempts >= $MAX_ATTEMPTS)
+    {
+        session_start();
+        unset($_SESSION["uID"]);
         throw new Exception("too many failed attempts");
+    }
+}
+
+function clearFailedLoginAttempts($pdo)
+{
+    $ip = getClientIpAddress();
+
+    $stmt = $pdo->prepare("DELETE FROM failedLoginAttempt WHERE ipAddress = ?");
+    $stmt->execute([$ip]);
 }
 
 function getClientIpAddress()

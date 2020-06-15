@@ -5,6 +5,9 @@
         require "$rootDir/Pandemic/serverCode/connect.php";
         require "$rootDir/Pandemic/serverCode/utilities.php";
 
+        $ipAddress = getClientIpAddress();
+        $failedAttemptCount = countFailedAttempts($pdo, $ipAddress);
+
         $data = json_decode(file_get_contents("php://input"), true);
         
         if (!isset($data["username"]))
@@ -17,7 +20,9 @@
 
         if ($stmt->rowCount() === 0)
         {
-            recordFailedLoginAttempt($pdo, $username);
+            recordFailedLoginAttempt($pdo, $username, $ipAddress);
+            throwExceptionIfFailedAttemptLimitReached($failedAttemptCount + 1);
+
             throw new Exception("Username does not exist");
         }
         
@@ -30,7 +35,9 @@
 
         if (!password_verify($data["password"], $hash))
         {
-            recordFailedLoginAttempt($pdo, $username);
+            recordFailedLoginAttempt($pdo, $username, $ipAddress);
+            throwExceptionIfFailedAttemptLimitReached($failedAttemptCount + 1);
+
             throw new Exception("Invalid password");
         }
 

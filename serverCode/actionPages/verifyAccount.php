@@ -4,6 +4,9 @@
         require "../connect.php";
         require "../utilities.php";
 
+        $ipAddress = getClientIpAddress();
+        $failedAttemptCount = countFailedAttempts($pdo, $ipAddress);
+
         $data = json_decode(file_get_contents("php://input"), true);
 
         session_start();
@@ -30,7 +33,9 @@
 
         if ($row["verificationCode"] != $vCode)
         {
-            recordFailedLoginAttempt($pdo, $userID);
+            recordFailedLoginAttempt($pdo, $userID, $ipAddress);
+            throwExceptionIfFailedAttemptLimitReached($failedAttemptCount + 1);
+            
             throw new Exception("invalid code");
         }
         
