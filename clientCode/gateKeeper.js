@@ -31,10 +31,10 @@ $(function()
     }
     
     removeAllDataAttributes($lobby.removeAttr("class"));
-    bindLoginPageEvents();
+    bindLoginPageEventListeners();
 });
 
-function bindLoginPageEvents()
+function bindLoginPageEventListeners()
 {
     if (data.lockedOut)
         return false;
@@ -54,15 +54,15 @@ function bindLoginPageEvents()
         .children(".loadingGif").remove();
     
     let $elementsToBind = $btnLogin.html("Log In").click(attemptLogin).add(usernameSelector).add(passwordSelector);
-    bindKeypressEventListener($elementsToBind.off("keypress"), 13, attemptLogin);
+    bindKeypressEventListeners($elementsToBind.off("keypress"), 13, attemptLogin);
     
     $elementsToBind = $btnAttemptAccess.click(attemptAccess).add(accessCodeSelector);
-    bindKeypressEventListener($elementsToBind.off("keypress"), 13, attemptAccess);
+    bindKeypressEventListeners($elementsToBind.off("keypress"), 13, attemptAccess);
 
     $("form").submit(() => false);
 }
 
-function unbindLoginPageEvents()
+function unbindLoginPageEventListeners()
 {
     const {
         btnLogInSelector,
@@ -82,7 +82,7 @@ function unbindLoginPageEvents()
 
 function attemptLogin()
 {
-    unbindLoginPageEvents();
+    unbindLoginPageEventListeners();
 
     if (data.lockedOut)
         return false;
@@ -111,7 +111,7 @@ function attemptLogin()
             {
                 if (invalidCredentials(response.failure))
                 {
-                    bindLoginPageEvents();
+                    bindLoginPageEventListeners();
                     return false;
                 }
 
@@ -126,14 +126,17 @@ function attemptLogin()
         .catch(e => serverOperationFailed(e.message));
 }
 
-async function showMainMenu({ animate } = {})
+function showMainMenu({ animate } = {})
 {
     if (animate !== false)
         animate = true;
     
-    await transitionPageContentTo("mainMenu.php", { animate });
     removeAllDataAttributes($(selectors.lobbySelector).removeAttr("class"));
+    transitionPageContentTo("mainMenu.php", { animate, beforeShow: bindMainMenuEventListeners });
+}
 
+function bindMainMenuEventListeners()
+{
     if ($("#gameInProgress").length)
     {
         let $this;
@@ -145,17 +148,17 @@ async function showMainMenu({ animate } = {})
 
         $("#btnResumeGame").click(() => window.location.replace("game.php"));
         $("#btnAbandonGame").click(promptAbandonGame);
+
+        return false;
     }
-    else
+    
+    $("#btnPlay").click(function()
     {
-        $("#btnPlay").click(function()
-        {
-            $(this).off("click").addClass("btnDisabled")
-                .html("CREATING GAME...")
-                .append(strings.loadingGifHtml);
-            createGame();
-        });
-    }
+        $(this).off("click").addClass("btnDisabled")
+            .html("CREATING GAME...")
+            .append(strings.loadingGifHtml);
+        createGame();
+    });
 }
 
 async function attemptAccess()
@@ -326,7 +329,7 @@ class UserAccountCreator
                 .add(confirmPasswordSelector)
                 .add(emailSelector);
         
-        bindKeypressEventListener($elements.off("keypress"), 13, () => self.tryCreateAccount());
+        bindKeypressEventListeners($elements.off("keypress"), 13, () => self.tryCreateAccount());
     }
 
     unbindEventListeners()
@@ -492,7 +495,6 @@ class UserAccountCreator
     {
         if (reason.includes("already exists"))
         {
-            console.log("already exists");
             const { usernameSelector, emailSelector } = selectors;
 
             if (reason.includes("Username"))
@@ -520,11 +522,11 @@ async function promptAccountVerification(emailAddress, { animate } = {})
         .html(`A verification code has been sent to ${emailAddress}.`);
     
     await transitionPageContentTo("accountVerification.php", { beforeShow, animate });
-    bindVerificationPageEvents();
+    bindVerificationPageEventListeners();
     removeAllDataAttributes($(selectors.lobbySelector).removeAttr("class"));
 }
 
-function bindVerificationPageEvents()
+function bindVerificationPageEventListeners()
 {
     const {
         verificationCodeSelector,
@@ -533,13 +535,13 @@ function bindVerificationPageEvents()
     } = selectors;
 
     $(btnVerifySelector).off("click").click(verifyAccount).removeClass("btnDisabled").html("Verify");
-    bindKeypressEventListener($(verificationCodeSelector).off("keypress"), 13, verifyAccount);
+    bindKeypressEventListeners($(verificationCodeSelector).off("keypress"), 13, verifyAccount);
     $(lnkResendCodeSelector).off("click").click(resendVerificationCode);
 
     $("form").submit(() => false);
 }
 
-function unbindVerificationPageEvents()
+function unbindVerificationPageEventListeners()
 {
     const {
         verificationCodeSelector,
@@ -554,7 +556,7 @@ function unbindVerificationPageEvents()
 
 function verifyAccount()
 {
-    unbindVerificationPageEvents();
+    unbindVerificationPageEventListeners();
     
     if (data.lockedOut)
         return false;
@@ -585,7 +587,6 @@ function verifyAccount()
 
 function accountVerificationFailed(reason)
 {
-    console.error(reason);
     let errorMsg;
 
     if (reason === "no code")
@@ -616,7 +617,7 @@ function accountVerificationFailed(reason)
     if (!data.lockedOut)
     {
         hideValidationErrorsOnChangeEvent(verificationCodeSelector);
-        bindVerificationPageEvents();
+        bindVerificationPageEventListeners();
     }
 }
 
@@ -698,7 +699,6 @@ function abandonGame()
 
 function serverOperationFailed(reason)
 {
-    console.log(reason);
     if (reason.includes("not logged in"))
         window.location.reload(false);
     else
@@ -711,8 +711,8 @@ function serverOperationFailed(reason)
 function tooManyFailedAttempts()
 {
     data.lockedOut = true;
-    unbindLoginPageEvents();
-    unbindVerificationPageEvents();
+    unbindLoginPageEventListeners();
+    unbindVerificationPageEventListeners();
 
     const {
         btnLogInSelector,

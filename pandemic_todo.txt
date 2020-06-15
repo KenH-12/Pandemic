@@ -3,19 +3,13 @@ BUGS
 
 TO DO
 -----
-the extra functionality in the showMainMenu function should be passed as the beforeShow argument for transitionContentTo 
-
-lock account after n attempts
-	login
-	access code
-	account verification
-
 access codes
 	code generation
 	handle valid codes
 		code should become session variable until account is created
 	loading gif
 	handle invalid codes
+		lock account after n failed attempts
 	handle server errors
 
 account creation

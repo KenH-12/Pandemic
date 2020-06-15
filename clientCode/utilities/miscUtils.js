@@ -218,7 +218,7 @@ function devToolsIsOpen()
 	return isOpen;
 }
 
-function bindKeypressEventListener($elements, keyCode, fn)
+function bindKeypressEventListeners($elements, keyCode, fn)
 {
 	$elements.keypress(function(event)
 	{
