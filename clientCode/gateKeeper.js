@@ -15,7 +15,8 @@ const selectors = {
     verificationCodeSelector: "#txtVerificationCode",
     btnVerifySelector: "#btnVerify",
     lnkResendCodeSelector: "#lnkResendCode"
-}
+},
+data = {}
 
 $(function()
 {
@@ -35,6 +36,9 @@ $(function()
 
 function bindLoginPageEvents()
 {
+    if (data.lockedOut)
+        return false;
+    
     const {
             btnLogInSelector,
             usernameSelector,
@@ -54,6 +58,8 @@ function bindLoginPageEvents()
     
     $elementsToBind = $btnAttemptAccess.click(attemptAccess).add(accessCodeSelector);
     bindKeypressEventListener($elementsToBind.off("keypress"), 13, attemptAccess);
+
+    $("form").submit(() => false);
 }
 
 function unbindLoginPageEvents()
@@ -77,6 +83,9 @@ function unbindLoginPageEvents()
 function attemptLogin()
 {
     unbindLoginPageEvents();
+
+    if (data.lockedOut)
+        return false;
 
     const {
             usernameSelector,
@@ -193,7 +202,11 @@ function usernameOrPasswordIsEmpty(credentials)
 
 function invalidCredentials(reason)
 {
-    const { passwordSelector, usernameSelector } = selectors;
+    const {
+        passwordSelector,
+        usernameSelector,
+        btnLogInSelector
+    } = selectors;
     
     let selector,
         errorMsg;
@@ -208,11 +221,20 @@ function invalidCredentials(reason)
         selector = usernameSelector;
         errorMsg = "That username does not exist.";
     }
+    else if (reason.includes("too many failed attempts"))
+    {
+        tooManyFailedAttempts();
+        selector = btnLogInSelector;
+        errorMsg = "Too many failed attempts — try again in 15 minutes.";
+    }
 
     if (selector)
     {
         new ValidationError(selector, errorMsg).show();
-        hideValidationErrorsOnChangeEvent(selector);
+        
+        if (!data.lockedOut)
+            hideValidationErrorsOnChangeEvent(selector);
+        
         return true;
     }
 
@@ -513,6 +535,8 @@ function bindVerificationPageEvents()
     $(btnVerifySelector).off("click").click(verifyAccount).removeClass("btnDisabled").html("Verify");
     bindKeypressEventListener($(verificationCodeSelector).off("keypress"), 13, verifyAccount);
     $(lnkResendCodeSelector).off("click").click(resendVerificationCode);
+
+    $("form").submit(() => false);
 }
 
 function unbindVerificationPageEvents()
@@ -524,13 +548,16 @@ function unbindVerificationPageEvents()
     } = selectors;
 
     $(btnVerifySelector).addClass("btnDisabled").html("Verifying...")
-        .add(lnkResendCodeSelector).off("click");
-    $(verificationCodeSelector).off("keypress");
+        .add(lnkResendCodeSelector).off("click")
+        .add(verificationCodeSelector).off("keypress");
 }
 
 function verifyAccount()
 {
     unbindVerificationPageEvents();
+    
+    if (data.lockedOut)
+        return false;
     
     const { verificationCodeSelector, btnVerifySelector } = selectors,
         verificationCode = $(verificationCodeSelector).val(),
@@ -574,15 +601,23 @@ function accountVerificationFailed(reason)
         
         $instructions.html(`Click the "Resend Code" link below to send a new verification code to ${emailAddress}`);
     }
+    else if (reason.includes("too many failed attempts"))
+    {
+        tooManyFailedAttempts();
+        errorMsg = "Too many failed attempts — try again in 15 minutes."
+    }
     else
         return serverOperationFailed(reason);
     
     const { verificationCodeSelector } = selectors;
 
     new ValidationError(verificationCodeSelector, errorMsg).show();
-    hideValidationErrorsOnChangeEvent(verificationCodeSelector);
 
-    bindVerificationPageEvents();
+    if (!data.lockedOut)
+    {
+        hideValidationErrorsOnChangeEvent(verificationCodeSelector);
+        bindVerificationPageEvents();
+    }
 }
 
 function resendVerificationCode()
@@ -671,4 +706,20 @@ function serverOperationFailed(reason)
         $(".content").remove();
         new ValidationError("#header", "An error occured. <a href=''>Refresh</a> the page and try again.").show();
     }
+}
+
+function tooManyFailedAttempts()
+{
+    data.lockedOut = true;
+    unbindLoginPageEvents();
+    unbindVerificationPageEvents();
+
+    const { btnLogInSelector, btnVerifySelector } = selectors,
+        $btnLogin = $(btnLogInSelector),
+        $btnVerify = $(btnVerifySelector);
+
+    $btnLogin.html("Login Failed");
+    $btnVerify.html("Failure");
+
+    $(".loadingGif").remove();
 }

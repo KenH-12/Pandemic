@@ -63,6 +63,71 @@ function sendVerificationCode($pdo, $userID)
     $headers = "MIME-Version: 1.0\r\nContent-type: text/html; charset=iso-8859-1";
 }
 
+function clearFailedLoginAttempts($pdo)
+{
+    $ip = getClientIpAddress();
+
+    $stmt = $pdo->prepare("DELETE FROM failedLoginAttempt WHERE ipAddress = ?");
+    $stmt->execute([$ip]);
+}
+
+function recordFailedLoginAttempt($pdo, $usernameOrId)
+{
+    $MAX_ATTEMPTS = 10;
+    $ip = getClientIpAddress();
+
+    $timezone = new DateTimeZone("America/Toronto");
+    $fifteenMinsAgo = (new DateTime("15 minutes ago", $timezone))->format("Y-m-d H:i:s");
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS 'numAttempts'
+                            FROM failedLoginAttempt
+                            WHERE ipAddress = ?
+                            AND timeOfAttempt > ?");
+    $stmt->execute([$ip, $fifteenMinsAgo]);
+
+    $numAttempts = $stmt->fetch()["numAttempts"];
+
+    // Don't bother recording more than 10 failed attempts per 15 minute interval.
+    if ($numAttempts >= $MAX_ATTEMPTS)
+        throw new Exception("too many failed attempts");
+
+    // Max not yet reached...
+    
+    // Get the username that was used in the attempt.
+    if (is_numeric($usernameOrId))
+    {
+        $stmt = $pdo->prepare("SELECT username from user WHERE userID = ?");
+        $stmt->execute([$usernameOrId]);
+        
+        if ($stmt->rowCount() === 0)
+            $username = "0";
+        else
+            $username = $stmt->fetch()["username"];
+    }
+    else
+        $username = $usernameOrId;
+    
+    // Record the attempt.
+    $timeOfAttempt = (new DateTime(null, $timezone))->format("Y-m-d H:i:s");
+    $stmt = $pdo->prepare("INSERT INTO failedLoginAttempt (ipAddress, username, timeOfAttempt) VALUES (?, ?, ?)");
+    $stmt->execute([$ip, $username, $timeOfAttempt]);
+
+    // Has the max number of attempts been reached?
+    if ($numAttempts + 1 == $MAX_ATTEMPTS)
+        throw new Exception("too many failed attempts");
+}
+
+function getClientIpAddress()
+{
+    if (isset($_SERVER['HTTP_CLIENT_IP']))
+        return $_SERVER['HTTP_CLIENT_IP'];
+    
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+        return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    
+    return $_SERVER['REMOTE_ADDR'];
+}
+
 function getTurnNumber($pdo, $game)
 {
     $stmt = $pdo->prepare("SELECT turnNum

@@ -56,7 +56,7 @@
                         <div class='content'>
                             <form id='frmLogIn'>
                                 <label for='txtUsername'>Username or Email:</label>
-                                <input id='txtUsername' type='text' />
+                                <input id='txtUsername' type='text' maxlength='20' />
 
                                 <label for='txtPassword'>Password:</label>
                                 <input id='txtPassword' type='password' />

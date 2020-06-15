@@ -29,9 +29,12 @@
         $row = $stmt->fetch();
 
         if ($row["verificationCode"] != $vCode)
+        {
+            recordFailedLoginAttempt($pdo, $userID);
             throw new Exception("invalid code");
+        }
         
-        $now = (new DateTime())->setTimezone(new DateTimeZone('America/Toronto'));
+        $now = new DateTime(null, new DateTimeZone("America/Toronto"));
         if (strtotime($now->format("Y-m-d H:i:s")) > strtotime($row["vCodeExpiry"]))
             throw new Exception("code expired");
 
@@ -40,6 +43,8 @@
 
         if ($stmt->rowCount() !== 1)
             throwException($pdo, "failed to update account status to verified.");
+        
+        clearFailedLoginAttempts($pdo);
         
         $response["success"] = true;
     }

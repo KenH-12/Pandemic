@@ -104,6 +104,16 @@ CREATE TABLE `USER`
 );
 SET GLOBAL time_zone = '-4:00'; -- Toronto
 
+CREATE TABLE failedLoginAttempt
+(
+	attemptID		INT AUTO_INCREMENT,
+	ipAddress		VARCHAR(45),
+	username			VARCHAR(20),
+	timeOfAttempt	DATETIME,
+	
+	CONSTRAINT pk_failedLoginAttempt_attemptID PRIMARY KEY(attemptID)
+);
+
 CREATE TABLE ROLE
 (
 	roleID		TINYINT AUTO_INCREMENT,

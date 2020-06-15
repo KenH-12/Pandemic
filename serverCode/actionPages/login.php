@@ -16,7 +16,10 @@
         $stmt->execute([$username, $username]);
 
         if ($stmt->rowCount() === 0)
+        {
+            recordFailedLoginAttempt($pdo, $username);
             throw new Exception("Username does not exist");
+        }
         
         $user = $stmt->fetch();
         $userID = $user["userID"];
@@ -26,7 +29,12 @@
         $hash = $stmt->fetch()["pass"];
 
         if (!password_verify($data["password"], $hash))
+        {
+            recordFailedLoginAttempt($pdo, $username);
             throw new Exception("Invalid password");
+        }
+
+        clearFailedLoginAttempts($pdo);
         
         session_start();
         $_SESSION["uID"] = $userID;
