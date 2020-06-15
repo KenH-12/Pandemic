@@ -714,12 +714,16 @@ function tooManyFailedAttempts()
     unbindLoginPageEvents();
     unbindVerificationPageEvents();
 
-    const { btnLogInSelector, btnVerifySelector } = selectors,
+    const {
+        btnLogInSelector,
+        btnVerifySelector
+    } = selectors,
         $btnLogin = $(btnLogInSelector),
         $btnVerify = $(btnVerifySelector);
 
     $btnLogin.html("Login Failed");
-    $btnVerify.html("Failure");
+    $btnVerify.html("Failure")
+        .prev().off("keypress");
 
     $(".loadingGif").remove();
 }
