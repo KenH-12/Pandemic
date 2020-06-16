@@ -10,7 +10,7 @@ const selectors = {
     btnAttemptAccessSelector: "#btnAttemptAccess",
     confirmPasswordSelector: "#txtConfirmPassword",
     emailSelector: "#txtEmailAddress",
-    accessCodeSelector: "#txtAccessCode",
+    accessKeySelector: "#txtAccessKey",
     btnCreateAccountSelector: "#btnCreateAccount",
     verificationCodeSelector: "#txtVerificationCode",
     btnVerifySelector: "#btnVerify",
@@ -44,7 +44,7 @@ function bindLoginPageEventListeners()
             usernameSelector,
             passwordSelector,
             btnAttemptAccessSelector,
-            accessCodeSelector
+            accessKeySelector
         } = selectors,
         $btnLogin = $(btnLogInSelector),
         $btnAttemptAccess = $(btnAttemptAccessSelector);
@@ -56,7 +56,7 @@ function bindLoginPageEventListeners()
     let $elementsToBind = $btnLogin.html("Log In").click(attemptLogin).add(usernameSelector).add(passwordSelector);
     bindKeypressEventListeners($elementsToBind.off("keypress"), 13, attemptLogin);
     
-    $elementsToBind = $btnAttemptAccess.click(attemptAccess).add(accessCodeSelector);
+    $elementsToBind = $btnAttemptAccess.click(attemptAccess).add(accessKeySelector);
     bindKeypressEventListeners($elementsToBind.off("keypress"), 13, attemptAccess);
 
     $("form").submit(() => false);
@@ -69,14 +69,14 @@ function unbindLoginPageEventListeners()
         usernameSelector,
         passwordSelector,
         btnAttemptAccessSelector,
-        accessCodeSelector
+        accessKeySelector
     } = selectors;
 
     $(btnLogInSelector).add(btnAttemptAccessSelector)
         .off("click").addClass("btnDisabled")
         .add(usernameSelector)
         .add(passwordSelector)
-        .add(accessCodeSelector)
+        .add(accessKeySelector)
         .off("keypress");
 }
 
@@ -163,19 +163,19 @@ function bindMainMenuEventListeners()
 
 async function attemptAccess()
 {
-    const { accessCodeSelector } = selectors,
-        accessCode = $(accessCodeSelector).val();
+    const { accessKeySelector } = selectors,
+        accessKey = $(accessKeySelector).val();
 
-    if (!accessCode.length)
+    if (!accessKey.length)
     {
-        new ValidationError(accessCodeSelector, "An access code is required to create an account.").show();
-        hideValidationErrorsOnChangeEvent(accessCodeSelector);
+        new ValidationError(accessKeySelector, "An access key is required to create an account.").show();
+        hideValidationErrorsOnChangeEvent(accessKeySelector);
 
         return false;
     }
     
     // TODO: more client-side validation perhaps
-    // TODO: validate access code on server-side
+    // TODO: validate access key on server-side
 
     await transitionPageContentTo("accountCreation.php");
     new UserAccountCreator().bindEventListeners();
