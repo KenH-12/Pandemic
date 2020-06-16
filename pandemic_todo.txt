@@ -3,12 +3,13 @@ BUGS
 
 TO DO
 -----
-access codes
-	code generation
-	handle valid codes
+change "access code" to "access key"
+
+access keys
+	handle valid keys
 		code should become session variable until account is created
 	loading gif
-	handle invalid codes
+	handle invalid keys
 		lock account after n failed attempts
 	handle server errors
 
@@ -20,6 +21,8 @@ account creation
 	password
 		show strength with each keypress
 		forgot your password? process
+
+last active
 
 main menu
 	if the user has won a game, the default difficulty should be normal (or perhaps the last selected difficulty)

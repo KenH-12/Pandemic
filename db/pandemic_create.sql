@@ -13,12 +13,16 @@ DROP TABLE IF EXISTS pandemic;
 DROP TABLE IF EXISTS diseaseStatus;
 DROP TABLE IF EXISTS game;
 DROP TABLE IF EXISTS step;
-DROP TABLE IF EXISTS gameEndCause;
+DROP TABLE IF EXISTS gameendcause;
 DROP TABLE IF EXISTS `user`;
+DROP TABLE IF EXISTS accessKey;
+DROP TABLE IF EXISTS failedLoginAttempt;
 DROP TABLE IF EXISTS role;
 DROP TABLE IF EXISTS cardpile;
 DROP TABLE IF EXISTS cityconnection;
 DROP TABLE IF EXISTS city;
+
+SET GLOBAL time_zone = '-4:00'; -- Toronto
 
 CREATE TABLE step
 (
@@ -89,7 +93,17 @@ SELECT
 FROM pandemic
 INNER JOIN game ON game.gameID = pandemic.gameID;
 
-CREATE TABLE `USER`
+CREATE TABLE accessKey
+(
+	keyCode CHAR(10) NOT NULL,
+	createdFor VARCHAR(50) NOT NULL,
+	createdOn DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	usesRemaining TINYINT DEFAULT 4,
+	
+	CONSTRAINT pk_accessKey_keyCode PRIMARY KEY(keyCode)
+);
+
+CREATE TABLE `user`
 (
 	userID				INT AUTO_INCREMENT,
 	username				VARCHAR(20) NOT NULL,
@@ -99,17 +113,18 @@ CREATE TABLE `USER`
 	vCodeExpiry			DATETIME,
 	accountVerified	BOOL DEFAULT 0,
 	lastActive			DATETIME,
+	accessKeyUsed		CHAR(10) NOT NULL,
 	
-	CONSTRAINT pk_user_userID PRIMARY KEY(userID)
+	CONSTRAINT pk_user_userID PRIMARY KEY(userID),
+	CONSTRAINT fk_user_accessKey FOREIGN KEY(accessKeyUsed) REFERENCES accessKey(keyCode)
 );
-SET GLOBAL time_zone = '-4:00'; -- Toronto
 
 CREATE TABLE failedLoginAttempt
 (
 	attemptID		INT AUTO_INCREMENT,
-	ipAddress		VARCHAR(45),
-	username			VARCHAR(20),
-	timeOfAttempt	DATETIME,
+	ipAddress		VARCHAR(45) NOT NULL,
+	username			VARCHAR(20) NOT NULL,
+	timeOfAttempt	DATETIME NOT NULL,
 	
 	CONSTRAINT pk_failedLoginAttempt_attemptID PRIMARY KEY(attemptID)
 );
