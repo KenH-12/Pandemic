@@ -28,7 +28,10 @@ main menu
 		show a pawn for each role
 		when 'randomize roles' is checked, show pawns with "?" on them
 
-names need to be removed from PlayerPanels when in single player mode
+the dispatch pawn action (discard required) needs a loading gif
+
+display difficulty somewhere on the board
+	above infection rate?
 
 when the game is over
 	navigate back to home scree
@@ -79,8 +82,6 @@ consider removing the special actions container
 
 the 'choose flight type' interface should provide only the flight type options with descriptions viewable on hover
 	when a flight type is selected, the normal action interface should be displayed
-
-display difficulty on board above infection rate
 
 change "x actions remaining" to 4 lights which turn off as actions are used
 

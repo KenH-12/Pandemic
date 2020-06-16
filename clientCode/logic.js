@@ -3592,18 +3592,18 @@ class Player
 	{
 		return new Promise(async resolve =>
 		{
-			const origin = this.getLocation();
+			const origin = this.getLocation(),
+				animatePawns = true;
 			
 			this.$pawn.removeClass(this.cityKey).addClass(destination.key);
-			destination.setPawnIndices();
-			
 			this.cityKey = destination.key;
+			destination.setPawnIndices();
 	
 			$("#travelPathArrowContainer").css("z-index", 4);
 			await Promise.all(
 			[
-				destination.cluster({ animatePawns: true }),
-				origin.cluster({ animatePawns: true })
+				destination.cluster({ animatePawns }),
+				origin.cluster({ animatePawns })
 			]);
 
 			hideTravelPathArrow();
@@ -6826,6 +6826,7 @@ async function setup()
 	
 	await parseEvents(events);
 	loadGamestate(gamestate);
+	const isNewGame = currentStepIs("setup");
 	loadCityStates(cities);
 
 	gameData.startingHandPopulations = startingHandPopulations;
@@ -6840,12 +6841,13 @@ async function setup()
 	loadInfectionDiscards(infectionDiscards);
 	loadPlayerCards(playerCards);
 
-	getActivePlayer().getLocation().setPawnIndices();
 	await resizeAll();
 
-	// Delay clustering to ensure cluster accuracy.
-	await sleep(100);
-	executePendingClusters();
+	if (!isNewGame)
+	{
+		getActivePlayer().getLocation().setPawnIndices();
+		executePendingClusters();
+	}
 
 	if (isOneQuietNight())
 		indicateOneQuietNightStep();
@@ -6858,7 +6860,7 @@ async function setup()
 	bindEventCardHoverEvents();
 	enablePlayerDiscardHoverEvents();
 	
-	if (currentStepIs("setup"))
+	if (isNewGame)
 	{
 		gameData.allRoles = allRoles;
 		animateNewGameSetup();
@@ -7564,6 +7566,7 @@ function placePawnsInAtlanta()
 			duration: getDuration(400)
 		});
 		pinpointCity(ATLANTA_KEY);
+		await sleep(400);
 	
 		for (let rID in players)
 		{
@@ -7571,6 +7574,7 @@ function placePawnsInAtlanta()
 			appendPawnToBoard(player);
 			queueCluster(player.cityKey);
 		}
+		getCity(ATLANTA_KEY).setPawnIndices();
 		executePendingClusters();
 		
 		for (let rID of turnOrder)

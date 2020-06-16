@@ -191,14 +191,14 @@ export default class City
 	setPawnIndices()
 	{
 		const activePlayer = getActivePlayer(),
-			activePawn = activePlayer.$pawn;
+			$activePawn = activePlayer.$pawn,
+			{ key } = this,
+			$allPawnsInCity = $(`.${key}.pawn`);
 		
-		if (activePlayer.cityKey == this.key && $(`.${this.key}.pawn`).length > 2)
+		if (activePlayer.cityKey === key && $allPawnsInCity.length > 2)
 		{
-			activePawn.data("pawnIndex", "1");
-			
-			const otherPawns = $(`.${this.key}.pawn`).not(`#${activePawn.attr("id")}`);
-			otherPawns.data("pawnIndex", "0");
+			$activePawn.data("pawnIndex", "1");
+			$allPawnsInCity.not($activePawn).data("pawnIndex", "0");
 		}
 
 		return this;
