@@ -29,11 +29,13 @@
         $EVENT_CODE = "ef";
 
          // Get the bottom card from the infection deck.
-         $stmt = $pdo->prepare("SELECT MIN(cardIndex), cardKey, color
+         $stmt = $pdo->prepare("SELECT cardKey, color
                                 FROM vw_infectioncard
                                 WHERE game = ?
                                 AND pile = 'deck'
-                                AND cardIndex IS NOT NULL");
+                                AND cardIndex IS NOT NULL
+                                ORDER BY cardIndex
+                                LIMIT 1");
         $stmt->execute([$game]);
         $bottomCard = $stmt->fetch();
 
