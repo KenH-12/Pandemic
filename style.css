@@ -43,7 +43,9 @@ body
 	-ms-user-select: none;       /* Internet Explorer/Edge */
 }
 input, select { background-color: #fff }
-input[type='text'] { cursor: text }
+input[type='text'],
+input[type='password']
+{ cursor: text }
 #lobby {
 	--lobby-padding: 30px;
 	--lobby-full-width: 560px;

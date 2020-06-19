@@ -3,15 +3,26 @@ BUGS
 
 TO DO
 -----
-change "access code" to "access key"
-
 access keys
 	handle valid keys
 		code should become session variable until account is created
-	loading gif
-	handle invalid keys
-		lock account after n failed attempts
-	handle server errors
+	form to request a new key
+		details of request:
+			why should I give them a key?
+				which company are they from?
+			how many accounts do they want?
+			to which email address should the key be sent
+		submitting the form should send me an email which includes:
+			the request details
+			a denial button
+				sends an email saying that their request has been denied because the app is exclusive
+			an approval button
+				approval button links to the password-protected "grant access key" page
+					email address is autofilled
+					editable textbox autofilled with the provided company name
+					ddl for number of uses
+					grant access key button
+						generates a new key and emails it
 
 account creation
 	test send confirmation email

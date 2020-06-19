@@ -161,9 +161,9 @@ function bindMainMenuEventListeners()
     });
 }
 
-async function attemptAccess()
+function attemptAccess()
 {
-    const { accessKeySelector } = selectors,
+    const { accessKeySelector, btnAttemptAccessSelector } = selectors,
         accessKey = $(accessKeySelector).val();
 
     if (!accessKey.length)
@@ -173,12 +173,51 @@ async function attemptAccess()
 
         return false;
     }
-    
-    // TODO: more client-side validation perhaps
-    // TODO: validate access key on server-side
 
-    await transitionPageContentTo("accountCreation.php");
-    new UserAccountCreator().bindEventListeners();
+    unbindLoginPageEventListeners();
+    const $loadingGif = $(strings.loadingGifHtml).insertAfter(btnAttemptAccessSelector);
+    
+    postData("serverCode/actionPages/verifyAccessKey.php", { accessKey })
+        .then(async response =>
+        {
+            $loadingGif.remove();
+
+            if (response.failure)
+                return invalidAccessKey(response.failure);
+
+            await transitionPageContentTo("accountCreation.php");
+            new UserAccountCreator().bindEventListeners();
+        })
+        .catch(e => serverOperationFailed(e.message));
+}
+
+function invalidAccessKey(reason)
+{
+    let errorMsg;
+
+    if (reason.includes("invalid key"))
+        errorMsg = "Invalid key";
+    else if (reason.includes("key depleted"))
+        errorMsg = "That key has already been used the maximum number of times.";
+    else if (reason.includes("too many failed attempts"))
+    {
+        tooManyFailedAttempts();
+        errorMsg = "Too many failed attempts — try again in 15 minutes.";
+    }
+    
+    if (errorMsg)
+    {
+        const { accessKeySelector } = selectors;
+        new ValidationError(accessKeySelector, errorMsg).show();
+        
+        if (!data.lockedOut)
+        {
+            hideValidationErrorsOnChangeEvent(accessKeySelector);
+            bindLoginPageEventListeners();
+        }
+    }
+    else
+        serverOperationFailed(reason);
 }
 
 function usernameOrPasswordIsEmpty(credentials)
@@ -714,16 +753,8 @@ function tooManyFailedAttempts()
     unbindLoginPageEventListeners();
     unbindVerificationPageEventListeners();
 
-    const {
-        btnLogInSelector,
-        btnVerifySelector
-    } = selectors,
-        $btnLogin = $(btnLogInSelector),
-        $btnVerify = $(btnVerifySelector);
-
-    $btnLogin.html("Login Failed");
-    $btnVerify.html("Failure")
-        .prev().off("keypress");
+    
+    $(selectors.btnVerifySelector).prev().off("keypress");
 
     $(".loadingGif").remove();
 }
