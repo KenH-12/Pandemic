@@ -3,9 +3,9 @@ BUGS
 
 TO DO
 -----
+verification code should be a table with a userID fk
+
 access keys
-	handle valid keys
-		code should become session variable until account is created
 	form to request a new key
 		details of request:
 			why should I give them a key?

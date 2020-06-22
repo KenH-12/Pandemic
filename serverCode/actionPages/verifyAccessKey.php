@@ -24,13 +24,11 @@
             throw new Exception("invalid key");
         }
         
-        $row = $stmt->fetch();
-
-        if ($row["usesRemaining"] == "0")
+        if ($stmt->fetch()["usesRemaining"] == "0")
             throw new Exception("key depleted");
         
         session_start();
-        $_SESSION["key"] = $accessKey;
+        $_SESSION["accessKey"] = $accessKey;
         
         clearFailedLoginAttempts($pdo);
         

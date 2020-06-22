@@ -16,7 +16,7 @@
                     <label for='txtConfirmPassword'>Confirm Password:</label>
                     <input id='txtConfirmPassword' type='password' autocomplete='new-password' />
 
-                    <div id='btnCreateAccount' class='button'>Create Account</div>
+                    <div id='btnCreateAccount' class='button' tabindex='0'>Create Account</div>
                     <p class='validationError errorSummary hidden'>Please fix the above error(s).</p>
                 </form>
             </div>";
