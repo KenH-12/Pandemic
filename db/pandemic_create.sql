@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS diseaseStatus;
 DROP TABLE IF EXISTS game;
 DROP TABLE IF EXISTS step;
 DROP TABLE IF EXISTS gameendcause;
+DROP TABLE IF EXISTS verificationCode;
 DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS accessKey;
 DROP TABLE IF EXISTS failedLoginAttempt;
@@ -109,14 +110,22 @@ CREATE TABLE `user`
 	username				VARCHAR(20) NOT NULL,
 	pass					VARCHAR(255) NOT NULL,
 	email					VARCHAR(320) NOT NULL,
-	verificationCode	INT,
-	vCodeExpiry			DATETIME,
 	accountVerified	BOOL DEFAULT 0,
 	lastActive			DATETIME,
 	accessKeyUsed		CHAR(10) NOT NULL,
 	
 	CONSTRAINT pk_user_userID PRIMARY KEY(userID),
 	CONSTRAINT fk_user_accessKey FOREIGN KEY(accessKeyUsed) REFERENCES accessKey(keyCode)
+);
+
+CREATE TABLE verificationCode
+(
+	vCode		INT,
+	expiry	DATETIME,
+	userID	INT,
+	
+	CONSTRAINT pk_verificationCode_vCode PRIMARY KEY(vCode),
+	CONSTRAINT fk_user_verificationCode FOREIGN KEY(userID) REFERENCES `user`(userID)
 );
 
 CREATE TABLE failedLoginAttempt

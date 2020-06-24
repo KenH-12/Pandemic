@@ -20,7 +20,7 @@
         $userID = $_SESSION["uID"];
         $vCode = $data["verificationCode"];
 
-        $stmt = $pdo->prepare("SELECT verificationCode, vCodeExpiry FROM `user` WHERE userID = ?");
+        $stmt = $pdo->prepare("SELECT vCode, expiry FROM verificationCode WHERE userID = ?");
         $stmt->execute([$userID]);
 
         if ($stmt->rowCount() === 0)
@@ -31,7 +31,7 @@
         
         $row = $stmt->fetch();
 
-        if ($row["verificationCode"] != $vCode)
+        if ($row["vCode"] != $vCode)
         {
             recordFailedLoginAttempt($pdo, $userID, $ipAddress);
             throwExceptionIfFailedAttemptLimitReached($failedAttemptCount + 1);
@@ -40,8 +40,16 @@
         }
         
         $now = new DateTime(null, new DateTimeZone("America/Toronto"));
-        if (strtotime($now->format("Y-m-d H:i:s")) > strtotime($row["vCodeExpiry"]))
+        if (strtotime($now->format("Y-m-d H:i:s")) > strtotime($row["expiry"]))
             throw new Exception("code expired");
+
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare("DELETE FROM verificationCode WHERE userID = ?");
+        $stmt->execute([$userID]);
+
+        if ($stmt->rowCount() !== 1)
+            throwException($pdo, "failed to delete verification code.");
 
         $stmt = $pdo->prepare("UPDATE `user` SET accountVerified = 1 WHERE userID = ?");
         $stmt->execute([$userID]);
@@ -63,6 +71,14 @@
     }
     finally
     {
+        if ($pdo->inTransaction())
+        {
+            if (isset($response["failure"]))
+                $pdo->rollback();
+            else
+                $pdo->commit();
+        }
+        
         echo json_encode($response);
     }
 ?>
