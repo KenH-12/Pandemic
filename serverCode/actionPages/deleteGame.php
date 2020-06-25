@@ -12,13 +12,17 @@
         
         $uID = $_SESSION["uID"];
 
-        $stmt = $pdo->prepare("SELECT game FROM vw_player WHERE uID = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT gameID FROM game
+                                INNER JOIN vw_player ON game.gameID = vw_player.game 
+                                WHERE uID = ?
+                                AND endCauseID IS NULL
+                                LIMIT 1");
         $stmt->execute([$uID]);
         
         if ($stmt->rowCount() === 0)
             throw new Exception("game not found");
         
-        $game = $stmt->fetch()["game"];
+        $game = $stmt->fetch()["gameID"];
 
         $pdo->beginTransaction();
 
