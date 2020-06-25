@@ -1,7 +1,7 @@
-CREATE FUNCTION `udf_generateVerificationCode`(
+CREATE DEFINER=`root`@`localhost` FUNCTION `udf_generateVerificationCode`(
 	`uID` INT
 )
-RETURNS INT
+RETURNS int(11)
 LANGUAGE SQL
 NOT DETERMINISTIC
 CONTAINS SQL
@@ -14,15 +14,15 @@ BEGIN
 	DO
 		SET vCode = udf_getRandBetween(10000, 99999);
 		
-		IF vCode IN (SELECT verificationCode FROM `user`) THEN
+		IF vCode IN (SELECT vCode FROM verificationCode) THEN
 			SET vCode = 0;
 		END IF;
 	END WHILE;
 	
-	UPDATE `user`
-	SET verificationCode = vCode,
-		vCodeExpiry = DATE_ADD(NOW(), INTERVAL 1 HOUR)
-	WHERE userID = uID;
+	INSERT INTO verificationCode
+		(vCode, expiry, userID)
+	VALUES
+		(vCode, DATE_ADD(NOW(), INTERVAL 1 HOUR), uID);
 	
 	IF ROW_COUNT() != 1 THEN
 		SET vCode = 0;
