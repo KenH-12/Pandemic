@@ -91,15 +91,19 @@ BEGIN
 			END IF;
 			
 			IF playersNeedCards THEN
+			
+				SET handID = NULL;
 				-- Get the pileID of a player who still needs cards, which is also their roleID
-				SET handID = (SELECT rID
-									FROM vw_player
-									LEFT OUTER JOIN vw_playerCard
-									ON vw_player.rID = vw_playerCard.pileID
-									WHERE vw_player.game = gID
-									GROUP BY rID
-									HAVING COUNT(*) < startingHandSize
-									LIMIT 1);
+				SELECT rID INTO handID
+				FROM vw_player
+				WHERE game = gID
+				AND rID NOT IN (SELECT pileID
+									FROM vw_playercard
+									WHERE game = gID
+									AND pile != 'deck'
+									GROUP BY pileID
+									HAVING COUNT(*) = startingHandSize)
+				LIMIT 1;
 				
 				IF handID IS NOT NULL THEN
 					-- Get the next index within the player's hand.
