@@ -49,6 +49,7 @@
 						<h2 class='cardsDefeat hidden'>Your team ran out of time!</h2>
 						<h3 class='cardsDefeat hidden'>(unable to draw 2 cards)</h3>
 					</div>
+					<div id='btnMainMenu' class='button hidden'>RETURN TO MAIN MENU</div>
 				</div>
 				<div id='container'>
 

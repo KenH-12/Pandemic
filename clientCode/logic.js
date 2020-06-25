@@ -6461,8 +6461,10 @@ async function outbreakDefeatAnimation()
 async function endGame()
 {
 	const $curtain = $("#curtain"),
+		$btnMainMenu = $curtain.children("#btnMainMenu"),
 		hidden = "hidden",
-		{ gameEndCause, boardHeight } = gameData;
+		{ gameEndCause, boardHeight } = gameData,
+		initialProperties = { opacity: 0 };
 
 	$curtain.children("p").addClass(hidden);
 
@@ -6478,16 +6480,22 @@ async function endGame()
 	$curtain.find(selectorToShow).removeClass(hidden)
 		.first().css("margin-top", boardHeight / 3);
 	
-	await animationPromise(
-	{
+	await animationPromise({
 		$elements: $curtain.removeAttr("style").removeClass("hidden"),
-		initialProperties: { opacity: 0 },
+		initialProperties,
 		desiredProperties: { opacity: 0.9 },
 		duration: 1000,
 		easing: "easeInOutQuint"
 	});
 
-	// TODO: show options for what to do after the game ends
+	await sleep(750);
+
+	animationPromise({
+		$elements: $btnMainMenu.click(() => window.location.replace("index.php")).removeClass(hidden),
+		initialProperties,
+		desiredProperties: { opacity: 1.1 },
+		duration: 750
+	});
 }
 
 function animateDiscoverCure(diseaseColor, diseaseStatus)

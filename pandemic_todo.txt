@@ -3,6 +3,8 @@ BUGS
 
 TO DO
 -----
+don't show games that have ended as 'in progress'
+
 access keys
 	form to request a new key
 		details of request:
@@ -40,13 +42,8 @@ main menu
 		show a pawn for each role
 		when 'randomize roles' is checked, show pawns with "?" on them
 
-the dispatch pawn action (discard required) needs a loading gif
-
 display difficulty somewhere on the board
 	above infection rate?
-
-when the game is over
-	navigate back to home scree
 
 load other js files only when necessary
 

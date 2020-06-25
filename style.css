@@ -298,15 +298,20 @@ html,
 #curtain h1,
 #curtain h2,
 #curtain h3
-{
-	text-align: center;
-}
+{ text-align: center }
 #curtain h2,
 #curtain h3
 { font-family: 'Oswald', sans-serif }
 #curtain h1 { font-size: 60px }
 #curtain h2 { font-size: 26px }
 #curtain h3 { font-size: 16px; font-weight: 400; }
+#curtain .button
+{
+	width: 26%;
+	padding: 1%;
+	margin: 3% 37%;
+	font-size: 20px;
+}
 .pinpointRect,
 .infectionRateHighlight,
 .outbreaksHighlight,
