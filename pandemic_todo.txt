@@ -3,7 +3,8 @@ BUGS
 
 TO DO
 -----
-don't show games that have ended as 'in progress'
+record important details about completed games before deleting them
+	currently completed games and all related records remain in the database
 
 access keys
 	form to request a new key

@@ -3154,7 +3154,7 @@ async function animateDrawStep(cardDrawEvent)
 	if (gameData.gameEndCause) // not enough player cards remain in the deck -- the players lose.
 	{
 		await sleep(getDuration("longInterval"));
-		reject("Out of player cards -- the players lose.");
+		Promise.reject("Out of player cards -- the players lose.");
 		return outOfPlayerCardsDefeatAnimation($container);
 	}
 

@@ -11,17 +11,21 @@
         
         $uID = $_SESSION["uID"];
 
-        $stmt = $pdo->prepare("SELECT game FROM vw_player WHERE uID = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT gameID, epidemicCards, turnNumber FROM game
+                                INNER JOIN vw_player ON game.gameID = vw_player.game
+                                WHERE uID = ?
+                                AND endCauseID IS NULL
+                                LIMIT 1");
         $stmt->execute([$uID]);
 
         $gameInProgress = $stmt->rowCount() === 1;
 
         if ($gameInProgress)
         {
-            $game = $stmt->fetch()["game"];
-
-            $stmt = $pdo->query("SELECT numEpidemics FROM vw_gamestate WHERE game = $game");
-            $numEpidemics = $stmt->fetch()["numEpidemics"];
+            $gameDetails = $stmt->fetch();
+            $game = $gameDetails["gameID"];
+            $numEpidemics = $gameDetails["epidemicCards"];
+            $numTurns = $gameDetails["turnNumber"];
 
             if ($numEpidemics == 4)
                 $difficulty = "Introductory";
@@ -49,9 +53,6 @@
             foreach ($diseaseStatuses as $key => $status)
                 if ($status !== "rampant")
                     $numCures++;
-            
-            $stmt = $pdo->query("SELECT turnNum FROM vw_gamestate WHERE game = $game");
-            $numTurns = $stmt->fetch()["turnNum"];
             
             $content = "<div id='gameInProgress'>
                             <h3>GAME IN PROGRESS:</h3>
@@ -119,7 +120,7 @@
     finally
     {
         if (isset($failure))
-            echo "An error occured... sorry about that!<br/>Refresh the page and try again.";
+            echo "An error occured... sorry about that!<br/><a href=''>Refresh</a> the page and try again.";
         else
             echo $content;
     }
