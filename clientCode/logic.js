@@ -923,13 +923,13 @@ const actionInterfacePopulator = {
 		const {
 				driveFerry,
 				shuttleFlight,
-				dispatchPawn,
+				rendezvous,
 				treatDisease
 			} = eventTypes,
 			immediatelyExecutedEventTypeCodes = [
 				driveFerry.code,
 				shuttleFlight.code,
-				dispatchPawn.code,
+				rendezvous.code,
 				treatDisease.code
 			];
 		
@@ -940,7 +940,7 @@ const actionInterfacePopulator = {
 			relevantEventTypeName = relevantEventType.name.toUpperCase();
 
 		let promptingRelevantEventType = false;
-		if (relevantEventType.code !== dispatchPawn.code)
+		if (relevantEventType.code !== rendezvous.code)
 		{
 			for (let i = 0; i < $promptedActionTitles.length; i++)
 			{
@@ -1080,7 +1080,7 @@ const actionInterfacePopulator = {
 		
 		return actionInterfacePopulator;
 	},
-	appendDiscardPrompt({ cardKeys, promptMsg, buttonText, onConfirm, flightType } = {})
+	appendDiscardPrompt({ cardKeys, promptMsg, buttonText, onConfirm, flightType, isDispatch } = {})
 	{
 		const { $actionInterface } = actionInterfacePopulator,
 			buttonClass = "btnConfirm",
@@ -1119,7 +1119,7 @@ const actionInterfacePopulator = {
 					.addClass("btnDisabled")
 					.html("CONFIRMING...");
 				
-				actionInterfacePopulator.removeUnchosenFlightTypes(flightType);
+				actionInterfacePopulator.removeUnchosenFlightTypes(flightType, isDispatch);
 				
 				onConfirm($btnConfirm);
 			});
@@ -1132,13 +1132,29 @@ const actionInterfacePopulator = {
 
 		return actionInterfacePopulator;
 	},
-	removeUnchosenFlightTypes(chosenFlightType)
+	removeUnchosenFlightTypes(chosenFlightType, isDispatch)
 	{
 		if (!chosenFlightType)
 			return actionInterfacePopulator;
 		
+		const { $actionInterface } = actionInterfacePopulator;
+		
+		if (isDispatch)
+		{
+			$actionInterface.find(".btnConfirm").off("click").addClass("btnDisabled");
+			
+			const $dispatchMethod = $actionInterface.find(`.dispatchTypeInfo[data-eventtype='${chosenFlightType.code}']`);
+			
+			$dispatchMethod.closest(".discardSelections")
+					.siblings(".discardSelections, .actionInterfaceDivision")
+					.add($dispatchMethod.siblings(".questionMark"))
+					.remove();
+			
+			return actionInterfacePopulator;
+		}
+		
 		const titleSelector = `.actionTitle[data-eventType='${chosenFlightType.code}']`,
-			$chosenFlightTypeTitle = actionInterfacePopulator.$actionInterface.find(titleSelector),
+			$chosenFlightTypeTitle = $actionInterface.find(titleSelector),
 			$nextInterfaceDivision = $chosenFlightTypeTitle.nextAll(".actionInterfaceDivision").first();
 			
 		$chosenFlightTypeTitle.prevAll().remove();
@@ -1545,22 +1561,32 @@ const actionInterfacePopulator = {
 			{
 				newSubtitle += "...<br/><br/>";
 				
+				const isDispatch = true,
+					buttonText = "CONFIRM",
+					questionMark = "<span class='questionMark'>?</span>";
+				
 				actionInterfacePopulator
 					.appendDiscardPrompt(
 					{
+						isDispatch,
 						flightType: directFlight,
 						cardKeys: destination.key,
-						promptMsg: `<span class='largeText'>via ${getDispatchInstructionTooltip(directFlight)}?</span><br/><br/>Discard:`,
-						buttonText: "CONFIRM",
+						promptMsg: `<span class='largeText'>
+										via ${getDispatchInstructionTooltip(directFlight)}${questionMark}
+									</span><br/><br/>Discard:`,
+						buttonText,
 						onConfirm: function() { movementAction(directFlight, destination, { playerToDispatch }) }
 					})
 					.appendDivision()
 					.appendDiscardPrompt(
 					{
+						isDispatch,
 						flightType: charterFlight,
 						cardKeys: playerToDispatch.cityKey,
-						promptMsg: `<span class='largeText'>via ${getDispatchInstructionTooltip(charterFlight)}?</span><br/><br/>Discard:`,
-						buttonText: "CONFIRM",
+						promptMsg: `<span class='largeText'>
+										via ${getDispatchInstructionTooltip(charterFlight)}${questionMark}
+									</span><br/><br/>Discard:`,
+						buttonText,
 						onConfirm: function() { movementAction(charterFlight, destination, { playerToDispatch }) }
 					});
 			}
@@ -2792,7 +2818,7 @@ function movementAction(eventType, destination, { playerToDispatch, operationsFl
 	
 	// Move appears to be valid
 	disableActions();
-	actionInterfacePopulator.closeIrrelevantPrompts(playerToDispatch ? eventTypes.dispatchPawn : eventType, { destination });
+	actionInterfacePopulator.closeIrrelevantPrompts(eventType, { destination });
 
 	if (!movementTypeRequiresDiscard(eventType))
 	{
