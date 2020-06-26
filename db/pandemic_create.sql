@@ -5,6 +5,8 @@ DROP VIEW IF EXISTS vw_infectionCard;
 DROP VIEW IF EXISTS vw_player;
 DROP VIEW IF EXISTS vw_gamestate;
 DROP VIEW IF EXISTS vw_disease;
+DROP TABLE IF EXISTS gameRecord;
+DROP TABLE IF EXISTS roleRecord;
 DROP TABLE IF EXISTS epidemicintensify;
 DROP TABLE IF EXISTS eventhistory;
 DROP TABLE IF EXISTS player;
@@ -138,7 +140,7 @@ CREATE TABLE failedLoginAttempt
 	CONSTRAINT pk_failedLoginAttempt_attemptID PRIMARY KEY(attemptID)
 );
 
-CREATE TABLE ROLE
+CREATE TABLE role
 (
 	roleID		TINYINT AUTO_INCREMENT,
 	roleName		VARCHAR(21) NOT NULL,
@@ -146,7 +148,7 @@ CREATE TABLE ROLE
 	CONSTRAINT pk_role_roleID PRIMARY KEY(roleID)
 );
 
-CREATE TABLE CITY
+CREATE TABLE city
 (
 	cityKey			CHAR(4) NOT NULL,
 	population		INT NOT NULL,
@@ -155,7 +157,7 @@ CREATE TABLE CITY
 	CONSTRAINT pk_city_cityKey PRIMARY KEY(cityKey)
 );
 
-CREATE TABLE CITYCONNECTION
+CREATE TABLE cityConnection
 (
 	cityKeyA CHAR(4) NOT NULL,
 	cityKeyB CHAR(4) NOT NULL,
@@ -232,7 +234,7 @@ FROM location
 INNER JOIN city ON location.cityKey = city.cityKey
 INNER JOIN cardpile ON location.infectionCardPileID = cardpile.ID;
 
-CREATE TABLE PLAYER
+CREATE TABLE player
 (
 	playerID		INT AUTO_INCREMENT,
 	nextRoleID	INT DEFAULT 0,
@@ -284,7 +286,7 @@ SELECT	eventID AS id,
 			gameID AS game
 FROM eventhistory;
 
-CREATE TABLE EPIDEMICINTENSIFY
+CREATE TABLE epidemicIntensify
 (
 	eventID		INT NOT NULL,
 	cityKey		CHAR(4) NOT NULL,
@@ -310,3 +312,23 @@ FROM game
 INNER JOIN step ON game.stepID = step.stepID
 INNER JOIN player ON game.gameID = player.gameID
 WHERE turnRoleID = roleID;
+
+CREATE TABLE gameRecord
+(
+	recordID			INT AUTO_INCREMENT,
+	numEpidemics	TINYINT NOT NULL,
+	endCauseID		TINYINT NOT NULL,
+	
+	CONSTRAINT pk_gameRecord_recordID PRIMARY KEY (recordID),
+	CONSTRAINT fk_gameEndCause_gameRecord FOREIGN KEY (endCauseID) REFERENCES gameEndCause (endCauseID)
+);
+
+CREATE TABLE roleRecord
+(
+	recordID INT NOT NULL,
+	roleID TINYINT NOT NULL,
+	
+	CONSTRAINT pk_roleRecord_recordID_roleID PRIMARY KEY (recordID, roleID),
+	CONSTRAINT fk_gameRecord_roleRecord FOREIGN KEY (recordID) REFERENCES gameRecord (recordID),
+	CONSTRAINT fk_role_roleRecord FOREIGN KEY (roleID) REFERENCES role (roleID)
+);
