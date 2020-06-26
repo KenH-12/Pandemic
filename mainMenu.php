@@ -30,7 +30,7 @@
             if ($numEpidemics == 4)
                 $difficulty = "Introductory";
             else if ($numEpidemics == 5)
-                $difficulty = "Normal";
+                $difficulty = "Standard";
             else
                 $difficulty = "Heroic";
 
@@ -88,8 +88,8 @@
                                 <label for='radIntroductory'>Introductory</label>
                             </div>
                             <div>
-                                <input type='radio' name='radDifficulty' id='radNormal' value='5'>
-                                <label for='radNormal'>Normal</label>
+                                <input type='radio' name='radDifficulty' id='radStandard' value='5'>
+                                <label for='radStandard'>Standard</label>
                             </div>
                             <div>
                                 <input type='radio' name='radDifficulty' id='radHeroic' value='6'>

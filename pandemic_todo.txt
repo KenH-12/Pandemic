@@ -43,9 +43,6 @@ main menu
 		show a pawn for each role
 		when 'randomize roles' is checked, show pawns with "?" on them
 
-display difficulty somewhere on the board
-	above infection rate?
-
 load other js files only when necessary
 
 when a city or contained piece is hovered, show the city name in a larger fontn
