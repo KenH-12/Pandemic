@@ -35,11 +35,11 @@
     }
     catch(PDOException $e)
     {
-        $response["failure"] = "Failed to delete game: " . $e->getMessage();
+        $response["failure"] = "Failed to abandon game: " . $e->getMessage();
     }
     catch(Exception $e)
     {
-        $response["failure"] = "Failed to delete game: " . $e->getMessage();
+        $response["failure"] = "Failed to abandon game: " . $e->getMessage();
     }
     finally
     {

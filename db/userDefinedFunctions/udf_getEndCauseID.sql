@@ -1,5 +1,5 @@
 CREATE DEFINER=`root`@`localhost` FUNCTION `udf_getEndCauseID`(
-	`endCauseDescription` VARCHAR(8)
+	`endCauseDescription` VARCHAR(9)
 )
 RETURNS tinyint(4)
 LANGUAGE SQL
