@@ -26,6 +26,8 @@
 
         $pdo->beginTransaction();
 
+        recordGameEndCause($pdo, $game, "abandoned");
+
         $stmt = $pdo->query("DELETE FROM epidemicIntensify WHERE eventID IN (SELECT eventID FROM eventHistory WHERE gameID = $game)");
         if (queryCausedError($pdo))
             throwException($pdo, "failed to delete epidemic intensify records");

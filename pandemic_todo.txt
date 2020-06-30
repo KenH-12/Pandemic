@@ -3,8 +3,7 @@ BUGS
 
 TO DO
 -----
-record important details about completed games before deleting them
-	currently completed games and all related records remain in the database
+delete completed games
 
 access keys
 	form to request a new key

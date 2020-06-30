@@ -1145,6 +1145,8 @@ function recordGameEndCause($pdo, $game, $endCauseName)
     
     if ($stmt->rowCount() !== 1)
         throwException($pdo, "Failed to record game end cause");
+
+    recordCompletedGame($pdo, $game);    
 }
 
 function getGameEndCause($pdo, $game)
@@ -1158,6 +1160,36 @@ function getGameEndCause($pdo, $game)
     $endCauseID = $stmt->fetch()["endCauseID"];
     $result = $pdo->query("SELECT udf_getEndCauseDescription($endCauseID) AS 'endCause'");
     return $result->fetch()["endCause"];
+}
+
+function recordCompletedGame($pdo, $game)
+{
+    $stmt = $pdo->prepare("SELECT numEpidemics, endCauseID FROM game WHERE gameID = ?");
+    $stmt->execute([$game]);
+    $gameDetails = $stmt->fetch();
+
+    $numEpidemics = $gameDetails["numEpidemics"];
+    $endCauseID = $gameDetails["endCauseID"];
+
+    $stmt = $pdo->query("INSERT INTO gameRecord (numEpidemics, endCauseID) VALUES ($numEpidemics, $endCauseID)");
+
+    if ($stmt->rowCount() !== 1)
+        throwException($pdo, "failed to record completed game.");
+
+    $recordID = lastInsertId();
+
+    $stmt = $pdo->prepare("SELECT rID FROM vw_player WHERE game = ?");
+    $stmt->execute([$game]);
+    $roleNames = $stmt->fetchAll();
+
+    $stmt = $pdo->prepare("INSERT INTO roleRecord (recordID, roleID) VALUES ($recordID, ?)");
+    foreach ($row in $roleNames)
+    {
+        $stmt->execute([$row["rID"]]);
+
+        if ($stmt->rowCount() !== 1)
+            throwException($pdo, "failed to record role of completed game.");
+    }
 }
 
 function getEventById($pdo, $game, $eventID)

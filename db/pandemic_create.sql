@@ -5,8 +5,8 @@ DROP VIEW IF EXISTS vw_infectionCard;
 DROP VIEW IF EXISTS vw_player;
 DROP VIEW IF EXISTS vw_gamestate;
 DROP VIEW IF EXISTS vw_disease;
-DROP TABLE IF EXISTS gameRecord;
-DROP TABLE IF EXISTS roleRecord;
+DROP TABLE IF EXISTS rolerecord;
+DROP TABLE IF EXISTS gamerecord;
 DROP TABLE IF EXISTS epidemicintensify;
 DROP TABLE IF EXISTS eventhistory;
 DROP TABLE IF EXISTS player;
@@ -35,10 +35,10 @@ CREATE TABLE step
 	CONSTRAINT pk_step_stepID PRIMARY KEY(stepID)
 );
 
-CREATE TABLE gameEndCause
+CREATE TABLE gameendcause
 (
 	endCauseID	TINYINT AUTO_INCREMENT,
-	description	VARCHAR(8) NOT NULL, -- 'victory','outbreak', 'cubes', or 'cards'
+	description	VARCHAR(9) NOT NULL, -- 'victory', 'outbreak', 'cubes', or 'cards'
 	
 	CONSTRAINT pk_gameEndCause_endCauseID PRIMARY KEY(endCauseID)
 );
