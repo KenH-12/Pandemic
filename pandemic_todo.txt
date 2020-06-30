@@ -3,8 +3,6 @@ BUGS
 
 TO DO
 -----
-delete completed games
-
 access keys
 	form to request a new key
 		details of request:

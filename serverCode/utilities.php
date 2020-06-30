@@ -1164,32 +1164,59 @@ function getGameEndCause($pdo, $game)
 
 function recordCompletedGame($pdo, $game)
 {
-    $stmt = $pdo->prepare("SELECT numEpidemics, endCauseID FROM game WHERE gameID = ?");
+    $stmt = $pdo->prepare("SELECT endCauseID, epidemicCards FROM game WHERE gameID = ?");
     $stmt->execute([$game]);
     $gameDetails = $stmt->fetch();
 
-    $numEpidemics = $gameDetails["numEpidemics"];
     $endCauseID = $gameDetails["endCauseID"];
+    $numEpidemics = $gameDetails["epidemicCards"];
 
     $stmt = $pdo->query("INSERT INTO gameRecord (numEpidemics, endCauseID) VALUES ($numEpidemics, $endCauseID)");
 
     if ($stmt->rowCount() !== 1)
         throwException($pdo, "failed to record completed game.");
 
-    $recordID = lastInsertId();
+    $recordID = $pdo->lastInsertId();
 
     $stmt = $pdo->prepare("SELECT rID FROM vw_player WHERE game = ?");
     $stmt->execute([$game]);
-    $roleNames = $stmt->fetchAll();
+    $roles = $stmt->fetchAll();
 
     $stmt = $pdo->prepare("INSERT INTO roleRecord (recordID, roleID) VALUES ($recordID, ?)");
-    foreach ($row in $roleNames)
+    foreach ($roles as $row)
     {
         $stmt->execute([$row["rID"]]);
 
         if ($stmt->rowCount() !== 1)
             throwException($pdo, "failed to record role of completed game.");
     }
+}
+
+function deleteGame($pdo, $game)
+{
+    $stmt = $pdo->query("DELETE FROM epidemicIntensify WHERE eventID IN (SELECT eventID FROM eventHistory WHERE gameID = $game)");
+    if (queryCausedError($pdo))
+        throwException($pdo, "failed to delete epidemic intensify records");
+
+    $stmt = $pdo->query("DELETE FROM eventHistory WHERE gameID = $game");
+    if (queryCausedError($pdo))
+        throwException($pdo, "failed to delete event history");
+
+    $stmt = $pdo->query("DELETE FROM player WHERE gameID = $game");
+    if (queryCausedError($pdo))
+        throwException($pdo, "failed to delete players");
+
+    $stmt = $pdo->query("DELETE FROM location WHERE gameID = $game");
+    if (queryCausedError($pdo))
+        throwException($pdo, "failed to delete locations");
+
+    $stmt = $pdo->query("DELETE FROM pandemic WHERE gameID = $game");
+    if (queryCausedError($pdo))
+        throwException($pdo, "failed to delete pandemic");
+
+    $stmt = $pdo->query("DELETE FROM game WHERE gameID = $game");
+    if (queryCausedError($pdo))
+        throwException($pdo, "failed to delete game");
 }
 
 function getEventById($pdo, $game, $eventID)

@@ -27,30 +27,7 @@
         $pdo->beginTransaction();
 
         recordGameEndCause($pdo, $game, "abandoned");
-
-        $stmt = $pdo->query("DELETE FROM epidemicIntensify WHERE eventID IN (SELECT eventID FROM eventHistory WHERE gameID = $game)");
-        if (queryCausedError($pdo))
-            throwException($pdo, "failed to delete epidemic intensify records");
-
-        $stmt = $pdo->query("DELETE FROM eventHistory WHERE gameID = $game");
-        if (queryCausedError($pdo))
-            throwException($pdo, "failed to delete event history");
-
-        $stmt = $pdo->query("DELETE FROM player WHERE gameID = $game");
-        if (queryCausedError($pdo))
-            throwException($pdo, "failed to delete players");
-
-        $stmt = $pdo->query("DELETE FROM location WHERE gameID = $game");
-        if (queryCausedError($pdo))
-            throwException($pdo, "failed to delete locations");
-
-        $stmt = $pdo->query("DELETE FROM pandemic WHERE gameID = $game");
-        if (queryCausedError($pdo))
-            throwException($pdo, "failed to delete pandemic");
-
-        $stmt = $pdo->query("DELETE FROM game WHERE gameID = $game");
-        if (queryCausedError($pdo))
-            throwException($pdo, "failed to delete game");
+        deleteGame($pdo, $game);
         
         unset($_SESSION["game"]);
 

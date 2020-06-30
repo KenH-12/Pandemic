@@ -27,9 +27,25 @@
         
         if (is_nan($numRoles) || $numRoles < 2 || $numRoles > 4)
             throw new Exception("Invalid number of roles: $numRoles");
+        
+        $stmt = $pdo->prepare("SELECT DISTINCT gameID FROM game
+                                INNER JOIN vw_player ON game.gameID = vw_player.game
+                                WHERE uID = ?
+                                AND endCauseID IS NOT NULL");
+        $stmt->execute([$uID]);
+        $completedGamesToCleanUp = $stmt->fetchAll();
 
         $pdo->beginTransaction();
 
+        // Delete leftover game records
+        foreach ($completedGamesToCleanUp as $game)
+        {
+            $gID = $game["gameID"];
+
+            recordCompletedGame($pdo, $gID);
+            deleteGame($pdo, $gID);
+        }
+        
         $stmt = $pdo->prepare("INSERT INTO game (epidemicCards) VALUES (?)");
         $stmt->execute([$numEpidemics]);
 

@@ -725,7 +725,7 @@ function promptAbandonGame()
 
 function abandonGame()
 {
-    postData("serverCode/actionPages/deleteGame.php", {})
+    postData("serverCode/actionPages/abandonGame.php", {})
         .then(response =>
         {
             if (response.failure)
