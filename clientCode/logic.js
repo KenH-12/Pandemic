@@ -6845,7 +6845,8 @@ async function setup()
 				cities,
 				players,
 				infectionDiscards,
-				diseaseStatuses
+				diseaseStatuses,
+				failure
 			},
 			1: playerCards,
 			2: events
@@ -6853,7 +6854,11 @@ async function setup()
 				getData(`${selectPath}retrieveGameData.php`),
 				getData(`${selectPath}retrievePlayerCards.php`),
 				getData(`${selectPath}retrieveEventHistory.php`)
-			]);
+			]),
+		retrievalFailure = failure || playerCards.failure || events.failure || false;
+	
+	if (retrievalFailure)
+		return promptRefresh(new Error(retrievalFailure));
 	
 	if (gamestate.gameIsResuming)
 		prepareToFlagRemovedEventCardEvents();

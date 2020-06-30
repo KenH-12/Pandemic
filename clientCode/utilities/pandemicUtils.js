@@ -260,7 +260,9 @@ function promptRefresh(error)
 {
 	console.error(error);
 	
-	const $rightPanel = $("#rightPanel"),
+	const $curtain = $("#curtain"),
+		$rightPanel = $("#rightPanel"),
+		$container = $curtain.filter(":visible").length ? $curtain : $rightPanel,
 		refreshString = "<a href=''>refresh</a> the page";
 
 	let title,
@@ -280,13 +282,16 @@ function promptRefresh(error)
 		recommendedAction = `To continue your game, ${refreshString}.`;
 	}
 
-	$rightPanel.add("#boardContainer").children().addClass("hidden");
+	if ($container.is($curtain))
+		$curtain.empty();
+	else
+		$rightPanel.add("#boardContainer").children().addClass("hidden");
 
 	$(`<div id='errorContainer'>
 		<h3>${title}</h3>
 		<p>${details}</p>
 		<p>${recommendedAction}</p>
-	</div>`).appendTo($rightPanel);
+	</div>`).appendTo($container);
 	
 	$("#boardImg").fadeTo(1000, 0.4);
 }

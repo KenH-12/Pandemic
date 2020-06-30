@@ -2092,6 +2092,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	font-size: 22px;
 	margin-bottom: 5px;
 }
+#curtain #errorContainer * { text-align: left !important }
 a,
 a:visited
 {
