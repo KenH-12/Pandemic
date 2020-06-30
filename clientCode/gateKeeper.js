@@ -616,7 +616,7 @@ function verifyAccount()
             if (response.failure)
                 return accountVerificationFailed(response.failure);
             
-            $btnVerify.html("Success").css({ color: "#fff", backgroundColor: "#00a94f" });
+            $btnVerify.html("Verified!").css({ color: "#fff", backgroundColor: "#00a94f" });
             await sleep(1000);
             
             showMainMenu();
