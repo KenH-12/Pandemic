@@ -48,14 +48,6 @@ menu
 	rules / instructions / FAQ
 	resign button
 
-event history
-	game end icon and details
-	travel paths for movement actions and research station relocations?
-	outbreak spread paths?
-
-handle errors
-	setup
-
 add tests
 
 make sure things look ok for different screen sizes
@@ -64,11 +56,6 @@ cross-browser compatabililty
 	animations
 	css
 		calc variants
-
-index
-	access key verification
-	allow access keys to be requested
-	tab / enter key bindings
 
 for multiplayer games, require permission for certain actions
 	share knowledge
@@ -118,6 +105,11 @@ split data.currentStep into an object containing 'next' and 'current' keys
 
 SMALL FIXES
 -----------
+event history
+	game end icon and details
+	travel paths for movement actions and research station relocations?
+	outbreak spread paths?
+
 don't repeat setup animation after refresh if it already completed or was skipped
 
 loading gifs should appear after a short delay (if the connection is fast enough, they will not appear at all)

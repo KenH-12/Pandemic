@@ -15,10 +15,17 @@
 							ORDER BY pileID, cardIndex");
 		$stmt->execute([$_SESSION["game"]]);
 		$response = $stmt->fetchAll();
+		
+		if (!$response)
+			throw new Exception("cards not found");
+	}
+	catch(PDOException $e)
+	{
+		$response["failure"] = "Failed to retrieve player cards: PDOException: " . $e->getMessage();
 	}
 	catch(Exception $e)
 	{
-		$response["failure"] = $e->getMessage();
+		$response["failure"] = "Failed to retrieve player cards: " . $e->getMessage();
 	}
 	finally
 	{

@@ -6,7 +6,7 @@
 		require "../utilities.php";
 		
 		if (!isset($_SESSION["game"]))
-			throw new Exception("Game does not exist.");
+			throw new Exception("game does not exist");
 		
 		$game = $_SESSION["game"];
 		
@@ -23,7 +23,7 @@
 		$response["gamestate"] = $stmt->fetch();
 		
 		if (!$response["gamestate"])
-			throw new Exception("Game not found.");
+			throw new Exception("game data not found");
 		
 		// If at least one recorded event other than Initial Infections ('ii') and Starting Hands ('sh')
 		// the game is being resumed.
@@ -115,9 +115,13 @@
 
 		$response["gamestate"]["numPlayerCardsRemaining"] = countCardsInPlayerDeck($pdo, $game);
 	}
+	catch(PDOException $e)
+	{
+		$response["failure"] = "Failed to retrieve game data: PDOException: " . $e->getMessage();
+	}
 	catch(Exception $e)
 	{
-		$response["failure"] = $e->getMessage();
+		$response["failure"] = "Failed to retrieve game data: " . $e->getMessage();
 	}
 	finally
 	{
