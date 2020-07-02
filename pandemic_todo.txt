@@ -3,6 +3,15 @@ BUGS
 
 TO DO
 -----
+make sure things look ok for different screen sizes
+	big screens
+		arrange player deck with 6 epidemics exceeds screen height
+		drawn player cards overlap before being revealed
+
+enforce min-width
+
+cured diseases tooltip wording and comma after however
+
 access keys
 	form to request a new key
 		details of request:
@@ -42,15 +51,9 @@ main menu
 
 load other js files only when necessary
 
-when a city or contained piece is hovered, show the city name in a larger fontn
-
 menu
 	rules / instructions / FAQ
 	resign button
-
-add tests
-
-make sure things look ok for different screen sizes
 
 cross-browser compatabililty
 	animations

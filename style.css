@@ -2099,3 +2099,35 @@ a:visited
 	color: var(--epidemic-green)
 }
 a:hover { cursor: pointer }
+
+@media screen and (min-width: 1920px)
+{
+	#topPanel .title,
+	#infectionDiscardContainer .title
+	{
+		font-size: 21px;
+	}
+	.cubeSupply p
+	{
+		font-size: 26px;
+		margin-top: -4px;
+	}
+	.cubeSupply .diseaseCube
+	{
+		width: 67%;
+		margin: 0 14%;
+	}
+
+	#topPanel .info,
+	.bottomPanelDiv .info
+	{
+		font-size: 18px;
+		line-height: 20px;
+	}
+
+	#infectionDeckContainer img
+	{
+		width: 39%;
+		margin: 2% 30.5% 1% 30.5%;
+	}
+}
