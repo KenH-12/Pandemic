@@ -2103,7 +2103,8 @@ a:hover { cursor: pointer }
 @media screen and (min-width: 1920px)
 {
 	#topPanel .title,
-	#infectionDiscardContainer .title
+	#infectionDiscardContainer .title,
+	.bottomPanelDiv .title
 	{
 		font-size: 21px;
 	}
@@ -2129,5 +2130,37 @@ a:hover { cursor: pointer }
 	{
 		width: 39%;
 		margin: 2% 30.5% 1% 30.5%;
+	}
+
+	.eventHistoryButton
+	{
+		font-size: 24px;
+	}
+	#btnUndo
+	{
+		font-size: 34px;
+	}
+
+	#cureMarkerContainer .title
+	{
+		font-size: 28px;
+	}
+	#cureMarkerContainer .infoContainer
+	{
+		margin-bottom: -3px;
+	}
+	#cureMarkerContainer .info
+	{
+		font-size: 18px;
+		vertical-align: text-bottom;
+	}
+
+	#researchStationSupplyContainer .researchStation
+	{
+		width: 21%;
+	}
+	#researchStationSupplyCount
+	{
+		font-size: 32px;
 	}
 }
