@@ -10,8 +10,6 @@ make sure things look ok for different screen sizes
 
 enforce min-width
 
-cured diseases tooltip wording and comma after however
-
 access keys
 	form to request a new key
 		details of request:
@@ -53,6 +51,8 @@ load other js files only when necessary
 
 menu
 	rules / instructions / FAQ
+		describe info icons and .hoverInfo elements
+		mention the trophy and warning icons
 	resign button
 
 cross-browser compatabililty

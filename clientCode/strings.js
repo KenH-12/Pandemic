@@ -29,7 +29,7 @@ strings = {
     researcherCardText: `<li><span>You may give any 1 of your City cards when you Share Knowledge. It need not match your city. A player who Shares Knowledge with you on their turn can take any 1 of your City cards.</span></li>`,
     scientistCardText: `<li><span>You need only 4 cards of the same color to do the Discover a Cure action.</span></li>`,
 
-    additionalDiscoverACureInfo: "When a disease is cured, its cubes remain on the board and new cubes can still be placed during epidemics or infections. However treating this disease is now easier and your team is closer to winning.",
+    additionalDiscoverACureInfo: "When a disease is cured, cubes of that colour remain on the board and new cubes of that colour can still be placed during epidemics or infections. However, treating this disease is now easier and your team is closer to winning.",
 
     eventCardPlayabilityRule: "<span>Play at any time. Not an action.</span>",
 

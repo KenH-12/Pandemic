@@ -315,7 +315,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"Remove any 1 card in the Infection Discard Pile from the game.",
 			"* You may play this between the Infect and Intensify steps of an epidemic."
 		],
-		instructions: "Select a card from INFECTION DISCARDS to remove from the game.",
+		instructions: "Select a card from the INFECTION DISCARDS to remove from the game.",
 		propertyNames: ["cardKey", "infectionDiscardIndex"],
 		actionPathName: "eventCards/resilientPopulation"
 	},
