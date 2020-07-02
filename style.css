@@ -1346,13 +1346,10 @@ span.r, p.r {color: #ef282a; background: none !important }
 	white-space: nowrap;
 	margin: 2px 1%;
 	border: none;
-	font-size: 14px;
-	overflow: hidden;
-}
-.playerCard
-{
 	border-top-left-radius: 5px;
 	border-bottom-right-radius: 5px;
+	font-size: 14px;
+	overflow: hidden;
 }
 .playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template):not(.notLocatable),
 .infectionCard:not(.template),
@@ -2162,5 +2159,29 @@ a:hover { cursor: pointer }
 	#researchStationSupplyCount
 	{
 		font-size: 32px;
+	}
+
+	.playerCard
+	{
+		border-top-left-radius: 8px;
+		border-bottom-right-radius: 8px;
+		font-size: 18px;
+	}
+
+	/* TODO: .playerCard found in other areas */
+
+	.playerPanel .role
+	{ font-size: 20px }
+
+	/* TODO: .playerPanel-2, .playerPanel-3  font-size */
+
+	.btnCollapseExpand > .numCardsInHand
+	{
+		font-size: 20px;
+	}
+	.btnCollapseExpand > div
+	{
+		font-size: 24px;
+		line-height: 14px;
 	}
 }
