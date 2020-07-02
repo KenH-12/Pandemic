@@ -6024,7 +6024,7 @@ function positionInfectionPanelComponents()
 		});
 
 	const veilLeft = getDimension("diseaseIcon");
-	$veils.height(cardHeight)
+	$veils.height(cardHeight*1.2)
 		.css("left", veilLeft);
 }
 
