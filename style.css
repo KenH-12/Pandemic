@@ -2129,6 +2129,31 @@ a:hover { cursor: pointer }
 		margin: 2% 30.5% 1% 30.5%;
 	}
 
+	.procedureContainer
+	{
+		font-size: 18px;
+	}
+	.procedureContainer .title
+	{
+		font-size: 20px;
+	}
+	#turnProcedureInfo
+	{
+		font-size: 18px;
+	}
+	.playStepInfo
+	{
+		font-size: 16px;
+	}
+	.procedureContainer .substep
+	{
+		font-size: 15px;
+	}
+	.procedureContainer .highlighted span:not(.playStepInfo)
+	{
+		font-size: 19px;
+	}
+
 	.eventHistoryButton
 	{
 		font-size: 24px;
