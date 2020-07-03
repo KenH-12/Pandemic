@@ -333,10 +333,8 @@ class Step
 		if (typeof this.setDescription === "function")
 			this.setDescription();
 
-		$container.children("#turnIndicator")
-			.html(`${activePlayer.name}'s Turn`)
-			.next() // role indicator
-			.html(activePlayer.role)
+		$container.children("#roleIndicator")
+			.html(`${activePlayer.role}'s Turn`)
 			.attr("class", activePlayer.camelCaseRole)
 			.click(function() { activePlayer.pinpointLocation() })
 			.next() // step indicator
@@ -6024,7 +6022,7 @@ function positionInfectionPanelComponents()
 		});
 
 	const veilLeft = getDimension("diseaseIcon");
-	$veils.height(cardHeight*1.2)
+	$veils.height(cardHeight*1.4)
 		.css("left", veilLeft);
 }
 

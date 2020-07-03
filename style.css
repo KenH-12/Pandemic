@@ -1112,10 +1112,6 @@ span.r, p.r {color: #ef282a; background: none !important }
 	text-align: center;
 }
 #indicatorContainer > * {margin-bottom: 4px}
-#turnIndicator
-{
-	font-size: 16px;
-}
 #roleIndicator
 {
 	font-weight: 700;
@@ -2214,7 +2210,6 @@ a:hover { cursor: pointer }
 		padding: 3px 10px;
 	}
 	#indicatorContainer > * {margin-bottom: 6px}
-	#turnIndicator,
 	#stepIndicator
 	{
 		font-size: 20px;
