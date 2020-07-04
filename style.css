@@ -1101,7 +1101,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .scrollable { overflow-y: scroll }
 #indicatorContainer
 {
-	padding: 2px 7px;
+	padding: 2px 0;
 	background-color: #353535;
 	border: none;
 	overflow: hidden;
@@ -1892,7 +1892,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	padding: 5px 3%;
 	font-size: 14px;
 	border: 1px solid #fff;
-	margin: 1%;
+	margin: 0 1% 8px 1%;
 	margin-top: 0;
 	background-color: #043d77;
 }
@@ -2126,15 +2126,16 @@ a:hover { cursor: pointer }
 
 	.procedureContainer
 	{
-		font-size: 18px;
+		font-size: 20px;
 	}
 	.procedureContainer .title
 	{
-		font-size: 20px;
+		font-size: 24px;
 	}
 	#turnProcedureInfo
 	{
 		font-size: 18px;
+		line-height: 26px;
 	}
 	.playStepInfo
 	{
@@ -2142,11 +2143,11 @@ a:hover { cursor: pointer }
 	}
 	.procedureContainer .substep
 	{
-		font-size: 15px;
+		font-size: 17px;
 	}
 	.procedureContainer .highlighted span:not(.playStepInfo)
 	{
-		font-size: 19px;
+		font-size: 21px;
 	}
 
 	.eventHistoryButton
@@ -2207,20 +2208,34 @@ a:hover { cursor: pointer }
 
 	#indicatorContainer
 	{
-		padding: 3px 10px;
+		padding: 3px 0;
 	}
 	#indicatorContainer > * {margin-bottom: 6px}
 	#stepIndicator
 	{
-		font-size: 20px;
+		font-size: 22px;
 	}
 	#roleIndicator
 	{
-		font-size: 26px;
-		line-height: 30px;
-		height: 32px;
+		font-size: 30px;
+		line-height: 36px;
+		height: 42px;
 	}
 	#stepIndicator .info
+	{
+		font-size: 18px;
+	}
+
+	.actionCategory h2
+	{
+		font-size: 20px;
+		margin: 10px 0 0 4px;
+	}
+	.actionName
+	{
+		font-size: 25px
+	}
+	.actionInfo
 	{
 		font-size: 18px;
 	}
