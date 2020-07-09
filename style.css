@@ -41,6 +41,8 @@ body
 	-khtml-user-select: none;    /* Konqueror */
 	-moz-user-select: none;      /* Firefox */
 	-ms-user-select: none;       /* Internet Explorer/Edge */
+
+	min-width: 1024px;
 }
 input, select { background-color: #fff }
 input[type='text'],
@@ -948,7 +950,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 #topPanel .title, #infectionDiscardContainer .title, .bottomPanelDiv .title
 {
-	font-size: 16px;
+	font-size: 13px;
 	text-align: center;
 	padding-top: 3px;
 	border-bottom: 1px solid #fff;
@@ -957,7 +959,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #topPanel .info,
 .bottomPanelDiv .info
 {
-	font-size: 12px;
+	font-size: 10px;
 	vertical-align: text-top;
 }
 .cubeSupply
@@ -972,7 +974,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .cubeSupply p
 {
-	font-size: 18px;
+	font-size: 15px;
 	text-align: center;
 	margin-top: -3px;
 }
@@ -2091,6 +2093,25 @@ a:visited
 	color: var(--epidemic-green)
 }
 a:hover { cursor: pointer }
+
+@media screen and (min-width: 1200px)
+{
+	#topPanel .title,
+	#infectionDiscardContainer .title,
+	.bottomPanelDiv .title
+	{
+		font-size: 16px;
+	}
+	#topPanel .info,
+	.bottomPanelDiv .info
+	{
+		font-size: 12px;
+	}
+	.cubeSupply p
+	{
+		font-size: 18px;
+	}
+}
 
 @media screen and (min-width: 1920px)
 {
