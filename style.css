@@ -645,12 +645,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 6%;
 	background-color: #0c658b;
 	text-align: center;
-	font-size: 18px;
+	font-size: 14px;
 }
 #btnUndo
 {
 	width: 9%;
-	font-size: 26px;
+	font-size: 19px;
 	font-weight: 700;
 	border-right: 1px solid #fff;
 }
@@ -2191,6 +2191,15 @@ a:hover { cursor: pointer }
 		font-size: 14px;
 	}
 
+	.eventHistoryButton
+	{
+		font-size: 18px;
+	}
+	#btnUndo
+	{
+		font-size: 22px;
+	}
+
 	#cureMarkerContainer .title
 	{
 		font-size: 20px;
@@ -2198,6 +2207,14 @@ a:hover { cursor: pointer }
 	#cureMarkerContainer .info
 	{
 		font-size: 14px;
+	}
+}
+
+@media screen and (min-width: 1400px)
+{
+	#btnUndo
+	{
+		font-size: 26px;
 	}
 }
 
