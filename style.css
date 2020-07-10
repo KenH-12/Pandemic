@@ -1609,7 +1609,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .loadingGif img { width: 8% }
 .actionCategory h2
 {
-	font-size: 18px;
+	font-size: 14px;
 	margin: 10px 0 0 2px;
 }
 .actionButton,
@@ -1644,14 +1644,15 @@ span.r, p.r {color: #ef282a; background: none !important }
 .actionIcon img[src='images/loading.gif'] { background-color: #0d2c5b }
 .actionName
 {
-	width: 65.5%;
+	width: 66%;
+	font-size: 16px;
 	text-align: left;
 }
 .actionInfo
 {
-	width: 6%;
+	width: 5%;
 	margin: 0 2%;
-	font-size: 14px;
+	font-size: 11px;
 	pointer-events: all;
 }
 .actionButton:not(.btnDisabled) .actionInfo:hover
@@ -2165,17 +2166,29 @@ a:hover { cursor: pointer }
 	#indicatorContainer > * {margin-bottom: 6px}
 	#stepIndicator
 	{
-		font-size: 22px;
+		font-size: 16px;
 	}
 	#roleIndicator
 	{
-		font-size: 30px;
-		line-height: 36px;
-		height: 42px;
+		font-size: 20px;
+		line-height: 26px;
+		height: 30px;
 	}
 	#stepIndicator .info
 	{
 		font-size: 18px;
+	}
+
+	.actionCategory h2 { font-size: 16px }
+	.actionName
+	{
+		width: 65.5%;
+		font-size: 18px;
+	}
+	.actionInfo
+	{
+		width: 6%;
+		font-size: 14px;
 	}
 }
 
