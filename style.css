@@ -880,12 +880,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 	display: inline-block;
 	width: 20%;
 	margin-left: 5%;
+	margin-top: -2px;
 }
 #researchStationSupplyCount
 {
 	display: inline-block;
 	color: #fff;
-	font-size: 22px;
+	font-size: 18px;
 	margin-left: 31.5%;
 }
 
@@ -924,7 +925,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #playerDeckContainer img
 {
 	width: 40%;
-	margin: 5px 30% 0 30%;
+	margin: 2% 30%;
 }
 #playerDiscardContainer
 {
@@ -2208,6 +2209,16 @@ a:hover { cursor: pointer }
 	{
 		font-size: 14px;
 	}
+
+	#researchStationSupplyContainer .researchStation
+	{
+		margin-left: 5%;
+		margin-top: 0;
+	}
+	#researchStationSupplyCount
+	{
+		font-size: 22px;
+	}
 }
 
 @media screen and (min-width: 1400px)
@@ -2306,6 +2317,11 @@ a:hover { cursor: pointer }
 	#researchStationSupplyCount
 	{
 		font-size: 32px;
+	}
+
+	#playerDeckContainer img
+	{
+		margin: 4% 30%;
 	}
 
 	.playerCard
