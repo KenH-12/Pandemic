@@ -1309,15 +1309,15 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .btnCollapseExpand > .numCardsInHand
 {
-	font-size: 14px;
+	font-size: 11px;
 	font-family: 'Ropa Sans', sans-serif;
-	padding: 3px 0;
+	padding: 1px 0;
 }
 .btnCollapseExpand > div
 {
 	font-family: 'Times New Roman', Times, serif;
-	font-size: 20px;
-	line-height: 12px;
+	font-size: 18px;
+	line-height: 9px;
 	
 	transform: rotate(-90deg);
 	-webkit-transform: rotate(-90deg); /* Safari */
@@ -2127,6 +2127,18 @@ a:hover { cursor: pointer }
 		white-space: nowrap;
 		overflow: hidden;
 	}
+	/* TODO: different font-sizes for different numbers of player panels */
+
+	.btnCollapseExpand > .numCardsInHand
+	{
+		font-size: 13px;
+		padding: 3px 0;
+	}
+	.btnCollapseExpand > div
+	{
+		font-size: 20px;
+		line-height: 12px;
+	}
 
 	.procedureContainer
 	{
@@ -2334,7 +2346,10 @@ a:hover { cursor: pointer }
 	/* TODO: .playerCard found in other areas */
 
 	.playerPanel .role
-	{ font-size: 20px }
+	{
+		font-size: 20px;
+		line-height: 30px;
+	}
 
 	/* TODO: .playerPanel-2, .playerPanel-3  font-size */
 
