@@ -833,7 +833,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #cureMarkerContainer .title
 {
 	font-family: 'Oswald', sans-serif;
-	font-size: 20px;
+	font-size: 19px;
 	border-bottom: 1px solid var(--epidemic-green);
 }
 #cureMarkerContainer .infoContainer
@@ -843,7 +843,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 #cureMarkerContainer .info
 {
-	font-size: 14px;
+	font-size: 11px;
 	vertical-align: text-bottom;
 }
 .cureMarker
@@ -1610,7 +1610,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .actionCategory h2
 {
 	font-size: 14px;
-	margin: 10px 0 0 2px;
+	margin: 2px 0 0 2px;
 }
 .actionButton,
 .actionPromptOption
@@ -1897,7 +1897,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	padding: 3px 1%;
 	font-size: 12px;
 	border: 1px solid #fff;
-	margin: 0 1% 5px 1%;
+	margin: 0 1% 4px 1%;
 	margin-top: 0;
 	background-color: #043d77;
 }
@@ -2188,6 +2188,15 @@ a:hover { cursor: pointer }
 	.actionInfo
 	{
 		width: 6%;
+		font-size: 14px;
+	}
+
+	#cureMarkerContainer .title
+	{
+		font-size: 20px;
+	}
+	#cureMarkerContainer .info
+	{
 		font-size: 14px;
 	}
 }
