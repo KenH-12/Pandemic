@@ -1104,7 +1104,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .scrollable { overflow-y: scroll }
 #indicatorContainer
 {
-	padding: 2px 0;
+	padding: 1px 0;
 	background-color: #353535;
 	border: none;
 	overflow: hidden;
@@ -1118,13 +1118,14 @@ span.r, p.r {color: #ef282a; background: none !important }
 #roleIndicator
 {
 	font-weight: 700;
-	font-size: 20px;
+	font-size: 17px;
 	line-height: 24px;
-	height: 26px;
+	height: 27px;
 }
+#stepIndicator { font-size: 14px }
 #stepIndicator .info
 {
-	font-size: 14px;
+	font-size: 11px;
 	float: left;
 }
 #stepIndicator .info + span { margin-left: -14px }
@@ -2155,6 +2156,26 @@ a:hover { cursor: pointer }
 	.procedureContainer .highlighted span:not(.playStepInfo)
 	{
 		font-size: 15px;
+	}
+
+	#indicatorContainer
+	{
+		padding: 3px 0;
+	}
+	#indicatorContainer > * {margin-bottom: 6px}
+	#stepIndicator
+	{
+		font-size: 22px;
+	}
+	#roleIndicator
+	{
+		font-size: 30px;
+		line-height: 36px;
+		height: 42px;
+	}
+	#stepIndicator .info
+	{
+		font-size: 18px;
 	}
 }
 
