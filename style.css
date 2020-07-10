@@ -960,7 +960,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #topPanel .info,
 .bottomPanelDiv .info
 {
-	font-size: 10px;
+	font-size: 11px;
 	vertical-align: text-top;
 }
 .cubeSupply
@@ -1892,43 +1892,42 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 
 .procedureContainer
 {
-	padding: 5px 3%;
-	font-size: 14px;
+	padding: 3px 1%;
+	font-size: 12px;
 	border: 1px solid #fff;
-	margin: 0 1% 8px 1%;
+	margin: 0 1% 5px 1%;
 	margin-top: 0;
 	background-color: #043d77;
 }
 .procedureContainer > *
 {
-	padding: 1px 3px;
+	padding: 1px 2px;
 	color: #aaa;
 }
 .procedureContainer .title
 {
-	font-size: 15px;
+	font-size: 14px;
 	border-bottom: 1px solid #fff;
-	margin-bottom: 3px;
+	margin-bottom: 2px;
 	color: #fff;
 }
-#turnProcedureInfo, .playStepInfo { font-size: 12px }
+#turnProcedureInfo, .playStepInfo { font-size: 11px }
 #turnProcedureInfo
 {
-	line-height: 18px;
+	line-height: 16px;
 	float: right;
 }
-.playStepInfo { margin-left: 10px }
+.playStepInfo { margin-left: 5px }
 .playStepInfo:hover { color: #fff }
-.playStepTooltip { top: 5 }
 .procedureContainer .substep
 {
 	margin-left: 6%;
-	font-size: 13px;
+	font-size: 11px;
 }
 .procedureContainer .highlighted span:not(.playStepInfo)
 {
 	color: #fff;
-	font-size: 15px;
+	font-size: 14px;
 	filter: drop-shadow(0px 0px 3px #1799d1);
 }
 
@@ -2124,6 +2123,38 @@ a:hover { cursor: pointer }
 		padding: 0;
 		white-space: nowrap;
 		overflow: hidden;
+	}
+
+	.procedureContainer
+	{
+		padding: 5px 3%;
+		font-size: 14px;
+		margin: 0 1% 8px 1%;
+	}
+	.procedureContainer > *
+	{
+		padding: 1px 3px;
+	}
+	.procedureContainer .title
+	{
+		font-size: 15px;
+		margin-bottom: 3px;
+	}
+	#turnProcedureInfo, .playStepInfo { font-size: 12px }
+	#turnProcedureInfo
+	{
+		line-height: 18px;
+	}
+	.playStepInfo { margin-left: 10px }
+	.playStepTooltip { top: 5 }
+	.procedureContainer .substep
+	{
+		margin-left: 6%;
+		font-size: 13px;
+	}
+	.procedureContainer .highlighted span:not(.playStepInfo)
+	{
+		font-size: 15px;
 	}
 }
 
