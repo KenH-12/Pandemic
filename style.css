@@ -344,6 +344,7 @@ html,
 	z-index: 1;
 	font-size: 0;
 	overflow: hidden;
+	border-bottom: 1px solid #fff;
 }
 #boardContainer > div,
 #boardContainer > .pawn,
@@ -1250,7 +1251,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .playerPanel
 {
 	vertical-align: top;
-	margin-right: 1%;
+	margin-right: 0.75%;
 	color: #fff;
 	text-align: center;
 	border: 1px solid #fff;
@@ -1258,7 +1259,6 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 	background-color: #353535;
-	margin-left: -1px;
 	overflow: hidden;
 	position: relative;
 	z-index: 6;
@@ -1281,9 +1281,10 @@ span.r, p.r {color: #ef282a; background: none !important }
 .name, .role
 {
 	width: 100%;
-	font-size: 14px;
-	white-space: nowrap;
-	overflow: hidden;
+	font-size: 12px;
+	line-height: 18px;
+	padding-top: 1px;
+	padding-bottom: 2px;
 }
 .name
 {
@@ -1345,7 +1346,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border: none;
 	border-top-left-radius: 5px;
 	border-bottom-right-radius: 5px;
-	font-size: 14px;
+	font-size: 10px;
 	overflow: hidden;
 }
 .playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template):not(.notLocatable),
@@ -2110,6 +2111,19 @@ a:hover { cursor: pointer }
 	.cubeSupply p
 	{
 		font-size: 18px;
+	}
+
+	.playerCard
+	{
+		font-size: 14px;
+	}
+
+	.name, .role
+	{
+		font-size: 14px;
+		padding: 0;
+		white-space: nowrap;
+		overflow: hidden;
 	}
 }
 
