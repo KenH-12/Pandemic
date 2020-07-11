@@ -28,9 +28,6 @@ make sure things look ok for different screen sizes
 	infect cities
 
 	special event alerts
-
-	full cards
-		event
 	
 	tooltip widths
 

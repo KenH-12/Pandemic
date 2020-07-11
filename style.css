@@ -550,7 +550,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 
 #boardContainer > .eventCardFull,
 #contingencyWrapper
-{ width: 17% }
+{ width: 18% }
 .eventCardFull
 {
 	padding-bottom: 3px;
@@ -568,7 +568,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	color: #fff;
 	border-bottom-right-radius: 5px;
 }
-.eventCardFull h3 { margin-top: -2px; padding-bottom: 5px }
+.eventCardFull h3 { padding-bottom: 5px }
 .eventCardFull img { border-top: 2px solid #000 }
 .eventCardFull img,
 .eventCardFull > p:first-of-type
@@ -1522,7 +1522,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .roleCard h3,
 .eventCardFull h3
 {
-	font-size: 16px;
+	font-size: 14px;
 	text-align: center;
 }
 .rolePortrait { border-bottom: 2px solid #fff }
@@ -1733,8 +1733,9 @@ span.r, p.r {color: #ef282a; background: none !important }
 #actionPrompt .eventCardFull
 {
 	display: inline-block;
-	width: 70%;
-	margin: 5px 15%;
+	width: 90%;
+	margin: 3px 5%;
+	font-size: 12px;
 }
 .discardPrompt .playerCard { margin-bottom: 5px; }
 .actionPromptOption
@@ -2237,8 +2238,7 @@ a:hover { cursor: pointer }
 	{
 		width: 20%;
 	}
-	.roleCard,
-	.eventCardFull
+	.roleCard
 	{
 		font-size: 14px;
 	}
@@ -2247,6 +2247,19 @@ a:hover { cursor: pointer }
 	{
 		font-size: 18px;
 	}
+	.eventCardFull p
+	{
+		font-size: 14px;
+	}
+	.eventCardFull h5
+	{
+		font-size: 14px;
+	}
+	#actionPrompt .eventCardFull
+	{
+		width: 82%;
+		margin: 5px 9%;
+	}
 }
 
 @media screen and (min-width: 1400px)
@@ -2254,6 +2267,15 @@ a:hover { cursor: pointer }
 	#btnUndo
 	{
 		font-size: 26px;
+	}
+
+	#boardContainer > .eventCardFull
+	{
+		width: 16%;
+	}
+	.eventCardFull p
+	{
+		font-size: 15px;
 	}
 }
 
@@ -2447,8 +2469,27 @@ a:hover { cursor: pointer }
 		font-size: 18px;
 	}
 	.roleCard h3,
-	.eventCardFull h3
+	.eventCardFull h3,
+	#actionPrompt > .eventCardFull h3
 	{
 		font-size: 24px;
+	}
+	#boardContainer > .eventCardFull
+	{
+		width: 15%;
+	}
+	.eventCardFull h5
+	{
+		font-size: 17px;
+		padding: 10px 3px 0 5px;
+	}
+	.eventCardFull p
+	{
+		font-size: 18px;
+	}
+	#actionPrompt .eventCardFull
+	{
+		width: 70%;
+		margin: 10px 15%;
 	}
 }
