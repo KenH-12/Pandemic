@@ -30,8 +30,6 @@ make sure things look ok for different screen sizes
 	special event alerts
 
 	full cards
-		role
-		epidemic
 		event
 	
 	tooltip widths

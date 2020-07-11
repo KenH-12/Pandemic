@@ -1494,7 +1494,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 
 .roleCard
 {
-	width: 17%;
+	width: 20%;
 	border-radius: 8px;
 }
 .roleCard,
@@ -1506,11 +1506,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 	position: absolute;
 	z-index: 12;
 	filter: drop-shadow(0px 0px 6px #000);
-	font-size: 14px;
+	font-size: 12px;
 	max-width: 24%;
 }
 .roleCard,
-.eventCardFull { font-size: 14px }
+.eventCardFull
+{ font-size: 14px }
 .roleCard h3
 {
 	margin-top: 8px;
@@ -1521,7 +1522,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .roleCard h3,
 .eventCardFull h3
 {
-	font-size: 18px;
+	font-size: 16px;
 	text-align: center;
 }
 .rolePortrait { border-bottom: 2px solid #fff }
@@ -2231,6 +2232,21 @@ a:hover { cursor: pointer }
 	{
 		font-size: 22px;
 	}
+
+	.roleCard
+	{
+		width: 20%;
+	}
+	.roleCard,
+	.eventCardFull
+	{
+		font-size: 14px;
+	}
+	.roleCard h3,
+	.eventCardFull h3
+	{
+		font-size: 18px;
+	}
 }
 
 @media screen and (min-width: 1400px)
@@ -2419,5 +2435,20 @@ a:hover { cursor: pointer }
 	{
 		font-size: 12px;
 		padding: 3px 0 0 12px;
+	}
+
+	.roleCard
+	{
+		width: 16%;
+	}
+	.roleCard,
+	.eventCardFull
+	{
+		font-size: 18px;
+	}
+	.roleCard h3,
+	.eventCardFull h3
+	{
+		font-size: 24px;
 	}
 }
