@@ -4,6 +4,41 @@ BUGS
 TO DO
 -----
 make sure things look ok for different screen sizes
+	action interfaces
+		drive/ferry
+		direct flight
+		charter flight
+		shuttle flight
+		build research station
+		treat disease
+		share knowledge
+		discover a cure
+		pass
+
+		event cards
+			airlift
+			government grant
+			resilient population
+			one quiet night
+			forecast
+
+	card draw
+	resolve epidemics
+	discard prompt
+	infect cities
+
+	special event alerts
+
+	full cards
+		role
+		epidemic
+		event
+	
+	tooltip widths
+
+	small screens
+		action buttons may exceed screen height
+
 	big screens
 		arrange player deck with 6 epidemics exceeds screen height
 		drawn player cards overlap before being revealed

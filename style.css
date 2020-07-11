@@ -1203,22 +1203,22 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 #boardContainer > .epidemicFull
 {
-	width: 250px;
+	width: 180px;
 	pointer-events: none;
 }
 #boardContainer > .epidemicFull > div
 { background: transparent }
 .epidemicFull h2
 {
-	font-size: 20px;
+	font-size: 16px;
 	text-align: center;
-	padding: 5px 0;
+	padding: 3px 0;
 	border-bottom: 2px solid #fff;
 }
 .epidemicFull.pending h2 { border-bottom: none }
 .epidemicFull > div
 {
-	padding: 10px;
+	padding: 6px 10px;
 	background-color: #007034;
 	transition: background-color 0.5s;
 }
@@ -1227,7 +1227,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	background-color: var(--epidemic-green);
 	transition: background-color 0.5s;
 }
-.epidemicFull h3 { font-size: 16px }
+.epidemicFull h3 { font-size: 14px }
 .epidemicFull h3 > * { vertical-align: middle }
 .epidemicFull h3 img
 {
@@ -1240,7 +1240,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .epidemicFull p
 {
-	font-size: 12px;
+	font-size: 10px;
 	font-weight: 700;
 	padding: 3px 0 0 12px;
 	color: yellow;
@@ -2395,5 +2395,29 @@ a:hover { cursor: pointer }
 	.actionInfo
 	{
 		font-size: 18px;
+	}
+
+	#boardContainer > .epidemicFull
+	{
+		width: 250px;
+	}
+	.epidemicFull h2
+	{
+		font-size: 24px;
+	}
+	.epidemicFull > div
+	{
+		padding: 10px;
+	}
+	.epidemicFull h3 { font-size: 16px }
+	.epidemicFull h3 img
+	{
+		width: 16px;
+		margin-left: 8px;
+	}
+	.epidemicFull p
+	{
+		font-size: 12px;
+		padding: 3px 0 0 12px;
 	}
 }
