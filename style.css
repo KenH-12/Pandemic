@@ -1611,8 +1611,8 @@ span.r, p.r {color: #ef282a; background: none !important }
 .loadingGif img { width: 8% }
 .actionCategory h2
 {
-	font-size: 14px;
-	margin: 2px 0 0 2px;
+	font-size: 12px;
+	margin: 3px 0 0 2px;
 }
 .actionButton,
 .actionPromptOption
@@ -1687,7 +1687,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .actionTitle > h2
 {
 	width: 80%;
-	font-size: 24px;
+	font-size: 18px;
 	font-family: 'Exo 2', sans-serif;
 	padding-left: 2%;
 }
@@ -1740,7 +1740,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .discardPrompt .playerCard { margin-bottom: 5px; }
 .actionPromptOption
 {
-	font-size: 20px;
+	font-size: 16px;
 	margin-bottom: 5px;
 	padding: 2px 0;
 }
@@ -1752,13 +1752,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 	padding: 0;
 	text-align: left;
 	font-family: 'Exo 2';
-	font-size: 15px;
+	font-size: 13px;
 	cursor: pointer;
 }
 #btnCancelAction > * { vertical-align: middle }
 #btnCancelAction span:first-of-type
 {
-	font-size: 22px;
+	font-size: 18px;
 	font-weight: 700;
 	margin: 0 6.5%;
 }
@@ -2194,16 +2194,16 @@ a:hover { cursor: pointer }
 		font-size: 18px;
 	}
 
-	.actionCategory h2 { font-size: 16px }
+	.actionCategory h2 { font-size: 14px }
 	.actionName
 	{
-		width: 65.5%;
+		width: 67%;
 		font-size: 18px;
 	}
 	.actionInfo
 	{
-		width: 6%;
-		font-size: 14px;
+		width: 5%;
+		font-size: 12px;
 	}
 
 	.eventHistoryButton
@@ -2260,6 +2260,24 @@ a:hover { cursor: pointer }
 		width: 82%;
 		margin: 5px 9%;
 	}
+	
+	#btnCancelAction
+	{
+		font-size: 15px;
+	}
+	#btnCancelAction span:first-of-type
+	{
+		font-size: 22px;
+	}
+	.actionTitle > h2
+	{
+		font-size: 21px;
+	}
+
+	.actionPromptOption
+	{
+		font-size: 20px;
+	}
 }
 
 @media screen and (min-width: 1400px)
@@ -2276,6 +2294,22 @@ a:hover { cursor: pointer }
 	.eventCardFull p
 	{
 		font-size: 15px;
+	}
+
+	.actionCategory h2
+	{
+		font-size: 16px;
+		padding-top: 5px;
+	}
+	.actionName
+	{
+		width: 67%;
+		font-size: 20px;
+	}
+	.actionInfo
+	{
+		width: 5%;
+		font-size: 12px;
 	}
 }
 
@@ -2302,7 +2336,7 @@ a:hover { cursor: pointer }
 	.bottomPanelDiv .info
 	{
 		font-size: 18px;
-		line-height: 20px;
+		line-height: 24px;
 	}
 
 	#infectionDeckContainer img
@@ -2491,5 +2525,15 @@ a:hover { cursor: pointer }
 	{
 		width: 70%;
 		margin: 10px 15%;
+	}
+
+	.actionCategory h2 { font-size: 21px }
+	.actionName
+	{
+		font-size: 26px;
+	}
+	.actionInfo
+	{
+		font-size: 19px;
 	}
 }
