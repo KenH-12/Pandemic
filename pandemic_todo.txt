@@ -5,15 +5,8 @@ TO DO
 -----
 make sure things look ok for different screen sizes
 	action interfaces
-		drive/ferry
-		direct flight
-		charter flight
-		shuttle flight
-		build research station
 		treat disease
-		share knowledge
 		discover a cure
-		pass
 
 		event cards
 			airlift
@@ -30,9 +23,6 @@ make sure things look ok for different screen sizes
 	special event alerts
 	
 	tooltip widths
-
-	small screens
-		action buttons may exceed screen height
 
 	big screens
 		arrange player deck with 6 epidemics exceeds screen height

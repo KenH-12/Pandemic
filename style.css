@@ -1553,11 +1553,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .button
 {
-	width: 75%;
+	width: 80%;
 	text-align: center;
 	font-family: 'Exo 2';
-	padding: 5px;
-	margin-left: 12.5%;
+	font-size: 14px;
+	padding: 3px;
+	margin-left: 10%;
 	background-color: #0e7aa8;
 	cursor: pointer;
 }
@@ -1704,6 +1705,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border-top: 2px solid #fff;
 	border-bottom: 2px solid #fff;
 }
+#actionInterface > .rules,
+#actionInterface .instructions,
+.shareableCards
+{
+	font-size: 14px;
+}
 #actionInterface > .rules > p
 {
 	text-align: left;
@@ -1726,7 +1733,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #actionInterface .eventCardFull + .instructions { text-align: center }
 #actionPrompt .playerCard
 {
-	font-size: 18px;
+	font-size: 14px;
 	width: 94%;
 	margin: 0 3% 5px 3%;
 }
@@ -1839,7 +1846,6 @@ span.r, p.r {color: #ef282a; background: none !important }
 .shareableCards p
 {
 	text-align: center;
-	line-height: 22px;
 }
 
 .roleTag
@@ -2274,9 +2280,29 @@ a:hover { cursor: pointer }
 		font-size: 21px;
 	}
 
+	#actionInterface > .rules,
+	#actionInterface .instructions,
+	.shareableCards
+	{
+		font-size: 16px;
+	}
+
 	.actionPromptOption
 	{
 		font-size: 20px;
+	}
+
+	#actionPrompt .playerCard
+	{
+		font-size: 16px;
+	}
+
+	.btnConfirm
+	{
+		font-size: 16px;
+		width: 75%;
+		padding: 5px;
+		margin-left: 12.5%;
 	}
 }
 
@@ -2310,6 +2336,30 @@ a:hover { cursor: pointer }
 	{
 		width: 5%;
 		font-size: 12px;
+	}
+
+	.actionTitle > h2
+	{
+		font-size: 24px;
+	}
+
+	#actionInterface > .rules,
+	#actionInterface .instructions,
+	.shareableCards
+	{
+		font-size: 18px;
+	}
+
+	#actionPrompt .playerCard
+	{
+		font-size: 18px;
+	}
+
+	.btnConfirm
+	{
+		font-size: 18px;
+		width: 80%;
+		margin-left: 10%;
 	}
 }
 
@@ -2414,8 +2464,6 @@ a:hover { cursor: pointer }
 		border-bottom-right-radius: 8px;
 		font-size: 18px;
 	}
-
-	/* TODO: .playerCard found in other areas */
 
 	.playerPanel .role
 	{
@@ -2530,10 +2578,47 @@ a:hover { cursor: pointer }
 	.actionCategory h2 { font-size: 21px }
 	.actionName
 	{
-		font-size: 26px;
+		font-size: 24px;
 	}
 	.actionInfo
 	{
 		font-size: 19px;
+	}
+
+	#btnCancelAction
+	{
+		font-size: 20px;
+	}
+	#btnCancelAction span:first-of-type
+	{
+		font-size: 26px;
+	}
+
+	.actionTitle > h2
+	{
+		font-size: 32px;
+	}
+
+	#actionInterface > .rules,
+	#actionInterface .instructions,
+	.shareableCards
+	{
+		font-size: 22px;
+	}
+
+	.actionPromptOption
+	{
+		font-size: 28px;
+	}
+
+	#actionPrompt .playerCard
+	{
+		font-size: 22px;
+	}
+
+	.btnConfirm
+	{
+		font-size: 24px;
+		padding: 8px;
 	}
 }
