@@ -141,7 +141,6 @@ function parseEvents(events)
 			let parsedEvent;
 			for (let e of events)
 			{
-				console.log("parsing event: ", e);
 				if (!e) continue;
 				
 				if (e.code === eventTypes.startingHands.code)
@@ -398,7 +397,9 @@ class Step
 	{
 		stepName = `action ${i}`;
 		steps[stepName] = new Step(stepName, [enableAvailableActions, finishActionStep],
-			`${actionsRemaining} Action${--actionsRemaining > 1 ? "s" : ""} Remaining`);
+			`${actionsRemaining} Action${actionsRemaining === 1 ? "" : "s"} Remaining`);
+		
+		actionsRemaining--;
 	}
 
 	// If the hand limit is violated as a result of the Share Knowledge action,
@@ -509,7 +510,7 @@ function indicateActionsLeft({ addend, zeroRemaining } = {})
 	if (currentStepDescription.substring(2, 8) !== "Action")
 		return;
 	
-	const n = zeroRemaining ? "0" : parseInt(currentStepDescription[0]) + addend;
+	const n = zeroRemaining ? 0 : parseInt(currentStepDescription[0]) + addend;
 
 	$stepIndicator.html(`${n} Action${n === 1 ? "" : "s"} Remaining`);
 }
