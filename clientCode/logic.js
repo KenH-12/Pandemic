@@ -879,7 +879,7 @@ function promptAction(actionProperties)
 		$actionCategories.addClass(hidden);
 		$actionPrompt.removeClass(hidden).removeAttr("style");
 
-		const $instructions = $actionPrompt.find(".instructions");
+		const $instructions = $actionPrompt.find(".instructions").first();
 		if ($instructions.html().length === 0)
 			$instructions.addClass(hidden);
 
