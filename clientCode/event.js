@@ -117,7 +117,6 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: [
 			`At any research station, discard 5 city cards of the same color from your hand to cure the disease of that color.`,
 			`If no cubes of this color are on the board, the disease becomes eradicated.`,
-			"<br/>",
 			strings.victoryCondition
 		],
 		actionPathName: "actions/discoverCure",
