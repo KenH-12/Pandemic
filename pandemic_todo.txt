@@ -3,10 +3,11 @@ BUGS
 
 TO DO
 -----
+Discover a cure's mention of "eradicated" should have the hoverInfo class
+
 make sure things look ok for different screen sizes
 	action interfaces
 		treat disease
-		discover a cure
 
 		event cards
 			airlift

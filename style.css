@@ -43,6 +43,7 @@ body
 	-ms-user-select: none;       /* Internet Explorer/Edge */
 
 	min-width: 1024px;
+	max-width: 1920px;
 }
 input, select { background-color: #fff }
 input[type='text'],
@@ -1120,8 +1121,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	font-weight: 700;
 	font-size: 17px;
-	line-height: 24px;
-	height: 27px;
+	padding-bottom: 4px;
 }
 #stepIndicator { font-size: 14px }
 #stepIndicator .info
@@ -1398,10 +1398,11 @@ span.r, p.r {color: #ef282a; background: none !important }
 	text-align: center;
 }
 .discardPrompt { padding: 5px 5% }
-.cardsToKeep > .instructions
+.cardsToKeep .instructions
 {
-	font-size: 14px;
-	margin-bottom: 5px;
+	font-size: 12px;
+	margin: -2px 0 3px 0;
+	padding: 0 0 3px 0;
 	border-bottom: 1px solid #fff;
 }
 .discardPrompt p span
@@ -1411,7 +1412,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .discardPrompt .playerCard
 {
-	margin-bottom: 3px;
+	margin-bottom: 2px !important;
 	cursor: pointer !important;
 }
 .cardsToKeep > p,
@@ -1424,12 +1425,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 100%;
 	margin: 0;
 	padding: 0;
-	min-height: 45px;
+	min-height: 30px;
 }
 .discardSelections .specialAbilityTag { width: 96% }
 .discardPrompt .cardsToKeep
 {
-	min-height: 45px;
+	min-height: 85px;
 	padding-bottom: 3px;
 }
 .cardsToKeep .playerCard:last-of-type { margin-bottom: 0 !important }
@@ -1678,7 +1679,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #discardStepContainer > .discardPrompt
 { background: linear-gradient(to bottom, var(--main-background-color), #054583, var(--main-background-color)) }
 #actionPrompt { padding-bottom: 5px }
-.actionTitle { padding: 5px; }
+.actionTitle { padding: 1px 5px; }
 .actionTitle *
 {
 	display: inline-block;
@@ -1701,12 +1702,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 #actionInterface { font-family: 'Ropa Sans' }
 #actionInterface > .rules
 {
-	padding: 8px 2% 0 2%;
+	padding: 5px 2% 0 2%;
 	border-top: 2px solid #fff;
 	border-bottom: 2px solid #fff;
 }
 #actionInterface > .rules,
-#actionInterface .instructions,
+#actionInterface > .instructions,
 .shareableCards
 {
 	font-size: 14px;
@@ -1715,7 +1716,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	text-align: left;
 	padding: 0 1%;
-	margin-bottom: 8px;
+	margin-bottom: 5px;
 }
 .rules > p.specialAbilityRule
 {
@@ -1724,12 +1725,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 #actionInterface > .rules li { margin-left: 3% }
 #actionInterface > .playerCard { cursor: pointer }
-#actionInterface .instructions 
+#actionInterface > .instructions 
 {
 	padding: 3%;
 	padding-bottom: none;
 }
-#actionInterface .instructions + .discardSelections { margin-top: -2.5% }
+#actionInterface > .instructions + .discardSelections { margin-top: -2.5% }
 #actionInterface .eventCardFull + .instructions { text-align: center }
 #actionPrompt .playerCard
 {
@@ -2192,8 +2193,7 @@ a:hover { cursor: pointer }
 	#roleIndicator
 	{
 		font-size: 20px;
-		line-height: 26px;
-		height: 30px;
+		padding-bottom: 5px;
 	}
 	#stepIndicator .info
 	{
@@ -2275,13 +2275,24 @@ a:hover { cursor: pointer }
 	{
 		font-size: 22px;
 	}
+
+	.actionTitle { padding: 5px }
 	.actionTitle > h2
 	{
 		font-size: 21px;
 	}
 
+	#actionInterface > .rules
+	{
+		padding: 8px 2% 0 2%;
+	}
+	#actionInterface > .rules > p
+	{
+		margin-bottom: 8px;
+	}
+
 	#actionInterface > .rules,
-	#actionInterface .instructions,
+	#actionInterface > .instructions,
 	.shareableCards
 	{
 		font-size: 16px;
@@ -2300,9 +2311,23 @@ a:hover { cursor: pointer }
 	.btnConfirm
 	{
 		font-size: 16px;
+		line-height: 16px;
 		width: 75%;
 		padding: 5px;
 		margin-left: 12.5%;
+	}
+
+	.cardsToKeep .instructions
+	{
+		font-size: 14px;
+		margin: 0 0 6px 0;
+		padding: 3px;
+	}
+	.cardsToKeep > p,
+	.discardSelections > p,
+	.discardPrompt p span
+	{
+		font-size: 18px;
 	}
 }
 
@@ -2344,13 +2369,13 @@ a:hover { cursor: pointer }
 	}
 
 	#actionInterface > .rules,
-	#actionInterface .instructions,
+	#actionInterface > .instructions,
 	.shareableCards
 	{
 		font-size: 18px;
 	}
 
-	#actionPrompt .playerCard
+	#actionPrompt > .playerCard
 	{
 		font-size: 18px;
 	}
@@ -2358,8 +2383,15 @@ a:hover { cursor: pointer }
 	.btnConfirm
 	{
 		font-size: 18px;
+		line-height: 18px;
 		width: 80%;
 		margin-left: 10%;
+	}
+
+	.cardsToKeep .instructions,
+	.discardPrompt .playerCard
+	{
+		font-size: 16px;
 	}
 }
 
@@ -2495,8 +2527,6 @@ a:hover { cursor: pointer }
 	#roleIndicator
 	{
 		font-size: 30px;
-		line-height: 36px;
-		height: 42px;
 	}
 	#stepIndicator .info
 	{
@@ -2600,10 +2630,18 @@ a:hover { cursor: pointer }
 	}
 
 	#actionInterface > .rules,
-	#actionInterface .instructions,
+	#actionInterface > .instructions,
 	.shareableCards
 	{
 		font-size: 22px;
+	}
+	#actionInterface > .rules
+	{
+		padding: 10px 3% 0 3%;
+	}
+	#actionInterface > .rules > p
+	{
+		margin-bottom: 12px;
 	}
 
 	.actionPromptOption
@@ -2619,6 +2657,17 @@ a:hover { cursor: pointer }
 	.btnConfirm
 	{
 		font-size: 24px;
-		padding: 8px;
+		padding: 14px 0;
+	}
+
+	.cardsToKeep .instructions
+	{
+		font-size: 18px;
+	}
+	.cardsToKeep > p,
+	.discardSelections > p,
+	.discardPrompt p span
+	{
+		font-size: 26px;
 	}
 }
