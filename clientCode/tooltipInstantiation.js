@@ -40,6 +40,7 @@ export default function instantiateTooltips()
 	bindDispatchTypeHoverEvents();
 	bindForecastInfoHoverEvents();
 	bindPlayStepHoverEvents();
+	bindActionPromptRulesHoverEvents();
 }
 
 const containerSelector = "#boardContainer";
@@ -674,6 +675,19 @@ function bindPlayStepHoverEvents()
 
 		bindEpidemicCardHoverEvents($procedureContainer);
 	});
+}
+
+function bindActionPromptRulesHoverEvents()
+{
+	new Tooltip({
+		hoverElementSelector: "#actionPrompt .rules .hoverInfo",
+		positionRelativeToSelector: ".rules",
+		juxtaposition: "left",
+		alignArrowWithHoveredElement: true,
+		containerSelector,
+		getContent: ({ $hoveredElement }) => getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType"))),
+		cssClassString: "eventTypeTooltip"
+	}).bindHoverEvents();
 }
 
 function getHoverElementsWhichInterfereWithDragging()
