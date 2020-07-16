@@ -1412,10 +1412,10 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .discardPrompt .playerCard
 {
-	margin-bottom: 2px !important;
+	margin-bottom: 2px;
 	cursor: pointer !important;
 }
-.cardsToKeep > p,
+.cardsToKeep > p
 .discardSelections > p
 {
 	margin: 0 2% 3px 2%;
@@ -1736,8 +1736,10 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	font-size: 14px;
 	width: 94%;
-	margin: 0 3% 5px 3%;
+	margin: 0 3% 1px 3%;
 }
+#actionInterface > .playerCard
+{ margin-bottom: 5px }
 #actionPrompt .eventCardFull
 {
 	display: inline-block;
@@ -1760,13 +1762,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 	padding: 0;
 	text-align: left;
 	font-family: 'Exo 2';
-	font-size: 13px;
+	font-size: 11px;
 	cursor: pointer;
 }
 #btnCancelAction > * { vertical-align: middle }
 #btnCancelAction span:first-of-type
 {
-	font-size: 18px;
+	font-size: 15px;
 	font-weight: 700;
 	margin: 0 6.5%;
 }
@@ -1957,6 +1959,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 {
 	text-align: center;
 	padding: 5px 0;
+	font-size: 12px;
 }
 
 #setupProcedureContainer { margin-bottom: -2px }
@@ -2266,14 +2269,16 @@ a:hover { cursor: pointer }
 		width: 82%;
 		margin: 5px 9%;
 	}
+	#forecastContainer > p
+	{ font-size: 16px }
 	
 	#btnCancelAction
 	{
-		font-size: 15px;
+		font-size: 14px;
 	}
 	#btnCancelAction span:first-of-type
 	{
-		font-size: 22px;
+		font-size: 18px;
 	}
 
 	.actionTitle { padding: 5px }
@@ -2329,6 +2334,10 @@ a:hover { cursor: pointer }
 	{
 		font-size: 18px;
 	}
+	#actionInterface > .discardPrompt .playerCard
+	{
+		margin-bottom: 2px;
+	}
 }
 
 @media screen and (min-width: 1400px)
@@ -2346,6 +2355,8 @@ a:hover { cursor: pointer }
 	{
 		font-size: 15px;
 	}
+	#forecastContainer > p
+	{ font-size: 18px }
 
 	.actionCategory h2
 	{
@@ -2604,6 +2615,8 @@ a:hover { cursor: pointer }
 		width: 70%;
 		margin: 10px 15%;
 	}
+	#forecastContainer > p
+	{ font-size: 20px }
 
 	.actionCategory h2 { font-size: 21px }
 	.actionName
@@ -2669,5 +2682,9 @@ a:hover { cursor: pointer }
 	.discardPrompt p span
 	{
 		font-size: 26px;
+	}
+	#actionInterface > .discardPrompt .playerCard
+	{
+		margin-bottom: 3px;
 	}
 }

@@ -5,14 +5,7 @@ TO DO
 -----
 make sure things look ok for different screen sizes
 	action interfaces
-		treat disease
-
-		event cards
-			airlift
-			government grant
-			resilient population
-			one quiet night
-			forecast
+		share knowledge w/ researcher (give and take options available)
 
 	card draw
 	resolve epidemics
