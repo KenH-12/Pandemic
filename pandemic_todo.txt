@@ -9,7 +9,6 @@ make sure things look ok for different screen sizes
 
 	card draw
 	resolve epidemics
-	discard prompt
 	infect cities
 
 	special event alerts

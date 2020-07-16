@@ -1410,7 +1410,8 @@ span.r, p.r {color: #ef282a; background: none !important }
 	float: right;
 	padding: 0 2px;
 }
-.discardPrompt .playerCard
+.discardPrompt .playerCard,
+#discardStepContainer .playerCard
 {
 	margin-bottom: 2px;
 	cursor: pointer !important;
@@ -1574,7 +1575,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	margin-top: 12.5%;
 	font-family: 'Exo 2', sans-serif;
-	font-size: 20px;
+	font-size: 18px;
 }
 
 .button-secondary-color { background-color: #1799d1 }
@@ -2338,6 +2339,13 @@ a:hover { cursor: pointer }
 	{
 		margin-bottom: 2px;
 	}
+
+	#cardDrawContainer .button,
+	#infectCitiesContainer .button,
+	#epidemicContainer .button
+	{
+		font-size: 20px;
+	}
 }
 
 @media screen and (min-width: 1400px)
@@ -2662,7 +2670,8 @@ a:hover { cursor: pointer }
 		font-size: 28px;
 	}
 
-	#actionPrompt .playerCard
+	#actionPrompt .playerCard,
+	#discardStepContainer .playerCard
 	{
 		font-size: 22px;
 	}
@@ -2677,14 +2686,19 @@ a:hover { cursor: pointer }
 	{
 		font-size: 18px;
 	}
+	#discardStepContainer .cardsToKeep .instructions
+	{
+		font-size: 20px;
+	}
 	.cardsToKeep > p,
 	.discardSelections > p,
 	.discardPrompt p span
 	{
 		font-size: 26px;
 	}
+
 	#actionInterface > .discardPrompt .playerCard
-	{
-		margin-bottom: 3px;
-	}
+	{ margin-bottom: 3px }
+	#discardStepContainer .playerCard
+	{ margin-bottom: 5px }
 }
