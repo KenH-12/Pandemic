@@ -1128,6 +1128,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	font-size: 11px;
 	float: left;
+	margin-left: 5px;
 }
 #stepIndicator .info + span { margin-left: -14px }
 #roleIndicator,
@@ -2194,14 +2195,14 @@ a:hover { cursor: pointer }
 	{
 		font-size: 16px;
 	}
+	#stepIndicator .info
+	{
+		font-size: 12px;
+	}
 	#roleIndicator
 	{
 		font-size: 20px;
 		padding-bottom: 5px;
-	}
-	#stepIndicator .info
-	{
-		font-size: 18px;
 	}
 
 	.actionCategory h2 { font-size: 14px }
@@ -2701,4 +2702,12 @@ a:hover { cursor: pointer }
 	{ margin-bottom: 3px }
 	#discardStepContainer .playerCard
 	{ margin-bottom: 5px }
+
+	#cardDrawContainer .button,
+	#infectCitiesContainer .button,
+	#epidemicContainer .button
+	{
+		font-size: 26px;
+		padding: 10px;
+	}
 }

@@ -3283,8 +3283,6 @@ async function animateCardsToHand($cards)
 
 async function resizeAll()
 {
-	console.log("resizeAll()");
-
 	const devToolsWasOpen = !gameData.devToolsIsClosed;
 	gameData.checkDevToolsOpenState();
 
@@ -3407,7 +3405,7 @@ function resizeRightPanelElements()
 	rightPanel.height(gameData.boardHeight);
 	gameData.panelWidth = rightPanel.width();
 	
-	if ($("#infectionsContainer, #initialInfectionsContainer, #forecastContainer").not(".hidden").length)
+	if ($("#infectCitiesContainer, #initialInfectionsContainer, #forecastContainer").not(".hidden").length)
 	{
 		positionInfectionPanelComponents();
 		positionFaceDownInfectionCards();
