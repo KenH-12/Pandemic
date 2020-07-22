@@ -97,3 +97,28 @@ function numberWithCommas(x)
 {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+function getOuterHtml($element)
+{
+	return $("<div>").append($element.clone()).html();
+}
+
+function stripTagsThatMatchSelector(html, selector)
+{
+	const $elements = $(`<div>`).append(html);
+
+	let $elementsToStrip = $elements.find(selector),
+		$eToStrip,
+		$parent;
+
+	while ($elementsToStrip.length)
+	{
+		$eToStrip = $elementsToStrip.first();
+		$parent = $eToStrip.parent();
+		$parent.html($parent.html().replace(getOuterHtml($eToStrip), $eToStrip.text()));
+
+		$elementsToStrip = $elements.find(selector);
+	}
+
+	return $elements.html();
+}
