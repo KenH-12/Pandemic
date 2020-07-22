@@ -3,9 +3,9 @@ BUGS
 
 TO DO
 -----
-the word "eradicated" in the the research station supply tooltip's discover a cure tooltip should not have the hoverInfo class
-
 make sure things look ok for different screen sizes
+	the role indicator line-height is not perfect for 1366px screen width
+	
 	action interfaces
 		share knowledge w/ researcher (give and take options available)
 

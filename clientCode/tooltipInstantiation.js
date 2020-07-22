@@ -440,7 +440,8 @@ function bindResearchStationInfoHoverEvents()
 	}).bindHoverEvents();
 
 	new Tooltip({
-		getContent: ({ $hoveredElement }) => getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType"))),
+		getContent: ({ $hoveredElement }) =>
+			getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType")), { omitHoverInfoElements: true }),
 		hoverElementSelector: ".rsInfo .hoverInfo",
 		positionRelativeToSelector: ".rsInfo",
 		juxtaposition: "right",
