@@ -1671,7 +1671,7 @@ function getEventType(eventCode)
 	return eventTypes[eventCodes[eventCode]];
 }
 
-function getEventTypeTooltipContent(eventType, { includeName = true, pluralNameForm, actionNotPossible, includeRelatedRoleRule, isDispatchType } = {})
+function getEventTypeTooltipContent(eventType, { includeName = true, pluralNameForm, actionNotPossible, includeRelatedRoleRule, isDispatchType, omitHoverInfoElements } = {})
 {
 	let content = "";
 
@@ -1695,6 +1695,9 @@ function getEventTypeTooltipContent(eventType, { includeName = true, pluralNameF
 	if (includeRelatedRoleRule)
 		content += `<p class='specialAbilityRule'>${replaceRoleNamesWithRoleTags(eventType.relatedRoleRule)}</p>`;
 	
+	if (omitHoverInfoElements)
+		content = stripTagsThatMatchSelector(content, ".hoverInfo");
+
 	return content;
 }
 
