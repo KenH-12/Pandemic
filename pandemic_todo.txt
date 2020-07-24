@@ -5,7 +5,9 @@ TO DO
 -----
 make sure things look ok for different screen sizes
 
-	card draw
+	infect cities
+		top of card is visible during reveal animation (screen widths over 1400px)
+
 	resolve epidemics
 
 	special event alerts

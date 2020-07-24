@@ -2425,6 +2425,11 @@ a:hover { cursor: pointer }
 	{
 		font-size: 16px;
 	}
+
+	#cardDrawContainer > h2
+	{
+		font-size: 36px;
+	}
 }
 
 @media screen and (min-width: 1920px)
@@ -2728,5 +2733,23 @@ a:hover { cursor: pointer }
 	{
 		font-size: 26px;
 		padding: 10px;
+	}
+
+	#cardDrawContainer .playerCard
+	{
+		width: 96%;
+		height: 40px;
+		line-height: 40px;
+		font-size: 24px;
+	}
+	#cardDrawContainer .playerCard,
+	.epidemicFull
+	{
+		margin: 25px 2%;
+	}
+
+	#cardDrawContainer > h2
+	{
+		font-size: 46px;
 	}
 }
