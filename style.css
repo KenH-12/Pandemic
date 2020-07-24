@@ -2134,12 +2134,9 @@ a:hover { cursor: pointer }
 		font-size: 14px;
 	}
 
-	.name, .role
+	.playerPanel .role
 	{
 		font-size: 14px;
-		padding: 0;
-		white-space: nowrap;
-		overflow: hidden;
 	}
 	/* TODO: different font-sizes for different numbers of player panels */
 
@@ -2202,7 +2199,6 @@ a:hover { cursor: pointer }
 	#roleIndicator
 	{
 		font-size: 20px;
-		padding-bottom: 5px;
 	}
 
 	.actionCategory h2 { font-size: 14px }
