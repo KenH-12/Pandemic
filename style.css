@@ -1188,6 +1188,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 89.52%;
 	left: 10.48%;
 	z-index: 5;
+	margin-top: -2px;
 }
 #infectionDiscardContainer .infectionCard
 {
