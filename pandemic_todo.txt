@@ -4,9 +4,6 @@ BUGS
 TO DO
 -----
 make sure things look ok for different screen sizes
-	
-	action interfaces
-		share knowledge w/ researcher (give and take options available)
 
 	card draw
 	resolve epidemics
@@ -18,8 +15,19 @@ make sure things look ok for different screen sizes
 	big screens
 		arrange player deck with 6 epidemics exceeds screen height
 		drawn player cards overlap before being revealed
+	
+	setup animations
+		determine roles
+		give cards to each role
+		determine turn order
+		prepare the player deck
+		infect 9 cities
+		place pawns in Atlanta
+		place research station in Atlanta
 
 enforce min-width
+
+replace "click to locate" title attributes with the Tooltip class
 
 access keys
 	form to request a new key

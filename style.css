@@ -1120,7 +1120,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #roleIndicator
 {
 	font-weight: 700;
-	font-size: 17px;
+	font-size: 16px;
 	padding-bottom: 4px;
 }
 #stepIndicator { font-size: 14px }
@@ -2309,6 +2309,7 @@ a:hover { cursor: pointer }
 	#actionPrompt .playerCard
 	{
 		font-size: 16px;
+		margin-bottom: 2px;
 	}
 
 	.btnConfirm
@@ -2318,6 +2319,11 @@ a:hover { cursor: pointer }
 		width: 75%;
 		padding: 5px;
 		margin-left: 12.5%;
+	}
+
+	.playerOptions .roleTag
+	{
+		font-size: 18px;
 	}
 
 	.cardsToKeep .instructions
@@ -2363,6 +2369,11 @@ a:hover { cursor: pointer }
 	#forecastContainer > p
 	{ font-size: 18px }
 
+	#roleIndicator
+	{
+		font-size: 22px;
+	}
+
 	.actionCategory h2
 	{
 		font-size: 16px;
@@ -2402,6 +2413,11 @@ a:hover { cursor: pointer }
 		line-height: 18px;
 		width: 80%;
 		margin-left: 10%;
+	}
+
+	.playerOptions .roleTag
+	{
+		font-size: 20px;
 	}
 
 	.cardsToKeep .instructions,
@@ -2671,12 +2687,19 @@ a:hover { cursor: pointer }
 	#discardStepContainer .playerCard
 	{
 		font-size: 22px;
+		margin-bottom: 3px;
 	}
 
 	.btnConfirm
 	{
 		font-size: 24px;
 		padding: 14px 0;
+	}
+
+	.playerOptions .roleTag
+	{
+		font-size: 24px;
+		padding: 4px 0 2px 0;
 	}
 
 	.cardsToKeep .instructions
