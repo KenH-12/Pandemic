@@ -3,12 +3,9 @@ BUGS
 
 TO DO
 -----
+the discard step instructions should indicate that event cards can be played by click the card in the player panel
+
 make sure things look ok for different screen sizes
-
-	resolve epidemics
-		loading gif
-
-	special event alerts
 	
 	tooltip widths
 

@@ -2361,11 +2361,11 @@ a:hover { cursor: pointer }
 		padding: 8px 12px;
 	}
 	.epidemicFull h3 { font-size: 15px }
-	/* .epidemicFull h3 img
+	.epidemicFull h3 img
 	{
-		width: 16px;
+		width: 17px;
 		margin-left: 8px;
-	} */
+	}
 	.epidemicFull p
 	{
 		font-size: 12px;
@@ -2466,12 +2466,6 @@ a:hover { cursor: pointer }
 	{
 		padding: 8px 12px;
 	}
-	.epidemicFull h3 { font-size: 15px }
-	/* .epidemicFull h3 img
-	{
-		width: 16px;
-		margin-left: 8px;
-	} */
 	.epidemicFull p
 	{
 		font-size: 12px;
@@ -2645,8 +2639,8 @@ a:hover { cursor: pointer }
 	.epidemicFull h3 { font-size: 16px }
 	.epidemicFull h3 img
 	{
-		width: 16px;
-		margin-left: 8px;
+		width: 18px;
+		margin-left: 10px;
 	}
 	.epidemicFull p
 	{
