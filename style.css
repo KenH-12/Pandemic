@@ -1205,7 +1205,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 #boardContainer > .epidemicFull
 {
-	width: 180px;
+	width: 24%;
 	pointer-events: none;
 }
 #boardContainer > .epidemicFull > div
@@ -2350,6 +2350,26 @@ a:hover { cursor: pointer }
 	{
 		font-size: 20px;
 	}
+
+	#boardContainer > .epidemicFull
+	{
+		width: 23.7%;
+	}
+	.epidemicFull h2 { font-size: 18px }
+	.epidemicFull div	
+	{
+		padding: 8px 12px;
+	}
+	.epidemicFull h3 { font-size: 15px }
+	/* .epidemicFull h3 img
+	{
+		width: 16px;
+		margin-left: 8px;
+	} */
+	.epidemicFull p
+	{
+		font-size: 12px;
+	}
 }
 
 @media screen and (min-width: 1400px)
@@ -2430,6 +2450,31 @@ a:hover { cursor: pointer }
 	#cardDrawContainer > h2
 	{
 		font-size: 36px;
+	}
+
+	#epidemicContainer > .epidemicFull
+	{
+		width: 90%;
+		margin-left: 5%;
+	}
+	#boardContainer > .epidemicFull
+	{
+		width: 21%;
+	}
+	.epidemicFull h2 { font-size: 18px }
+	.epidemicFull div	
+	{
+		padding: 8px 12px;
+	}
+	.epidemicFull h3 { font-size: 15px }
+	/* .epidemicFull h3 img
+	{
+		width: 16px;
+		margin-left: 8px;
+	} */
+	.epidemicFull p
+	{
+		font-size: 12px;
 	}
 }
 
@@ -2752,5 +2797,25 @@ a:hover { cursor: pointer }
 	#cardDrawContainer > h2
 	{
 		font-size: 46px;
+	}
+
+	#boardContainer > .epidemicFull
+	{
+		width: 21.5%;
+	}
+	.epidemicFull h2 { font-size: 22px }
+	.epidemicFull div
+	{
+		padding: 12px 14px;
+	}
+	.epidemicFull h3 { font-size: 20px }
+	/* .epidemicFull h3 img
+	{
+		width: 16px;
+		margin-left: 8px;
+	} */
+	.epidemicFull p
+	{
+		font-size: 16px;
 	}
 }

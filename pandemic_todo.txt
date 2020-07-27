@@ -6,6 +6,7 @@ TO DO
 make sure things look ok for different screen sizes
 
 	resolve epidemics
+		loading gif
 
 	special event alerts
 	
