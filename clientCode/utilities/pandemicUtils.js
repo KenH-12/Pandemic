@@ -215,8 +215,9 @@ function showLoadingGif(eventType)
 		$anchor = getAnchorElement();
 		if ($anchor.length)
 		{
-			const $img = $("<img src='images/loading.gif' alt='loading' />"),
-				$loadingGif = $anchor.closest(".epidemicFull").length ? $img : $(`<div class='loadingGif'></div>`).append($img);
+			const isForEpidemic = $anchor.closest(".epidemicFull").length,
+				$img = $(`<img src='images/loading${ isForEpidemic ? "_epidemic" : "" }.gif' alt='loading' />`),
+				$loadingGif = isForEpidemic ? $img : $(`<div class='loadingGif'></div>`).append($img);
 			
 			$loadingGif.insertAfter($anchor);
 			
