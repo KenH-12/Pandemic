@@ -1671,7 +1671,15 @@ function getEventType(eventCode)
 	return eventTypes[eventCodes[eventCode]];
 }
 
-function getEventTypeTooltipContent(eventType, { includeName = true, pluralNameForm, actionNotPossible, includeRelatedRoleRule, isDispatchType, omitHoverInfoElements } = {})
+function getEventTypeTooltipContent(eventType,
+	{
+		includeName = true, // Includes the event type name as the title.
+		pluralNameForm, // Pluralizes the event type name in the title.
+		actionNotPossible, // Includes an indication that performing the event is not currently possible.
+		includeRelatedRoleRule, // Some event types have special rules that apply to a specific role.
+		isDispatchType, // Indicates that the Dispatcher's special action was used to perform a movement event.
+		omitHoverInfoElements // Set to true when the tooltip will not be hoverable.
+	} = {})
 {
 	let content = "";
 

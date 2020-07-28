@@ -462,7 +462,8 @@ function bindActionButtonHoverEvents()
 				return getEventTypeTooltipContent(eventType,
 					{
 						actionNotPossible: $btn.hasClass("btnDisabled"),
-						includeRelatedRoleRule: relatedRoleRuleApplies(eventType)
+						includeRelatedRoleRule: relatedRoleRuleApplies(eventType),
+						omitHoverInfoElements: true
 					});
 			};
 	
