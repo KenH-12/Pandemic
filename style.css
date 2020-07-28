@@ -710,16 +710,17 @@ span.r, p.r {color: #ef282a; background: none !important }
 	padding: 4px;
 }
 .tooltip  p { margin: 4px 0 }
-.tooltip .warning { font-size: 25px; vertical-align: super; }
+.tooltip .warning { font-size: 22px; vertical-align: super; }
 
 .eventTypeTooltip
 {
 	pointer-events: none;
 }
-.eventTypeTooltip h3
+.eventTypeTooltip h3,
+.eventDetails .title
 {
 	font-family: 'Exo 2', sans-serif;
-	font-size: 20px;
+	font-size: 18px;
 }
 .eventTypeTooltip .actionNotPossible
 {
@@ -727,12 +728,11 @@ span.r, p.r {color: #ef282a; background: none !important }
 	text-align: center;
 	border-top: 1px solid #666;
 	border-bottom: 1px solid #666;
-	padding: 2px 0;
+	padding: 1px 0;
 }
 .eventTypeTooltip p
 {
 	margin-top: 3px;
-	line-height: 16px;
 }
 .eventTypeTooltip h3 + p
 {
@@ -752,19 +752,15 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .eventDetails .title
 {
-	font-family: 'Exo 2', sans-serif;
-	font-size: 20px;
-	line-height: 20px;
 	text-align: center;
 	border-bottom: 1px solid #fff;
-	padding-bottom: 3px;
-	margin-bottom: 3px;
+	margin: -2px 0 3px 0;
 }
 .eventDetails  .title > .eventTypeInfo
 {
 	float: right;
-	font-size: 14px;
-	line-height: 20px;
+	font-size: 13px;
+	line-height: 18px;
 	margin-left: 5px;
 }
 .eventDetails  .title > .eventTypeInfo:hover,
@@ -791,13 +787,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 .eventDetails .infectionCard
 {
 	font-size: 14px;
-	margin-bottom: 8px;
+	margin-bottom: 6px;
 }
 .eventDetails .infectionCard .cityName
 {
-	top: 3px;
+	margin-top: 3px;
 	white-space: nowrap;
-	margin-left: 18%
+	margin-left: 20%
 }
 
 .eventDetails .column
@@ -813,7 +809,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	overflow: visible;
 }
 .eventDetails .column:last-of-type p:first-of-type { border-bottom: 1px solid #fff }
-.eventDetails .hand { padding: 5px 0 }
+.eventDetails .hand { padding: 4px 0 }
 .eventDetails .populationRank
 {
 	font-size: 22px;
@@ -821,7 +817,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 
 .indent-1,
-.eventTypeTooltip li 
+.eventTypeTooltip li
 { margin-left: 12px }
 .indent-2 { margin-left: 30px }
 
@@ -1511,7 +1507,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	z-index: 12;
 	filter: drop-shadow(0px 0px 6px #000);
 	font-size: 12px;
-	max-width: 24%;
+	max-width: 30%;
 }
 .roleCard,
 .eventCardFull
@@ -2060,8 +2056,8 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 .playerCard .population
 {
 	display: block;
-	font-size: 12px;
-	line-height: 12px;
+	font-size: 10px;
+	line-height: 10px;
 	font-family: 'B612 Mono', monospace;
 }
 .popRank
@@ -2114,6 +2110,47 @@ a:hover { cursor: pointer }
 
 @media screen and (min-width: 1200px)
 {
+	.tooltip { max-width: 26% }
+	.tooltip,
+	.eventDetails
+	{
+		font-size: 14px;
+	}
+	.tooltip .warning { font-size: 25px }
+
+	.eventTypeTooltip h3
+	{
+		font-size: 20px;
+	}
+	.eventTypeTooltip .actionNotPossible
+	{
+		padding: 2px 0;
+	}
+	.eventTypeTooltip p
+	{
+		margin-top: 3px;
+		line-height: 16px;
+	}
+	.eventDetails .title
+	{
+		font-size: 20px;
+	}
+	.eventDetails  .title > .eventTypeInfo
+	{
+		font-size: 14px;
+		line-height: 21px;
+	}
+	.eventDetails .playerCard
+	{
+		margin: 3px 0;
+	}
+	.playerCard .population
+	{
+		font-size: 12px;
+		line-height: 12px;
+	}
+	.eventDetails .hand { padding: 5px 0 }
+
 	#topPanel .title,
 	#infectionDiscardContainer .title,
 	.bottomPanelDiv .title
