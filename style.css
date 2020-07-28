@@ -276,7 +276,7 @@ select
 #btnAbandonGame:hover { background-color: #ef282a;}
 
 .smallText { font-size: 12px }
-.largeText { font-size: 20px }
+.largeText { font-size: 18px }
 .whiteText { color: #fff !important }
 .italics { font-style: italic }
 #container
@@ -2150,6 +2150,7 @@ a:hover { cursor: pointer }
 		line-height: 12px;
 	}
 	.eventDetails .hand { padding: 5px 0 }
+	.largeText { font-size: 20px }
 
 	#topPanel .title,
 	#infectionDiscardContainer .title,
@@ -2411,6 +2412,53 @@ a:hover { cursor: pointer }
 
 @media screen and (min-width: 1400px)
 {
+	.tooltip { max-width: 28% }
+	.tooltip,
+	.eventDetails
+	{
+		font-size: 16px;
+	}
+	.tooltip .warning { font-size: 30px }
+
+	.eventTypeTooltip h3,
+	.eventDetails .title
+	{
+		font-size: 22px;
+	}
+	.eventTypeTooltip h3
+	{
+		margin-bottom: -3px;
+	}
+	.eventTypeTooltip .actionNotPossible
+	{
+		padding: 3px 0;
+	}
+	.eventTypeTooltip p
+	{
+		margin-top: 8px;
+		line-height: 18px;
+	}
+	.eventDetails .title
+	{
+		padding-bottom: 2px;
+	}
+	.eventDetails  .title > .eventTypeInfo
+	{
+		font-size: 14px;
+		line-height: 26px;
+	}
+	.playerCard .population
+	{
+		font-size: 13px;
+		line-height: 13px;
+	}
+	.eventDetails .hand { padding: 5px 0 }
+	.eventDetails .infectionCard .cityName
+	{
+		margin-top: 4px;
+	}
+	.largeText { font-size: 24px }
+
 	#btnUndo
 	{
 		font-size: 26px;
@@ -2511,6 +2559,64 @@ a:hover { cursor: pointer }
 
 @media screen and (min-width: 1920px)
 {
+	.tooltip { max-width: 30% }
+	.tooltip,
+	.eventDetails
+	{
+		font-size: 18px;
+	}
+	.tooltip .warning { font-size: 32px }
+
+	.eventTypeTooltip h3,
+	.eventDetails .title
+	{
+		font-size: 28px;
+	}
+	.eventTypeTooltip h3
+	{
+		line-height: 28px;
+		padding: 2px 0 0 0;
+		margin-bottom: -5px;
+	}
+	.eventTypeTooltip h3 + p
+	{
+		padding-top: 8px;
+	}
+	.eventTypeTooltip p
+	{
+		line-height: 20px;
+		margin-top: 12px;
+	}
+	.eventTypeTooltip > p:first-of-type
+	{
+		margin-top: 4px;
+	}
+	.eventTypeTooltip .actionNotPossible + p
+	{
+		margin-top: 6px;
+	}
+	.eventDetails .title
+	{
+		padding-bottom: 4px;
+	}
+	.eventDetails  .title > .eventTypeInfo
+	{
+		font-size: 18px;
+		line-height: 30px;
+	}
+	.playerCard .population
+	{
+		font-size: 16px;
+		line-height: 16px;
+	}
+	.eventDetails .hand { padding: 7px 0 }
+	.eventDetails .infectionCard .cityName
+	{
+		margin-top: 4px;
+	}
+	.eventDetails .populationRank { font-size: 32px }
+	.largeText { font-size: 30px }
+
 	#topPanel .title,
 	#infectionDiscardContainer .title,
 	.bottomPanelDiv .title
