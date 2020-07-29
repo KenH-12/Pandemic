@@ -1117,7 +1117,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	font-weight: 700;
 	font-size: 16px;
-	padding-bottom: 4px;
+	padding-bottom: 2px;
 }
 #stepIndicator { font-size: 14px }
 #stepIndicator .info
@@ -1264,9 +1264,10 @@ span.r, p.r {color: #ef282a; background: none !important }
 	z-index: 6;
 }
 .playerPanel-2 { width: 49.1% }
-.playerPanel-2 .role,
+.playerPanel-2 .role
+{ font-size: 16px }
 .playerPanel-3 .role
-{ font-size: 18px }
+{ font-size: 14px }
 .playerPanel-3 { width: 32.4% }
 .playerPanel-4 { width: 24.1% }
 .playerPanel-4 .role { font-size: 14px }
@@ -1281,14 +1282,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 .name, .role
 {
 	width: 100%;
-	font-size: 12px;
-	line-height: 18px;
 	padding-top: 1px;
 	padding-bottom: 2px;
 }
 .name
 {
 	font-family: 'Ropa Sans', sans-serif;
+	font-size: 12px;
 	line-height: 14px;
 }
 .role
@@ -2177,11 +2177,18 @@ a:hover { cursor: pointer }
 		font-size: 14px;
 	}
 
-	.playerPanel .role
+	.playerPanel-2 .role
 	{
-		font-size: 14px;
+		font-size: 18px;
+		padding-bottom: 2px;
 	}
-	/* TODO: different font-sizes for different numbers of player panels */
+	.playerPanel-3 .role
+	{ font-size: 17px }
+	.playerPanel-4 .role
+	{
+		font-size: 20px;
+		line-height: 23px;
+	}
 
 	.btnCollapseExpand > .numCardsInHand
 	{
@@ -2481,6 +2488,19 @@ a:hover { cursor: pointer }
 	#forecastContainer .tooltip
 	{ font-size: 18px }
 
+	.playerPanel-2 .role
+	{
+		font-size: 22px;
+		padding-bottom: 4px;
+	}
+	.playerPanel-3 .role
+	{ font-size: 20px }
+	.playerPanel-4 .role
+	{
+		font-size: 22px;
+		line-height: 25px;
+	}
+
 	#roleIndicator
 	{
 		font-size: 22px;
@@ -2723,13 +2743,15 @@ a:hover { cursor: pointer }
 		font-size: 18px;
 	}
 
-	.playerPanel .role
+	.playerPanel-2 .role
+	{ font-size: 28px }
+	.playerPanel-3 .role
+	{ font-size: 26px }
+	.playerPanel-4 .role
 	{
-		font-size: 20px;
-		line-height: 30px;
+		font-size: 26px;
+		line-height: 34px;
 	}
-
-	/* TODO: .playerPanel-2, .playerPanel-3  font-size */
 
 	.btnCollapseExpand > .numCardsInHand
 	{
