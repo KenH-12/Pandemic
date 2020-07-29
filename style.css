@@ -2006,16 +2006,19 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 }
 #roleSetupContainer .role
 {
-	text-align: center;
 	border: none;
 }
 .roleContainer { margin-bottom: 10px }
+.slotMachine,
+#roleSetupContainer .role
+{
+	text-align: center;
+	font-size: 14px;
+}
 .slotMachine
 {
 	overflow: hidden;
 	border-radius: 2px;
-	text-align: center;
-	font-size: 14px;
 }
 .slotMachineOption
 {
@@ -2050,9 +2053,9 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 .roleContainer .playerCard,
 .playerCard.drawing
 {
-	height: 20px;
-	line-height: 20px;
-	font-size: 14px;
+	height: 16px;
+	line-height: 16px;
+	font-size: 12px;
 }
 .playerCard.drawing { transition: height, line-height, font-size 0.5s }
 .roleContainer .playerCard
@@ -2068,10 +2071,15 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	line-height: 10px;
 	font-family: 'B612 Mono', monospace;
 }
+.roleContainer .playerCard .population
+{
+	font-size: 9px;
+	line-height: 9px;
+}
 .popRank
 {
 	position: absolute;
-	font-size: 20px;
+	font-size: 18px;
 	font-family: 'B612 Mono', monospace;
 	font-weight: 400;
 	z-index: 8;
@@ -2128,10 +2136,23 @@ a:hover { cursor: pointer }
 	{ margin-bottom: 8% }
 	.roleContainer
 	{ margin-bottom: 12px }
-	.slotMachine
+	.slotMachine,
+	#roleSetupContainer .role
 	{ font-size: 16px }
 	.slotMachine, .slotMachineShadow
 	{ height: 100px }
+
+	.roleContainer .playerCard,
+	.playerCard.drawing
+	{
+		height: 20px;
+		line-height: 20px;
+		font-size: 14px;
+	}
+	.popRank
+	{
+		font-size: 22px;
+	}
 	
 	.tooltip { max-width: 26% }
 	.tooltip,
@@ -2171,6 +2192,11 @@ a:hover { cursor: pointer }
 	{
 		font-size: 12px;
 		line-height: 12px;
+	}
+	.roleContainer .playerCard .population
+	{
+		font-size: 11px;
+		line-height: 11px;
 	}
 	.eventDetails .hand { padding: 5px 0 }
 	.largeText { font-size: 20px }
@@ -2459,10 +2485,23 @@ a:hover { cursor: pointer }
 	}
 	.roleContainer
 	{ margin-bottom: 15px }
-	.slotMachine
+	.slotMachine,
+	#roleSetupContainer .role
 	{ font-size: 18px }
 	.slotMachine, .slotMachineShadow
 	{ height: 110px }
+
+	.roleContainer .playerCard,
+	.playerCard.drawing
+	{
+		height: 24px;
+		line-height: 24px;
+		font-size: 16px;
+	}
+	.popRank
+	{
+		font-size: 26px;
+	}
 	
 	.tooltip { max-width: 28% }
 	.tooltip,
@@ -2499,10 +2538,11 @@ a:hover { cursor: pointer }
 		font-size: 14px;
 		line-height: 26px;
 	}
-	.playerCard .population
+	.playerCard .population,
+	.roleContainer .playerCard .population
 	{
-		font-size: 13px;
-		line-height: 13px;
+		font-size: 14px;
+		line-height: 14px;
 	}
 	.eventDetails .hand { padding: 5px 0 }
 	.eventDetails .infectionCard .cityName
@@ -2642,10 +2682,23 @@ a:hover { cursor: pointer }
 	#skipSetupButtons,
 	.roleContainer
 	{ margin-bottom: 40px }
-	.slotMachine
+	.slotMachine,
+	#roleSetupContainer .role
 	{ font-size: 22px }
 	.slotMachine, .slotMachineShadow
 	{ height: 134px }
+
+	.roleContainer .playerCard,
+	.playerCard.drawing
+	{
+		height: 24px;
+		line-height: 24px;
+		font-size: 20px;
+	}
+	.popRank
+	{
+		font-size: 34px;
+	}
 	
 	.tooltip { max-width: 30% }
 	.tooltip,
@@ -2692,7 +2745,8 @@ a:hover { cursor: pointer }
 		font-size: 18px;
 		line-height: 30px;
 	}
-	.playerCard .population
+	.playerCard .population,
+	.roleContainer .playerCard .population
 	{
 		font-size: 16px;
 		line-height: 16px;

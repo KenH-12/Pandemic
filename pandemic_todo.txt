@@ -3,13 +3,13 @@ BUGS
 
 TO DO
 -----
+the font-size of dealt player cards might be too big for 1024px screen width
+
 the discard step instructions should indicate that event cards can be played by click the card in the player panel
 
 make sure things look ok for different screen sizes
 
 	setup animations
-		give cards to each role
-		determine turn order
 		prepare the player deck
 		infect 9 cities
 		place pawns in Atlanta
