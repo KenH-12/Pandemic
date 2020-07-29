@@ -6,8 +6,6 @@ TO DO
 the discard step instructions should indicate that event cards can be played by click the card in the player panel
 
 make sure things look ok for different screen sizes
-	
-	tooltip widths
 
 	big screens
 		arrange player deck with 6 epidemics exceeds screen height

@@ -1960,6 +1960,10 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	padding: 5px 0;
 	font-size: 12px;
 }
+#forecastContainer .tooltip
+{
+	font-size: 14px;
+}
 
 #setupProcedureContainer { margin-bottom: -2px }
 #setupProcedureContainer .highlighted { font-size: 16px }
@@ -2117,7 +2121,7 @@ a:hover { cursor: pointer }
 		font-size: 14px;
 	}
 	.tooltip .warning { font-size: 25px }
-
+	#rightPanel .tooltip { max-width: 210px }
 	.eventTypeTooltip h3
 	{
 		font-size: 20px;
@@ -2306,7 +2310,8 @@ a:hover { cursor: pointer }
 		width: 82%;
 		margin: 5px 9%;
 	}
-	#forecastContainer > p
+	#forecastContainer > p,
+	#forecastContainer .tooltip
 	{ font-size: 16px }
 	
 	#btnCancelAction
@@ -2419,7 +2424,7 @@ a:hover { cursor: pointer }
 		font-size: 16px;
 	}
 	.tooltip .warning { font-size: 30px }
-
+	#rightPanel .tooltip { max-width: 250px }
 	.eventTypeTooltip h3,
 	.eventDetails .title
 	{
@@ -2472,7 +2477,8 @@ a:hover { cursor: pointer }
 	{
 		font-size: 15px;
 	}
-	#forecastContainer > p
+	#forecastContainer > p,
+	#forecastContainer .tooltip
 	{ font-size: 18px }
 
 	#roleIndicator
@@ -2566,7 +2572,7 @@ a:hover { cursor: pointer }
 		font-size: 18px;
 	}
 	.tooltip .warning { font-size: 32px }
-
+	#rightPanel .tooltip { max-width: 300px }
 	.eventTypeTooltip h3,
 	.eventDetails .title
 	{
@@ -2824,7 +2830,8 @@ a:hover { cursor: pointer }
 		width: 70%;
 		margin: 10px 15%;
 	}
-	#forecastContainer > p
+	#forecastContainer > p,
+	#forecastContainer .tooltip
 	{ font-size: 20px }
 
 	.actionCategory h2 { font-size: 21px }
