@@ -7,12 +7,7 @@ the discard step instructions should indicate that event cards can be played by 
 
 make sure things look ok for different screen sizes
 
-	big screens
-		arrange player deck with 6 epidemics exceeds screen height
-		drawn player cards overlap before being revealed
-	
 	setup animations
-		determine roles
 		give cards to each role
 		determine turn order
 		prepare the player deck

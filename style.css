@@ -1977,7 +1977,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 }
 #skipSetupButtons
 {
-	margin: -4px 1% 4px 1%;
+	margin: 0 1% 4px 1%;
 	height: 20px;
 	border: 1px solid #fff;
 	border-top: none;
@@ -1987,8 +1987,8 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	display: inline-block;
 	width: 50%;
 	text-align: center;
-	font-size: 12px;
-	line-height: 15px;
+	font-size: 13px;
+	padding: 2px 0 1px 0;
 	font-family: 'Ropa Sans', sans-serif;
 	background-color: #1282b3;
 	cursor: pointer;
@@ -2118,6 +2118,21 @@ a:hover { cursor: pointer }
 
 @media screen and (min-width: 1200px)
 {
+	#setupProcedureContainer
+	{ font-size: 15px }
+	#setupProcedureContainer .title
+	{ font-size: 18px }
+	#setupProcedureContainer .highlighted span
+	{ font-size: 16px }
+	#skipSetupButtons
+	{ margin-bottom: 8% }
+	.roleContainer
+	{ margin-bottom: 12px }
+	.slotMachine
+	{ font-size: 16px }
+	.slotMachine, .slotMachineShadow
+	{ height: 100px }
+	
 	.tooltip { max-width: 26% }
 	.tooltip,
 	.eventDetails
@@ -2428,6 +2443,27 @@ a:hover { cursor: pointer }
 
 @media screen and (min-width: 1400px)
 {
+	#setupProcedureContainer
+	{ font-size: 16px }
+	#setupProcedureContainer .title
+	{ font-size: 20px }
+	#setupProcedureContainer .highlighted span
+	{ font-size: 19px }
+	#skipSetupButtons
+	{ height: 22px }
+	.btnSkip
+	{
+		font-size: 15px;
+		margin-top: 2px;
+		padding-top: 2px;
+	}
+	.roleContainer
+	{ margin-bottom: 15px }
+	.slotMachine
+	{ font-size: 18px }
+	.slotMachine, .slotMachineShadow
+	{ height: 110px }
+	
 	.tooltip { max-width: 28% }
 	.tooltip,
 	.eventDetails
@@ -2589,6 +2625,28 @@ a:hover { cursor: pointer }
 
 @media screen and (min-width: 1920px)
 {
+	#setupProcedureContainer
+	{ font-size: 20px }
+	#setupProcedureContainer .title
+	{ font-size: 24px }
+	#setupProcedureContainer .highlighted span
+	{ font-size: 21px }
+	#skipSetupButtons
+	{ height: 24px }
+	.btnSkip
+	{
+		font-size: 16px;
+		margin-top: 2px;
+		padding-top: 3px;
+	}
+	#skipSetupButtons,
+	.roleContainer
+	{ margin-bottom: 40px }
+	.slotMachine
+	{ font-size: 22px }
+	.slotMachine, .slotMachineShadow
+	{ height: 134px }
+	
 	.tooltip { max-width: 30% }
 	.tooltip,
 	.eventDetails
