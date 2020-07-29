@@ -1965,8 +1965,10 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	font-size: 14px;
 }
 
-#setupProcedureContainer { margin-bottom: -2px }
-#setupProcedureContainer .highlighted { font-size: 16px }
+#setupProcedureContainer
+{
+	margin-bottom: -2px;
+}
 #setupContainer h4
 {
 	padding: 5px;
@@ -1975,7 +1977,8 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 }
 #skipSetupButtons
 {
-	margin: 0 1% 10px 1%;
+	margin: -4px 1% 4px 1%;
+	height: 20px;
 	border: 1px solid #fff;
 	border-top: none;
 }
@@ -1984,10 +1987,10 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	display: inline-block;
 	width: 50%;
 	text-align: center;
-	font-size: 13px;
+	font-size: 12px;
+	line-height: 15px;
 	font-family: 'Ropa Sans', sans-serif;
 	background-color: #1282b3;
-	padding: 2px 8px;
 	cursor: pointer;
 }
 #btnSkipSetup { border-left: 1px solid #fff }
@@ -1995,7 +1998,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 #skippingSetupMsg { margin-top: 200px }
 #roleSetupContainer, #preparePlayerDeckContainer
 {
-	padding: 2% 12%;
+	padding: 0 12%;
 }
 #roleSetupContainer .name
 {
@@ -2006,12 +2009,13 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	text-align: center;
 	border: none;
 }
-.roleContainer { margin-bottom: 20px }
+.roleContainer { margin-bottom: 10px }
 .slotMachine
 {
 	overflow: hidden;
 	border-radius: 2px;
 	text-align: center;
+	font-size: 14px;
 }
 .slotMachineOption
 {
@@ -2041,7 +2045,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 		rgba(0, 0, 0, .6),
 		rgba(0, 0, 0, .9))
 }
-.slotMachine, .slotMachineShadow { height: 100px; }
+.slotMachine, .slotMachineShadow { height: 90px; }
 
 .roleContainer .playerCard,
 .playerCard.drawing
