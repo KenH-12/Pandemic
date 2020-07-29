@@ -3194,12 +3194,12 @@ async function dealFaceDownPlayerCards($container, numCardsToDeal)
 	return sleep(getDuration("longInterval"));
 }
 
-function dealFaceDownPlayerCard($container, deckProperties, { finalCardbackWidth, zIndex } = {})
+function dealFaceDownPlayerCard($container, deckProperties, { zIndex } = {})
 {
 	const $playerCard = $("<div class='playerCard template'></div>").appendTo($container),
 		containerOffset = $playerCard.offset(),
 		$cardback = newFacedownPlayerCard().addClass("drawnPlayerCard");
-	
+
 	if (zIndex)
 		$cardback.css({ zIndex });
 
@@ -3213,7 +3213,7 @@ function dealFaceDownPlayerCard($container, deckProperties, { finalCardbackWidth
 			})
 		.animate(
 			{
-				width: finalCardbackWidth || $container.width() * 0.152,
+				width: $playerCard.height(),
 				top: containerOffset.top,
 				left: containerOffset.left
 			},
@@ -7858,9 +7858,8 @@ async function dealFaceDownStartingHands(startingHandsEvent, $roleContainers)
 	const startingHandSize = startingHandsEvent.hands[0].cards.length,
 		numCardsToDeal = startingHandsEvent.hands.length * startingHandSize,
 		deckProperties = playerDeckImgManager.getProperties(),
-		finalCardbackWidth = 20,
 		interval = getDuration("dealCard") * 0.4;
-	
+		
 	await makeRoomForStartingHands(startingHandSize, $roleContainers);
 
 	let cardsDealt = 0,
@@ -7868,7 +7867,7 @@ async function dealFaceDownStartingHands(startingHandsEvent, $roleContainers)
 		zIndex = 10 + numCardsToDeal;
 	while (cardsDealt < numCardsToDeal)
 	{
-		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), deckProperties, { finalCardbackWidth, zIndex });
+		dealFaceDownPlayerCard($roleContainers.eq(roleIndex), deckProperties, { zIndex });
 		await sleep(getDuration(interval));
 		
 		cardsDealt++;
