@@ -57,7 +57,7 @@ function bindPlayerDeckHoverEvents()
 
 			return `<p>Cards left in deck: ${numPlayerCardsRemaining}</p>
 				<br/>
-				<p>Difficulty: ${getDifficultyName()}<br/><span class='indent-1'>-> ${numEpidemics} Epidemics</span><br/>Epidemic cards left in deck: ${numEpidemics - epidemicCount}</p>
+				<p>Difficulty: ${getDifficultyName()}<br/><span class='indent-1'>-> ${numEpidemics} <span class='hoverInfo epidemicInfo'>Epidemics</span></span><br/>Epidemic cards left in deck: ${numEpidemics - epidemicCount}</p>
 				<br/>
 				<p>${playerDeckInfo}</p>
 				<p>${discardRule}</p>
@@ -89,7 +89,10 @@ function bindPlayerDeckHoverEvents()
 		hoverElementSelector: infoIconSelector,
 		positionRelativeToSelector,
 		juxtaposition,
-		containerSelector
+		containerSelector,
+		allowTooltipHovering: true,
+		tooltipHoveringForgiveness: { bottom: 20 },
+		afterShow: ({ $tooltip }) => bindEpidemicCardHoverEvents($tooltip)
 	}).bindHoverEvents();
 
 	new Tooltip({
@@ -625,6 +628,8 @@ async function showFullEpidemicCard($hoveredElement)
 			$relativeTo = $(".infectionRateTooltip");
 			juxtaposition = "bottom";
 		}
+		else if ($hoveredElement.closest(".tooltip").length)
+			$relativeTo = $(".tooltip");
 		else
 		{
 			tooltipMargin = 10;
