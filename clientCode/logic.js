@@ -424,11 +424,12 @@ class Step
 Hand Limit Exceeded!<br/>`;
 
 		if (playerWithTooManyCards.rID !== getActivePlayer().rID)
-		{
-			this.description += `The ${playerWithTooManyCards.newRoleTag()} must discard to 7 cards.`;
-		}
+			this.description += `The ${playerWithTooManyCards.newRoleTag()} must discard to 7 cards`;
 		else
 			this.description += "Discard to 7 Cards";
+		
+		if (playerWithTooManyCards.isHoldingAnyEventCard())
+			this.description += " or <span class='hoverInfo eventCardInfo'>play Event cards</span>.";
 	}
 
 	stepName = "draw";

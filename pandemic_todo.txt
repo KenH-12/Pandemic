@@ -3,7 +3,11 @@ BUGS
 
 TO DO
 -----
-the discard step instructions should indicate that event cards can be played by click the card in the player panel
+general instructions
+	hoverInfo
+	info icons
+	event history
+	objectives
 
 enforce min-width
 

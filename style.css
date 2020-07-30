@@ -1127,6 +1127,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	margin-left: 5px;
 }
 #stepIndicator .info + span { margin-left: -14px }
+#stepIndicator .eventCardInfo { font-size: 12px }
 #roleIndicator,
 .playerPanel .role
 { font-family: 'Oswald', 'Electrolize', sans-serif }
@@ -2125,6 +2126,9 @@ a:visited
 }
 a:hover { cursor: pointer }
 
+.nowrap
+{ white-space: nowrap }
+
 @media screen and (min-width: 1200px)
 {
 	#setupProcedureContainer
@@ -2298,19 +2302,15 @@ a:hover { cursor: pointer }
 	{
 		padding: 3px 0;
 	}
-	#indicatorContainer > * {margin-bottom: 6px}
+	#indicatorContainer > *
+	{ margin-bottom: 6px }
 	#stepIndicator
-	{
-		font-size: 16px;
-	}
+	{ font-size: 16px }
 	#stepIndicator .info
-	{
-		font-size: 12px;
-	}
+	{ font-size: 12px }
+	#stepIndicator .eventCardInfo { font-size: 14px }
 	#roleIndicator
-	{
-		font-size: 20px;
-	}
+	{ font-size: 20px }
 
 	.actionCategory h2 { font-size: 14px }
 	.actionName
@@ -2937,19 +2937,16 @@ a:hover { cursor: pointer }
 	{
 		padding: 3px 0;
 	}
-	#indicatorContainer > * {margin-bottom: 6px}
+	#indicatorContainer > *
+	{ margin-bottom: 6px }
 	#stepIndicator
-	{
-		font-size: 22px;
-	}
-	#roleIndicator
-	{
-		font-size: 30px;
-	}
+	{ font-size: 22px }
 	#stepIndicator .info
-	{
-		font-size: 18px;
-	}
+	{ font-size: 18px }
+	#stepIndicator .eventCardInfo
+	{ font-size: 20px }
+	#roleIndicator
+	{ font-size: 30px }
 
 	.actionCategory h2
 	{

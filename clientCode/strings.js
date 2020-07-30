@@ -1,5 +1,8 @@
 "use strict";
 
+import { newPlayerCard } from "./utilities/pandemicUtils.js";
+import { eventCards } from "./eventCard.js";
+
 const warningSymbol = "<span class='warning'>⚠️</span>",
 strings = {
     loadingGifHtml: "<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>",
@@ -32,7 +35,8 @@ strings = {
     additionalDiscoverACureInfo: "When a disease is cured, cubes of that colour remain on the board and new cubes of that colour can still be placed during epidemics or infections. However, treating this disease is now easier and your team is closer to winning.",
 
     eventCardPlayabilityRule: "<span>Play at any time. Not an action.</span>",
-
+    eventCardInfo: `To play an Event card, find the card in the role's hand (top-left of the screen) and click it.<br/><br/>
+<span style='white-space:nowrap'>Event cards look like this:</span>${newPlayerCard(eventCards["airl"])}`,
     forecastTopInfo: "The top card will be put back on the deck last (and drawn from the deck first).",
     forcastBottomInfo: "The bottom card will be put back on the deck first (and drawn from the deck sixth).",
 };

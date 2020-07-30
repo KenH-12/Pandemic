@@ -39,6 +39,7 @@ export default function instantiateTooltips()
 	bindActionButtonHoverEvents();
 	bindDispatchTypeHoverEvents();
 	bindForecastInfoHoverEvents();
+	bindEventCardInfoHoverEvents();
 	bindPlayStepHoverEvents();
 	bindActionPromptRulesHoverEvents();
 }
@@ -530,6 +531,18 @@ function bindForecastInfoHoverEvents()
 		hoverElementSelector: `${containerSelector} .hoverInfo:not(.concealed)`,
 		positionRelativeToSelector: containerSelector,
 		containerSelector
+	}).bindHoverEvents();
+}
+
+function bindEventCardInfoHoverEvents()
+{
+	new Tooltip({
+		content: strings.eventCardInfo,
+		hoverElementSelector: ".eventCardInfo",
+		juxtaposition: "bottom",
+		containerSelector: "#rightPanel",
+		positionRelativeToSelector: "#stepIndicator",
+		alignArrowWithHoveredElement: true
 	}).bindHoverEvents();
 }
 
