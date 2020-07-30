@@ -2092,17 +2092,17 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 
 #preparePlayerDeckContainer > div
 {
-	margin-bottom: 60px;
+	margin-bottom: 30px;
 }
 #preparePlayerDeckContainer .playerCard
 {
-	height: 24px;
-	line-height: 24px;
+	height: 20px;
+	line-height: 20px;
 	font-size: 16px;
 }
 #preparePlayerDeckContainer img
 {
-	width: 24px;
+	width: 20px;
 }
 
 #errorContainer
@@ -2152,6 +2152,21 @@ a:hover { cursor: pointer }
 	.popRank
 	{
 		font-size: 22px;
+	}
+
+	#preparePlayerDeckContainer > div
+	{
+		margin-bottom: 40px;
+	}
+	#preparePlayerDeckContainer .playerCard
+	{
+		height: 24px;
+		line-height: 24px;
+		font-size: 16px;
+	}
+	#preparePlayerDeckContainer img
+	{
+		width: 24px;
 	}
 	
 	.tooltip { max-width: 26% }
@@ -2503,6 +2518,25 @@ a:hover { cursor: pointer }
 		font-size: 26px;
 	}
 	
+	#setupContainer h4
+	{
+		font-size: 20px;
+	}
+	#preparePlayerDeckContainer > div
+	{
+		margin-bottom: 50px;
+	}
+	#preparePlayerDeckContainer .playerCard
+	{
+		height: 28px;
+		line-height: 28px;
+		font-size: 18px;
+	}
+	#preparePlayerDeckContainer img
+	{
+		width: 28px;
+	}
+
 	.tooltip { max-width: 28% }
 	.tooltip,
 	.eventDetails
@@ -2698,6 +2732,25 @@ a:hover { cursor: pointer }
 	.popRank
 	{
 		font-size: 34px;
+	}
+
+	#setupContainer h4
+	{
+		font-size: 28px;
+	}
+	#preparePlayerDeckContainer > div
+	{
+		margin-bottom: 80px;
+	}
+	#preparePlayerDeckContainer .playerCard
+	{
+		height: 38px;
+		line-height: 38px;
+		font-size: 28px;
+	}
+	#preparePlayerDeckContainer img
+	{
+		width: 38px;
 	}
 	
 	.tooltip { max-width: 30% }
@@ -3091,11 +3144,6 @@ a:hover { cursor: pointer }
 		padding: 12px 14px;
 	}
 	.epidemicFull h3 { font-size: 20px }
-	/* .epidemicFull h3 img
-	{
-		width: 16px;
-		margin-left: 8px;
-	} */
 	.epidemicFull p
 	{
 		font-size: 16px;

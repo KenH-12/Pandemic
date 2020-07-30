@@ -3,17 +3,11 @@ BUGS
 
 TO DO
 -----
+the word "epidemics" in the player deck tooltip should be hoverable
+
 the font-size of dealt player cards might be too big for 1024px screen width
 
 the discard step instructions should indicate that event cards can be played by click the card in the player panel
-
-make sure things look ok for different screen sizes
-
-	setup animations
-		prepare the player deck
-		infect 9 cities
-		place pawns in Atlanta
-		place research station in Atlanta
 
 enforce min-width
 
