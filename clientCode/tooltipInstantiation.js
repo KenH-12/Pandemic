@@ -362,7 +362,6 @@ function bindEventDetailsHoverEvents()
 				return getEventTypeTooltipContent(eventType, { isDispatchType });
 			},
 		containerSelector,
-		positionRelativeToSelector: ".eventDetails",
 		juxtaposition,
 		cssClassString
 	}).bindHoverEvents();

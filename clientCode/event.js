@@ -162,7 +162,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"Discard the city card that <i>matches</i> a pawn's location to dispatch that pawn to <i>any</i> city.",
 			dispatchDiscardRule
 		],
-		rendezvousRules: ["The Dispatcher may, as an action, move any pawn to any city containing another pawn."],
+		rendezvousRules: ["The Dispatcher may, as an action, move any pawn to a city containing another pawn."],
 		shuttleFlightRules: ["Dispatch a pawn from a city with a research station to any other city that has a research station."],
 		abbreviatedRulesetLength: 3,
 		instructions: "To dispatch a pawn, drag and drop it onto a city.",
