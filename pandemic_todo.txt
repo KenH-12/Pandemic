@@ -3,8 +3,6 @@ BUGS
 
 TO DO
 -----
-the font-size of dealt player cards might be too big for 1024px screen width
-
 the discard step instructions should indicate that event cards can be played by click the card in the player panel
 
 enforce min-width
