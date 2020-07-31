@@ -33,7 +33,7 @@ export default class DiscardPrompt
 		if (cardKeys.length === numDiscardsRequired)
 		{
 			for (let key of cardKeys)
-                this.$discardsContainer.append(newPlayerCard(getCityOrEventCardObject(key), { noTooltip: true }));
+                this.$discardsContainer.append(newPlayerCard(getCityOrEventCardObject(key)));
             
             bindCityLocatorClickEvents({ $containingElement: this.$discardsContainer });
 
@@ -47,7 +47,7 @@ export default class DiscardPrompt
 		else
 		{
 			for (let key of cardKeys)
-				this.$keepersContainer.append(newPlayerCard(getCityOrEventCardObject(key), { noTooltip: true }));
+				this.$keepersContainer.append(newPlayerCard(getCityOrEventCardObject(key), { notLocatable: true }));
 
 			this.discardSelectionCount = 0;
 			this.keeperCount = cardKeys.length;
@@ -145,10 +145,12 @@ export default class DiscardPrompt
 		$btn.off("click")
 			.click(function()
 			{
+				const $allCards = self.getDiscardSelectionElements().add(self.getKeeperCardElements())
+					.addClass("notLocatable");
+
 				$btn.addClass("btnDisabled")
 					.html("CONFIRMING...")
-					.add(self.getDiscardSelectionElements())
-					.add(self.getKeeperCardElements())
+					.add($allCards)
 					.off("click");
 
 				self.onConfirm(self.getDiscardSelectionKeys(), $btn);

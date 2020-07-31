@@ -16,7 +16,7 @@ import {
     StartingHands
 } from "./event.js";
 import { bindEventCardHoverEvents, eventCards } from "./eventCard.js";
-import { bindCityLocatorClickEvents } from "./city.js";
+import { bindCityLocatorClickEvents, getCity } from "./city.js";
 import {
     resizeInfectionCards,
 	activePlayerCanTakeFromResearcher,
@@ -39,6 +39,7 @@ export default function instantiateTooltips()
 	bindResearchStationInfoHoverEvents();
 	bindActionButtonHoverEvents();
 	bindDispatchTypeHoverEvents();
+	bindCityCardHoverEvents();
 	bindForecastInfoHoverEvents();
 	bindEventCardInfoHoverEvents();
 	bindPlayStepHoverEvents();
@@ -518,6 +519,25 @@ function bindDispatchTypeHoverEvents()
 		juxtaposition: "top",
 		containerSelector: "#rightPanel",
 		cssClassString: "eventTypeTooltip"
+	}).bindHoverEvents();
+}
+
+function bindCityCardHoverEvents()
+{
+	const getContent = ({ $hoveredElement }) => `City card<br/>Click to locate ${getCity($hoveredElement.attr("data-key")).name}`,
+		playerCardSelector = ".playerCard:not(.eventCard):not(.epidemic):not(.notLocatable)";
+
+	new Tooltip({
+		getContent,
+		hoverElementSelector: `#boardContainer ${playerCardSelector}`,
+		getJuxtaposition: ({ $hoveredElement }) => $hoveredElement.closest("#playerDiscardContainer").length ? "left" : "right",
+		containerSelector
+	}).bindHoverEvents();
+
+	new Tooltip({
+		getContent,
+		hoverElementSelector: `#rightPanel ${playerCardSelector}`,
+		containerSelector: "#rightPanel"
 	}).bindHoverEvents();
 }
 

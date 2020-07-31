@@ -493,15 +493,13 @@ export default class City
 		return offsets;
 	}
 
-	getPlayerCard({ noTooltip, includePopulation } = {})
+	getPlayerCard({ includePopulation, notLocatable } = {})
 	{
-		const { name, color, key } = this, 
-			tooltip = noTooltip ? "" : ` title='City card
-Click to locate ${name}'`,
+		const { name, color, key } = this,
 			population = includePopulation && this.population ?
 				`<span class='population'>Population: ${numberWithCommas(this.population)}</span>` : "";
 
-		return `<div class='playerCard ${color}' data-key='${key}'${tooltip}>
+		return `<div class='playerCard ${color}${ notLocatable ? " notLocatable" : "" }' data-key='${key}'>
 					${name.toUpperCase()}
 					${population}
 				</div>`;
@@ -1271,7 +1269,8 @@ function bindCityLocatorClickEvents({ $containingElement } = {})
 		$locatable = $containingElement ? $containingElement.find(selector) : $(selector);
 	
 	$locatable.off("click")
-		.click(function() { pinpointCityFromCard($(this)) });
+		.click(function() { pinpointCityFromCard($(this)) })
+		.addClass("locatable");
 }
 
 function pinpointCityFromCard($card)

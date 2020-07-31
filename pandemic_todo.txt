@@ -9,9 +9,16 @@ general instructions
 	event history
 	objectives
 
-enforce min-width
+perhaps the "PLAY" info icon should have its own small tooltip
+	"on each role's turn, play procedes by completing these steps."
 
-replace "click to locate" title attributes with the Tooltip class
+double check tooltip hovering forgiveness for different screen widths
+
+the action buttons in the right panel sometimes exceed the screen height, but the panel does not become scrollable
+
+the cure vial tooltip needs more info about the advantages of having discovered a cure
+
+when the operations expert has only one city card, operations flight should have a "confirm" button instead of asking them to select a card
 
 access keys
 	form to request a new key

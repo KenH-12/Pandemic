@@ -1410,7 +1410,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	float: right;
 	padding: 0 2px;
 }
-.discardPrompt .playerCard,
+.discardPrompt .playerCard:not(.locatable),
 #discardStepContainer .playerCard
 {
 	margin-bottom: 2px;
@@ -2125,9 +2125,6 @@ a:visited
 	color: var(--epidemic-green)
 }
 a:hover { cursor: pointer }
-
-.nowrap
-{ white-space: nowrap }
 
 @media screen and (min-width: 1200px)
 {

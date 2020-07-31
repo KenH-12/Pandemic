@@ -1058,7 +1058,9 @@ const actionInterfacePopulator = {
 	},
 	appendOptionButtons(buttonType, cityKeys, onClick)
 	{
-		const $interface = actionInterfacePopulator.$actionInterface;
+		const $interface = actionInterfacePopulator.$actionInterface,
+			notLocatable = true;
+		
 		let buttonClass, newElementFn;
 
 		if (buttonType === "city")
@@ -1073,7 +1075,7 @@ const actionInterfacePopulator = {
 		}
 
 		for (let key of cityKeys)
-			$interface.append(newElementFn(getCityOrEventCardObject(key), { noTooltip: true }));
+			$interface.append(newElementFn(getCityOrEventCardObject(key), { notLocatable }));
 		
 		if (typeof onClick === "function")
 			$interface.children(`.${buttonClass}`).click(function() { onClick($(this)) });
@@ -1425,6 +1427,8 @@ const actionInterfacePopulator = {
 		
 		if (participant)
 		{
+			const notLocatable = true;
+			
 			let $giveableContainer = false,
 				$takeableContainer = false;
 			
@@ -1440,7 +1444,7 @@ const actionInterfacePopulator = {
 										</div>`);
 				
 				for (let cardKey of player.getShareableCardKeys())
-					$giveableContainer.append(newPlayerCard(getCity(cardKey), { noTooltip: true }));
+					$giveableContainer.append(newPlayerCard(getCity(cardKey), { notLocatable }));
 
 				$actionInterface.append($giveableContainer);
 			}
@@ -1455,7 +1459,7 @@ const actionInterfacePopulator = {
 										</div>`);
 				
 				for (let cardKey of participant.getShareableCardKeys())
-					$takeableContainer.append(newPlayerCard(getCity(cardKey), { noTooltip: true }));
+					$takeableContainer.append(newPlayerCard(getCity(cardKey), { notLocatable }));
 
 				$actionInterface.append($takeableContainer);
 			}

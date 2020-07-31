@@ -544,7 +544,7 @@ class StartingHands extends PermanentEvent
 				if (this.populationRanks.hasOwnProperty(card.key))
 					turnOrder += `<p class='populationRank' data-key='${card.key}'>#${this.populationRanks[card.key]}</p>`;
 
-				handDetails += card.getPlayerCard({ includePopulation: true, noTooltip: true });
+				handDetails += card.getPlayerCard({ includePopulation: true });
 			}
 			
 			handDetails += "</div>";
@@ -703,7 +703,7 @@ class DirectFlight extends MovementAction
     {
 		return `${super.getDetails()}
 				<p>Discarded:</p>
-				${this.destination.getPlayerCard({ noTooltip: true })}`;
+				${this.destination.getPlayerCard()}`;
     }
 }
 
@@ -719,7 +719,7 @@ class CharterFlight extends MovementAction
     {
 		return `${super.getDetails()}
 				<p>Discarded:</p>
-				${this.origin.getPlayerCard({ noTooltip: true })}`;
+				${this.origin.getPlayerCard()}`;
     }
 }
 
@@ -786,7 +786,7 @@ class BuildResearchStation extends ResearchStationPlacement
 		if (this.player.role === "Operations Expert")
 			return `<p>[discard not required]</p>`;
 		
-		return `<p>Discarded:</p>${this.city.getPlayerCard({ noTooltip: true })}`;
+		return `<p>Discarded:</p>${this.city.getPlayerCard()}`;
 	}
 }
 
@@ -868,7 +868,7 @@ class ShareKnowledge extends UndoableEvent
 
 		return `${super.getDetails()}
 				<p>${ isGiver ? "Gave" : "Received" } Card:</p>
-				${this.card.getPlayerCard({ noTooltip: true })}
+				${this.card.getPlayerCard()}
 				<p>${ isGiver ? "To" : "From" }: ${participant.newRoleTag()}</p>`;
 	}
 
@@ -901,7 +901,7 @@ class DiscoverACure extends UndoableEvent
     {
 		let discarded = "";
 		for (let card of this.discards)
-			discarded += card.getPlayerCard({ noTooltip: true });
+			discarded += card.getPlayerCard();
 		
 		return `${super.getDetails()}
 				<p>Discarded: </p>
@@ -971,7 +971,7 @@ class OperationsFlight extends MovementAction
     {
 		return `${super.getDetails()}
 				<p>Discarded: </p>
-				${this.discard.getPlayerCard({ noTooltip: true })}`;
+				${this.discard.getPlayerCard()}`;
     }
 }
 
@@ -988,7 +988,7 @@ class PlanContingency extends UndoableEvent
     {
 		return `${super.getDetails()}
 				<p>Stored Event Card:</p>
-				${this.eventCard.getPlayerCard({ noTooltip: true })}`;
+				${this.eventCard.getPlayerCard()}`;
 	}
 	
 	async animateUndo(animateDiscardPlayerCard)
@@ -1036,7 +1036,7 @@ class DispatchPawn extends MovementAction
     {
 		let discarded = "";
 		if (this.discard)
-			discarded = `<p>Discarded:</p>${this.discard.getPlayerCard({ noTooltip: true })}`;
+			discarded = `<p>Discarded:</p>${this.discard.getPlayerCard()}`;
 		
 		return `${super.getDetails()}
 				<p>Dispatched: ${this.dispatchedPlayer.newRoleTag()}</p>
@@ -1380,7 +1380,7 @@ class CardDraw extends PermanentEvent
 		for (let card of this.cards)
 		{
 			if (typeof card.getPlayerCard === "function")
-				draws += card.getPlayerCard({ noTooltip: true });
+				draws += card.getPlayerCard();
 			else
 				draws += "<div class='playerCard epidemic'>EPIDEMIC</div>";
 		}
@@ -1410,7 +1410,7 @@ class Discard extends UndoableEvent
 		
 		let discards = "";
 		for (let card of this.cards)
-			discards += card.getPlayerCard({ noTooltip: true });
+			discards += card.getPlayerCard();
 		
 		return `${super.getDetails()}
 				<p>Cards In Hand: ${ HAND_LIMIT + this.cards.length }</p>

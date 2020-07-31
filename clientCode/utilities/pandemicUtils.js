@@ -62,10 +62,10 @@ function newDiseaseCubeElement({ color, cityKey, asJqueryObject = true } = {})
 	return asJqueryObject ? $(diseaseCubeHtml) : diseaseCubeHtml;
 }
 
-function newPlayerCard(relatedObject, { noTooltip } = {})
+function newPlayerCard(relatedObject, { notLocatable } = {})
 {
 	if (typeof relatedObject.getPlayerCard === "function")
-		return relatedObject.getPlayerCard({ noTooltip });
+		return relatedObject.getPlayerCard({ notLocatable });
 
 	return `<div class='playerCard epidemic' data-key='epid'>EPIDEMIC</div>`;
 }
