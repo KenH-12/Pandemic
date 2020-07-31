@@ -1511,6 +1511,8 @@ span.r, p.r {color: #ef282a; background: none !important }
 	font-size: 12px;
 	max-width: 30%;
 }
+.tooltip:not(.hoverableTooltip)
+{ pointer-events: none }
 .roleCard,
 .eventCardFull
 { font-size: 14px }

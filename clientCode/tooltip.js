@@ -141,9 +141,11 @@ export default class Tooltip
         
         const {
                 content,
-                cssClassString
+                cssClassString,
+                allowTooltipHovering
             } = this,
-            $tooltip = $(`<div class='tooltip ${cssClassString}'></div>`);
+            hoverable = allowTooltipHovering ? "hoverableTooltip" : "",
+            $tooltip = $(`<div class='tooltip ${cssClassString} ${hoverable}'></div>`);
         
         let tooltipContent = content;
 
