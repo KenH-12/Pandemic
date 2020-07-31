@@ -15,13 +15,14 @@ import {
     getEventTypeTooltipContent,
     StartingHands
 } from "./event.js";
-import { bindEventCardHoverEvents } from "./eventCard.js";
+import { bindEventCardHoverEvents, eventCards } from "./eventCard.js";
 import { bindCityLocatorClickEvents } from "./city.js";
 import {
     resizeInfectionCards,
 	activePlayerCanTakeFromResearcher,
 	getColorWord,
-	getColorClass
+	getColorClass,
+	newPlayerCard
 } from "./utilities/pandemicUtils.js";
 import { eventHistory } from "./eventHistory.js";
 
@@ -536,7 +537,7 @@ function bindForecastInfoHoverEvents()
 function bindEventCardInfoHoverEvents()
 {
 	new Tooltip({
-		content: strings.eventCardInfo,
+		getContent: () => strings.eventCardInfo + newPlayerCard(eventCards["airl"]),
 		hoverElementSelector: ".eventCardInfo",
 		juxtaposition: "bottom",
 		containerSelector: "#rightPanel",
