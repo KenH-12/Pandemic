@@ -5196,7 +5196,7 @@ async function animateEpidemicIntensify()
 {
 	const $container = $("#infectionDiscardContainer"),
 		$title = $container.children(".title").first(),
-		$cards = $container.children(".infectionCard").addClass("template"), // template css class prevents the target cursor from appearing
+		$cards = $container.children(".infectionCard").addClass("notLocatable"),
 		delay = getDuration("longInterval");
 	
 	disableInfectionDiscardHoverEvents();
@@ -5213,6 +5213,9 @@ async function animateEpidemicIntensify()
 
 		return sleep(delay);
 	}
+
+	// Prevent any infection card tooltips from remaining after the associated card element is removed.
+	$(".tooltip.infDiscardTooltip").remove();
 
 	const $veil = $container.children("#infDiscardVeil"),
 		$deck = $("#infectionDeckContainer img"),

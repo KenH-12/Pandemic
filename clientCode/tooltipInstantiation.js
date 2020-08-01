@@ -247,7 +247,14 @@ function bindInfectionCardHoverEvents()
 			
 			return "left";
 		},
-		containerSelector
+		containerSelector,
+		afterShow: ({ $hoveredElement, $tooltip }) =>
+		{
+			// Infection discard tooltips need to be marked as such so that they do not remain visible
+			// after Epidemic Intensify removes the associated infection card element.
+			if ($hoveredElement.closest("#infectionDiscardContainer"))
+				$tooltip.addClass("infDiscardTooltip");
+		}
 	}).bindHoverEvents();
 
 	new Tooltip({
