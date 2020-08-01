@@ -458,11 +458,17 @@ function enforceEventDetailsHeightLimit($detailsContainer)
 
 function bindCuredDiseaseInfoHoverEvents()
 {
-	const getContent = function()
+	const {
+			additionalDiscoverACureInfo,
+			victoryCondition,
+			curedDiseaseInfo,
+			eradicationRules
+		} = strings,
+		getContent = function()
 		{
-			return `${strings.additionalDiscoverACureInfo}
+			return `${additionalDiscoverACureInfo}
 					<br/>
-					${strings.victoryCondition}
+					${victoryCondition}
 					<br/>
 					<br/>
 					<span class='largeText'>Cures Discovered: ${4 - gameData.cures.remaining}</span>`;
@@ -477,7 +483,7 @@ function bindCuredDiseaseInfoHoverEvents()
 		}).bindHoverEvents();
 	
 	new Tooltip({
-		content: `<p class='largeText'>Disease Cured</p>`,
+		content: `<p class='largeText'>Disease Cured!</p>${curedDiseaseInfo}<br/>${victoryCondition}`,
 		hoverElementSelector: ".cureMarker:not([src$='eradicated.png'])",
 		juxtaposition,
 		containerSelector,
@@ -485,7 +491,7 @@ function bindCuredDiseaseInfoHoverEvents()
 	}).bindHoverEvents();
 
 	new Tooltip({
-		content: `<p class='largeText'>Disease Eradicated</p>${strings.eradicationRules}`,
+		content: `<p class='largeText'>Disease Eradicated</p>${eradicationRules}`,
 		hoverElementSelector: ".cureMarker[src$='eradicated.png']",
 		juxtaposition,
 		containerSelector

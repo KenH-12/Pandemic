@@ -16,7 +16,8 @@ strings = {
     outOfCardsWarning: `${warningSymbol} If there are fewer than 2 cards left in the Player Deck when it is time to draw, the game ends and your team has lost!`,
     
     victoryCondition: "<span class='warning'>🏆</span>Discover cures to all 4 diseases and your team wins immediately, no matter how many cubes are on the board.",
-
+    additionalDiscoverACureInfo: "When a disease is cured, cubes of that colour remain on the board and new cubes of that colour can still be placed during epidemics or infections. However, treating this disease is now easier and your team is closer to winning.",
+    curedDiseaseInfo: "Treating this disease now removes all cubes of this colour from the city you are in.",
     eradicationRules: `<p>If no cubes of a <i>cured</i> disease are left on the board, the disease is <i>eradicated</i>.</p>
         <p>When cities of an eradicated disease are infected, no new disease cubes are placed there.</p>
         <p>Eradicating a disease is not needed to win; once all diseases are cured, the game ends and your team wins immediately!</p>`,
@@ -28,8 +29,6 @@ strings = {
     quarantineSpecialistCardText: `<li><span>Prevent disease cube placements (and outbreaks) in the city you are in and all cities connected to it.</span></li>`,
     researcherCardText: `<li><span>You may give any 1 of your City cards when you Share Knowledge. It need not match your city. A player who Shares Knowledge with you on their turn can take any 1 of your City cards.</span></li>`,
     scientistCardText: `<li><span>You need only 4 cards of the same color to do the Discover a Cure action.</span></li>`,
-
-    additionalDiscoverACureInfo: "When a disease is cured, cubes of that colour remain on the board and new cubes of that colour can still be placed during epidemics or infections. However, treating this disease is now easier and your team is closer to winning.",
 
     eventCardPlayabilityRule: "<span>Play at any time. Not an action.</span>",
     eventCardInfo: `To play an Event card, find the card in the role's hand (top-left of the screen) and click it.<br/><br/>
