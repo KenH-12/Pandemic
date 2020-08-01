@@ -215,9 +215,10 @@ function bindInfectionCardHoverEvents()
 {
 	const getContent = ({ $hoveredElement }) =>
 		{
-			let content = "Infection card<br/>";
+			let content = "— Infection card —<br/>";
 			
-			if (eventTypeIsBeingPrompted(eventTypes.resilientPopulation))
+			if ($hoveredElement.closest("#infectionDiscardContainer").length
+				&& eventTypeIsBeingPrompted(eventTypes.resilientPopulation))
 			{
 				if ($hoveredElement.hasClass("selectedForRemoval"))
 					content += `Selected for removal...<br/>Click the "Play Event Card" button to confirm.`;
@@ -225,11 +226,16 @@ function bindInfectionCardHoverEvents()
 					content += "Select for removal?";
 			}
 			else
+			{
 				content += `Click to locate ${getCity($hoveredElement.attr("data-key")).name}`;
+
+				if ($hoveredElement.closest("#forecastCards").length)
+					content += "<br/> or drag and drop to reorder.";
+			}
 			
 			return content;
 		},
-		infectionCardSelector = ".infectionCard:not(.template)";
+		infectionCardSelector = ".infectionCard:not(.template):not(.notLocatable)";
 	
 	new Tooltip({
 		getContent,
@@ -567,7 +573,7 @@ function bindDispatchTypeHoverEvents()
 
 function bindCityCardHoverEvents()
 {
-	const getContent = ({ $hoveredElement }) => `City card<br/>Click to locate ${getCity($hoveredElement.attr("data-key")).name}`,
+	const getContent = ({ $hoveredElement }) => `— City card —<br/>Click to locate ${getCity($hoveredElement.attr("data-key")).name}`,
 		playerCardSelector = ".playerCard:not(.eventCard):not(.epidemic):not(.notLocatable)";
 
 	new Tooltip({
