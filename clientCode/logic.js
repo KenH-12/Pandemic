@@ -3153,22 +3153,11 @@ async function drawStep()
 			if (!cardKeys) return false;
 
 			if (gameData.nextStep === "epIncrease")
-			{
-				let title;
-				
-				if (numEpidemicsToResolve() === 1)
-				{
-					gameData.epidemicCount++;
-					title = "EPIDEMIC!"
-				}
-				else
-				{
-					gameData.epidemicCount += 2;
-					title = "DOUBLE EPIDEMIC!!";
-				}
-				
-				await specialEventAlert({ title, eventClass: "epidemic", visibleMs: 1250 });
-			}
+				await specialEventAlert({
+					title: numEpidemicsToResolve() === 1 ? "EPIDEMIC!" : "DOUBLE EPIDEMIC!!",
+					eventClass: "epidemic",
+					visibleMs: 1250
+				});
 
 			await sleep(750);
 			finishDrawStep(cardKeys);
@@ -4983,7 +4972,7 @@ async function epidemicIncrease()
 	await highlightEpidemicStep($epidemic, "increase");
 	
 	requestAction(eventType)
-		.then(event => moveInfectionRateMarker({ newEpidemicCount: event.epidemicCount, animate: true }))
+		.then(events => moveInfectionRateMarker({ newEpidemicCount: events[0].epidemicCount, animate: true }))
 		.then(() =>
 		{
 			appendEventHistoryIconOfType(eventType);

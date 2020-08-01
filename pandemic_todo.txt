@@ -1,7 +1,5 @@
 BUGS
 ----
-scenario: double epidemic
-issue: the infection rate marker did not appear to move for the either epidemic
 
 TO DO
 -----
