@@ -1946,12 +1946,26 @@ function dealForecastedCards($cardContainer, cardKeys)
 
 function enableForecastSorting($cardContainer)
 {
+	const $cards = $cardContainer.children(".infectionCard"),
+		sorting = "sorting",
+		cardContentsSelector = ".infectionCardContents",
+		notLocatable = "notLocatable";
+	
 	$cardContainer.sortable(
 	{
 		containment: $cardContainer.parent(),
 		axis: "y",
-		sort: function(e, ui) { ui.item.addClass("sorting").find(".infectionCardContents").css("width", "100%") },
-		stop: function(e, ui) { ui.item.removeClass("sorting").find(".infectionCardContents").css("width", "19.5%") },
+		sort: function(e, ui)
+		{
+			ui.item.addClass(sorting).find(cardContentsSelector).css({ width: "100%" });
+			$cards.addClass(notLocatable);
+			$(".tooltip").remove();
+		},
+		stop: function(e, ui)
+		{
+			ui.item.removeClass(sorting).find(cardContentsSelector).css({ width: "19.5%" });
+			$cards.removeClass(notLocatable);
+		},
 		revert: 200
 	});
 }
