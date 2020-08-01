@@ -3,9 +3,6 @@ BUGS
 
 TO DO
 -----
-infection card tooltips
-	forecast -- when done, tootlips should be prevented
-
 general instructions
 	hoverInfo
 	info icons

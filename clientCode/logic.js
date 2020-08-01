@@ -1998,7 +1998,10 @@ function forecastPlacement(forecastEvent, $btnDone)
 
 async function animateForecastPlacement($cardContainer)
 {
-	const $cards = $cardContainer.children(".infectionCard");
+	const $cards = $cardContainer.children(".infectionCard").addClass("notLocatable");
+
+	// Remove any tooltips associated with Forecasted cards.
+	$(".tooltip.forecastedCardTooltip").remove();
 
 	$cards.prepend($(`<img	class='forecastCardback'
 							src='images/cards/infectionCardback.png'

@@ -248,11 +248,11 @@ function bindInfectionCardHoverEvents()
 			return "left";
 		},
 		containerSelector,
-		afterShow: ({ $hoveredElement, $tooltip }) =>
+		beforeShow: ({ $hoveredElement, $tooltip }) =>
 		{
 			// Infection discard tooltips need to be marked as such so that they do not remain visible
 			// after Epidemic Intensify removes the associated infection card element.
-			if ($hoveredElement.closest("#infectionDiscardContainer"))
+			if ($hoveredElement.closest("#infectionDiscardContainer").length)
 				$tooltip.addClass("infDiscardTooltip");
 		}
 	}).bindHoverEvents();
@@ -260,7 +260,14 @@ function bindInfectionCardHoverEvents()
 	new Tooltip({
 		getContent,
 		hoverElementSelector: `#rightPanel ${infectionCardSelector}`,
-		containerSelector: "#rightPanel"
+		containerSelector: "#rightPanel",
+		beforeShow: ({ $hoveredElement, $tooltip }) =>
+		{
+			// Forecasted infection card tooltips need to be marked as such so that they do not
+			// remain visible when the cards are placed back on the deck.
+			if ($hoveredElement.closest("#forecastCards").length)
+				$tooltip.addClass("forecastedCardTooltip");
+		}
 	}).bindHoverEvents();
 }
 
