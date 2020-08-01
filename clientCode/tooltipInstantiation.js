@@ -7,7 +7,8 @@ import {
     getPlayer,
     getActivePlayer,
     locatePawnOnRoleTagClick,
-    getDifficultyName
+    getDifficultyName,
+	eventTypeIsBeingPrompted
 } from "./gameData.js";
 import {
     eventTypes,
@@ -31,6 +32,7 @@ export default function instantiateTooltips()
     bindCubeSuppliesInfoHoverEvents();
 	bindInfectionDeckHoverEvents();
 	bindInfectionRateInfoHoverEvents();
+	bindInfectionCardHoverEvents();
 	bindOutbreakMarkerHoverEvents();
 	bindEventHistoryButtonHoverEvents();
 	bindEventHistoryIconHoverEvents();
@@ -208,6 +210,47 @@ function bindInfectionRateInfoHoverEvents()
 		cssClassString: "eventTypeTooltip"
 	}).bindHoverEvents();
 }
+
+function bindInfectionCardHoverEvents()
+{
+	const getContent = ({ $hoveredElement }) =>
+		{
+			let content = "Infection card<br/>";
+			
+			if (eventTypeIsBeingPrompted(eventTypes.resilientPopulation))
+			{
+				if ($hoveredElement.hasClass("selectedForRemoval"))
+					content += `Selected for removal...<br/>Click the "Play Event Card" button to confirm.`;
+				else
+					content += "Select for removal?";
+			}
+			else
+				content += `Click to locate ${getCity($hoveredElement.attr("data-key")).name}`;
+			
+			return content;
+		},
+		infectionCardSelector = ".infectionCard:not(.template)";
+	
+	new Tooltip({
+		getContent,
+		hoverElementSelector: `#boardContainer ${infectionCardSelector}`,
+		getJuxtaposition: ({ $hoveredElement }) =>
+		{
+			if ($hoveredElement.closest(".eventDetails").length)
+				return "right";
+			
+			return "left";
+		},
+		containerSelector
+	}).bindHoverEvents();
+
+	new Tooltip({
+		getContent,
+		hoverElementSelector: `#rightPanel ${infectionCardSelector}`,
+		containerSelector: "#rightPanel"
+	}).bindHoverEvents();
+}
+
 function bindOutbreakMarkerHoverEvents()
 {
 	const getContent = function({ $hoveredElement })
@@ -536,7 +579,7 @@ function bindCityCardHoverEvents()
 
 	new Tooltip({
 		getContent,
-		hoverElementSelector: `#rightPanel ${playerCardSelector}`,
+		hoverElementSelector: `#rightPanel ${playerCardSelector}:not(.template)`,
 		containerSelector: "#rightPanel"
 	}).bindHoverEvents();
 }

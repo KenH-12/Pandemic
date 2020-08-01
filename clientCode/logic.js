@@ -829,7 +829,7 @@ function resetActionPrompt({ actionCancelled } = {})
 		}
 		else if (eventTypeIsBeingPrompted(resilientPopulation))
 		{
-			resetInfectionDiscardClicksAndTooltips();
+			resetInfectionCardClickEventListeners();
 			hideResilientPopulationArrow({ reset: true });
 		}
 
@@ -2088,26 +2088,62 @@ function enableResilientPopulationSelection()
 {
 	const $infectionDiscards = $("#infectionDiscardContainer").children(".infectionCard");
 
-	if ($infectionDiscards.length)
-	{
-		showResilientPopulationArrow();
-		
-		$infectionDiscards.off("click")
-			.click(function()
+	if (!$infectionDiscards.length)
+		return actionInterfacePopulator.replaceInstructions("<span class='r'>The Infection Discard Pile is empty!<br />To play Resilient Population, there must be at least 1 card in the Infection Discard Pile.</span>");
+	
+	const selected = "selectedForRemoval";
+	let $this;
+
+	$infectionDiscards.off("click")
+		.click(function()
+		{
+			$this = $(this);
+
+			if ($this.hasClass(selected))
+				return resilientPopulationTargetAlreadySelected($this);
+			
+			$infectionDiscards.removeClass(selected);
+			$this.addClass(selected);
+
+			// The current tooltip text should not remain; it will change if another mouseenter event fires.
+			$(".tooltip").remove();
+			
+			hideResilientPopulationArrow({ selectionWasMade: true });
+			promptAction(
 			{
-				hideResilientPopulationArrow({ selectionWasMade: true });
-				promptAction(
-				{
-					eventType: eventTypes.resilientPopulation,
-					cardKeyToRemove: $(this).data("key")
-				});
-			})
-			.css({ cursor: "pointer" })
-			.attr("title", `Infection card
-Select for removal?`);
-	}
-	else
-		actionInterfacePopulator.replaceInstructions("<span class='r'>The Infection Discard Pile is empty!<br />To play Resilient Population, there must be at least 1 card in the Infection Discard Pile.</span>");
+				eventType: eventTypes.resilientPopulation,
+				cardKeyToRemove: $this.data("key")
+			});
+		})
+		.css({ cursor: "pointer" });
+	
+	showResilientPopulationArrow();
+}
+
+async function resilientPopulationTargetAlreadySelected($selectedCard)
+{
+	$selectedCard.off("click");
+
+	const $btnConfirm = $(".btnConfirm"),
+		marginTop = $btnConfirm.css("margin-top");
+
+	await propertyStrobe($btnConfirm,
+		{
+			initialState: {
+				border: "none",
+				marginTop
+			},
+			strobeState: {
+				border: "5px solid red",
+				marginTop: `${getLeadingNumber(marginTop) - 5}px`
+			},
+			numFlashes: 4,
+			flashIntervalMs: 120
+		});
+	
+	removeInlineStylePropertiesFrom($btnConfirm);
+
+	return enableResilientPopulationSelection();
 }
 
 async function showResilientPopulationArrow()
@@ -2154,7 +2190,7 @@ function hideResilientPopulationArrow({ selectionWasMade, reset } = {})
 
 function resilientPopulation(cardKeyToRemove, $btnConfirm)
 {
-	resetInfectionDiscardClicksAndTooltips();
+	resetInfectionCardClickEventListeners();
 	disableActions();
 	disableInfectionDiscardHoverEvents();
 
@@ -2177,19 +2213,12 @@ function resilientPopulation(cardKeyToRemove, $btnConfirm)
 		.catch(promptRefresh);
 }
 
-function resetInfectionDiscardClicksAndTooltips()
+function resetInfectionCardClickEventListeners()
 {
 	let $this, city;
 	$("#infectionDiscardContainer").children(".infectionCard")
 		.off("click")
 		.click(function() { pinpointCityFromCard($(this)) })
-		.each(function()
-		{
-			$this = $(this);
-			city = getCity($this.attr("data-key"));
-
-			setInfectionCardTitleAttribute($this, city);
-		})
 		.css("cursor", "url('images/target_black.png'), auto");
 }
 
@@ -5897,8 +5926,6 @@ function loadInfCardsDrawnThisTurn()
 				.siblings(".cityName")
 				.html(city.name.toUpperCase())
 				.siblings(".veil").remove();
-			
-			setInfectionCardTitleAttribute($card, city);
 		}
 	}
 
@@ -6217,8 +6244,6 @@ async function revealInfectionCard({ city, cityKey, infectionIndex }, { forecast
 			.siblings(".cityName")
 			.html(city.name.toUpperCase());
 		
-		setInfectionCardTitleAttribute($card, city);
-		
 		$veil.animate({ left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
 			getDuration("revealInfCard"),
 			easings.revealCard,
@@ -6233,12 +6258,6 @@ async function revealInfectionCard({ city, cityKey, infectionIndex }, { forecast
 				resolve();
 			});
 	});
-}
-
-function setInfectionCardTitleAttribute($card, city)
-{
-	$card.attr("title", `Infection card
-Click to locate ${city.name}`);
 }
 
 function placeDiseaseCubes({ cityKey, numCubes = 1, diseaseColor })
@@ -6696,8 +6715,6 @@ function loadInfectionDiscards(cards)
 						<p class='cityName'>${city.name.toUpperCase()}</p>
 					</div>
 				</div>`);
-		
-		setInfectionCardTitleAttribute($card, city);
 		
 		if (card.pile === "discard")
 			$discardPileTitle.after($card);
