@@ -1351,21 +1351,24 @@ span.r, p.r {color: #ef282a; background: none !important }
 	overflow: hidden;
 }
 .playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template):not(.notLocatable),
-.infectionCard:not(.template),
+.infectionCard:not(.template):not(.notLocatable),
 .playerPanel .role.locatable *:not(.eventCard),
 #roleIndicator,
 .roleTag
 { cursor: url("images/target_black.png"), auto }
+
 .playerCard.b:not(.notLocatable),
 .eventDetails .locatable { cursor: url("images/target_white.png"), auto }
+
 .playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template):not(.notLocatable):hover,
-.infectionCard:not(.template):hover .cityName,
+.infectionCard:not(.template):not(.notLocatable):hover .cityName,
 .playerPanel .role.locatable *:not(.eventCard):hover,
 #roleIndicator:hover,
 .roleTag:not(.playerOption):hover,
 .playerCard.b:not(.notLocatable):hover,
 .eventDetails .locatable:hover
 { text-decoration: underline; }
+
 .playerCard * { pointer-events: none }
 .playerPanel > .playerCard:first-of-type { margin-top: 4px }
 .playerPanel .playerCard.eventCard:not(.unavailable) { cursor: pointer }

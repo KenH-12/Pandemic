@@ -2229,11 +2229,9 @@ function resilientPopulation(cardKeyToRemove, $btnConfirm)
 
 function resetInfectionCardClickEventListeners()
 {
-	let $this, city;
 	$("#infectionDiscardContainer").children(".infectionCard")
 		.off("click")
-		.click(function() { pinpointCityFromCard($(this)) })
-		.css("cursor", "url('images/target_black.png'), auto");
+		.click(function() { pinpointCityFromCard($(this)) });
 }
 
 async function resilientPopulationAnimation(cardKeyToRemove)
@@ -5021,7 +5019,7 @@ async function epidemicInfect()
 			getInfectionContainer().append(newInfectionCardTemplate());
 			positionInfectionPanelComponents();
 			await dealFaceDownInfCard(card, { dealFromBottomOfDeck: true });
-			await revealInfectionCard(card);
+			await revealInfectionCard(card, { notLocatable: true });
 		
 			const { color } = card.city;
 		
@@ -5050,7 +5048,8 @@ async function epidemicInfect()
 			}
 				
 			await sleep(interval);
-			await discardInfectionCard($("#epidemicContainer").find(".infectionCard"), 400);
+			await discardInfectionCard($("#epidemicContainer").find(".infectionCard").removeClass("notLocatable"), 400);
+			resetInfectionCardClickEventListeners();
 			await sleep(interval);
 		
 			proceed();
@@ -6239,7 +6238,7 @@ function positionFaceDownInfectionCards()
 	makeElementsSquare($cardbacks);
 }
 
-async function revealInfectionCard({ city, cityKey, infectionIndex }, { forecasting } = {})
+async function revealInfectionCard({ city, cityKey, infectionIndex }, { forecasting, notLocatable } = {})
 {
 	return new Promise(resolve =>
 	{
@@ -6252,11 +6251,15 @@ async function revealInfectionCard({ city, cityKey, infectionIndex }, { forecast
 		$cardback.fadeOut(getDuration("revealInfCard"), function() { $(this).remove() });
 		
 		$card.attr("data-key", cityKey)
-			.click(function() { pinpointCityFromCard($card) })
 			.find(".infectionCardImg")
 			.attr("src", `images/cards/infectionCard_${city.color}.png`)
 			.siblings(".cityName")
 			.html(city.name.toUpperCase());
+		
+		if (notLocatable)
+			$card.addClass("notLocatable");
+		else
+			$card.click(() => pinpointCityFromCard($card));
 		
 		$veil.animate({ left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
 			getDuration("revealInfCard"),

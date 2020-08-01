@@ -1,8 +1,16 @@
 BUGS
 ----
+scenario: double epidemic on first turn
+issue: the infection rate marker did not appear to move for the first epidemic (or perhaps the second)
+	and the infection rate marker ended up on the second space (refreshing moved it to the third)
+
+the hovered infection card's tooltip remained visible after the card was hidden by epidemic intensify
 
 TO DO
 -----
+infection card tooltips
+	forecast -- when done, tootlips should be prevented
+
 general instructions
 	hoverInfo
 	info icons
