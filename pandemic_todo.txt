@@ -11,8 +11,6 @@ general instructions
 
 double check tooltip hovering forgiveness for different screen widths
 
-the action buttons in the right panel sometimes exceed the screen height, but the panel does not become scrollable
-
 access keys
 	form to request a new key
 		details of request:

@@ -1112,7 +1112,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	text-align: center;
 }
-#indicatorContainer > * {margin-bottom: 4px}
+#indicatorContainer > * { margin-bottom: 1px }
 #roleIndicator
 {
 	font-weight: 700;
@@ -2301,11 +2301,9 @@ a:hover { cursor: pointer }
 	}
 
 	#indicatorContainer
-	{
-		padding: 3px 0;
-	}
+	{ padding-top: 3px }
 	#indicatorContainer > *
-	{ margin-bottom: 6px }
+	{ margin-bottom: 4px }
 	#stepIndicator
 	{ font-size: 16px }
 	#stepIndicator .info
