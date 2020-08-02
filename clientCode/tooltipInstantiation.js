@@ -353,7 +353,7 @@ const eventDetailsTooltip = new Tooltip({
 	juxtaposition: "top",
 	cssClassString: "eventDetails",
 	allowTooltipHovering: true,
-	tooltipHoveringForgiveness: { top: 2, left: 2, right: 3, bottom: 1 }
+	tooltipHoveringForgiveness: { top: 2, left: 2, right: 3, bottom: 3 }
 });
 function bindEventHistoryIconHoverEvents()
 {

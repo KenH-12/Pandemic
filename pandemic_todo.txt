@@ -9,8 +9,6 @@ general instructions
 	event history
 	objectives
 
-double check tooltip hovering forgiveness for different screen widths
-
 access keys
 	form to request a new key
 		details of request:
