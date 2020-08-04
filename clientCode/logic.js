@@ -119,6 +119,7 @@ import instantiateTooltips, {
 	disableTooltipsWhileDragging,
 	enableTooltipsAfterDragging
 } from "./tooltipInstantiation.js";
+import SideMenu from "./sideMenu.js";
 
 $(function(){
 const playerDeckImgManager = new DeckImageManager({
@@ -126,7 +127,8 @@ const playerDeckImgManager = new DeckImageManager({
 		imageUrlWithoutNumber: "images/cards/playerDeck_.png",
 		numImages: 7,
 		maxCardCount: false // to be set once gameData is retrieved
-	});
+	}),
+	sideMenu = new SideMenu();
 
 function parseEvents(events)
 {
@@ -3439,8 +3441,10 @@ function resizeBottomPanelElements()
 
 function resizeRightPanelElements()
 {
-	const rightPanel = $("#rightPanel");
-	rightPanel.height(gameData.boardHeight);
+	const rightPanel = $("#rightPanel"),
+		{ boardHeight } = gameData;
+	
+	rightPanel.height(boardHeight);
 	gameData.panelWidth = rightPanel.width();
 	
 	if ($("#infectCitiesContainer, #initialInfectionsContainer, #forecastContainer").not(".hidden").length)
@@ -3450,6 +3454,8 @@ function resizeRightPanelElements()
 	}
 	
 	resizeTreatDiseaseOptions();
+
+	$("#sideMenu").height(boardHeight);
 }
 
 function resizeTreatDiseaseOptions()

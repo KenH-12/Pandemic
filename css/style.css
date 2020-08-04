@@ -2,6 +2,9 @@
 {
 	--main-background-color: #09154f;
 	--epidemic-green: #00a94f;
+	--board-width-percentage: 80.5%;
+	--button-background: #0e7aa8;
+	--button-background-bright: #1799d1;
 }
 *
 {
@@ -334,7 +337,7 @@ html,
 #boardImg, #boardContainer
 {
 	position: absolute;
-	width: 80.5%;
+	width: var(--board-width-percentage);
 }
 #boardImg
 {
@@ -1092,7 +1095,10 @@ span.r, p.r {color: #ef282a; background: none !important }
 	height: 44.6%;
 }
 
-#rightPanel, .infectionCardContents {width: 19.5%;}
+#rightPanel,
+#sideMenu,
+.infectionCardContents
+{ width: 19.5% }
 #rightPanel
 {
 	float: right;
@@ -1355,10 +1361,10 @@ span.r, p.r {color: #ef282a; background: none !important }
 .playerPanel .role.locatable *:not(.eventCard),
 #roleIndicator,
 .roleTag
-{ cursor: url("images/target_black.png"), auto }
+{ cursor: url("../images/target_black.png"), auto }
 
 .playerCard.b:not(.notLocatable),
-.eventDetails .locatable { cursor: url("images/target_white.png"), auto }
+.eventDetails .locatable { cursor: url("../images/target_white.png"), auto }
 
 .playerCard:not(.b):not(.eventCard):not(.epidemic):not(.template):not(.notLocatable):hover,
 .infectionCard:not(.template):not(.notLocatable):hover .cityName,
@@ -1566,7 +1572,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	font-size: 14px;
 	padding: 3px;
 	margin-left: 10%;
-	background-color: #0e7aa8;
+	background-color: var(--button-background);
 	cursor: pointer;
 }
 .button:not(.btnDisabled):active,
@@ -1583,7 +1589,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	font-size: 18px;
 }
 
-.button-secondary-color { background-color: #1799d1 }
+.button-secondary-color { background-color: var(--button-background-bright) }
 .button.flashing,
 .button-secondary-color { transition: background-color 0.6s }
 
@@ -1591,7 +1597,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .button:focus,
 .btnSkip:hover,
 #btnUndo:hover
-{ background-color: #1799d1 }
+{ background-color: var(--button-background-bright) }
 .button:not(.flashing),
 .button:hover,
 .btnSkip:hover,
@@ -1651,7 +1657,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	padding: 0 2%;
 	border-radius: 15%;
 }
-.actionIcon img[src='images/loading.gif'] { background-color: #0d2c5b }
+.actionIcon img[src='../images/loading.gif'] { background-color: #0d2c5b }
 .actionName
 {
 	width: 66%;
@@ -1690,7 +1696,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	display: inline-block;
 	vertical-align: middle;
-	filter: drop-shadow(0px 0px 5px #1799d1);
+	filter: drop-shadow(0px 0px 5px var(--button-background-bright));
 }
 .actionTitle > h2
 {
@@ -1910,6 +1916,7 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	z-index: 10;
 }
 
+
 .procedureContainer
 {
 	padding: 3px 1%;
@@ -1931,11 +1938,13 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 	margin-bottom: 2px;
 	color: #fff;
 }
+#turnProcedureContainer .title
+{ width: 83% }
 #turnProcedureInfo, .playStepInfo { font-size: 11px }
 #turnProcedureInfo
 {
 	line-height: 16px;
-	float: right;
+	margin-left: 15px;
 }
 .playStepInfo { margin-left: 5px }
 .playStepInfo:hover { color: #fff }
@@ -1948,12 +1957,12 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 {
 	color: #fff;
 	font-size: 14px;
-	filter: drop-shadow(0px 0px 3px #1799d1);
+	filter: drop-shadow(0px 0px 3px var(--button-background-bright));
 }
 
 #quarantineArea
 {
-	background-image: url("images/quarantineArea.jpg");
+	background-image: url("../images/quarantineArea.jpg");
 	z-index: 2;
 	opacity: 0;
 }
@@ -2130,6 +2139,39 @@ a:visited
 	color: var(--epidemic-green)
 }
 a:hover { cursor: pointer }
+
+#btnSideMenu,
+#sideMenu
+{ position: absolute }
+#btnSideMenu
+{
+	z-index: 49;
+	width: 3%;
+	right: 0.3%;
+	border-left: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-bottom-left-radius: 4px;
+	background-color: var(--button-background);
+}
+#btnSideMenu:hover,
+.hamburger:hover
+{ background-color: var(--button-background-bright) }
+#sideMenu
+{
+	z-index: 48;
+	display: inline-block;
+	background-color: var(--main-background-color);
+	height: 200px;
+	border-left: 1px solid #fff;
+	left: 100%
+}
+#sideMenu.is-active
+{ left: var(--board-width-percentage) }
+#sideMenu.is-active,
+#sideMenu:not(.is-active)
+{
+	transition: left 0.15s;
+}
 
 @media screen and (min-width: 1200px)
 {

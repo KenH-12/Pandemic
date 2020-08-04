@@ -18,7 +18,8 @@
 				<title>Pandemic</title>
 				<meta name='viewport' content='width=device-width, initial-scale=1'>
 				<link href='https://fonts.googleapis.com/css?family=Exo+2:800|Electrolize|Audiowide|Oswald:400,700|B612+Mono|Ropa+Sans&display=swap' rel='stylesheet'>
-				<link rel='stylesheet' type='text/css' href='style.css'>
+				<link type='text/css' href='css/style.css' rel='stylesheet'>
+				<link type='text/css' href='css/hamburgers.css' rel='stylesheet'>
 				<script src='clientCode/jquery-1.11.2.min.js'></script>
 				<script src='clientCode/jquery-ui.min.js'></script>
 				<script src='clientCode/jquery.easing.1.3.js'></script>
@@ -194,6 +195,8 @@
 
 					<img id='boardImg' src='images/pandemic_board.png' alt='Game Board'>
 					
+					<div id='sideMenu'></div>
+
 					<div id='rightPanel'>
 						<div id='setupProcedureContainer' class='procedureContainer hidden'>
 							<p class='title'><span>SETUP</p>
@@ -233,6 +236,12 @@
 								</div>
 							</div>
 						</div>
+
+						<button id='btnSideMenu' class='hamburger hamburger--spin' type='button'>
+							<span class='hamburger-box'>
+								<span class='hamburger-inner'></span>
+							</span>
+						</button>
 
 						<div id='turnProcedureContainer' class='procedureContainer hidden'>
 							<p class='title'>PLAY<span class='info' id='turnProcedureInfo'>&#9432;</span></p>
