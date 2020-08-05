@@ -199,9 +199,24 @@
 						<div class='title'>
 							<h2>MENU</h2>
 						</div>
+
+						<div class='button'>HELP</div>
+						<div class='secondaryButtonContainer hidden'>
+							<div class='button'>How to play</div>
+							<div id='importantInfo' class='button'>Where to find important info</div>
+							<div class='button'>Common Terms</div>
+						</div>
 						<div class='button'>RULES</div>
-						<div class='button'>OPTIONS</div>
-						<div class='button'>EXIT GAME</div>
+						<div class='secondaryButtonContainer hidden'>
+							<div class='button'>Objectives</div>
+							<div class='button'>Play steps</div>
+							<div class='button'>Roles</div>
+							<div class='button'>Cards</div>
+							<div class='button'>Special events</div>
+							<div class='button'>Game setup</div>
+						</div>
+						<div class='button'>GIVE UP</div>
+						<div class='button'>RETURN TO MAIN MENU</div>
 					</div>
 
 					<div id='rightPanel'>

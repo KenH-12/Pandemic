@@ -3,11 +3,52 @@ BUGS
 
 TO DO
 -----
-general instructions
-	hoverInfo
-	info icons
-	event history
-	objectives
+one quiet night tooltip for the infect cities play step
+
+side menu
+	help
+		where to find info
+			hoverInfo and info icons
+				example tooltips
+			trophy and warning icons
+			role cards
+			event cards
+			epidemics
+			event history
+			look to the right panel for prompts
+		terms
+	
+	rules
+		objectives
+			win condition
+			loss conditions
+		game setup
+		play steps
+			do 4 actions
+			draw 2 cards
+				resolve epidemics
+				discard to 7 cards
+			infect cities
+		roles
+			2-4 roles
+			special abilities, when they apply, and whatnot
+		cards
+			player
+				hand limit
+				city
+				event
+				epidemic
+			infection
+		special events
+			epidemics
+				steps
+				event card rules
+				double epidemic
+			outbreaks
+
+	give up
+	back to main menu
+	
 
 access keys
 	form to request a new key

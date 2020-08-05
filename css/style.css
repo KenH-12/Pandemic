@@ -2171,7 +2171,7 @@ a:hover { cursor: pointer }
 {
 	z-index: 48;
 	display: inline-block;
-	background-color: var(--main-background-color);
+	background: linear-gradient(to top, var(--main-background-color), #054583);
 	border-left: 1px solid #fff;
 	left: 100%;
 	font-family: 'Exo 2', sans-serif;
@@ -2202,6 +2202,28 @@ a:hover { cursor: pointer }
 	text-align: left;
 	padding: 10px;
 }
+#sideMenu > .button:hover
+{ padding-left: 15px }
+
+.secondaryButtonContainer
+{
+	width: 100%;
+	display: block;
+}
+.secondaryButtonContainer .button
+{
+	width: 96%;
+	margin: 1px 0 0 4%;
+	text-align: left;
+	background-color: #0b668d;
+}
+.secondaryButtonContainer .button:hover
+{
+	background-color: var(--button-background-bright);
+	padding-left: 10px;
+}
+#sideMenu .button, #sideMenu .button:hover
+{ transition: padding .2s }
 
 @media screen and (min-width: 1200px)
 {
