@@ -12,7 +12,7 @@ Copyright (c) 2016 Jonathan Suh <hello@jonsuh.com> (jonsuh.com)
  * @link https://github.com/jonsuh/hamburgers
  */
 .hamburger {
-  padding: 4px 0 12px 0;
+  padding: 0 0 8px 0;
   display: inline-block;
   cursor: pointer;
   transition-property: opacity, filter;
@@ -52,9 +52,9 @@ Copyright (c) 2016 Jonathan Suh <hello@jonsuh.com> (jonsuh.com)
     content: "";
     display: block; }
   .hamburger-inner::before {
-    top: -8px; }
+    top: -6px; }
   .hamburger-inner::after {
-    bottom: -8px; }
+    bottom: -6px; }
 
 /*
    * Spin
@@ -79,3 +79,41 @@ Copyright (c) 2016 Jonathan Suh <hello@jonsuh.com> (jonsuh.com)
     bottom: 0;
     transform: rotate(-90deg);
     transition: bottom 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1); }
+  
+@media screen and (min-width: 1200px)
+{
+  .hamburger
+  { padding: 1px 0 10px 0 }
+  .hamburger-inner::before
+	{ top: -8px }
+	.hamburger-inner::after
+  { bottom: -8px }
+}
+
+@media screen and (min-width: 1400px)
+{
+  .hamburger
+  { padding: 2px 0 12px 0 }
+  .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after
+  { height: 3px }
+  .hamburger-inner::before
+	{ top: -9px }
+	.hamburger-inner::after
+  { bottom: -9px }
+}
+
+@media screen and (min-width: 1800px)
+{
+  .hamburger
+  { padding: 4px 0 14px 0 }
+  .hamburger-inner::before
+	{ top: -10px }
+	.hamburger-inner::after
+  { bottom: -10px }
+}
+
+@media screen and (min-width: 1900px)
+{
+  .hamburger
+  { padding: 6px 0 16px 0 }
+}

@@ -2172,7 +2172,6 @@ a:hover { cursor: pointer }
 	z-index: 48;
 	display: inline-block;
 	background-color: var(--main-background-color);
-	height: 200px;
 	border-left: 1px solid #fff;
 	left: 100%;
 	font-family: 'Exo 2', sans-serif;
@@ -2555,6 +2554,9 @@ a:hover { cursor: pointer }
 	{
 		font-size: 12px;
 	}
+
+	#btnSideMenu
+	{ width: 2.9% }
 }
 
 @media screen and (min-width: 1400px)
@@ -3227,4 +3229,7 @@ a:hover { cursor: pointer }
 	{
 		font-size: 16px;
 	}
+
+	#btnSideMenu
+	{ width: 2.5% }
 }
