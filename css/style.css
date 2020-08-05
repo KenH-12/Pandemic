@@ -2150,12 +2150,21 @@ a:hover { cursor: pointer }
 	right: 0.3%;
 	border-left: 1px solid #fff;
 	border-bottom: 1px solid #fff;
-	border-bottom-left-radius: 4px;
 	background-color: var(--button-background);
 }
 #btnSideMenu:hover,
 .hamburger:hover
 { background-color: var(--button-background-bright) }
+#btnSideMenu.is-active
+{
+	top: -1px;
+	right: 0;
+	background-color: #b10e10;
+	transition: background-color 0.2s 0.15s;
+}
+#btnSideMenu.is-active:hover { background-color: #ef282a }
+#btnSideMenu:not(.is-active)
+{ transition: top, right 0.2s 0.15s }
 #sideMenu
 {
 	z-index: 48;
@@ -2163,7 +2172,8 @@ a:hover { cursor: pointer }
 	background-color: var(--main-background-color);
 	height: 200px;
 	border-left: 1px solid #fff;
-	left: 100%
+	left: 100%;
+	font-family: 'Exo 2', sans-serif;
 }
 #sideMenu.is-active
 { left: var(--board-width-percentage) }
@@ -2171,6 +2181,25 @@ a:hover { cursor: pointer }
 #sideMenu:not(.is-active)
 {
 	transition: left 0.15s;
+}
+#sideMenu > .title
+{
+	padding: 5px 0 0 3px;
+	font-size: 24px;
+}
+#sideMenu > .title h2
+{
+	display: inline-block;
+	padding-bottom: -2px;
+	border-bottom: 2px solid #fff;
+}
+#sideMenu > .button
+{
+	width: 100%;
+	margin: 3px 0 0 0;
+	font-size: 20px;
+	text-align: left;
+	padding: 10px;
 }
 
 @media screen and (min-width: 1200px)

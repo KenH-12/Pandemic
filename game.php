@@ -195,7 +195,14 @@
 
 					<img id='boardImg' src='images/pandemic_board.png' alt='Game Board'>
 					
-					<div id='sideMenu'></div>
+					<div id='sideMenu'>
+						<div class='title'>
+							<h2>MENU</h2>
+						</div>
+						<div class='button'>RULES</div>
+						<div class='button'>OPTIONS</div>
+						<div class='button'>EXIT GAME</div>
+					</div>
 
 					<div id='rightPanel'>
 						<div id='setupProcedureContainer' class='procedureContainer hidden'>
