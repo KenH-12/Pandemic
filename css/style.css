@@ -962,6 +962,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 .bottomPanelDiv .info
 {
 	font-size: 11px;
+	line-height: 13px;
 	vertical-align: text-top;
 }
 .cubeSupply
@@ -1943,8 +1944,9 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 #turnProcedureInfo, .playStepInfo { font-size: 11px }
 #turnProcedureInfo
 {
-	line-height: 16px;
-	margin-left: 15px;
+	line-height: 14px;
+	vertical-align: text-top;
+	margin-left: 5px;
 }
 .playStepInfo { margin-left: 5px }
 .playStepInfo:hover { color: #fff }
@@ -2304,6 +2306,7 @@ a:hover { cursor: pointer }
 	.bottomPanelDiv .info
 	{
 		font-size: 12px;
+		line-height: unset;
 	}
 	.cubeSupply p
 	{
@@ -2657,6 +2660,12 @@ a:hover { cursor: pointer }
 	}
 	.largeText { font-size: 24px }
 
+	#topPanel .info,
+	.bottomPanelDiv .info
+	{ line-height: 16px }
+	#turnProcedureInfo
+	{ line-height: unset }
+
 	#btnUndo
 	{
 		font-size: 26px;
@@ -2905,7 +2914,8 @@ a:hover { cursor: pointer }
 	.bottomPanelDiv .info
 	{
 		font-size: 18px;
-		line-height: 24px;
+		line-height: 20px;
+		vertical-align: text-top;
 	}
 
 	#infectionDeckContainer img
