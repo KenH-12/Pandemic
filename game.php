@@ -202,7 +202,7 @@
 
 						<div class='button'>HELP</div>
 						<div class='secondaryButtonContainer hidden'>
-							<div class='button'>How to play</div>
+							<div id='howToPlay' class='button'>How to play</div>
 							<div id='importantInfo' class='button'>Where to find important info</div>
 							<div id='whatJustHappened' class='button'>What just happened?</div>
 							<div class='button'>Common Terms</div>

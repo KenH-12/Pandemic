@@ -3,6 +3,7 @@
 import { eventTypes } from "./event.js";
 import { gameData, eventTypeIsBeingPrompted, getPlayer } from "./gameData.js";
 import Tooltip from "./tooltip.js";
+import { strings } from "./strings.js";
 
 export default class EventCard
 {
@@ -155,8 +156,7 @@ function bindDisabledEventCardHoverEvents()
         const forecastPriorityMsg = eventTypeIsBeingPrompted(eventTypes.forecastPlacement) ?
             "<p class='r'>* You must resolve the Forecast event before doing anything else.</p>" : "";
         
-        return `${forecastPriorityMsg}<p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
-            <p>However, when 2 Epidemic cards are drawn together, event cards can be played after resolving the first epidemic.</p>`;
+        return `${forecastPriorityMsg}${strings.eventCardPlayabilityExceptions}`;
     }
 
     let hoverElementSelector = ".eventCard.unavailable";

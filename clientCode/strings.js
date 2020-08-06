@@ -4,6 +4,18 @@ const trophySymbol = "<span class='warning'>🏆</span>",
     warningSymbol = "<span class='warning'>⚠️</span>",
     eventHistoryInfo = "The event history (bottom-left corner) is a great source of information about the things that have occured so far in the game.",
 strings = {
+    howToPlay: [
+        ["h5", "What do I do now?"],
+        "If you are ever unsure of how to proceed, look to the right panel (behind this menu) for prompts or clues.",
+        ["h5", "Turns"],
+        `Each of the 3 "PLAY" steps (top-right of the screen behind this menu) must be completed on each role's turn. The current step is always highlighted.`,
+        ["h5", "Actions"],
+        `During the "Do 4 actions" step, use the action buttons in the right panel to work toward discovering cures to all 4 diseases while preventing global catastrophy. Mouse over an action button's info icon (&#9432;) to view the action's rules.`,
+        "NOTE: you can perform movement actions by dragging and dropping an active pawn onto a <span class='hoverInfo validDestinationInfo'>valid destination</span>, and you can do the <span class='hoverInfo eventTypeInfo' data-eventType='td'>Treat Disease</span> action by clicking a disease cube at the active role's current location.",
+        ["h5", "Event cards"],
+        "With a few <span class='hoverInfo eventCardExceptions'>exceptions</span>, Event cards can be <span class='hoverInfo eventCardInfo'>played</span> at any time. Playing an Event card does not take an action.",
+        "NOTE: if a role's hand limit is reached, they are allowed to play Event cards from their hand instead of discarding."
+    ],
     importantInfo: [
         ["h5", "General Information"],
         "Look for info icons (<span class='info' id='metaInfo'>&#9432;</span>) and words with a <span class='hoverInfo' id='metaHoverInfo'>blue underline</span> -- they can be moused over to see a tooltip containing more detailed information about something.",
@@ -48,9 +60,14 @@ strings = {
     researcherCardText: `<li><span>You may give any 1 of your City cards when you Share Knowledge. It need not match your city. A player who Shares Knowledge with you on their turn can take any 1 of your City cards.</span></li>`,
     scientistCardText: `<li><span>You need only 4 cards of the same color to do the Discover a Cure action.</span></li>`,
 
+    dispatchDiscardRule: "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
+
     eventCardPlayabilityRule: "<span>Play at any time. Not an action.</span>",
-    eventCardInfo: `To play an Event card, find the card in the role's hand (top-left of the screen) and click it.<br/><br/>
+    eventCardInfo: `<p>To play an Event card, find the card in the role's hand (top-left of the screen) and click it.</p>
+<p>Mouse over an Event card to view the full card text.</p>
 <span style='white-space:nowrap'>Event cards look like this:</span>`,
+    eventCardPlayabilityExceptions: `<p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
+<p>However, when 2 Epidemic cards are drawn together, event cards can be played after resolving the first epidemic.</p>`,
     forecastTopInfo: "The top card will be put back on the deck last (and drawn from the deck first).",
     forcastBottomInfo: "The bottom card will be put back on the deck first (and drawn from the deck sixth).",
 };

@@ -16,8 +16,7 @@ import {
 } from "./utilities/pandemicUtils.js";
 import { postData } from "./utilities/fetchUtils.js";
 
-const dispatchDiscardRule = "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
-eventTypes = {
+const eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
 		code: "dr",
@@ -92,7 +91,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Treat Disease",
 		code: "td",
 		rules: [
-			"Remove 1 disease cube from the city you are in, placing it in the cube supply next to the board.",
+			"Remove 1 disease cube from the city you are in, returning it to the Disease Cube Supply.",
 			"If the disease has been cured, remove all cubes of that color from the city you are in."
 		],
 		instructions: "Select a Disease Color:",
@@ -150,22 +149,22 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: [
 			"The Dispatcher may, as an action, either:",
 			"<li>move any pawn to any city containing another pawn, or</li>",
-			"<li>move another role's pawn as if it were his own.</li>",
-			`${dispatchDiscardRule} A card discarded for a Charter Flight must match the city the pawn is moving from.`
+			"<li>move another role's pawn <span class='hoverInfo dispatchInfo'>as if it were his own</span>.</li>",
+			`${strings.dispatchDiscardRule} A card discarded for a Charter Flight must match the city the pawn is moving from.`
 		],
 		driveFerryRules: ["Dispatch a pawn to a city connected by a white line to the one it is in."],
 		directFlightRules: [
 			"Discard a city card to dispatch a pawn to the city named on the card.",
-			dispatchDiscardRule
+			strings.dispatchDiscardRule
 		],
 		charterFlightRules: [
 			"Discard the city card that <i>matches</i> a pawn's location to dispatch that pawn to <i>any</i> city.",
-			dispatchDiscardRule
+			strings.dispatchDiscardRule
 		],
 		rendezvousRules: ["The Dispatcher may, as an action, move any pawn to a city containing another pawn."],
 		shuttleFlightRules: ["Dispatch a pawn from a city with a research station to any other city that has a research station."],
 		abbreviatedRulesetLength: 3,
-		instructions: "To dispatch a pawn, drag and drop it onto a city.",
+		instructions: "To dispatch a pawn, drag and drop it onto a valid destination city.",
 		actionPathName: "actions/movementAction",
 		propertyNames: ["dispatchedRoleID", "originKey", "destinationKey", "movementTypeCode", "rolesAtRendezvousDestination"]
 	},

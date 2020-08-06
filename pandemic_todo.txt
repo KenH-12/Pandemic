@@ -3,14 +3,15 @@ BUGS
 
 TO DO
 -----
+role card text is a little small for 1366px screen width
+
 prompting something should hide the side menu
 
 one quiet night tooltip for the infect cities play step
 
 side menu
 	help
-		how to play
-		terms
+		common terms
 	
 	rules
 		objectives
