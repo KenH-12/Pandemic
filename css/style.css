@@ -2213,7 +2213,7 @@ a:hover { cursor: pointer }
 .secondaryButtonContainer .button
 {
 	width: 96%;
-	margin: 1px 0 0 4%;
+	margin: 1px 0 0 3%;
 	text-align: left;
 	background-color: #0b668d;
 }
@@ -2224,6 +2224,21 @@ a:hover { cursor: pointer }
 }
 #sideMenu .button, #sideMenu .button:hover
 { transition: padding .2s }
+
+.sideMenuContent
+{
+	margin: 2px 0 0 6%;
+	font-family: "Ropa sans", sans-serif;
+	line-height: 18px;
+}
+.sideMenuContent p
+{ margin-bottom: 6px }
+#metaInfo.info
+{
+	font-size: 14px;
+	line-height: 16px;
+	vertical-align: text-top;
+}
 
 @media screen and (min-width: 1200px)
 {

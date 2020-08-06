@@ -1,11 +1,15 @@
 "use strict";
 
+import { strings } from "./strings.js";
+
 export default class sideMenu
 {
     constructor()
     {
         this.$hamburgerButton = $("#btnSideMenu");
         this.$menu = $("#sideMenu");
+        this.buttonContainerSelector = ".secondaryButtonContainer";
+
         this.$hamburgerButton.click(() => this.toggle());
     }
 
@@ -40,41 +44,86 @@ export default class sideMenu
 
     toggleContent($menuItem)
     {
-        const buttonContainerSelector = ".secondaryButtonContainer",
+        const { buttonContainerSelector } = this,
             $buttonContainer = $menuItem.next(buttonContainerSelector).stop(),
-            collapse = "collapse";
+            isExpanded = $menuItem.next().not(".hidden").length;
         
-        if ($menuItem.hasClass(collapse))
-        {
-            $menuItem.removeClass(collapse);
+        if (isExpanded)
             return this.hideSecondaryButtons($buttonContainer);
-        }
         
-        $menuItem.addClass(collapse);
         this.showSecondaryButtons($buttonContainer);
     }
 
-    async showSecondaryButtons($buttonContainer)
+    async showSecondaryButtons($containerToShow)
     {
-        const desiredProperties = { height: $buttonContainer.removeClass("hidden").height() };
-        await animationPromise({
-            $elements: $buttonContainer,
-            initialProperties: { height: 0 },
-            desiredProperties,
-            duration: 200,
-            easing: "easeOutQuad"
-        });
-        removeInlineStylePropertiesFrom($buttonContainer);
+        const self = this;
+        
+        this.hideSecondaryButtons($(self.buttonContainerSelector).not($containerToShow));
+
+        await expand($containerToShow);
+
+        $containerToShow.children()
+            .off("click")
+            .click(function() { self.showContent($(this)) });
     }
 
-    async hideSecondaryButtons($buttonContainer)
+    async hideSecondaryButtons($containersToHide)
     {
-        await animationPromise({
-            $elements: $buttonContainer,
-            desiredProperties: { height: 0 },
-            duration: 200,
-            easing: "easeOutQuad"
-        });
-        removeInlineStylePropertiesFrom($buttonContainer.addClass("hidden"));
+        $containersToHide.children().off("click");
+        collapse($containersToHide);
     }
+
+    async showContent($secondaryButton)
+    {
+        const contentClass = "sideMenuContent",
+            stringKey = $secondaryButton.attr("id");
+        
+        if ($secondaryButton.next().hasClass(contentClass))
+            return this.hideContent($secondaryButton.next());
+        
+        if (typeof strings[stringKey] === "undefined")
+            return false;
+
+        this.hideContent($(`.${contentClass}`));
+        
+        const $content = $(`<div class='${contentClass}'></div>`).insertAfter($secondaryButton);
+
+        for (let p of strings[stringKey])
+            $content.append(`<p>${p}</p>`);
+        
+        expand($content);
+    }
+
+    async hideContent($content)
+    {
+        await collapse($content);
+        $content.remove();
+    }
+}
+
+const duration = 200,
+    easing = "easeOutQuad";
+
+async function expand($elements)
+{
+    await animationPromise({
+        $elements,
+        initialProperties: { height: 0 },
+        desiredProperties: { height: $elements.stop().removeClass("hidden").height() },
+        duration, easing
+    });
+    removeInlineStylePropertiesFrom($elements);
+    return Promise.resolve();
+}
+
+async function collapse($elements)
+{
+    $elements.stop();
+    await animationPromise({
+        $elements,
+        desiredProperties: { height: 0 },
+        duration, easing
+    });
+    removeInlineStylePropertiesFrom($elements.addClass("hidden"));
+    return Promise.resolve();
 }
