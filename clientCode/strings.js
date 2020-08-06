@@ -5,9 +5,15 @@ const trophySymbol = "<span class='warning'>🏆</span>",
     eventHistoryInfo = "The event history (bottom-left corner) is a great source of information about the things that have occured so far in the game.",
 strings = {
     importantInfo: [
+        ["h5", "General Information"],
         "Look for info icons (<span class='info' id='metaInfo'>&#9432;</span>) and words with a <span class='hoverInfo' id='metaHoverInfo'>blue underline</span> -- they can be moused over to see a tooltip containing more detailed information about something.",
+        eventHistoryInfo,
+        ["h5", "Objectives"],
         `Look for trophy icons (${trophySymbol}) and warning icons (${warningSymbol}) inside tooltips -- these indicate information about the ways that you can win or lose the game, respectively.`,
-        eventHistoryInfo
+        ["h5", "Roles"],
+        "Whenever you see the name of a role, you can mouse over it to view that role's special abilities.",
+        ["h5", "Cards"],
+        `Try hovering over the various types of cards to see their tooltips, or go to <span style='white-space:nowrap'>RULES -> Cards</span> to learn more.`,
     ],
     whatJustHappened: [
         eventHistoryInfo,

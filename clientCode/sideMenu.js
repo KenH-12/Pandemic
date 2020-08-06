@@ -88,8 +88,19 @@ export default class sideMenu
         
         const $content = $(`<div class='${contentClass}'></div>`).insertAfter($secondaryButton);
 
+        let tag = "p";
         for (let p of strings[stringKey])
-            $content.append(`<p>${p}</p>`);
+        {
+            if (Array.isArray(p))
+            {
+                tag = p[0];
+                p = p[1];
+            }
+            else
+                tag = "p";
+            
+            $content.append(`<${tag}>${p}</${tag}>`);
+        }
         
         expand($content);
     }

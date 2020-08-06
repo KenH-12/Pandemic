@@ -3,15 +3,13 @@ BUGS
 
 TO DO
 -----
+prompting something should hide the side menu
+
 one quiet night tooltip for the infect cities play step
 
 side menu
 	help
-		where to find info
-			role cards
-			event cards
-			epidemics
-			look to the right panel for prompts
+		how to play
 		terms
 	
 	rules

@@ -2216,6 +2216,7 @@ a:hover { cursor: pointer }
 {
 	width: 96%;
 	margin: 1px 0 0 3%;
+	font-size: 17px;
 	text-align: left;
 	background-color: #0b668d;
 }
@@ -2233,8 +2234,15 @@ a:hover { cursor: pointer }
 	font-family: "Ropa sans", sans-serif;
 	line-height: 18px;
 }
+.sideMenuContent h5
+{
+	font-family: 'Exo 2', sans-serif;
+	font-size: 17px;
+	border-bottom: 1px solid #fff;
+	display: inline-block;
+}
 .sideMenuContent p
-{ margin-bottom: 6px }
+{ margin-bottom: 5px }
 #metaInfo.info
 {
 	font-size: 14px;
