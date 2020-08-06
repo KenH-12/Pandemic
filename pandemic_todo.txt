@@ -8,13 +8,9 @@ one quiet night tooltip for the infect cities play step
 side menu
 	help
 		where to find info
-			hoverInfo and info icons
-				example tooltips
-			trophy and warning icons
 			role cards
 			event cards
 			epidemics
-			event history
 			look to the right panel for prompts
 		terms
 	

@@ -204,6 +204,7 @@
 						<div class='secondaryButtonContainer hidden'>
 							<div class='button'>How to play</div>
 							<div id='importantInfo' class='button'>Where to find important info</div>
+							<div id='whatJustHappened' class='button'>What just happened?</div>
 							<div class='button'>Common Terms</div>
 						</div>
 						<div class='button'>RULES</div>

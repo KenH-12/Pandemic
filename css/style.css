@@ -1105,7 +1105,9 @@ span.r, p.r {color: #ef282a; background: none !important }
 	float: right;
 	border-left: 1px solid #fff;
 }
-#rightPanel .tooltip { max-width: 180px }
+#rightPanel .tooltip,
+#sideMenu .tooltip
+{ max-width: 180px }
 .scrollable { overflow-y: scroll }
 #indicatorContainer
 {
@@ -2239,6 +2241,9 @@ a:hover { cursor: pointer }
 	line-height: 16px;
 	vertical-align: text-top;
 }
+
+#sideMenu .tooltip
+{ font-family: 'Electrolize', sans-serif }
 
 @media screen and (min-width: 1200px)
 {

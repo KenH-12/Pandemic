@@ -29,7 +29,8 @@ import { eventHistory } from "./eventHistory.js";
 
 export default function instantiateTooltips()
 {
-    bindCubeSuppliesInfoHoverEvents();
+	bindSideMenuHoverEvents();
+	bindCubeSuppliesInfoHoverEvents();
 	bindInfectionDeckHoverEvents();
 	bindInfectionRateInfoHoverEvents();
 	bindInfectionCardHoverEvents();
@@ -49,6 +50,26 @@ export default function instantiateTooltips()
 }
 
 const containerSelector = "#boardContainer";
+
+function bindSideMenuHoverEvents()
+{
+	const containerSelector = "#sideMenu",
+		juxtaposition = "bottom";
+	
+	new Tooltip({
+		content: "Info icons are littered throughout the interface. Use them to familiarize yourself with the rules!",
+		hoverElementSelector: "#metaInfo",
+		juxtaposition,
+		containerSelector
+	}).bindHoverEvents();
+
+	new Tooltip({
+		content: "Words or phrases underlined in blue require a bit of explanation. Mouse over them to learn more!",
+		hoverElementSelector: "#metaHoverInfo",
+		juxtaposition,
+		containerSelector
+	}).bindHoverEvents();
+}
 
 function bindPlayerDeckHoverEvents()
 {

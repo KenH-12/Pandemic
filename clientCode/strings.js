@@ -1,7 +1,19 @@
 "use strict";
 
-const warningSymbol = "<span class='warning'>⚠️</span>",
+const trophySymbol = "<span class='warning'>🏆</span>",
+    warningSymbol = "<span class='warning'>⚠️</span>",
+    eventHistoryInfo = "The event history (bottom-left corner) is a great source of information about the things that have occured so far in the game.",
 strings = {
+    importantInfo: [
+        "Look for info icons (<span class='info' id='metaInfo'>&#9432;</span>) and words with a <span class='hoverInfo' id='metaHoverInfo'>blue underline</span> -- they can be moused over to see a tooltip containing more detailed information about something.",
+        `Look for trophy icons (${trophySymbol}) and warning icons (${warningSymbol}) inside tooltips -- these indicate information about the ways that you can win or lose the game, respectively.`,
+        eventHistoryInfo
+    ],
+    whatJustHappened: [
+        eventHistoryInfo,
+        "Mouse over an icon in the event history to see the details of that particular event. Try hovering over the tooltip that appears to get more information about its contents. Use the tooltip's info icon (&#9432;) to learn more about the rules regarding that type of event.",
+        "Made a mistake? Try using the event history's undo button (&#x2B8C;).<br/>NOTE: some events cannot be undone!</p>"
+    ],
     loadingGifHtml: "<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>",
     diseaseCubeSupplyInfo: "<p>When a city is infected by a disease, 1 disease cube of the matching color is placed onto the city.</p><p>If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in the city.</p>",
     infectionRateInfo: `<p>The infection rate determines how many infection cards are flipped over during the <span class='hoverInfo' data-eventType='ic'>Infect Cities</span> step.</p>
@@ -15,7 +27,7 @@ strings = {
     discardRule: "If a role ever has more than 7 cards in hand (after first resolving any Epidemic cards drawn), they must discard or play event cards until they have 7 cards in hand.",
     outOfCardsWarning: `${warningSymbol} If there are fewer than 2 cards left in the Player Deck when it is time to draw, the game ends and your team has lost!`,
     
-    victoryCondition: "<span class='warning'>🏆</span>Discover cures to all 4 diseases and your team wins immediately, no matter how many cubes are on the board.",
+    victoryCondition: `${trophySymbol}Discover cures to all 4 diseases and your team wins immediately, no matter how many cubes are on the board.`,
     additionalDiscoverACureInfo: "When a disease is cured, cubes of that colour remain on the board and new cubes of that colour can still be placed during epidemics or infections. However, treating this disease is now easier and your team is closer to winning.",
     curedDiseaseInfo: "Treating this disease now removes all cubes of this colour from the city you are in.",
     eradicationRules: `<p>If no cubes of a <i>cured</i> disease are left on the board, the disease is <i>eradicated</i>.</p>
