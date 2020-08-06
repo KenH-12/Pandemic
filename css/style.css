@@ -2171,7 +2171,7 @@ a:hover { cursor: pointer }
 { transition: top, right 0.2s 0.15s }
 #sideMenu
 {
-	z-index: 48;
+	z-index: 40;
 	display: inline-block;
 	background: linear-gradient(to top, var(--main-background-color), #054583);
 	border-left: 1px solid #fff;
@@ -2203,25 +2203,49 @@ a:hover { cursor: pointer }
 	font-size: 20px;
 	text-align: left;
 	padding: 10px;
+	z-index: 42;
 }
-#sideMenu .button > * { vertical-align: middle }
-#sideMenu > .button .buttonChevron
+.buttonChevron
 {
 	position: absolute;
-	right: 10px;
 	font-family: 'B612 Mono';
-	font-size: 32px;
+	transform: rotate(180deg);
+	-webkit-transform: rotate(180deg); /* Safari */
+	-moz-transform: rotate(180deg); /* Firefox */
+	-ms-transform: rotate(180deg); /* IE */
+	-o-transform: rotate(180deg); /* Opera */
 }
-.buttonChevron.flipped
+.buttonChevron.rightChevron
 {
-	transform: rotate(-180deg);
-	-webkit-transform: rotate(-180deg); /* Safari */
-	-moz-transform: rotate(-180deg); /* Firefox */
-	-ms-transform: rotate(-180deg); /* IE */
-	-o-transform: rotate(-180deg); /* Opera */
+	transform: rotate(90deg);
+	-webkit-transform: rotate(90deg); /* Safari */
+	-moz-transform: rotate(90deg); /* Firefox */
+	-ms-transform: rotate(90deg); /* IE */
+	-o-transform: rotate(90deg); /* Opera */
 }
-#sideMenu > .button .buttonChevron.flipped
-{ line-height: 10px }
+#sideMenu > .button .buttonChevron
+{
+	right: 15px;
+	font-size: 32px;
+	line-height: 10px;
+}
+#sideMenu > .button .buttonChevron.rightChevron
+{
+	right: 20px;
+	line-height: 25px;
+}
+.secondaryButtonContainer .buttonChevron
+{
+	right: 1px;
+	margin-left: 3px;
+	font-size: 24px;
+	line-height: 8px;
+}
+.secondaryButtonContainer .buttonChevron.rightChevron
+{
+	right: 6px;
+	line-height: 20px;
+}
 #sideMenu > .button:hover
 { padding-left: 15px }
 
@@ -2232,16 +2256,18 @@ a:hover { cursor: pointer }
 }
 .secondaryButtonContainer .button
 {
-	width: 96%;
+	width: 97%;
 	margin: 1px 0 0 3%;
 	font-size: 17px;
 	text-align: left;
 	background-color: #0b668d;
+	position: relative;
+	z-index: 41;
 }
 .secondaryButtonContainer .button:hover
 {
 	background-color: var(--button-background-bright);
-	padding-left: 10px;
+	padding-left: 8px;
 }
 #sideMenu .button, #sideMenu .button:hover
 { transition: padding .2s }

@@ -8,7 +8,6 @@ export default class sideMenu
     {
         this.$hamburgerButton = $("#btnSideMenu");
         this.$menu = $("#sideMenu");
-        this.chevronSelector = ".buttonChevron";
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
         this.$hamburgerButton.click(() => this.toggle());
@@ -45,24 +44,18 @@ export default class sideMenu
 
     toggleContent($menuItem)
     {
-        const {
-                chevronSelector,
-                buttonContainerSelector,
-                $menu
-            } = this,
-            $chevron = $menuItem.children(chevronSelector),
+        const { buttonContainerSelector, $menu } = this,
             $buttonContainer = $menuItem.next(buttonContainerSelector).stop(),
-            isExpanded = $menuItem.next().not(".hidden").length,
-            flipped = "flipped";
+            isExpanded = $menuItem.next().not(".hidden").length;
         
         if (isExpanded)
         {
-            $chevron.addClass(flipped);
+            flipChevrons($menuItem);
             return this.hideSecondaryButtons($buttonContainer);
         }
         
-        $menu.find(chevronSelector).not($chevron).addClass(flipped);
-        $chevron.removeClass(flipped);
+        flipChevrons($menu.children(".button").not($menuItem));
+        unflipChevrons($menuItem);
         this.showSecondaryButtons($buttonContainer);
     }
 
@@ -79,23 +72,27 @@ export default class sideMenu
             .click(function() { self.showContent($(this)) });
     }
 
-    async hideSecondaryButtons($containersToHide)
+    hideSecondaryButtons($containersToHide)
     {
         $containersToHide.children().off("click");
         collapse($containersToHide);
     }
 
-    async showContent($secondaryButton)
+    showContent($secondaryButton)
     {
         const contentClass = "sideMenuContent",
             stringKey = $secondaryButton.attr("id");
         
         if ($secondaryButton.next().hasClass(contentClass))
+        {
+            flipChevrons($secondaryButton);
             return this.hideContent($secondaryButton.next());
+        }
         
         if (typeof strings[stringKey] === "undefined")
             return false;
 
+        flipChevrons(this.$menu.find(".secondaryButtonContainer").children(".button"));
         this.hideContent($(`.${contentClass}`));
         
         const $content = $(`<div class='${contentClass}'></div>`).insertAfter($secondaryButton);
@@ -114,6 +111,7 @@ export default class sideMenu
             $content.append(`<${tag}>${p}</${tag}>`);
         }
         
+        unflipChevrons($secondaryButton);
         expand($content);
     }
 
@@ -149,4 +147,14 @@ async function collapse($elements)
     });
     removeInlineStylePropertiesFrom($elements.addClass("hidden"));
     return Promise.resolve();
+}
+
+function flipChevrons($buttons)
+{
+    $buttons.each(function() { $(this).children(".buttonChevron").addClass("rightChevron") })
+}
+
+function unflipChevrons($buttons)
+{
+    $buttons.each(function() { $(this).children(".buttonChevron").removeClass("rightChevron") })
 }

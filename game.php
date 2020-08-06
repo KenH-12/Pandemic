@@ -200,13 +200,13 @@
 							<h2>MENU</h2>
 						</div>
 
-						<div class='button'>HELP<span class='buttonChevron flipped'>^</span></div>
+						<div class='button'>HELP<span class='buttonChevron rightChevron'>^</span></div>
 						<div class='secondaryButtonContainer hidden'>
-							<div id='howToPlay' class='button'>How to play</div>
-							<div id='importantInfo' class='button'>Where to find important info</div>
-							<div id='whatJustHappened' class='button'>What just happened?</div>
+							<div id='howToPlay' class='button'>How to play<span class='buttonChevron rightChevron'>^</span></div>
+							<div id='importantInfo' class='button'>Where to find important info<span class='buttonChevron rightChevron'>^</span></div>
+							<div id='whatJustHappened' class='button'>What just happened?<span class='buttonChevron rightChevron'>^</span></div>
 						</div>
-						<div class='button'>RULES<span class='buttonChevron flipped'>^</span></div>
+						<div class='button'>RULES<span class='buttonChevron rightChevron'>^</span></div>
 						<div class='secondaryButtonContainer hidden'>
 							<div class='button'>Objectives</div>
 							<div class='button'>Play steps</div>
