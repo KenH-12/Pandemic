@@ -5,7 +5,6 @@ const trophySymbol = "<span class='warning'>🏆</span>",
     eventHistoryInfo = "The event history (bottom-left corner) is a great source of information about the things that have occured so far in the game.",
 strings = {
     howToPlay: [
-        ["h5", "What do I do now?"],
         "If you are ever unsure of how to proceed, look to the right panel (behind this menu) for prompts or clues.",
         ["h5", "Turns"],
         `Each of the 3 "PLAY" steps (top-right of the screen behind this menu) must be completed on each role's turn. The current step is always highlighted.`,

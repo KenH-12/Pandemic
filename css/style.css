@@ -2204,6 +2204,24 @@ a:hover { cursor: pointer }
 	text-align: left;
 	padding: 10px;
 }
+#sideMenu .button > * { vertical-align: middle }
+#sideMenu > .button .buttonChevron
+{
+	position: absolute;
+	right: 10px;
+	font-family: 'B612 Mono';
+	font-size: 32px;
+}
+.buttonChevron.flipped
+{
+	transform: rotate(-180deg);
+	-webkit-transform: rotate(-180deg); /* Safari */
+	-moz-transform: rotate(-180deg); /* Firefox */
+	-ms-transform: rotate(-180deg); /* IE */
+	-o-transform: rotate(-180deg); /* Opera */
+}
+#sideMenu > .button .buttonChevron.flipped
+{ line-height: 10px }
 #sideMenu > .button:hover
 { padding-left: 15px }
 

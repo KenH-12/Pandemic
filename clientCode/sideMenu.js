@@ -8,6 +8,7 @@ export default class sideMenu
     {
         this.$hamburgerButton = $("#btnSideMenu");
         this.$menu = $("#sideMenu");
+        this.chevronSelector = ".buttonChevron";
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
         this.$hamburgerButton.click(() => this.toggle());
@@ -44,13 +45,24 @@ export default class sideMenu
 
     toggleContent($menuItem)
     {
-        const { buttonContainerSelector } = this,
+        const {
+                chevronSelector,
+                buttonContainerSelector,
+                $menu
+            } = this,
+            $chevron = $menuItem.children(chevronSelector),
             $buttonContainer = $menuItem.next(buttonContainerSelector).stop(),
-            isExpanded = $menuItem.next().not(".hidden").length;
+            isExpanded = $menuItem.next().not(".hidden").length,
+            flipped = "flipped";
         
         if (isExpanded)
+        {
+            $chevron.addClass(flipped);
             return this.hideSecondaryButtons($buttonContainer);
+        }
         
+        $menu.find(chevronSelector).not($chevron).addClass(flipped);
+        $chevron.removeClass(flipped);
         this.showSecondaryButtons($buttonContainer);
     }
 
