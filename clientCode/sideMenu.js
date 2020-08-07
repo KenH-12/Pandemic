@@ -110,30 +110,50 @@ export default class sideMenu
         flipChevrons(this.$menu.find(".secondaryButtonContainer").children(".button"));
         this.hideContent($(`.${contentClass}`));
         
-        const $content = $(`<div class='${contentClass}'></div>`).insertAfter($secondaryButton);
+        const $container = $(`<div class='${contentClass}'></div>`).insertAfter($secondaryButton);
 
-        let tag = "p";
-        for (let p of strings[stringKey])
-        {
-            if (Array.isArray(p))
-            {
-                tag = p[0];
-                p = p[1];
-            }
-            else
-                tag = "p";
-            
-            $content.append(`<${tag}>${p}</${tag}>`);
-        }
-        
+        this.parseAndAppendContent($container, strings[stringKey]);
         unflipChevrons($secondaryButton);
-        expand($content);
+        expand($container);
     }
 
     async hideContent($content)
     {
         await collapse($content);
         $content.remove();
+    }
+
+    parseAndAppendContent($container, content)
+    {
+        let tagName = "p",
+            member;
+        
+        if (!Array.isArray(content) && typeof content === "object")
+        {
+            for (let key in content)
+            {
+                member = content[key];
+                tagName = key.includes("Heading") ? "h5" : "p";
+                    
+                for (let string of ensureIsArray(member))
+                    appendHtmlToContainer($container, tagName, string);
+            }
+
+            return false;
+        }
+        
+        for (let p of content)
+        {
+            if (Array.isArray(p))
+            {
+                tagName = p[0];
+                p = p[1];
+            }
+            else
+                tagName = "p";
+            
+            appendHtmlToContainer($container, tagName, p);
+        }
     }
 }
 
@@ -172,4 +192,9 @@ function flipChevrons($buttons)
 function unflipChevrons($buttons)
 {
     $buttons.each(function() { $(this).children(".buttonChevron").removeClass("rightChevron") })
+}
+
+function appendHtmlToContainer($container, tagName, content)
+{
+    $container.append(`<${tagName}>${content}</${tagName}>`);
 }
