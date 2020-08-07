@@ -2078,17 +2078,20 @@ async function oneQuietNight($btnConfirm)
 function indicateOneQuietNightStep({ off } = {})
 {
 	let title = "",
-		html = "3. Infect Cities";
+		html = "3. Infect Cities",
+		classMethod = "removeClass";
 
 	if (!off)
 	{
 		html += " (One Quiet Night)";
 		title = `One Quiet Night: skip the next Infect Cities step.`;
+		classMethod = "addClass";
 	}
 	
 	$("#turnProcedureContainer").find(".step.infect").children("span").first()
 		.attr("title", title)
-		.html(html);
+		.html(html)
+		.next()[classMethod]("oneQuietNight");
 }
 
 function animateOneQuietNight()

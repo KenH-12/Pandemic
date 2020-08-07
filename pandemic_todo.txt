@@ -3,8 +3,6 @@ BUGS
 
 TO DO
 -----
-one quiet night tooltip for the infect cities play step
-
 side menu
 	rules
 		objectives

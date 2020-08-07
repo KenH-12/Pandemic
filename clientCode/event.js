@@ -323,7 +323,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		cardKey: "oneq",
 		rules: [
 			strings.eventCardPlayabilityRule,
-			"Skip the next Infect Cities step (do not flip over any Infection cards)."
+			"Skip the next Infect Cities step."
 		],
 		actionPathName: "eventCards/oneQuietNight"
 	},

@@ -823,6 +823,14 @@ function bindPlayStepHoverEvents()
 			positionRelativeToSelector,
 			alignArrowWithHoveredElement: true,
 			cssClassString: "playStepTooltip eventTypeTooltip"
+		}).bindHoverEvents(),
+		oneQuietNightToolip = new Tooltip({
+			hoverElementSelector: `${playStepInfoSelector}.oneQuietNight`,
+			getContent: () =>  `<h3>ONE QUIET NIGHT</h3><p>${eventTypes.oneQuietNight.rules[1]}</p>`,
+			containerSelector: "#rightPanel",
+			juxtaposition: "bottom",
+			positionRelativeToSelector,
+			cssClassString: "playStepTooltip eventTypeTooltip"
 		}).bindHoverEvents();
 	
 	$("#turnProcedureInfo").on("mouseenter", function()
@@ -838,6 +846,7 @@ function bindPlayStepHoverEvents()
 			$playStepInfoIcons.addClass(hiddenClass);
 			$infoIcon.removeClass(textShadowClass);
 			playStepTooltip.hide();
+			oneQuietNightToolip.hide();
 
 			unbindEpidemicCardHoverEvents($procedureContainer)
 		});
