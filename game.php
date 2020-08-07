@@ -9,6 +9,8 @@
 
 	$MAX_RESEARCH_STATION_COUNT = 6;
 	$MAX_CUBE_SUPPLY_COUNT = 24;
+
+	$chevron = "<span class='buttonChevron rightChevron'>^</span>";
 	
 	$doc = "<!DOCTYPE html>
 			<html lang='en'>
@@ -200,20 +202,20 @@
 							<h2>MENU</h2>
 						</div>
 
-						<div class='button'>HELP<span class='buttonChevron rightChevron'>^</span></div>
+						<div class='button'>HELP$chevron</div>
 						<div class='secondaryButtonContainer hidden'>
-							<div id='howToPlay' class='button'>How to play<span class='buttonChevron rightChevron'>^</span></div>
-							<div id='importantInfo' class='button'>Where to find important info<span class='buttonChevron rightChevron'>^</span></div>
-							<div id='whatJustHappened' class='button'>What just happened?<span class='buttonChevron rightChevron'>^</span></div>
+							<div id='howToPlay' class='button'>How to play$chevron</div>
+							<div id='importantInfo' class='button'>Where to find important info$chevron</div>
+							<div id='whatJustHappened' class='button'>What just happened?$chevron</div>
 						</div>
-						<div class='button'>RULES<span class='buttonChevron rightChevron'>^</span></div>
+						<div class='button'>RULES$chevron</div>
 						<div class='secondaryButtonContainer hidden'>
-							<div class='button'>Objectives</div>
-							<div class='button'>Play steps</div>
-							<div class='button'>Roles</div>
-							<div class='button'>Cards</div>
-							<div class='button'>Special events</div>
-							<div class='button'>Game setup</div>
+							<div id='objectives' class='button'>Objectives$chevron</div>
+							<div class='button'>Play steps$chevron</div>
+							<div class='button'>Roles$chevron</div>
+							<div class='button'>Cards$chevron</div>
+							<div class='button'>Special events$chevron</div>
+							<div class='button'>Game setup$chevron</div>
 						</div>
 						<div class='button'>GIVE UP</div>
 						<div class='button'>RETURN TO MAIN MENU</div>

@@ -5,9 +5,6 @@ TO DO
 -----
 side menu
 	rules
-		objectives
-			win condition
-			loss conditions
 		game setup
 		play steps
 			do 4 actions
