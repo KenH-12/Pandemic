@@ -1,17 +1,18 @@
 "use strict";
 
-const trophySymbol = "<span class='warning'>🏆</span>",
+const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind this menu) must be completed on each role's turn. The current step is always highlighted.`,
+    trophySymbol = "<span class='warning'>🏆</span>",
     warningSymbol = "<span class='warning'>⚠️</span>",
     eventHistoryInfo = "The event history (bottom-left corner) is a great source of information about the things that have occured so far in the game.",
     victoryCondition = `${trophySymbol} Discover cures to all 4 diseases and your team wins immediately, no matter how many disease cubes are on the board.`,
-    tooManyOutbreaksWarning = `${warningSymbol} If the outbreaks marker reaches the last space of the outbreaks track, the game ends and your team has lost!`,
+    tooManyOutbreaksWarning = `${warningSymbol} If the outbreaks marker reaches the last space of the Outbreaks Track, the game ends and your team has lost!`,
     insufficientCubesWarning = `${warningSymbol} If the number of disease cubes <i>actually needed on the board</i> cannot be placed because there are not enough cubes in the supply, the game ends and your team has lost!`,
     outOfCardsWarning = `${warningSymbol} If there are fewer than 2 cards left in the Player Deck when it is time to draw, the game ends and your team has lost!`,
 strings = {
     howToPlay: [
         "If you are ever unsure of how to proceed, look to the right panel (behind this menu) for prompts or clues.",
         ["h5", "Turns"],
-        `Each of the 3 "PLAY" steps (top-right of the screen behind this menu) must be completed on each role's turn. The current step is always highlighted.`,
+        turnInfo,
         ["h5", "Actions"],
         `During the "Do 4 actions" step, use the action buttons in the right panel to work toward discovering cures to all 4 diseases while preventing global catastrophy. Mouse over an action button's info icon (&#9432;) to view the action's rules.`,
         "NOTE: you can perform movement actions by dragging and dropping an active pawn onto a <span class='hoverInfo validDestinationInfo'>valid destination</span>, and you can do the <span class='hoverInfo eventTypeInfo' data-eventType='td'>Treat Disease</span> action by clicking a disease cube at the active role's current location.",
@@ -43,6 +44,34 @@ strings = {
         abbreviateWarning(insufficientCubesWarning),
         abbreviateWarning(outOfCardsWarning)
     ],
+    playSteps: {
+        turnInfo,
+        doFourActionsHeading: "Do 4 Actions",
+        doFourActions: [
+            "A role may do up to 4 actions each turn. Any combination of actions may be performed. The same action may be done several times, each time counting as 1 action.",
+            "A role’s special abilities may change how an action is done.",
+        ],
+        drawTwoCardsHeading: "Draw 2 Cards",
+        drawTwoCards: [
+            "After a role does 4 actions, they must draw 2 cards from the player deck; any city cards or event cards drawn are added to their hand.",
+			"If your draws include any <i>Epidemic</i> cards, they must be resolved immediately.",
+        ],
+        resolveEpidemicsHeading: "Resolve Epidemics",
+        resolveEpidemics: [
+            "If your draws include any <i>Epidemic</i> cards, the following steps will happen immediately:",
+            "1. Increase: The infection rate marker is moved forward 1 space on the Infection Rate Track.",
+            "2. Infect: The <i>bottom</i> card is drawn from the Infection Deck. Unless its disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>, 3 disease cubes of that colour are placed on the named city. If that city already has cubes of that colour, cubes are added until there are 3 and then an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> occurs. The drawn infection card is placed in the Infection Discard Pile.",
+            "3. Intensify: The Infection Discard Pile is shuffled and then placed on top of the Infection Deck.",
+        ],
+        discardToSevenCardsHeading: "Discard To 7 Cards",
+        discardToSevenCards: "If a role ever has more than 7 cards in their hand (after first resolving any Epidemic cards they may have drawn), they must discard cards or play Event cards until they have 7 cards in their hand.",
+        infectCitiesHeading: "Infect Cities",
+        infectCities: [
+            "During the Infect Cities step, infection cards are drawn one at a time from the top of the infection deck. The number of infection cards drawn is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
+			"Each time an infection card is revealed, a disease cube of the matching colour is placed on the named city.",
+			"If the city already has 3 cubes of this colour, an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> of this disease occurs in that city."
+        ]
+    },
     loadingGifHtml: "<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>",
     diseaseCubeSupplyInfo: "<p>When a city is infected by a disease, 1 disease cube of the matching color is placed onto the city.</p><p>If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in the city.</p>",
     infectionRateInfo: `<p>The infection rate determines how many infection cards are flipped over during the <span class='hoverInfo' data-eventType='ic'>Infect Cities</span> step.</p>

@@ -5,13 +5,6 @@ TO DO
 -----
 side menu
 	rules
-		game setup
-		play steps
-			do 4 actions
-			draw 2 cards
-				resolve epidemics
-				discard to 7 cards
-			infect cities
 		roles
 			2-4 roles
 			special abilities, when they apply, and whatnot
@@ -28,6 +21,7 @@ side menu
 				event card rules
 				double epidemic
 			outbreaks
+		game setup
 
 	give up
 	back to main menu

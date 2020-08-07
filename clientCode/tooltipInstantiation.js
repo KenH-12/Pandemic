@@ -53,32 +53,25 @@ const containerSelector = "#boardContainer";
 
 function bindSideMenuHoverEvents()
 {
-	const containerSelector = "#sideMenu";
-	let juxtaposition = "bottom";
+	const containerSelector = "#container";
 
 	new Tooltip({
 		content: "Info icons are littered throughout the interface. Use them to familiarize yourself with the rules!",
 		hoverElementSelector: "#metaInfo",
-		juxtaposition,
 		containerSelector
 	}).bindHoverEvents();
 
 	new Tooltip({
 		content: "Words or phrases underlined in blue require a bit of explanation. Mouse over them to learn more!",
 		hoverElementSelector: "#metaHoverInfo",
-		juxtaposition,
 		containerSelector
 	}).bindHoverEvents();
-
-	juxtaposition = "left";
 
 	new Tooltip({
 		content: `<p>There are 4 different movement actions that can be performed by any role. Some roles can move in unique ways using their special abilities.</p>
 <p>For most movement actions, clicking the action button will show a list of valid destinations. For others, almost any city is a valid destination.</p>
 <p>You can always drag and drop an active pawn to perform a movement action. If the travel path arrow turns red when you drop the pawn, it means the destination was invalid.</p>`,
-		cssClassString: "wideTooltip",
 		hoverElementSelector: ".hoverInfo.validDestinationInfo",
-		juxtaposition,
 		containerSelector
 	}).bindHoverEvents();
 
@@ -86,7 +79,6 @@ function bindSideMenuHoverEvents()
 		getContent: ({ $hoveredElement }) => getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType"))),
 		cssClassString: "eventTypeTooltip",
 		hoverElementSelector: "#sideMenu .hoverInfo.eventTypeInfo",
-		juxtaposition,
 		containerSelector
 	}).bindHoverEvents();
 }
@@ -668,7 +660,8 @@ function bindEventCardInfoHoverEvents()
 {
 	const getContent = () => strings.eventCardInfo + newPlayerCard(eventCards["airl"]),
 		eventCardInfoSelector = ".eventCardInfo",
-		sideMenuSelector = "#sideMenu";
+		sideMenuSelector = "#sideMenu",
+		containerSelector = "#container";
 	
 	new Tooltip({
 		getContent,
@@ -682,16 +675,13 @@ function bindEventCardInfoHoverEvents()
 	new Tooltip({
 		getContent,
 		hoverElementSelector: `${sideMenuSelector} ${eventCardInfoSelector}`,
-		juxtaposition: "left",
-		containerSelector: sideMenuSelector
+		containerSelector
 	}).bindHoverEvents();
 
 	new Tooltip({
 		content: strings.eventCardPlayabilityExceptions,
 		hoverElementSelector: `${sideMenuSelector} .eventCardExceptions`,
-		juxtaposition: "left",
-		cssClassString: "wideTooltip",
-		containerSelector: sideMenuSelector,
+		containerSelector,
 	}).bindHoverEvents();
 }
 
@@ -813,7 +803,7 @@ function bindPlayStepHoverEvents()
 			const eventTypeCode = $hoveredElement.attr("data-eventType"),
 				pluralNameForm = $hoveredElement.parent().hasClass("infect");
 			
-			return getEventTypeTooltipContent(getEventType(eventTypeCode), { pluralNameForm });
+			return getEventTypeTooltipContent(getEventType(eventTypeCode), { pluralNameForm, omitHoverInfoElements: true });
 		},
 		hiddenClass = "hidden",
 		playStepTooltip = new Tooltip({

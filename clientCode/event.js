@@ -198,8 +198,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "playSteps/drawPlayerCards",
 		propertyNames: ["cardKeys"],
 		rules: [
-			"After a role does 4 actions, they must draw 2 cards from the player deck; any city cards or event cards drawn are added to their hand.",
-			"If your draws include any <i>Epidemic</i> cards, they must be resolved immediately.",
+			...strings.playSteps.drawTwoCards,
 			"<br/>",
 			strings.outOfCardsWarning
 		]
@@ -240,7 +239,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "ds",
 		actionPathName: "playSteps/discardPlayerCards",
 		propertyNames: ["cardKeys"],
-		rules: ["If a role ever has more than 7 cards in their hand (after first resolving any Epidemic cards they may have drawn), they must discard cards or play Event cards until they have 7 cards in their hand."]
+		rules: [strings.playSteps.discardToSevenCards]
 	},
 	infectCity: {
 		name: "Infect City",
@@ -249,9 +248,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "playSteps/infectCity",
 		propertyNames: ["cityKey", "preventionCode"],
 		rules: [
-			"During the Infect Cities step, infection cards are flipped over one at a time from the top of the infection deck. The number of infection cards flipped over is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
-			"Each time an infection card is flipped over, a disease cube of the matching color is placed on the named city.",
-			"If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in that city.",
+			...strings.playSteps.infectCities,
 			"<br/>",
 			strings.insufficientCubesWarning
 		]
@@ -385,10 +382,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	doFourActions: {
 		name: "Do 4 Actions",
 		code: "ac",
-		rules: [
-			"A role may do up to 4 actions each turn. Any combination of actions may be performed. The same action may be done several times, each time counting as 1 action.",
-			"A role’s special abilities may change how an action is done."
-		],
+		rules: strings.playSteps.doFourActions,
 		noIcon: true
 	}
 },
