@@ -30,16 +30,31 @@ export default class sideMenu
 
     open()
     {
-        const self = this;
+        const self = this,
+            $boardContainer = $("#boardContainer");
 
         this.$menu.children(".button")
             .off("click")
             .click(function() { self.toggleContent($(this)) });
+        
+        // Close the menu if the user clicks anywhere else
+        $boardContainer.off("mousedown")
+            .mousedown(function()
+            {
+                $boardContainer.off("mousedown");
+                self.toggle();
+            });
     }
 
     close()
     {
         this.$menu.children(".button").off("click");
+    }
+
+    closeIfOpen()
+    {
+        if (this.$menu.hasClass("is-active"))
+            this.toggle();
     }
 
     toggleContent($menuItem)
