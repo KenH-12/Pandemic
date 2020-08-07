@@ -2177,7 +2177,11 @@ a:hover { cursor: pointer }
 	border-left: 1px solid #fff;
 	left: 100%;
 	font-family: 'Exo 2', sans-serif;
+	direction: rtl; /* scrollbar on right side */
+	overflow-y: scroll;
+	overflow-x: hidden;
 }
+#sideMenu * { direction: ltr }
 #sideMenu.is-active
 { left: var(--board-width-percentage) }
 #sideMenu.is-active,
@@ -2258,7 +2262,7 @@ a:hover { cursor: pointer }
 {
 	width: 97%;
 	margin: 1px 0 0 3%;
-	font-size: 17px;
+	font-size: 16px;
 	text-align: left;
 	background-color: #0b668d;
 	position: relative;
@@ -2294,10 +2298,13 @@ a:hover { cursor: pointer }
 	vertical-align: text-top;
 }
 
-#sideMenu .tooltip
-{ font-family: 'Electrolize', sans-serif }
-#sideMenu .wideTooltip
-{ max-width: 100% }
+.tooltip.wideTooltip
+{ max-width: 35% }
+#container > .tooltip
+{
+	z-index: 49;
+	max-width: 20%;
+}
 
 @media screen and (min-width: 1200px)
 {
