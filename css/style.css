@@ -2524,10 +2524,7 @@ a:hover { cursor: pointer }
 	.roleCard
 	{
 		width: 20%;
-	}
-	.roleCard
-	{
-		font-size: 14px;
+		font-size: 16px;
 	}
 	.roleCard h3,
 	.eventCardFull h3
