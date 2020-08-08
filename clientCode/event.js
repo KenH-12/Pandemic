@@ -287,12 +287,10 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "ob",
 		propertyNames: ["outbreakCount", "originKey", "diseaseColor", "triggeredByKey"],
 		rules: [
-			"When a disease outbreak occurs, the outbreaks marker is moved forward 1 space on the Outbreaks Track.",
-			"Then, 1 cube of the disease color is placed on every city connected to the outbreaking city. If any of those cities already has 3 cubes of the disease color, a <i>chain reaction outbreak</i> occurs after the current outbreak is done.",
+			...strings.outbreakInfo.outbreakRules,
+			strings.outbreakInfo.chainReactionOutbreak,
 			"<br/>",
-			"When a chain reaction outbreak occurs, the outbreaks marker is moved forward one space and disease cube are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> infection card.",
-			"<br/>",
-			strings.tooManyOutbreaksWarning
+			strings.outbreakInfo.tooManyOutbreaksWarning
 		]
 	},
 	outbreakInfection: {

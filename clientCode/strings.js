@@ -97,6 +97,17 @@ strings = {
         "There is one Infection card for each city on the board. When an Infection card is drawn, one or more disease cubes will be placed on the named city unless the disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>.",
         `To learn more, see the "Infect Cities" and "Resolve Epidemics" sections here: <a data-section='playSteps' data-scrollToId='resolveEpidemicsHeading' class='nowrap'>Rules -> Play Steps</a>`
     ],
+    outbreakInfo: {
+        outbreakRules: [
+            "A city cannot contain more than 3 disease cubes of a single colour. Instead of placing a 4th cube on a city, an <i>outbreak</i> will occur.",
+            "When a disease outbreak occurs, the outbreaks marker is moved forward 1 space on the Outbreaks Track.",
+			"Then, 1 cube of the disease colour is placed on every city connected to the outbreaking city. If any of those cities already has 3 cubes of the disease colour, a <i>chain reaction outbreak</i> occurs after the current outbreak is done."
+        ],
+        chainReactionOutbreakHeading: "Chain Reaction Outbreaks",
+        chainReactionOutbreak: "When a chain reaction outbreak occurs, the outbreaks marker is moved forward one space and disease cube are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> infection card.",
+        tooManyOutbreaksWarningHeading: "Prevent Worldwide Panic",
+        tooManyOutbreaksWarning
+    },
     loadingGifHtml: "<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>",
     diseaseCubeSupplyInfo: "<p>When a city is infected by a disease, 1 disease cube of the matching color is placed onto the city.</p><p>If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in the city.</p>",
     infectionRateInfo: `<p>The infection rate determines how many infection cards are flipped over during the <span class='hoverInfo' data-eventType='ic'>Infect Cities</span> step.</p>
@@ -105,7 +116,6 @@ strings = {
 <p>They can be placed on the board with the <span class='hoverInfo' data-eventType='rs'>Build Research Station</span> action.`,
     
     insufficientCubesWarning,
-    tooManyOutbreaksWarning,
     playerDeckInfo: "After doing 4 actions, the active role must draw 2 cards from the Player Deck. Any city cards or event cards drawn are added to the role's hand. Any Epidemic cards drawn must be resolved immediately.",
     discardRule: "If a role ever has more than 7 cards in hand (after first resolving any Epidemic cards drawn), they must discard or play event cards until they have 7 cards in hand.",
     outOfCardsWarning,

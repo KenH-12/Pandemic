@@ -5,12 +5,6 @@ TO DO
 -----
 side menu
 	rules
-		special events
-			epidemics
-				steps
-				event card rules
-				double epidemic
-			outbreaks
 		game setup
 
 	give up

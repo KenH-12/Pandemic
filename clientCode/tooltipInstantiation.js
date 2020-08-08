@@ -314,7 +314,7 @@ function bindOutbreakMarkerHoverEvents()
 
             return `<p class='largeText centeredText'>${outbreakCount} <span class='hoverInfo' data-eventType='${eventTypes.outbreak.code}'>outbreak${ plural ? "s" : "" }</span>
 				<br/>${ plural ? "have" : "has" } occured${ markerHasWarningGlow ? "!" : "." }</p>
-				<p>${strings.tooManyOutbreaksWarning}</p>`;
+				<p>${strings.outbreakInfo.tooManyOutbreaksWarning}</p>`;
 		},
 		juxtaposition = "right",
 		obMarkerTooltipClassName = "outbreaksMarkerTooltip";
