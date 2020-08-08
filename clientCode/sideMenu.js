@@ -90,11 +90,14 @@ export default class sideMenu
 
     hideSecondaryButtons($containersToHide)
     {
+        if (!$containersToHide.length)
+            return false;
+        
         $containersToHide.children().off("click");
         collapse($containersToHide);
     }
 
-    showContent($secondaryButton)
+    async showContent($secondaryButton)
     {
         const contentClass = "sideMenuContent",
             stringKey = $secondaryButton.attr("id");
@@ -115,7 +118,11 @@ export default class sideMenu
 
         this.parseAndAppendContent($container, strings[stringKey]);
         unflipChevrons($secondaryButton);
-        expand($container);
+        await expand($container);
+
+        this.bindLinkClicks();
+        
+        return Promise.resolve();
     }
 
     async hideContent($content)
@@ -155,6 +162,34 @@ export default class sideMenu
             
             appendHtmlToContainer($container, tagName, p);
         }
+    }
+
+    bindLinkClicks()
+    {
+        const $links = this.$menu.find("a"),
+            sideMenu = this;
+
+        for (let i = 0; i < $links.length; i++)
+            $links.eq(i).click(function() { sideMenu.goToSection($(this)) });
+    }
+
+    async goToSection($clickedLink)
+    {
+        const { $menu, buttonContainerSelector } = this,
+            sectionID = $clickedLink.attr("data-section"),
+            scrollToID = $clickedLink.attr("data-scrollToId"),
+            $secondaryButton = $menu.find(`#${sectionID}`),
+            $containerToShow = $secondaryButton.parent();
+
+        if ($secondaryButton.hasClass("hidden"))
+        {
+            this.hideSecondaryButtons($(buttonContainerSelector).not($containerToShow));
+            this.showSecondaryButtons($containerToShow);
+        }
+
+        await this.showContent($secondaryButton);
+        
+        $menu.scrollTop(scrollToID ? $menu.scrollTop() + $containerToShow.find(`#${scrollToID}`).offset().top : 0);
     }
 }
 

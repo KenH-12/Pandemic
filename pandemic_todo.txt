@@ -4,8 +4,6 @@ BUGS
 TO DO
 -----
 side menu
-	cards
-		links to other sections of the rules need coding
 	rules
 		special events
 			epidemics

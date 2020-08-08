@@ -60,7 +60,7 @@ strings = {
             "After a role does 4 actions, they must draw 2 cards from the player deck; any city cards or event cards drawn are added to their hand.",
 			"If your draws include any <i>Epidemic</i> cards, they must be resolved immediately.",
         ],
-        resolveEpidemicsHeading: "Resolve Epidemics",
+        resolveEpidemicsHeading: "<span id='resolveEpidemicsHeading'>Resolve Epidemics</span>",
         resolveEpidemics: [
             "If your draws include any <i>Epidemic</i> cards, the following steps will happen immediately:",
             "<span class='subheading'>1. Increase</span> The infection rate marker is moved forward 1 space on the Infection Rate Track.",
@@ -92,10 +92,10 @@ strings = {
         `<span class='subheading'>Event cards</span>There are five unique Event cards (silver coloured). ${eventCardInfo} Playing an Event card is not an action.`,
         eventCardPlayabilityExceptions,
         eventCardDiscardRule,
-        `<span class='subheading'>Epidemics</span>If your draws include any Epidemic cards, they must be resolved immediately. To learn more, read the "Resolve Epidemics" section here: <a class='nowrap'>Rules -> Play steps</a>`,
+        `<span class='subheading'>Epidemics</span>If your draws include any Epidemic cards, they must be resolved immediately. To learn more, read the "Resolve Epidemics" section here: <a data-section='playSteps' data-scrollToId='resolveEpidemicsHeading' class='nowrap'>Rules -> Play steps</a>`,
         ["h5", "Infection cards"],
         "There is one Infection card for each city on the board. When an Infection card is drawn, one or more disease cubes will be placed on the named city unless the disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>.",
-        `To learn more, see the "Infect Cities" and "Resolve Epidemics" sections here: <a class='nowrap'>Rules -> Play Steps</a>`
+        `To learn more, see the "Infect Cities" and "Resolve Epidemics" sections here: <a data-section='playSteps' data-scrollToId='resolveEpidemicsHeading' class='nowrap'>Rules -> Play Steps</a>`
     ],
     loadingGifHtml: "<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>",
     diseaseCubeSupplyInfo: "<p>When a city is infected by a disease, 1 disease cube of the matching color is placed onto the city.</p><p>If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in the city.</p>",
