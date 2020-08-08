@@ -1,10 +1,11 @@
 "use strict";
 
-const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind this menu) must be completed on each role's turn. The current step is always highlighted.`,
+const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind this menu) must be completed on each role's turn. The current step is always highlighted. After the Infect Cities step has been completed, the turn is over.`,
     trophySymbol = "<span class='warning'>🏆</span>",
     warningSymbol = "<span class='warning'>⚠️</span>",
     eventHistoryInfo = "The event history (bottom-left corner) is a great source of information about the things that have occured so far in the game.",
     victoryCondition = `${trophySymbol} Discover cures to all 4 diseases and your team wins immediately, no matter how many disease cubes are on the board.`,
+    maxDiseaseCubesRule = "A city cannot contain more than 3 disease cubes of a single colour. Instead of placing a 4th cube, an outbreak will occur.",
     tooManyOutbreaksWarning = `${warningSymbol} If the outbreaks marker reaches the last space of the Outbreaks Track, the game ends and your team has lost!`,
     insufficientCubesWarning = `${warningSymbol} If the number of disease cubes <i>actually needed on the board</i> cannot be placed because there are not enough cubes in the supply, the game ends and your team has lost!`,
     outOfCardsWarning = `${warningSymbol} If there are fewer than 2 cards left in the Player Deck when it is time to draw, the game ends and your team has lost!`,
@@ -12,6 +13,11 @@ const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind thi
     eventCardInfo = "During a turn, <i>any</i> role may play Event cards. To play an Event card, find the card in the role's hand (top-left of the screen) and click it. Mouse over an Event card to view the full card text.",
     eventCardPlayabilityExceptions = `Event cards can be played at any time, <i>except</i> in between drawing and resolving a card. However, when 2 Epidemic cards are drawn together, Event cards can be played after resolving the first Epidemic.`,
     eventCardDiscardRule = "NOTE: if a role's hand limit is reached, they are allowed to play Event cards from their hand instead of discarding.",
+    eradicationRules = [
+        "If no cubes of a <i>cured</i> disease are left on the board, the disease is <i>eradicated</i>.",
+        "When cities of an eradicated disease are infected, no new disease cubes are placed there.",
+        "Eradicating a disease is not needed to win; once all diseases are cured, the game ends and your team wins immediately!"
+    ],
 strings = {
     howToPlay: [
         "If you are ever unsure of how to proceed, look to the right panel (behind this menu) for prompts or clues.",
@@ -60,6 +66,7 @@ strings = {
             "After a role does 4 actions, they must draw 2 cards from the player deck; any city cards or event cards drawn are added to their hand.",
 			"If your draws include any <i>Epidemic</i> cards, they must be resolved immediately.",
         ],
+        outOfCardsWarning,
         resolveEpidemicsHeading: "<span id='resolveEpidemicsHeading'>Resolve Epidemics</span>",
         resolveEpidemics: [
             "If your draws include any <i>Epidemic</i> cards, the following steps will happen immediately:",
@@ -74,7 +81,8 @@ strings = {
             "During the Infect Cities step, infection cards are drawn one at a time from the top of the infection deck. The number of infection cards drawn is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
 			"Each time an infection card is revealed, a disease cube of the matching colour is placed on the named city.",
 			"If the city already has 3 cubes of this colour, an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> of this disease occurs in that city."
-        ]
+        ],
+        insufficientCubesWarning
     },
     roleInfo: [
         `Each role has a pawn and takes turns performing the "PLAY" steps (top-right of the screen behind this menu).`,
@@ -97,19 +105,30 @@ strings = {
         "There is one Infection card for each city on the board. When an Infection card is drawn, one or more disease cubes will be placed on the named city unless the disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>.",
         `To learn more, see the "Infect Cities" and "Resolve Epidemics" sections here: <a data-section='playSteps' data-scrollToId='resolveEpidemicsHeading' class='nowrap'>Rules -> Play Steps</a>`
     ],
+    diseaseInfo: {
+        victoryCondition,
+        diseaseCubesHeading: "Disease Cubes",
+        cubePlacement: "Disease cubes are placed on cities as a result of resolving Infection cards.",
+        maxDiseaseCubesRule,
+        curedDiseasesHeading: "Cured Diseases",
+        curedDiseases: "When a disease is cured, its cubes remain on the board and new cubes of that colour can still be placed. However, treating a cured disease is easier and your team is closer to winning.",
+        eradicationRulesHeading: "Eradicated Diseases",
+        eradicationRules
+    },
     outbreakInfo: {
         outbreakRules: [
-            "A city cannot contain more than 3 disease cubes of a single colour. Instead of placing a 4th cube on a city, an <i>outbreak</i> will occur.",
+            maxDiseaseCubesRule,
             "When a disease outbreak occurs, the outbreaks marker is moved forward 1 space on the Outbreaks Track.",
 			"Then, 1 cube of the disease colour is placed on every city connected to the outbreaking city. If any of those cities already has 3 cubes of the disease colour, a <i>chain reaction outbreak</i> occurs after the current outbreak is done."
         ],
         chainReactionOutbreakHeading: "Chain Reaction Outbreaks",
         chainReactionOutbreak: "When a chain reaction outbreak occurs, the outbreaks marker is moved forward one space and disease cube are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> infection card.",
-        tooManyOutbreaksWarningHeading: "Prevent Worldwide Panic",
-        tooManyOutbreaksWarning
+        tooManyOutbreaksWarningHeading: "Ways To Lose",
+        tooManyOutbreaksWarning,
+        insufficientCubesWarning
     },
     loadingGifHtml: "<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>",
-    diseaseCubeSupplyInfo: "<p>When a city is infected by a disease, 1 disease cube of the matching color is placed onto the city.</p><p>If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in the city.</p>",
+    diseaseCubeSupplyInfo: "<p>When a city is infected by a disease, 1 disease cube of the matching colour is placed onto the city.</p><p>If the city already has 3 cubes of this colour, an <i>outbreak</i> of this disease occurs in the city.</p>",
     infectionRateInfo: `<p>The infection rate determines how many infection cards are flipped over during the <span class='hoverInfo' data-eventType='ic'>Infect Cities</span> step.</p>
 <p>As more <span class='hoverInfo epidemicInfo'>Epidemics</span> are drawn, the infection rate will increase.</p>`,
     researchStationSupplyInfo: `<p>Research stations are required for the <span class='hoverInfo' data-eventType='dc'>Discover a Cure</span> and <span class='hoverInfo' data-eventType='sf'>Shuttle Flight</span> actions.</p>
@@ -123,17 +142,14 @@ strings = {
     victoryCondition,
     additionalDiscoverACureInfo: "When a disease is cured, cubes of that colour remain on the board and new cubes of that colour can still be placed during epidemics or infections. However, treating this disease is now easier and your team is closer to winning.",
     curedDiseaseInfo: "Treating this disease now removes all cubes of this colour from the city you are in.",
-    eradicationRules: `<p>If no cubes of a <i>cured</i> disease are left on the board, the disease is <i>eradicated</i>.</p>
-        <p>When cities of an eradicated disease are infected, no new disease cubes are placed there.</p>
-        <p>Eradicating a disease is not needed to win; once all diseases are cured, the game ends and your team wins immediately!</p>`,
 
     contingencyPlannerCardText: `<li><span>As an action, take any discarded Event card and store it.</span></li><li><span>When you play the stored Event card, remove it from the game.</span></li><li><span>Limit: 1 stored Event card at a time, which is not part of your hand.</span></li>`,
     dispatcherCardText: `<li><span>Move another role's pawn as if it were yours.</span></li><li><span>As an action, move any pawn to a city containing another pawn.</span></li>`,
-    medicCardText: `<li><span>Remove all cubes of one color when doing Treat Disease.</span></li><li><span>Automatically remove cubes of cured diseases from the city you are in (and prevent them from being placed there).</span></li>`,
+    medicCardText: `<li><span>Remove all cubes of one colour when doing Treat Disease.</span></li><li><span>Automatically remove cubes of cured diseases from the city you are in (and prevent them from being placed there).</span></li>`,
     operationsExpertCardText: `<li><span>As an action, build a research station in the city you are in (no City card needed).</span></li><li><span>Once per turn as an action, move from a research station to any city by discarding any City card.</span></li>`,
     quarantineSpecialistCardText: `<li><span>Prevent disease cube placements (and outbreaks) in the city you are in and all cities connected to it.</span></li>`,
     researcherCardText: `<li><span>You may give any 1 of your City cards when you Share Knowledge. It need not match your city. A player who Shares Knowledge with you on their turn can take any 1 of your City cards.</span></li>`,
-    scientistCardText: `<li><span>You need only 4 cards of the same color to do the Discover a Cure action.</span></li>`,
+    scientistCardText: `<li><span>You need only 4 cards of the same colour to do the Discover a Cure action.</span></li>`,
 
     dispatchDiscardRule: "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
 

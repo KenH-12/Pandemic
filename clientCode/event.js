@@ -92,20 +92,20 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "td",
 		rules: [
 			"Remove 1 disease cube from the city you are in, returning it to the Disease Cube Supply.",
-			"If the disease has been cured, remove all cubes of that color from the city you are in."
+			"If the disease has been cured, remove all cubes of that colour from the city you are in."
 		],
-		instructions: "Select a Disease Color:",
+		instructions: "Select a Disease Colour:",
 		actionPathName: "actions/treatDisease",
 		propertyNames: ["cityKey", "diseaseColor", "prevCubeCount", "newCubeCount"],
 		relatedRoleName: "Medic",
-		relatedRoleRule: "The Medic removes all cubes of one color when doing this action."
+		relatedRoleRule: "The Medic removes all cubes of one colour when doing this action."
 	},
 	autoTreatDisease: {
 		name: "Auto-Treat Disease",
 		code: "at",
 		propertyNames: ["cityKey", "diseaseColor", "numCubesRemoved"],
 		rules: [
-			"If a disease has been <i>cured</i>, the Medic automatically removes all cubes of that color from a city, simply by entering it or being there. This does not take an action.",
+			"If a disease has been <i>cured</i>, the Medic automatically removes all cubes of that colour from a city, simply by entering it or being there. This does not take an action.",
 			"The Medic's automatic removal of cubes can occur on other roles' turns, if he is moved by the Dispatcher or the Airlift Event.",
 			"The Medic also prevents placing disease cubes (and outbreaks) of <i>cured</i> diseases in his location."
 		]
@@ -114,20 +114,20 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Discover A Cure",
 		code: "dc",
 		rules: [
-			`At any research station, discard 5 city cards of the same color from your hand to cure the disease of that color.`,
-			`If no cubes of this color are on the board, the disease becomes <span class='hoverInfo' data-eventType='er'>eradicated</span>.`,
+			`At any research station, discard 5 city cards of the same colour from your hand to cure the disease of that colour.`,
+			`If no cubes of this colour are on the board, the disease becomes <span class='hoverInfo' data-eventType='er'>eradicated</span>.`,
 			strings.victoryCondition
 		],
 		actionPathName: "actions/discoverCure",
 		propertyNames: ["cardKeys"],
 		relatedRoleName: "Scientist",
-		relatedRoleRule: "The Scientist needs only 4 cards of the same color to do this action."
+		relatedRoleRule: "The Scientist needs only 4 cards of the same colour to do this action."
 	},
 	eradication: {
 		name: "eradication",
 		code: "er",
 		propertyNames: ["diseaseColor"],
-		rules: [strings.eradicationRules]
+		rules: [strings.diseaseInfo.eradicationRules]
 	},
 	planContingency: {
 		name: "Plan Contingency",
@@ -219,8 +219,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "playSteps/epidemicInfect",
 		propertyNames: ["cityKey", "prevCubeCount", "preventionCode"],
 		rules: [
-			"The <i>bottom</i> card of the Infection Deck is flipped over and 3 disease cubes of the matching color are placed on the named city.",
-			"If the city already contains cubes of this color, cubes are added until the city has 3 cubes of this color and then an <i>outbreak</i> of this disease occurs in the city.",
+			"The <i>bottom</i> card of the Infection Deck is flipped over and 3 disease cubes of the matching colour are placed on the named city.",
+			"If the city already contains cubes of this colour, cubes are added until the city has 3 cubes of this colour and then an <i>outbreak</i> of this disease occurs in the city.",
 			"The infection card is then placed in the Infection Discard Pile.",
 			"<br/>",
 			strings.insufficientCubesWarning
@@ -261,7 +261,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: [
 			"At the start of the game, 9 infection cards are flipped over.",
 			"<br />",
-			"Disease cubes of the matching color are placed on those cities as follows:",
+			"Disease cubes of the matching colour are placed on those cities as follows:",
 			"3 disease cubes are placed on each of the first 3 cities.",
 			"2 disease cubes are placed on each of the second 3 cities.",
 			"1 disease cube is placed on each of the last 3 cities.",

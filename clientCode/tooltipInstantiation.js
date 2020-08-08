@@ -76,7 +76,8 @@ function bindSideMenuHoverEvents()
 	}).bindHoverEvents();
 
 	new Tooltip({
-		getContent: ({ $hoveredElement }) => getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType"))),
+		getContent: ({ $hoveredElement }) =>
+			getEventTypeTooltipContent(getEventType($hoveredElement.attr("data-eventType")), { omitHoverInfoElements: true}),
 		cssClassString: "eventTypeTooltip",
 		hoverElementSelector: "#sideMenu .hoverInfo.eventTypeInfo",
 		containerSelector
@@ -495,7 +496,7 @@ function bindCuredDiseaseInfoHoverEvents()
 			additionalDiscoverACureInfo,
 			victoryCondition,
 			curedDiseaseInfo,
-			eradicationRules
+			diseaseInfo
 		} = strings,
 		getContent = function()
 		{
@@ -524,7 +525,7 @@ function bindCuredDiseaseInfoHoverEvents()
 	}).bindHoverEvents();
 
 	new Tooltip({
-		content: `<p class='largeText'>Disease Eradicated</p>${eradicationRules}`,
+		content: `<p class='largeText'>Disease Eradicated</p>${diseaseInfo.eradicationRules}`,
 		hoverElementSelector: ".cureMarker[src$='eradicated.png']",
 		juxtaposition,
 		containerSelector

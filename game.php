@@ -214,8 +214,8 @@
 							<div id='playSteps' class='button'>Play steps$chevron</div>
 							<div id='roleInfo' class='button'>Roles$chevron</div>
 							<div id='cardInfo' class='button'>Cards$chevron</div>
+							<div id='diseaseInfo' class='button'>Diseases$chevron</div>
 							<div id='outbreakInfo' class='button'>Outbreaks$chevron</div>
-							<div class='button'>Game setup$chevron</div>
 						</div>
 						<div class='button'>GIVE UP</div>
 						<div class='button'>RETURN TO MAIN MENU</div>
