@@ -4,14 +4,9 @@ BUGS
 TO DO
 -----
 side menu
+	cards
+		links to other sections of the rules need coding
 	rules
-		cards
-			player
-				hand limit
-				city
-				event
-				epidemic
-			infection
 		special events
 			epidemics
 				steps

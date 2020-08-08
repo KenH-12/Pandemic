@@ -213,7 +213,7 @@
 							<div id='objectives' class='button'>Objectives$chevron</div>
 							<div id='playSteps' class='button'>Play steps$chevron</div>
 							<div id='roleInfo' class='button'>Roles$chevron</div>
-							<div class='button'>Cards$chevron</div>
+							<div id='cardInfo' class='button'>Cards$chevron</div>
 							<div class='button'>Special events$chevron</div>
 							<div class='button'>Game setup$chevron</div>
 						</div>

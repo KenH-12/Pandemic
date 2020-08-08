@@ -9,6 +9,9 @@ const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind thi
     insufficientCubesWarning = `${warningSymbol} If the number of disease cubes <i>actually needed on the board</i> cannot be placed because there are not enough cubes in the supply, the game ends and your team has lost!`,
     outOfCardsWarning = `${warningSymbol} If there are fewer than 2 cards left in the Player Deck when it is time to draw, the game ends and your team has lost!`,
     discardToSevenCards = "If a role ever has more than 7 cards in their hand (after first resolving any Epidemic cards they may have drawn), they must discard cards or play Event cards until they have 7 cards in their hand.",
+    eventCardInfo = "During a turn, <i>any</i> role may play Event cards. To play an Event card, find the card in the role's hand (top-left of the screen) and click it. Mouse over an Event card to view the full card text.",
+    eventCardPlayabilityExceptions = `Event cards can be played at any time, <i>except</i> in between drawing and resolving a card. However, when 2 Epidemic cards are drawn together, Event cards can be played after resolving the first Epidemic.`,
+    eventCardDiscardRule = "NOTE: if a role's hand limit is reached, they are allowed to play Event cards from their hand instead of discarding.",
 strings = {
     howToPlay: [
         "If you are ever unsure of how to proceed, look to the right panel (behind this menu) for prompts or clues.",
@@ -19,7 +22,7 @@ strings = {
         "NOTE: you can perform movement actions by dragging and dropping an active pawn onto a <span class='hoverInfo validDestinationInfo'>valid destination</span>, and you can do the <span class='hoverInfo eventTypeInfo' data-eventType='td'>Treat Disease</span> action by clicking a disease cube at the active role's current location.",
         ["h5", "Event cards"],
         "With a few <span class='hoverInfo eventCardExceptions'>exceptions</span>, Event cards can be <span class='hoverInfo eventCardInfo'>played</span> at any time. Playing an Event card does not take an action.",
-        "NOTE: if a role's hand limit is reached, they are allowed to play Event cards from their hand instead of discarding."
+        eventCardDiscardRule
     ],
     importantInfo: [
         ["h5", "General Information"],
@@ -60,9 +63,9 @@ strings = {
         resolveEpidemicsHeading: "Resolve Epidemics",
         resolveEpidemics: [
             "If your draws include any <i>Epidemic</i> cards, the following steps will happen immediately:",
-            "1. Increase: The infection rate marker is moved forward 1 space on the Infection Rate Track.",
-            "2. Infect: The <i>bottom</i> card is drawn from the Infection Deck. Unless its disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>, 3 disease cubes of that colour are placed on the named city. If that city already has cubes of that colour, cubes are added until there are 3 and then an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> occurs. The drawn infection card is placed in the Infection Discard Pile.",
-            "3. Intensify: The Infection Discard Pile is shuffled and then placed on top of the Infection Deck.",
+            "<span class='subheading'>1. Increase</span> The infection rate marker is moved forward 1 space on the Infection Rate Track.",
+            "<span class='subheading'>2. Infect</span> The <i>bottom</i> card is drawn from the Infection Deck. Unless its disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>, 3 disease cubes of that colour are placed on the named city. If that city already has cubes of that colour, cubes are added until there are 3 and then an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> occurs. The drawn infection card is placed in the Infection Discard Pile.",
+            "<span class='subheading'>3. Intensify</span> The Infection Discard Pile is shuffled and then placed on top of the Infection Deck.",
         ],
         discardToSevenCardsHeading: "Discard To 7 Cards",
         discardToSevenCards,
@@ -80,6 +83,19 @@ strings = {
         "NOTE: some roles' special abilities can take effect during another role's turn.",
         ["h5", "Hands"],
         `Each role's hand can contain up to 7 Player cards. ${discardToSevenCards}`
+    ],
+    cardInfo: [
+        "There are two decks of cards: a Player Deck and an Infection Deck.",
+        ["h5", "Player cards"],
+        "There are 3 types of Player cards:",
+        "<span class='subheading'>City cards</span>There is one City card for each city on the board. Some actions require you to discard one or more City cards.",
+        `<span class='subheading'>Event cards</span>There are five unique Event cards (silver coloured). ${eventCardInfo} Playing an Event card is not an action.`,
+        eventCardPlayabilityExceptions,
+        eventCardDiscardRule,
+        `<span class='subheading'>Epidemics</span>If your draws include any Epidemic cards, they must be resolved immediately. To learn more, read the "Resolve Epidemics" section here: <a class='nowrap'>Rules -> Play steps</a>`,
+        ["h5", "Infection cards"],
+        "There is one Infection card for each city on the board. When an Infection card is drawn, one or more disease cubes will be placed on the named city unless the disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>.",
+        `To learn more, see the "Infect Cities" and "Resolve Epidemics" sections here: <a class='nowrap'>Rules -> Play Steps</a>`
     ],
     loadingGifHtml: "<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>",
     diseaseCubeSupplyInfo: "<p>When a city is infected by a disease, 1 disease cube of the matching color is placed onto the city.</p><p>If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in the city.</p>",
@@ -112,11 +128,8 @@ strings = {
     dispatchDiscardRule: "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
 
     eventCardPlayabilityRule: "<span>Play at any time. Not an action.</span>",
-    eventCardInfo: `<p>To play an Event card, find the card in the role's hand (top-left of the screen) and click it.</p>
-<p>Mouse over an Event card to view the full card text.</p>
-<span style='white-space:nowrap'>Event cards look like this:</span>`,
-    eventCardPlayabilityExceptions: `<p>Event cards can be played at any time, <i>except</i> in between drawing and resolving a card.</p>
-<p>However, when 2 Epidemic cards are drawn together, event cards can be played after resolving the first epidemic.</p>`,
+    eventCardInfo: `<p>${eventCardInfo}</p><span style='white-space:nowrap'>Event cards look like this:</span>`,
+    eventCardPlayabilityExceptions: `<p>${eventCardPlayabilityExceptions}</p>`,
     forecastTopInfo: "The top card will be put back on the deck last (and drawn from the deck first).",
     forcastBottomInfo: "The bottom card will be put back on the deck first (and drawn from the deck sixth).",
 };

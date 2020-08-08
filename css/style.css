@@ -144,7 +144,8 @@ input[type='password']
 	padding: 4px 0;
 	margin: 16px 0 0 0;
 }
-.inlineForm
+.inlineForm,
+.nowrap
 {
 	white-space: nowrap;
 }
@@ -2139,10 +2140,9 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 #curtain #errorContainer * { text-align: left !important }
 a,
 a:visited
-{
-	color: var(--epidemic-green)
-}
+{ color: var(--epidemic-green) }
 a:hover { cursor: pointer }
+#sideMenu a { text-decoration: underline }
 
 #btnSideMenu,
 #sideMenu
@@ -2291,6 +2291,11 @@ a:hover { cursor: pointer }
 }
 .sideMenuContent p
 { margin-bottom: 5px }
+.sideMenuContent .subheading
+{
+	text-decoration: underline;
+	display: block;
+}
 #metaInfo.info
 {
 	font-size: 14px;
