@@ -49,6 +49,7 @@ export default class sideMenu
     close()
     {
         this.$menu.children(".button").off("click");
+        $("#boardContainer").off("mousedown");
     }
 
     closeIfOpen()
