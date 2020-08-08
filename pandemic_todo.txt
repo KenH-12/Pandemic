@@ -5,9 +5,6 @@ TO DO
 -----
 side menu
 	rules
-		roles
-			2-4 roles
-			special abilities, when they apply, and whatnot
 		cards
 			player
 				hand limit

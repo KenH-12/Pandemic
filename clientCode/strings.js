@@ -8,6 +8,7 @@ const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind thi
     tooManyOutbreaksWarning = `${warningSymbol} If the outbreaks marker reaches the last space of the Outbreaks Track, the game ends and your team has lost!`,
     insufficientCubesWarning = `${warningSymbol} If the number of disease cubes <i>actually needed on the board</i> cannot be placed because there are not enough cubes in the supply, the game ends and your team has lost!`,
     outOfCardsWarning = `${warningSymbol} If there are fewer than 2 cards left in the Player Deck when it is time to draw, the game ends and your team has lost!`,
+    discardToSevenCards = "If a role ever has more than 7 cards in their hand (after first resolving any Epidemic cards they may have drawn), they must discard cards or play Event cards until they have 7 cards in their hand.",
 strings = {
     howToPlay: [
         "If you are ever unsure of how to proceed, look to the right panel (behind this menu) for prompts or clues.",
@@ -64,7 +65,7 @@ strings = {
             "3. Intensify: The Infection Discard Pile is shuffled and then placed on top of the Infection Deck.",
         ],
         discardToSevenCardsHeading: "Discard To 7 Cards",
-        discardToSevenCards: "If a role ever has more than 7 cards in their hand (after first resolving any Epidemic cards they may have drawn), they must discard cards or play Event cards until they have 7 cards in their hand.",
+        discardToSevenCards,
         infectCitiesHeading: "Infect Cities",
         infectCities: [
             "During the Infect Cities step, infection cards are drawn one at a time from the top of the infection deck. The number of infection cards drawn is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
@@ -72,6 +73,14 @@ strings = {
 			"If the city already has 3 cubes of this colour, an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> of this disease occurs in that city."
         ]
     },
+    roleInfo: [
+        `Each role has a pawn and takes turns performing the "PLAY" steps (top-right of the screen behind this menu).`,
+        ["h5", "Special Abilities"],
+        "Roles have unique special abilities to improve your team's chances of success. Too view a role's special abilities, mouse over the name of the role in the top-left of the screen (or wherever else a role's name may appear).",
+        "NOTE: some roles' special abilities can take effect during another role's turn.",
+        ["h5", "Hands"],
+        `Each role's hand can contain up to 7 Player cards. ${discardToSevenCards}`
+    ],
     loadingGifHtml: "<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>",
     diseaseCubeSupplyInfo: "<p>When a city is infected by a disease, 1 disease cube of the matching color is placed onto the city.</p><p>If the city already has 3 cubes of this color, an <i>outbreak</i> of this disease occurs in the city.</p>",
     infectionRateInfo: `<p>The infection rate determines how many infection cards are flipped over during the <span class='hoverInfo' data-eventType='ic'>Infect Cities</span> step.</p>
