@@ -215,6 +215,7 @@
 							<div id='roleInfo' class='button'>Roles$chevron</div>
 							<div id='cardInfo' class='button'>Cards$chevron</div>
 							<div id='diseaseInfo' class='button'>Diseases$chevron</div>
+							<div id='epidemicInfo' class='button'>Epidemics$chevron</div>
 							<div id='outbreakInfo' class='button'>Outbreaks$chevron</div>
 						</div>
 						<div class='button'>GIVE UP</div>

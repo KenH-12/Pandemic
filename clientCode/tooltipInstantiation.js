@@ -82,6 +82,13 @@ function bindSideMenuHoverEvents()
 		hoverElementSelector: "#sideMenu .hoverInfo.eventTypeInfo",
 		containerSelector
 	}).bindHoverEvents();
+
+	new Tooltip({
+		content: `<p>At the start of the game, after the roles' starting hands have been dealt, the remaining Player cards are divided into equal piles. The number of piles is equal to the number of Epidemic cards in the game. One Epidemic card is then shuffled into each pile, and the piles are stacked to form the Player Deck.</p>
+<p>The difficulty setting determines the number of Epidemic cards that will be shuffled into the Player Deck.</p>`,
+		hoverElementSelector: ".hoverInfo.epidemicDispersalInfo",
+		containerSelector
+	}).bindHoverEvents();
 }
 
 function bindPlayerDeckHoverEvents()

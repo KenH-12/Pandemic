@@ -210,7 +210,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		propertyNames: ["epidemicCount"],
 		rules: [
 			"The infection rate marker is moved forward 1 space on the Infection Rate Track.",
-			"The current infection rate determines how many infection cards are flipped over during a turn's Infect Cities step."
+			"The current infection rate determines how many Infection cards are flipped over during a turn's Infect Cities step."
 		]
 	},
 	epidemicInfect: {
@@ -259,14 +259,14 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "ii",
 		propertyNames: ["cityKey", "numCubes"],
 		rules: [
-			"At the start of the game, 9 infection cards are flipped over.",
+			"At the start of the game, 9 Infection cards are flipped over.",
 			"<br />",
 			"Disease cubes of the matching colour are placed on those cities as follows:",
 			"3 disease cubes are placed on each of the first 3 cities.",
 			"2 disease cubes are placed on each of the second 3 cities.",
 			"1 disease cube is placed on each of the last 3 cities.",
 			"<br />",
-			"The 9 infection cards are then placed in the infection discard pile."
+			"The 9 Infection cards are then placed in the infection discard pile."
 		]
 	},
 	startingHands: {

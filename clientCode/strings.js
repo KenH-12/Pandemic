@@ -63,24 +63,18 @@ strings = {
         ],
         drawTwoCardsHeading: "Draw 2 Cards",
         drawTwoCards: [
-            "After a role does 4 actions, they must draw 2 cards from the player deck; any city cards or event cards drawn are added to their hand.",
+            "After a role does 4 actions, they must draw 2 cards from the Player deck; any City cards or Event cards drawn are added to their hand.",
 			"If your draws include any <i>Epidemic</i> cards, they must be resolved immediately.",
         ],
         outOfCardsWarning,
-        resolveEpidemicsHeading: "<span id='resolveEpidemicsHeading'>Resolve Epidemics</span>",
-        resolveEpidemics: [
-            "If your draws include any <i>Epidemic</i> cards, the following steps will happen immediately:",
-            "<span class='subheading'>1. Increase</span> The infection rate marker is moved forward 1 space on the Infection Rate Track.",
-            "<span class='subheading'>2. Infect</span> The <i>bottom</i> card is drawn from the Infection Deck. Unless its disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>, 3 disease cubes of that colour are placed on the named city. If that city already has cubes of that colour, cubes are added until there are 3 and then an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> occurs. The drawn infection card is placed in the Infection Discard Pile.",
-            "<span class='subheading'>3. Intensify</span> The Infection Discard Pile is shuffled and then placed on top of the Infection Deck.",
-        ],
+        resolveEpidemicsHeading: "Resolve Epidemics",
+        resolveEpidemics: "If your draws include any <i>Epidemic</i> cards, they must be resolved immediately. To learn more about resolving Epidemics, go here: <a data-section='epidemicInfo' data-scrollToId='epidemicInfo' class='nowrap'>Rules -> Epidemics</a>",
         discardToSevenCardsHeading: "Discard To 7 Cards",
         discardToSevenCards,
-        infectCitiesHeading: "Infect Cities",
+        infectCitiesHeading: "<span id='infectCitiesHeading'>Infect Cities</span>",
         infectCities: [
-            "During the Infect Cities step, infection cards are drawn one at a time from the top of the infection deck. The number of infection cards drawn is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
-			"Each time an infection card is revealed, a disease cube of the matching colour is placed on the named city.",
-			"If the city already has 3 cubes of this colour, an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> of this disease occurs in that city."
+            "During the Infect Cities step, Infection cards are drawn one at a time from the top of the Infection Deck. The number of Infection cards drawn is equal to the current <i>infection rate</i> (see the Infection Rate Track in the top right of the board).",
+			"Each time an Infection card is revealed, a disease cube of the matching colour is placed on the named city. If the city already has 3 cubes of this colour, an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> of this disease occurs in that city."
         ],
         insufficientCubesWarning
     },
@@ -100,10 +94,10 @@ strings = {
         `<span class='subheading'>Event cards</span>There are five unique Event cards (silver coloured). ${eventCardInfo} Playing an Event card is not an action.`,
         eventCardPlayabilityExceptions,
         eventCardDiscardRule,
-        `<span class='subheading'>Epidemics</span>If your draws include any Epidemic cards, they must be resolved immediately. To learn more, read the "Resolve Epidemics" section here: <a data-section='playSteps' data-scrollToId='resolveEpidemicsHeading' class='nowrap'>Rules -> Play steps</a>`,
+        `<span class='subheading'>Epidemics</span>If your draws include any Epidemic cards, they must be resolved immediately. <a data-section='epidemicInfo' data-scrollToId='epidemicInfo'>Learn more about Epidemics</a>`,
         ["h5", "Infection cards"],
         "There is one Infection card for each city on the board. When an Infection card is drawn, one or more disease cubes will be placed on the named city unless the disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>.",
-        `To learn more, see the "Infect Cities" and "Resolve Epidemics" sections here: <a data-section='playSteps' data-scrollToId='resolveEpidemicsHeading' class='nowrap'>Rules -> Play Steps</a>`
+        "Infection cards are drawn during the <a data-section='playSteps' data-scrollToId='infectCitiesHeading' class='nowrap'>Infect Cities</a> step and when resolving <a data-section='epidemicInfo' data-scrollToId='epidemicInfo' class='nowrap'>Epidemics</a>."
     ],
     diseaseInfo: {
         victoryCondition,
@@ -115,6 +109,16 @@ strings = {
         eradicationRulesHeading: "Eradicated Diseases",
         eradicationRules
     },
+    epidemicInfo: [
+        "Epidemic cards are <span class='hoverInfo epidemicDispersalInfo'>dispersed</span> throughout the Player deck.",
+        "If your draws include any Epidemic cards, the following steps will happen immediately:",
+        "<span class='subheading'>1. Increase</span> The infection rate marker is moved forward 1 space on the Infection Rate Track.",
+        "<span class='subheading'>2. Infect</span> The <i>bottom</i> card is drawn from the Infection Deck. Unless its disease colour has been <span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>, 3 disease cubes of that colour are placed on the named city. If that city already has cubes of that colour, cubes are added until there are 3 and then an <span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span> occurs. The drawn Infection card is placed in the Infection Discard Pile.",
+        insufficientCubesWarning,
+        "<span class='subheading'>3. Intensify</span> The Infection Discard Pile is shuffled and then placed on top of the Infection Deck.",
+        ["h5", "Double Epidemics"],
+        "It is rare but possible for 2 Epidemics to be drawn at once. In this case, <span class='hoverInfo eventCardInfo'>Event cards</span> can be played after resolving the first Epidemic (but before starting to resolve the second Epidemic)."
+    ],
     outbreakInfo: {
         outbreakRules: [
             maxDiseaseCubesRule,
@@ -122,14 +126,14 @@ strings = {
 			"Then, 1 cube of the disease colour is placed on every city connected to the outbreaking city. If any of those cities already has 3 cubes of the disease colour, a <i>chain reaction outbreak</i> occurs after the current outbreak is done."
         ],
         chainReactionOutbreakHeading: "Chain Reaction Outbreaks",
-        chainReactionOutbreak: "When a chain reaction outbreak occurs, the outbreaks marker is moved forward one space and disease cube are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> infection card.",
+        chainReactionOutbreak: "When a chain reaction outbreak occurs, the outbreaks marker is moved forward one space and disease cube are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> Infection card.",
         tooManyOutbreaksWarningHeading: "Ways To Lose",
         tooManyOutbreaksWarning,
         insufficientCubesWarning
     },
     loadingGifHtml: "<div class='loadingGif'><img src='images/loading.gif' alt='loading' /></div>",
     diseaseCubeSupplyInfo: "<p>When a city is infected by a disease, 1 disease cube of the matching colour is placed onto the city.</p><p>If the city already has 3 cubes of this colour, an <i>outbreak</i> of this disease occurs in the city.</p>",
-    infectionRateInfo: `<p>The infection rate determines how many infection cards are flipped over during the <span class='hoverInfo' data-eventType='ic'>Infect Cities</span> step.</p>
+    infectionRateInfo: `<p>The infection rate determines how many Infection cards are flipped over during the <span class='hoverInfo' data-eventType='ic'>Infect Cities</span> step.</p>
 <p>As more <span class='hoverInfo epidemicInfo'>Epidemics</span> are drawn, the infection rate will increase.</p>`,
     researchStationSupplyInfo: `<p>Research stations are required for the <span class='hoverInfo' data-eventType='dc'>Discover a Cure</span> and <span class='hoverInfo' data-eventType='sf'>Shuttle Flight</span> actions.</p>
 <p>They can be placed on the board with the <span class='hoverInfo' data-eventType='rs'>Build Research Station</span> action.`,
