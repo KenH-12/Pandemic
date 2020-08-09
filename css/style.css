@@ -2282,10 +2282,12 @@ a:hover { cursor: pointer }
 	font-family: "Ropa sans", sans-serif;
 	line-height: 18px;
 }
+.sideMenuContent h5,
+.sideMenuContent .subheading
+{ font-size: 17px }
 .sideMenuContent h5
 {
 	font-family: 'Exo 2', sans-serif;
-	font-size: 17px;
 	border-bottom: 1px solid #fff;
 	display: inline-block;
 }
@@ -2296,6 +2298,8 @@ a:hover { cursor: pointer }
 	text-decoration: underline;
 	display: block;
 }
+.sideMenuContent .hoverInfo
+{ font-size: 15px }
 #metaInfo.info
 {
 	font-size: 14px;
