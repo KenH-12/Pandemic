@@ -75,7 +75,7 @@ export default class sideMenu
         this.showSecondaryButtons($buttonContainer);
     }
 
-    async showSecondaryButtons($containerToShow)
+    async showSecondaryButtons($containerToShow, { $contentToShow } = {})
     {
         const self = this;
         
@@ -86,6 +86,11 @@ export default class sideMenu
         $containerToShow.children()
             .off("click")
             .click(function() { self.showContent($(this)) });
+
+        if ($contentToShow)
+            await this.showContent($contentToShow);
+        
+        return Promise.resolve();
     }
 
     hideSecondaryButtons($containersToHide)
@@ -182,12 +187,9 @@ export default class sideMenu
             $containerToShow = $secondaryButton.parent();
 
         if ($secondaryButton.hasClass("hidden"))
-        {
             this.hideSecondaryButtons($(buttonContainerSelector).not($containerToShow));
-            this.showSecondaryButtons($containerToShow);
-        }
 
-        await this.showContent($secondaryButton);
+        await this.showSecondaryButtons($containerToShow, { $contentToShow: $secondaryButton });
         
         $menu.scrollTop(scrollToID ? $menu.scrollTop() + $containerToShow.find(`#${scrollToID}`).offset().top : 0);
     }

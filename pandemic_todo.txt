@@ -4,8 +4,12 @@ BUGS
 TO DO
 -----
 side menu
-	rules
-		game setup
+	add a link to the "where to find important info" section
+		objectives
+		roles
+		cards
+	
+	in play steps->do 4 actions, add a link to how to play->actions
 
 	give up
 	back to main menu
