@@ -241,7 +241,7 @@ function bindInfectionRateInfoHoverEvents()
 		getContent: ({ $hoveredElement }) => 
 			{
 				const eventType = getEventType($hoveredElement.attr("data-eventType"));
-				return getEventTypeTooltipContent(eventType, { pluralNameForm: true });
+				return getEventTypeTooltipContent(eventType, { pluralNameForm: true, omitHoverInfoElements: true });
 			},
 		hoverElementSelector: `.${tooltipCssClass} .hoverInfo:not(.epidemicInfo)`,
 		positionRelativeToSelector: `.${tooltipCssClass}`,
