@@ -191,7 +191,13 @@ export default class sideMenu
 
         await this.showSecondaryButtons($containerToShow, { $contentToShow: $secondaryButton });
         
-        $menu.scrollTop(scrollToID ? $menu.scrollTop() + $containerToShow.find(`#${scrollToID}`).offset().top : 0);
+        animationPromise({
+            $elements: $menu,
+            desiredProperties: {
+                scrollTop: scrollToID ? $menu.scrollTop() + $containerToShow.find(`#${scrollToID}`).offset().top : 0
+            },
+            easing: "easeOutQuart"
+        });
     }
 }
 
