@@ -122,3 +122,12 @@ function stripTagsThatMatchSelector(html, selector)
 
 	return $elements.html();
 }
+
+function arrayToParagraphs(arr)
+{
+	let html = "";
+	for (let p of arr)
+		html += `<p>${p}</p>`;
+	
+	return html;
+}

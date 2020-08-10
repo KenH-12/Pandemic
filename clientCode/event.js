@@ -127,7 +127,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "eradication",
 		code: "er",
 		propertyNames: ["diseaseColor"],
-		rules: [strings.diseaseInfo.eradicationRules]
+		rules: strings.diseaseInfo.eradicationRules
 	},
 	planContingency: {
 		name: "Plan Contingency",
@@ -198,8 +198,8 @@ The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "playSteps/drawPlayerCards",
 		propertyNames: ["cardKeys"],
 		rules: [
-			...strings.playSteps.drawTwoCards,
-			"<br/>",
+			strings.playSteps.drawTwoCards,
+			"If your draws include any <i>Epidemic</i> cards, they must be resolved immediately.",
 			strings.outOfCardsWarning
 		]
 	},

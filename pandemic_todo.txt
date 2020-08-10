@@ -3,17 +3,13 @@ BUGS
 
 TO DO
 -----
-side menu
-	add a link to the "where to find important info" section
-		objectives
-		roles
-		cards
-	
-	in play steps->do 4 actions, add a link to how to play->actions
+test what happens when an epidemic is the last card in the deck
 
+side menu
 	give up
 	back to main menu
-	
+
+city card populations can go in their tooltips
 
 access keys
 	form to request a new key

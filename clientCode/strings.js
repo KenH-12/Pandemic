@@ -1,11 +1,13 @@
 "use strict";
 
-const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind this menu) must be completed on each role's turn. The current step is always highlighted. After the Infect Cities step has been completed, the turn is over.`,
+const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind this menu) must be completed on each role's turn. The current step is always highlighted.`,
     trophySymbol = "<span class='warning'>🏆</span>",
     warningSymbol = "<span class='warning'>⚠️</span>",
-    eventHistoryInfo = "The event history (bottom-left corner) is a great source of information about the things that have occured so far in the game.",
+    outbreakHoverInfo = "<span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span>",
+    eradicatedHoverInfo = "<span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>",
+    eventHistoryInfo = "The Event History (bottom-left corner) is a great source of information about the things that have occured so far in the game.",
     victoryCondition = `${trophySymbol} Discover cures to all 4 diseases and your team wins immediately, no matter how many disease cubes are on the board.`,
-    maxDiseaseCubesRule = "A city cannot contain more than 3 disease cubes of a single colour. Instead of placing a 4th cube, an outbreak will occur.",
+    maxDiseaseCubesRule = `A city cannot contain more than 3 disease cubes of a single colour. Instead of placing a 4th cube, an ${outbreakHoverInfo} will occur.`,
     tooManyOutbreaksWarning = `${warningSymbol} If the outbreaks marker reaches the last space of the Outbreaks Track, the game ends and your team has lost!`,
     insufficientCubesWarning = `${warningSymbol} If the number of disease cubes <i>actually needed on the board</i> cannot be placed because there are not enough cubes in the supply, the game ends and your team has lost!`,
     outOfCardsWarning = `${warningSymbol} If there are fewer than 2 cards left in the Player Deck when it is time to draw, the game ends and your team has lost!`,
@@ -18,18 +20,17 @@ const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind thi
         "When cities of an eradicated disease are infected, no new disease cubes are placed there.",
         "Eradicating a disease is not needed to win; once all diseases are cured, the game ends and your team wins immediately!"
     ],
-    outbreakHoverInfo = "<span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span>",
-    eradicatedHoverInfo = "<span class='hoverInfo eventTypeInfo' data-eventType='er'>eradicated</span>",
 strings = {
     howToPlay: [
         "If you are ever unsure of how to proceed, look to the right panel (behind this menu) for prompts or clues.",
+        "Keep the <a data-section='objectives'>objectives</a> in mind when you are deciding what to do next.",
         ["h5", "Turns"],
         turnInfo,
-        ["h5", "Actions"],
-        `During the "Do 4 actions" step, use the action buttons in the right panel to work toward discovering cures to all 4 diseases while preventing global catastrophy. Mouse over an action button's info icon (&#9432;) to view the action's rules.`,
+        ["h5", "<span id='actionsHeading'>Actions</span>"],
+        `During the "Do 4 actions" step, use the action buttons in the right panel to work toward discovering cures to all 4 diseases while preventing global catastrophy. Mouse over an action button's info icon (&#9432;) to view that action's rules.`,
         "NOTE: you can perform movement actions by dragging and dropping an active pawn onto a <span class='hoverInfo validDestinationInfo'>valid destination</span>, and you can do the <span class='hoverInfo eventTypeInfo' data-eventType='td'>Treat Disease</span> action by clicking a disease cube at the active role's current location.",
         ["h5", "Event cards"],
-        "With a few <span class='hoverInfo eventCardExceptions'>exceptions</span>, Event cards can be <span class='hoverInfo eventCardInfo'>played</span> at any time. Playing an Event card does not take an action.",
+        "Event cards can be <span class='hoverInfo eventCardInfo'>played</span> at any time (with a few <span class='hoverInfo eventCardExceptions'>exceptions</span>). Playing an Event card does not take an action.",
         eventCardDiscardRule
     ],
     importantInfo: [
@@ -37,16 +38,18 @@ strings = {
         "Look for info icons (<span class='info' id='metaInfo'>&#9432;</span>) and words with a <span class='hoverInfo' id='metaHoverInfo'>blue underline</span> -- they can be moused over to see a tooltip containing more detailed information about something.",
         eventHistoryInfo,
         ["h5", "Objectives"],
-        `Look for trophy icons (${trophySymbol}) and warning icons (${warningSymbol}) inside tooltips -- these indicate information about the ways that you can win or lose the game, respectively.`,
+        "The full list of objectives can be found here: <a data-section='objectives' class='nowrap'>Rules -> Objectives</a>",
+        `Keep an eye out for trophy icons (${trophySymbol}) and warning icons (${warningSymbol}) inside tooltips -- these are reminders about the ways that you can win or lose the game, respectively.`,
         ["h5", "Roles"],
         "Whenever you see the name of a role, you can mouse over it to view that role's special abilities.",
+        "Learn more about roles here: <a data-section='roleInfo' class='nowrap'>Rules -> Roles</a>",
         ["h5", "Cards"],
-        `Try hovering over the various types of cards to see their tooltips, or go to <span style='white-space:nowrap'>RULES -> Cards</span> to learn more.`,
+        `Try hovering over a card to see its tooltip. Learn more about the various types of cards here: <a data-section='cardInfo' data-scrollToId='cardInfo'>Rules -> Cards</a>`,
     ],
     whatJustHappened: [
         eventHistoryInfo,
-        "Mouse over an icon in the event history to see the details of that particular event. Try hovering over the tooltip that appears to get more information about its contents. Use the tooltip's info icon (&#9432;) to learn more about the rules regarding that type of event.",
-        "Made a mistake? Try using the event history's undo button (&#x2B8C;).<br/>NOTE: some events cannot be undone!</p>"
+        "Mouse over an icon in the Event History to see the details of that particular event. Try hovering over the tooltip that appears to get more information about its contents. Use the tooltip's info icon (&#9432;) to learn more about the rules regarding that type of event.",
+        "Made a mistake? Try using the Event History's undo button (&#x2B8C;).<br/>NOTE: some events cannot be undone!</p>"
     ],
     objectives: [
         victoryCondition,
@@ -62,12 +65,10 @@ strings = {
         doFourActions: [
             "A role may do up to 4 actions each turn. Any combination of actions may be performed. The same action may be done several times, each time counting as 1 action.",
             "A role’s special abilities may change how an action is done.",
+            "Not sure how to do an action? <span class='nowrap'>See <a data-section='howToPlay' data-scrollToId='actionsHeading'>How to play -> Actions</a></span>"
         ],
         drawTwoCardsHeading: "Draw 2 Cards",
-        drawTwoCards: [
-            "After a role does 4 actions, they must draw 2 cards from the Player deck; any City cards or Event cards drawn are added to their hand.",
-			"If your draws include any <i>Epidemic</i> cards, they must be resolved immediately.",
-        ],
+        drawTwoCards: "After a role does 4 actions, they must draw 2 cards from the Player Deck; any City cards or Event cards drawn are added to their hand.",
         outOfCardsWarning,
         resolveEpidemicsHeading: "Resolve Epidemics",
         resolveEpidemics: "If your draws include any <i>Epidemic</i> cards, they must be resolved immediately. To learn more about resolving Epidemics, go here: <a data-section='epidemicInfo' data-scrollToId='epidemicInfo' class='nowrap'>Rules -> Epidemics</a>",
@@ -93,13 +94,16 @@ strings = {
         ["h5", "Player cards"],
         "There are 3 types of Player cards:",
         "<span class='subheading'>City cards</span>There is one City card for each city on the board. Some actions require you to discard one or more City cards.",
+        "You can click on a City card to locate that city on the board.",
         `<span class='subheading'>Event cards</span>There are five unique Event cards (silver coloured). ${eventCardInfo} Playing an Event card is not an action.`,
         eventCardPlayabilityExceptions,
         eventCardDiscardRule,
-        `<span class='subheading'>Epidemics</span>If your draws include any Epidemic cards, they must be resolved immediately. <a data-section='epidemicInfo' data-scrollToId='epidemicInfo'>Learn more about Epidemics</a>`,
+        "<span class='subheading'>Epidemics</span>If your draws include any Epidemic cards, they must be resolved immediately.",
+        "Learn more about Epidemics here: <a data-section='epidemicInfo' data-scrollToId='epidemicInfo' class='nowrap'>Rules -> Epidemics</a>",
         ["h5", "Infection cards"],
         `There is one Infection card for each city on the board. When an Infection card is drawn, one or more disease cubes will be placed on the named city unless the disease colour has been ${eradicatedHoverInfo}.`,
-        "Infection cards are drawn during the <a data-section='playSteps' data-scrollToId='infectCitiesHeading' class='nowrap'>Infect Cities</a> step and when resolving <a data-section='epidemicInfo' data-scrollToId='epidemicInfo' class='nowrap'>Epidemics</a>."
+        "Infection cards are drawn during the <span class='hoverInfo eventTypeInfo' data-eventType='ic'>Infect Cities</span> step and when resolving Epidemics.",
+        "You can click on an Infection card to locate that city on the board."
     ],
     diseaseInfo: {
         victoryCondition,
@@ -112,24 +116,24 @@ strings = {
         eradicationRules
     },
     epidemicInfo: [
-        "Epidemic cards are <span class='hoverInfo epidemicDispersalInfo'>dispersed</span> throughout the Player deck.",
+        "Epidemic cards are <span class='hoverInfo epidemicDispersalInfo'>dispersed</span> throughout the Player Deck.",
         "If your draws include any Epidemic cards, the following steps will happen immediately:",
         "<span class='subheading'>1. Increase</span> The infection rate marker is moved forward 1 space on the Infection Rate Track.",
         `<span class='subheading'>2. Infect</span> The <i>bottom</i> card is drawn from the Infection Deck. Unless its disease colour has been ${eradicatedHoverInfo}, 3 disease cubes of that colour are placed on the named city. If that city already has cubes of that colour, cubes are added until there are 3 and then an ${outbreakHoverInfo} occurs. The drawn Infection card is placed in the Infection Discard Pile.`,
         insufficientCubesWarning,
         "<span class='subheading'>3. Intensify</span> The Infection Discard Pile is shuffled and then placed on top of the Infection Deck.",
         ["h5", "Double Epidemics"],
-        `It is rare but possible for 2 Epidemics to be drawn at once. In this case, the second Epidemic's Infection card will be the only card to "shuffle", ending on top of the Infection Deck. An ${outbreakHoverInfo} will then occur in that city unless an <span class='hoverInfo eventCardInfo'>Event card</span> is played to prevent this.`,
+        `It is rare but possible for 2 Epidemics to be drawn at once. In this case, the second Epidemic's Infection card will be the only card to "shuffle", ending on top of the Infection Deck. An ${outbreakHoverInfo} will then occur in that city during <span class='hoverInfo eventTypeInfo' data-eventType='ic'>Infections</span> unless an <span class='hoverInfo eventCardInfo'>Event card</span> is played to prevent this.`,
         "In the case of a Double Epidemic, Event cards can be played after resolving the first Epidemic (but before starting to resolve the second)."
     ],
     outbreakInfo: {
         outbreakRules: [
-            maxDiseaseCubesRule,
+            stripTagsThatMatchSelector(maxDiseaseCubesRule, "span[data-eventType='ob']"),
             "When a disease outbreak occurs, the outbreaks marker is moved forward 1 space on the Outbreaks Track.",
 			"Then, 1 cube of the disease colour is placed on every city connected to the outbreaking city. If any of those cities already has 3 cubes of the disease colour, a <i>chain reaction outbreak</i> occurs after the current outbreak is done."
         ],
         chainReactionOutbreakHeading: "Chain Reaction Outbreaks",
-        chainReactionOutbreak: "When a chain reaction outbreak occurs, the outbreaks marker is moved forward one space and disease cube are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> Infection card.",
+        chainReactionOutbreak: "When a chain reaction outbreak occurs, the outbreaks marker is moved forward 1 space and disease cubes are placed as above, except cubes are not added to cities which have already had an outbreak as part of resolving the </i>current</i> Infection card.",
         tooManyOutbreaksWarningHeading: "Ways To Lose",
         tooManyOutbreaksWarning,
         insufficientCubesWarning
