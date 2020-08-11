@@ -48,8 +48,11 @@ strings = {
     ],
     whatJustHappened: [
         eventHistoryInfo,
-        "Mouse over an icon in the Event History to see the details of that particular event. Try hovering over the tooltip that appears to get more information about its contents. Use the tooltip's info icon (&#9432;) to learn more about the rules regarding that type of event.",
-        "Made a mistake? Try using the Event History's undo button (&#x2B8C;).<br/>NOTE: some events cannot be undone!</p>"
+        "Mouse over an icon in the Event History to see the details of that particular event. Try hovering over the tooltip that appears to get more information about its contents. Use the tooltip's info icon (&#9432;) to learn more about the rules regarding that type of event."
+    ],
+    mistakes: [
+        "Try using the Event History's undo button (&#x2B8C;). The Event History is located in the bottom-left corner of the screen.",
+        "NOTE: some events cannot be undone!"
     ],
     objectives: [
         victoryCondition,

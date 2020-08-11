@@ -6,6 +6,12 @@ TO DO
 test what happens when an epidemic is the last card in the deck
 
 side menu
+	the "MENU" title should be outside of the scrollbox
+	breadcrumbs / back button
+
+	rules
+		actions?
+
 	give up
 	back to main menu
 

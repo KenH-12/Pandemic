@@ -207,6 +207,7 @@
 							<div id='howToPlay' class='button'>How to play$chevron</div>
 							<div id='importantInfo' class='button'>Where to find important info$chevron</div>
 							<div id='whatJustHappened' class='button'>What just happened?$chevron</div>
+							<div id='mistakes' class='button'>Made a mistake?$chevron</div>
 						</div>
 						<div class='button'>RULES$chevron</div>
 						<div class='secondaryButtonContainer hidden'>
