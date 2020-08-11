@@ -1,6 +1,7 @@
 :root
 {
 	--main-background-color: #09154f;
+	--dark-grey-background: #252525;
 	--epidemic-green: #00a94f;
 	--board-width-percentage: 80.5%;
 	--button-background: #0e7aa8;
@@ -624,7 +625,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #topPanel,
 .bottomPanelDiv:not(#cureMarkerContainer)
 {
-	background-color: #252525;
+	background-color: var(--dark-grey-background);
 }
 #topPanel > div
 {
@@ -644,7 +645,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border-top: 1px solid #fff;
 	border-left: 1px solid #fff;
 }
-#eventHistory { background-color: #252525 }
+#eventHistory { background-color: var(--dark-grey-background) }
 .eventHistoryButton
 {
 	width: 6%;
@@ -710,7 +711,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 }
 .tooltip > .content
 {
-	background-color: #252525;
+	background-color: var(--dark-grey-background);
 	padding: 4px;
 }
 .tooltip  p { margin: 4px 0 }
@@ -1001,7 +1002,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	position: absolute;
 	left: 80%;
 	width: 20%;
-	background-color: #252525;
+	background-color: var(--dark-grey-background);
 	border-left: 1px solid #fff;
 	border-bottom: 1px solid #fff;
 	overflow: hidden;
@@ -1013,7 +1014,12 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border-top: 1px solid #fff;
 }
 
-#infDiscardVeil { position: absolute; background-color: #252525; z-index: 10;}
+#infDiscardVeil
+{
+	position: absolute;
+	background-color: var(--dark-grey-background);
+	z-index: 10;
+}
 .infDiscardCardback, .forecastCardback
 {
 	position: absolute;
@@ -1099,6 +1105,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 
 #rightPanel,
 #sideMenu,
+#sideMenuTitle,
 .infectionCardContents
 { width: 19.5% }
 #rightPanel
@@ -1153,7 +1160,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	padding: 5px 0;
 	text-align: center;
-	background-color: #252525;
+	background-color: var(--dark-grey-background);
 	border-bottom: 1px solid #fff;
 	border-left: 1px solid #fff;
 }
@@ -1973,8 +1980,8 @@ sup {font-size: xx-small; vertical-align: top; margin-left: 1px; padding: 0 1px 
 }
 
 #forecastContainer { margin-bottom: 10px }
-#forecastContainer, #forecastContainer .veil { background-color: #252525 }
-#forecastContainer .concealed { color: #252525; border: none }
+#forecastContainer, #forecastContainer .veil { background-color: var(--dark-grey-background) }
+#forecastContainer .concealed { color: var(--dark-grey-background); border: none }
 #forecastContainer > p
 {
 	text-align: center;
@@ -2145,7 +2152,8 @@ a:hover { cursor: pointer }
 #sideMenu a { text-decoration: underline }
 
 #btnSideMenu,
-#sideMenu
+#sideMenu,
+#sideMenuTitle
 { position: absolute }
 #btnSideMenu
 {
@@ -2174,31 +2182,42 @@ a:hover { cursor: pointer }
 	z-index: 40;
 	display: inline-block;
 	background: linear-gradient(to top, var(--main-background-color), #054583);
-	border-left: 1px solid #fff;
-	left: 100%;
+	border-left: 2px solid #fff;
 	font-family: 'Exo 2', sans-serif;
-	direction: rtl; /* scrollbar on right side */
 	overflow-y: scroll;
 	overflow-x: hidden;
+	margin-top: 34px;
 }
-#sideMenu * { direction: ltr }
-#sideMenu.is-active
+#sideMenu,
+#sideMenuTitle
+{
+	display: inline-block;
+	left: 100%;
+}
+#sideMenu.is-active,
+#sideMenuTitle.is-active
 { left: var(--board-width-percentage) }
 #sideMenu.is-active,
-#sideMenu:not(.is-active)
+#sideMenu:not(.is-active),
+#sideMenuTitle.is-active,
+#sideMenuTitle:not(.is-active)
 {
 	transition: left 0.15s;
 }
-#sideMenu > .title
+#sideMenuTitle
 {
-	padding: 5px 0 0 3px;
+	z-index: 41;
+	padding: 5px 0 0 10px;
 	font-size: 24px;
+	font-family: "Audiowide", sans-serif;
+	background-color: var(--dark-grey-background);
+	border-left: 2px solid #fff;
+	border-bottom: 2px solid #fff;
 }
-#sideMenu > .title h2
+#sideMenuTitle h2
 {
 	display: inline-block;
 	padding-bottom: -2px;
-	border-bottom: 2px solid #fff;
 }
 #sideMenu > .button
 {

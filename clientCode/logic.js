@@ -3458,7 +3458,7 @@ function resizeRightPanelElements()
 	
 	resizeTreatDiseaseOptions();
 
-	$("#sideMenu").height(boardHeight);
+	$("#sideMenu").height(boardHeight - $("#sideMenuTitle").outerHeight());
 }
 
 function resizeTreatDiseaseOptions()

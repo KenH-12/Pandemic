@@ -8,6 +8,7 @@ export default class sideMenu
     {
         this.$hamburgerButton = $("#btnSideMenu");
         this.$menu = $("#sideMenu");
+        this.$title = $("#sideMenuTitle");
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
         this.$hamburgerButton.click(() => this.toggle());
@@ -15,7 +16,7 @@ export default class sideMenu
 
     toggle()
     {
-        const { $hamburgerButton, $menu } = this,
+        const { $hamburgerButton, $menu, $title } = this,
             active = "is-active";
         
         let method = "open";
@@ -23,6 +24,7 @@ export default class sideMenu
             method = "close";
         
         $hamburgerButton.add($menu)
+            .add($title)
             .toggleClass(active);
         
         this[method]();
@@ -194,7 +196,7 @@ export default class sideMenu
         animationPromise({
             $elements: $menu,
             desiredProperties: {
-                scrollTop: scrollToID ? $menu.scrollTop() + $containerToShow.find(`#${scrollToID}`).offset().top : 0
+                scrollTop: scrollToID ? $menu.scrollTop() + $containerToShow.find(`#${scrollToID}`).position().top : 0
             },
             easing: "easeOutQuart"
         });

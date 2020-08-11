@@ -197,11 +197,10 @@
 
 					<img id='boardImg' src='images/pandemic_board.png' alt='Game Board'>
 					
+					<div id='sideMenuTitle'>
+						<h2>MENU</h2>
+					</div>
 					<div id='sideMenu'>
-						<div class='title'>
-							<h2>MENU</h2>
-						</div>
-
 						<div class='button'>HELP$chevron</div>
 						<div class='secondaryButtonContainer hidden'>
 							<div id='howToPlay' class='button'>How to play$chevron</div>
