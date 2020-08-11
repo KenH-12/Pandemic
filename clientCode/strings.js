@@ -67,9 +67,9 @@ strings = {
         doFourActionsHeading: "Do 4 Actions",
         doFourActions: [
             "A role may do up to 4 actions each turn. Any combination of actions may be performed. The same action may be done several times, each time counting as 1 action.",
-            "A role’s special abilities may change how an action is done.",
-            "Not sure how to do an action? <span class='nowrap'>See <a data-section='howToPlay' data-scrollToId='actionsHeading'>How to play -> Actions</a></span>"
+            "A role’s special abilities may change how an action is done."
         ],
+        howToPlayLink: "Not sure how to do an action? <span class='nowrap'>See <a data-section='howToPlay' data-scrollToId='actionsHeading'>How to play -> Actions</a></span>",
         drawTwoCardsHeading: "Draw 2 Cards",
         drawTwoCards: "After a role does 4 actions, they must draw 2 cards from the Player Deck; any City cards or Event cards drawn are added to their hand.",
         outOfCardsWarning,
