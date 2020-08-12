@@ -39,7 +39,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	charterFlight: {
 		name: "Charter Flight",
 		code: "cf",
-		rules: ["Discard the City card that <i>matches</i> the city you are in to move to <i>any</i> city."],
+		rules: [strings.actionRules.charterFlight[0]],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
 		dispatchInstructions: `To dispatch a pawn via Charter Flight,
 discard the City card that matches the pawn&#39;s current location.
@@ -55,7 +55,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	shuttleFlight: {
 		name: "Shuttle Flight",
 		code: "sf",
-		rules: ["Move from a city with a research station to any other city that has a research station."],
+		rules: [strings.actionRules.shuttleFlight[0]],
 		instructions: "Select a Destination:",
 		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey"]

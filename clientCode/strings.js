@@ -96,6 +96,14 @@ strings = {
             "Discard a City card to move to the city named on the card.",
             dragAndDropInfo
         ],
+        charterFlight: [
+            "Discard the City card that <i>matches</i> the city you are in to move to <i>any</i> city.",
+            dragAndDropInfo
+        ],
+        shuttleFlight: [
+            "Move from a city with a research station to any other city that has a research station.",
+            dragAndDropInfo
+        ],
     },
     roleInfo: [
         `Each role has a pawn and takes turns performing the "PLAY" steps (top-right of the screen behind this menu).`,
