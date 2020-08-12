@@ -1,7 +1,5 @@
 BUGS
 ----
-side menu navigation links sometimes seem to close the open section before reopening it and then doing the collapse animation
-	example: Rules->Actions->Treat Disease link to Rules->Diseases
 
 TO DO
 -----

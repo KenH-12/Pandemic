@@ -80,11 +80,10 @@ export default class sideMenu
 
     async showSecondaryButtons($containerToShow, { $contentToShow } = {})
     {
-        const { buttonContainerSelector } = this;
-
-        this.hideSecondaryButtons($(buttonContainerSelector).not($containerToShow));
-
-        await expand($containerToShow);
+        await Promise.all([
+            this.hideSecondaryButtons($(this.buttonContainerSelector).not(".hidden").not($containerToShow)),
+            expand($containerToShow)
+        ]);
 
         this.bindButtonClickEventListeners($containerToShow);
 
@@ -103,13 +102,15 @@ export default class sideMenu
             .click(function() { self.showContent($(this)) });
     }
 
-    hideSecondaryButtons($containersToHide)
+    async hideSecondaryButtons($containersToHide)
     {
         if (!$containersToHide.length)
-            return false;
+            return Promise.resolve();
         
         $containersToHide.children().off("click");
-        collapse($containersToHide);
+        await collapse($containersToHide);
+
+        return Promise.resolve();
     }
 
     showTertiaryButtons($buttonContainer, content)
@@ -214,16 +215,16 @@ export default class sideMenu
 
     async goToSection($clickedLink)
     {
-        const { $menu, buttonContainerSelector } = this,
+        const { $menu } = this,
             sectionID = $clickedLink.attr("data-section"),
             scrollToID = $clickedLink.attr("data-scrollToId"),
             $secondaryButton = $menu.find(`#${sectionID}`),
             $containerToShow = $secondaryButton.parent();
 
-        if ($secondaryButton.hasClass("hidden"))
-            this.hideSecondaryButtons($(buttonContainerSelector).not($containerToShow));
-
-        await this.showSecondaryButtons($containerToShow, { $contentToShow: $secondaryButton });
+        if ($containerToShow.hasClass("hidden"))
+            await this.showSecondaryButtons($containerToShow, { $contentToShow: $secondaryButton });
+        else
+            await this.showContent($secondaryButton);
         
         animationPromise({
             $elements: $menu,
