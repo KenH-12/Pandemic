@@ -6946,6 +6946,7 @@ async function setup()
 	}
 	else
 	{
+		sideMenu.showHamburgerButton();
 		$(".playerPanel .role").addClass("locatable");
 		bindPlayerDeckHoverEvents();
 		
@@ -7371,6 +7372,7 @@ async function beginGame()
 		{
 			$(this).removeClass("hidden").removeAttr("style");
 			if (gameData.skippingSetup) doneSkippingSetup();
+			sideMenu.showHamburgerButton();
 		});
 	});
 }

@@ -263,7 +263,7 @@
 							</div>
 						</div>
 
-						<button id='btnSideMenu' class='hamburger hamburger--spin' type='button'>
+						<button id='btnSideMenu' class='hamburger hamburger--spin hidden' type='button'>
 							<span class='hamburger-box'>
 								<span class='hamburger-inner'></span>
 							</span>

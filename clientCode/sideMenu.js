@@ -234,6 +234,11 @@ export default class sideMenu
             easing: "easeOutQuart"
         });
     }
+
+    showHamburgerButton()
+    {
+        $("#btnSideMenu").removeClass("hidden");
+    }
 }
 
 const duration = 200,
