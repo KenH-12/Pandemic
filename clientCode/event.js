@@ -63,10 +63,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	buildResearchStation: {
 		name: "Build Research Station",
 		code: "rs",
-		rules: [
-			"Discard the City card that matches the city you are in to place a research station there.",
-			"If the research station supply is empty, take a research station from anywhere on the board."
-		],
+		rules: strings.actionRules.buildResearchStation,
 		instructions: "",
 		actionPathName: "actions/buildResearchStation",
 		propertyNames: ["cityKey", "relocationKey"],
@@ -76,12 +73,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	shareKnowledge: {
 		name: "Share Knowledge",
 		code: "sk",
-		rules: [
-			"You can do this action in two ways:",
-			"<i>give</i> the City card that matches the city you are in to another player, or",
-			"<i>take</i> the City card that matches the city you are in from another player.",
-			"The other player must also be in the city with you."
-		],
+		rules: strings.actionRules.shareKnowledge,
 		actionPathName: "actions/shareKnowledge",
 		propertyNames: ["cardKey", "giverRoleID", "receiverRoleID"],
 		relatedRoleName: "Researcher",
@@ -90,10 +82,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	treatDisease: {
 		name: "Treat Disease",
 		code: "td",
-		rules: [
-			"Remove 1 disease cube from the city you are in, returning it to the Disease Cube Supply.",
-			"If the disease has been cured, remove all cubes of that colour from the city you are in."
-		],
+		rules: strings.actionRules.treatDisease.slice(0, 2),
 		instructions: "Select a Disease Colour:",
 		actionPathName: "actions/treatDisease",
 		propertyNames: ["cityKey", "diseaseColor", "prevCubeCount", "newCubeCount"],
@@ -113,11 +102,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 	discoverACure: {
 		name: "Discover A Cure",
 		code: "dc",
-		rules: [
-			`At any research station, discard 5 City cards of the same colour from your hand to cure the disease of that colour.`,
-			`If no cubes of this colour are on the board, the disease becomes <span class='hoverInfo' data-eventType='er'>eradicated</span>.`,
-			strings.victoryCondition
-		],
+		rules: strings.actionRules.discoverACure,
 		actionPathName: "actions/discoverCure",
 		propertyNames: ["cardKeys"],
 		relatedRoleName: "Scientist",
@@ -187,7 +172,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Pass",
 		code: "pa",
 		propertyNames: [],
-		rules: [`Forfeit your remaining actions for this turn and proceed to the "Draw 2 cards" step.`],
+		rules: strings.actionRules.pass,
 		instructions: "Pass on your remaining actions for this turn?",
 		actionPathName: "actions/passActions",
 		propertyNames: ["numActionsForfeited"]

@@ -104,6 +104,28 @@ strings = {
             "Move from a city with a research station to any other city that has a research station.",
             dragAndDropInfo
         ],
+        buildResearchStation: [
+            "Discard the City card that matches the city you are in to place a research station there.",
+			"If the research station supply is empty, take a research station from anywhere on the board."
+        ],
+        treatDisease: [
+            "Remove 1 disease cube from the city you are in, returning it to the Disease Cube Supply.",
+            "If the disease has been cured, remove all cubes of that colour from the city you are in.",
+            "* You can do this action by clicking a disease cube at the active role's current location.",
+            "Learn more about diseases here: <a data-section='diseaseInfo' data-scrollToId='diseaseInfo' class='nowrap'>Rules -> Diseases</a>"
+        ],
+        shareKnowledge: [
+            "You can do this action in two ways:",
+			"<i>give</i> the City card that matches the city you are in to another role, or",
+			"<i>take</i> the City card that matches the city you are in from another role.",
+			"The other role must also be in the city with you."
+        ],
+        discoverACure: [
+            `At any research station, discard 5 City cards of the same colour from your hand to cure the disease of that colour.`,
+			`If no cubes of this colour are on the board, the disease becomes ${eradicatedHoverInfo}.`,
+			victoryCondition
+        ],
+        pass: [`Forfeit your remaining actions for this turn and proceed to the "Draw 2 cards" step.`]
     },
     roleInfo: [
         `Each role has a pawn and takes turns performing the "PLAY" steps (top-right of the screen behind this menu).`,
