@@ -212,6 +212,7 @@
 						<div class='secondaryButtonContainer hidden'>
 							<div id='objectives' class='button'>Objectives$chevron</div>
 							<div id='playSteps' class='button'>Play steps$chevron</div>
+							<div id='actionRules' class='button'>Actions$chevron</div>
 							<div id='roleInfo' class='button'>Roles$chevron</div>
 							<div id='cardInfo' class='button'>Cards$chevron</div>
 							<div id='diseaseInfo' class='button'>Diseases$chevron</div>

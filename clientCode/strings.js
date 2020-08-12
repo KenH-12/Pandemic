@@ -20,6 +20,7 @@ const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind thi
         "When cities of an eradicated disease are infected, no new disease cubes are placed there.",
         "Eradicating a disease is not needed to win; once all diseases are cured, the game ends and your team wins immediately!"
     ],
+    dragAndDropInfo = "* You can do this action by dragging and dropping a pawn onto a <span class='hoverInfo validDestinationInfo abbrev'>valid destination</span>.",
 strings = {
     howToPlay: [
         "If you are ever unsure of how to proceed, look to the right panel (behind this menu) for prompts or clues.",
@@ -83,6 +84,18 @@ strings = {
 			`Each time an Infection card is revealed, a disease cube of the matching colour is placed on the named city. If the city already has 3 cubes of this colour, an ${outbreakHoverInfo} of this disease occurs in that city.`
         ],
         insufficientCubesWarning
+    },
+    actionRules: {
+        tertiaryButtons: true,
+        driveFerry: [
+            "Move to a city connected by a white line to the one you are in.",
+            "NOTE: San Francisco is connected Tokyo and Manila, and Los Angeles is connected to Sydney.",
+            dragAndDropInfo
+        ],
+        directFlight: [
+            "Discard a City card to move to the city named on the card.",
+            dragAndDropInfo
+        ],
     },
     roleInfo: [
         `Each role has a pawn and takes turns performing the "PLAY" steps (top-right of the screen behind this menu).`,
@@ -149,8 +162,8 @@ strings = {
 <p>They can be placed on the board with the <span class='hoverInfo' data-eventType='rs'>Build Research Station</span> action.`,
     
     insufficientCubesWarning,
-    playerDeckInfo: "After doing 4 actions, the active role must draw 2 cards from the Player Deck. Any city cards or event cards drawn are added to the role's hand. Any Epidemic cards drawn must be resolved immediately.",
-    discardRule: "If a role ever has more than 7 cards in hand (after first resolving any Epidemic cards drawn), they must discard or play event cards until they have 7 cards in hand.",
+    playerDeckInfo: "After doing 4 actions, the active role must draw 2 cards from the Player Deck. Any City cards or Event cards drawn are added to the role's hand. Any Epidemic cards drawn must be resolved immediately.",
+    discardRule: "If a role ever has more than 7 cards in hand (after first resolving any Epidemic cards drawn), they must discard or play Event cards until they have 7 cards in hand.",
     outOfCardsWarning,
     
     victoryCondition,

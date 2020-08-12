@@ -68,9 +68,19 @@ function bindSideMenuHoverEvents()
 	}).bindHoverEvents();
 
 	new Tooltip({
-		content: `<p>There are 4 different movement actions that can be performed by any role. Some roles can move in unique ways using their special abilities.</p>
-<p>For most movement actions, clicking the action button will show a list of valid destinations. For others, almost any city is a valid destination.</p>
-<p>You can always drag and drop an active pawn to perform a movement action. If the travel path arrow turns red when you drop the pawn, it means the destination was invalid.</p>`,
+		getContent: ({ $hoveredElement }) =>
+		{
+			let content = `<p>For most movement actions, clicking the action button will show a list of valid destinations. For others, almost any city is a valid destination.</p>
+<p>You can always drag and drop an active pawn to perform a movement action. If the travel path arrow turns red when you drop the pawn, it means the destination was invalid.</p>`;
+			
+			if ($hoveredElement.hasClass("abbrev"))
+				return content;
+			
+			content = "<p>There are 4 different movement actions that can be performed by any role. Some roles can move in unique ways using their special abilities.</p>"
+				+ content;
+			
+			return content;
+		},
 		hoverElementSelector: ".hoverInfo.validDestinationInfo",
 		containerSelector
 	}).bindHoverEvents();

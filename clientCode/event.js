@@ -20,7 +20,7 @@ const eventTypes = {
 	driveFerry: {
 		name: "Drive/Ferry",
 		code: "dr",
-		rules: ["Move to a city connected by a white line to the one you are in."],
+		rules: [strings.actionRules.driveFerry[0]],
 		instructions: "Select a Destination:",
 		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey"]
@@ -28,10 +28,10 @@ const eventTypes = {
 	directFlight: {
 		name: "Direct Flight",
 		code: "df",
-		rules: ["Discard a city card to move to the city named on the card."],
+		rules: [strings.actionRules.directFlight[0]],
 		instructions: "Select a Destination:",
 		dispatchInstructions: `To dispatch a pawn via Direct Flight,
-discard the city card that matches the destination city.
+discard the City card that matches the destination city.
 The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey"]
@@ -39,10 +39,10 @@ The card must come from the Dispatcher&#39;s hand.`,
 	charterFlight: {
 		name: "Charter Flight",
 		code: "cf",
-		rules: ["Discard the city card that <i>matches</i> the city you are in to move to <i>any</i> city."],
+		rules: ["Discard the City card that <i>matches</i> the city you are in to move to <i>any</i> city."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
 		dispatchInstructions: `To dispatch a pawn via Charter Flight,
-discard the city card that matches the pawn&#39;s current location.
+discard the City card that matches the pawn&#39;s current location.
 The card must come from the Dispatcher&#39;s hand.`,
 		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey"]
@@ -64,7 +64,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Build Research Station",
 		code: "rs",
 		rules: [
-			"Discard the city card that matches the city you are in to place a research station there.",
+			"Discard the City card that matches the city you are in to place a research station there.",
 			"If the research station supply is empty, take a research station from anywhere on the board."
 		],
 		instructions: "",
@@ -78,14 +78,14 @@ The card must come from the Dispatcher&#39;s hand.`,
 		code: "sk",
 		rules: [
 			"You can do this action in two ways:",
-			"<i>give</i> the city card that matches the city you are in to another player, or",
-			"<i>take</i> the city card that matches the city you are in from another player.",
+			"<i>give</i> the City card that matches the city you are in to another player, or",
+			"<i>take</i> the City card that matches the city you are in from another player.",
 			"The other player must also be in the city with you."
 		],
 		actionPathName: "actions/shareKnowledge",
 		propertyNames: ["cardKey", "giverRoleID", "receiverRoleID"],
 		relatedRoleName: "Researcher",
-		relatedRoleRule: "The Researcher may <i>give</i> a city card without needing to be in the city that matches the card."
+		relatedRoleRule: "The Researcher may <i>give</i> a City card without needing to be in the city that matches the card."
 	},
 	treatDisease: {
 		name: "Treat Disease",
@@ -114,7 +114,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Discover A Cure",
 		code: "dc",
 		rules: [
-			`At any research station, discard 5 city cards of the same colour from your hand to cure the disease of that colour.`,
+			`At any research station, discard 5 City cards of the same colour from your hand to cure the disease of that colour.`,
 			`If no cubes of this colour are on the board, the disease becomes <span class='hoverInfo' data-eventType='er'>eradicated</span>.`,
 			strings.victoryCondition
 		],
@@ -154,11 +154,11 @@ The card must come from the Dispatcher&#39;s hand.`,
 		],
 		driveFerryRules: ["Dispatch a pawn to a city connected by a white line to the one it is in."],
 		directFlightRules: [
-			"Discard a city card to dispatch a pawn to the city named on the card.",
+			"Discard a City card to dispatch a pawn to the city named on the card.",
 			strings.dispatchDiscardRule
 		],
 		charterFlightRules: [
-			"Discard the city card that <i>matches</i> a pawn's location to dispatch that pawn to <i>any</i> city.",
+			"Discard the City card that <i>matches</i> a pawn's location to dispatch that pawn to <i>any</i> city.",
 			strings.dispatchDiscardRule
 		],
 		rendezvousRules: ["The Dispatcher may, as an action, move any pawn to a city containing another pawn."],
@@ -178,7 +178,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		name: "Operations Flight",
 		code: "of",
 		capableRoleName: "Operations Expert",
-		rules: ["<i>Once per turn</i>, as an action, the Operations Expert may move from a research station to any city by discarding any city card."],
+		rules: ["<i>Once per turn</i>, as an action, the Operations Expert may move from a research station to any city by discarding any City card."],
 		instructions: "To select a destination, drag and drop your pawn onto a city.",
 		actionPathName: "actions/movementAction",
 		propertyNames: ["originKey", "destinationKey", "discardKey"]
@@ -279,7 +279,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 			"3 roles -> 3 cards each",
 			"4 roles -> 2 cards each",
 			"<br/>",
-			"The turn order is decided by the single highest city card population in each role's starting hand."
+			"The turn order is decided by the single highest City card population in each role's starting hand."
 		]
 	},
 	outbreak: {

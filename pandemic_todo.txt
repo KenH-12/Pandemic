@@ -9,7 +9,7 @@ side menu
 	responsiveness
 
 	rules
-		actions?
+		actions
 
 	give up
 	back to main menu

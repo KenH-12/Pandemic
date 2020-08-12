@@ -1,6 +1,7 @@
 "use strict";
 
 import { strings } from "./strings.js";
+import { eventTypes } from "./event.js";
 
 export default class sideMenu
 {
@@ -79,20 +80,27 @@ export default class sideMenu
 
     async showSecondaryButtons($containerToShow, { $contentToShow } = {})
     {
-        const self = this;
-        
-        this.hideSecondaryButtons($(self.buttonContainerSelector).not($containerToShow));
+        const { buttonContainerSelector } = this;
+
+        this.hideSecondaryButtons($(buttonContainerSelector).not($containerToShow));
 
         await expand($containerToShow);
 
-        $containerToShow.children()
-            .off("click")
-            .click(function() { self.showContent($(this)) });
+        this.bindButtonClickEventListeners($containerToShow);
 
         if ($contentToShow)
             await this.showContent($contentToShow);
         
         return Promise.resolve();
+    }
+
+    bindButtonClickEventListeners($container)
+    {
+        const self = this;
+
+        $container.children()
+            .off("click")
+            .click(function() { self.showContent($(this)) });
     }
 
     hideSecondaryButtons($containersToHide)
@@ -104,27 +112,48 @@ export default class sideMenu
         collapse($containersToHide);
     }
 
-    async showContent($secondaryButton)
+    showTertiaryButtons($buttonContainer, content)
+    {
+        $buttonContainer.removeClass("sideMenuContent")
+            .addClass("tertiaryButtonContainer");
+        
+        for (let key in content)
+        {
+            if (key === "tertiaryButtons")
+                continue;
+
+            appendHtmlToContainer($buttonContainer, "div", eventTypes[key].name, { id: key, cssClasses: "button" });
+        }
+
+        $buttonContainer.children().append("<span class='buttonChevron rightChevron'>^</span>")
+            .each(function() { $(this).attr("data-section", "actionRules") });
+        
+        this.bindButtonClickEventListeners($buttonContainer);
+    }
+
+    async showContent($clickedBtn)
     {
         const contentClass = "sideMenuContent",
-            stringKey = $secondaryButton.attr("id");
+            tertiaryButtonContainerClass = "tertiaryButtonContainer",
+            buttonIsTertiary = $clickedBtn.parent().hasClass(tertiaryButtonContainerClass),
+            contentIsAlreadyExpanded = $clickedBtn.next().hasClass(contentClass) || $clickedBtn.next().hasClass(tertiaryButtonContainerClass);
         
-        if ($secondaryButton.next().hasClass(contentClass))
+        if (contentIsAlreadyExpanded)
         {
-            flipChevrons($secondaryButton);
-            return this.hideContent($secondaryButton.next());
+            flipChevrons($clickedBtn);
+            return this.hideContent($clickedBtn.next());
         }
         
-        if (typeof strings[stringKey] === "undefined")
-            return false;
+        const stringKey = $clickedBtn.attr("id"),
+            content = buttonIsTertiary ? strings[$clickedBtn.attr("data-section")][stringKey] : strings[stringKey];
 
-        flipChevrons(this.$menu.find(".secondaryButtonContainer").children(".button"));
-        this.hideContent($(`.${contentClass}`));
+        flipChevrons(this.$menu.find(`.${ buttonIsTertiary ? tertiaryButtonContainerClass : "secondaryButtonContainer" }`).children(".button"));
+        this.hideContent($(`.${contentClass}`).add(`.${tertiaryButtonContainerClass}`).not($clickedBtn.parent()));
         
-        const $container = $(`<div class='${contentClass}'></div>`).insertAfter($secondaryButton);
+        const $container = $(`<div class='${contentClass}'></div>`).insertAfter($clickedBtn);
 
-        this.parseAndAppendContent($container, strings[stringKey]);
-        unflipChevrons($secondaryButton);
+        this.parseAndAppendContent($container, content, { isTertiaryContent: buttonIsTertiary });
+        unflipChevrons($clickedBtn);
         await expand($container);
 
         this.bindLinkClicks();
@@ -138,8 +167,11 @@ export default class sideMenu
         $content.remove();
     }
 
-    parseAndAppendContent($container, content)
+    parseAndAppendContent($container, content, { isTertiaryContent } = {})
     {
+        if (content.tertiaryButtons && !isTertiaryContent)
+            return this.showTertiaryButtons($container, content);
+        
         let tagName = "p",
             member;
         
@@ -240,7 +272,7 @@ function unflipChevrons($buttons)
     $buttons.each(function() { $(this).children(".buttonChevron").removeClass("rightChevron") })
 }
 
-function appendHtmlToContainer($container, tagName, content)
+function appendHtmlToContainer($container, tagName, content, { id, cssClasses } = {})
 {
-    $container.append(`<${tagName}>${content}</${tagName}>`);
+    $container.append(`<${tagName}${ id ? ` id='${id}'` : "" }${ cssClasses ? ` class='${cssClasses}'` : "" }>${content}</${tagName}>`);
 }

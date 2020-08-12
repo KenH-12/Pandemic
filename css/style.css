@@ -2269,15 +2269,21 @@ a:hover { cursor: pointer }
 	right: 6px;
 	line-height: 20px;
 }
+.tertiaryButtonContainer > .button > .buttonChevron
+{ right: 22px }
+.tertiaryButtonContainer > .button > .buttonChevron.rightChevron
+{ right: 28px }
 #sideMenu > .button:hover
 { padding-left: 15px }
 
-.secondaryButtonContainer
+.secondaryButtonContainer,
+.tertiaryButtonContainer
 {
 	width: 100%;
 	display: block;
 }
-.secondaryButtonContainer .button
+.secondaryButtonContainer .button,
+.tertiaryButtonContainer .button
 {
 	width: 97%;
 	margin: 1px 0 0 3%;
@@ -2286,6 +2292,12 @@ a:hover { cursor: pointer }
 	background-color: #0b668d;
 	position: relative;
 	z-index: 41;
+}
+.tertiaryButtonContainer .button
+{
+	margin-left: 6%;
+	padding-top: 0;
+	padding-bottom: 0;
 }
 .secondaryButtonContainer .button:hover
 {
