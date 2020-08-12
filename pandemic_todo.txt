@@ -3,8 +3,6 @@ BUGS
 
 TO DO
 -----
-test what happens when an epidemic is the last card in the deck
-
 side menu
 	responsiveness
 

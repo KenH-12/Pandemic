@@ -7286,14 +7286,15 @@ async function animateNewGameSetup()
 	beginGame();
 }
 
-function finishedSetupStep()
+function finishedSetupStep({ isFinalStep } = {})
 {
 	if (gameData.skippingSetupStep)
 	{
 		gameData.skipping = false;
 		gameData.skippingSetupStep = false;
 
-		bindBtnSkipSetupStepClick();
+		if (!isFinalStep)
+			bindBtnSkipSetupStepClick();
 	}
 }
 
@@ -7619,7 +7620,7 @@ async function placeResearchStationInAtlanta()
 		});
 		$cdcBlurb.remove();
 
-		finishedSetupStep();
+		finishedSetupStep({ isFinalStep: true });
 		resolve();
 	});
 }
