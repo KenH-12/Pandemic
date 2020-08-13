@@ -132,7 +132,7 @@ export default class sideMenu
         this.bindButtonClickEventListeners($buttonContainer);
     }
 
-    async showContent($clickedBtn)
+    async showContent($clickedBtn, { navigatingViaLink } = {})
     {
         const contentClass = "sideMenuContent",
             tertiaryButtonContainerClass = "tertiaryButtonContainer",
@@ -156,6 +156,9 @@ export default class sideMenu
         this.parseAndAppendContent($container, content, { isTertiaryContent: buttonIsTertiary });
         unflipChevrons($clickedBtn);
         await expand($container);
+
+        if (!navigatingViaLink && $clickedBtn.position().top < 0)
+            await this.scrollToElement($clickedBtn);
 
         this.bindLinkClicks();
         
@@ -224,15 +227,24 @@ export default class sideMenu
         if ($containerToShow.hasClass("hidden"))
             await this.showSecondaryButtons($containerToShow, { $contentToShow: $secondaryButton });
         else
-            await this.showContent($secondaryButton);
+            await this.showContent($secondaryButton, { navigatingViaLink: true });
         
-        animationPromise({
+        this.scrollToElement($menu.find(`#${scrollToID}`));
+    }
+
+    async scrollToElement($e)
+    {
+        const { $menu } = this;
+
+        await animationPromise({
             $elements: $menu,
             desiredProperties: {
-                scrollTop: scrollToID ? $menu.scrollTop() + $containerToShow.find(`#${scrollToID}`).position().top : 0
+                scrollTop: $e.length ? $menu.scrollTop() + $e.position().top : 0
             },
             easing: "easeOutQuart"
         });
+
+        return Promise.resolve();
     }
 
     showHamburgerButton()
