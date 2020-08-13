@@ -2706,7 +2706,6 @@ a:hover { cursor: pointer }
 		font-size: 24px;
 	}
 	#sideMenuTitle h2
-	{ padding-bottom: -2px }
 	#sideMenu > .button
 	{ font-size: 20px }
 	#sideMenu > .button .buttonChevron
@@ -3419,4 +3418,72 @@ a:hover { cursor: pointer }
 
 	#btnSideMenu
 	{ width: 2.5% }
+
+	#sideMenu
+	{ margin-top: 54px }
+	#sideMenuTitle
+	{
+		padding: 5px 10px;
+		font-size: 36px;
+	}
+	#sideMenu > .button
+	{ font-size: 26px }
+	#sideMenu > .button .buttonChevron
+	{
+		font-size: 36px;
+		right: 12px;
+	}
+	#sideMenu > .button .buttonChevron.rightChevron
+	{ line-height: 32px }
+	.secondaryButtonContainer > .button
+	{ font-size: 24px }
+	.secondaryButtonContainer .buttonChevron
+	{
+		font-size: 30px;
+		line-height: 12px;
+	}
+	.secondaryButtonContainer .buttonChevron.rightChevron
+	{
+		right: 8px;
+		line-height: 30px;
+	}
+	.secondaryButtonContainer .button
+	{ font-size: 23px }
+	.tertiaryButtonContainer .button
+	{
+		font-size: 21px;
+		padding-top: 1px;
+		padding-bottom: 1px;
+	}
+	.secondaryButtonContainer .button,
+	.tertiaryButtonContainer .button
+	{ padding-right: 0 }
+	.tertiaryButtonContainer > .button > .buttonChevron
+	{
+		right: 28px;
+		line-height: 9px;
+	}
+	.tertiaryButtonContainer > .button > .buttonChevron.rightChevron
+	{
+		right: 36px;
+		line-height: 26px;
+	}
+
+	.sideMenuContent
+	{
+		font-size: 18px;
+		line-height: 22px;
+	}
+	.sideMenuContent h5,
+	.sideMenuContent .subheading
+	{ font-size: 20px }
+	.sideMenuContent p
+	{ margin-bottom: 8px }
+	.sideMenuContent .hoverInfo
+	{ font-size: 19px }
+	#metaInfo.info
+	{
+		font-size: 20px;
+		line-height: 18px;
+	}
 }
