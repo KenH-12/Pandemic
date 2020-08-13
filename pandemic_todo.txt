@@ -4,12 +4,7 @@ BUGS
 TO DO
 -----
 side menu
-	responsiveness
-
 	give up
-	back to main menu
-
-city card populations can go in their tooltips
 
 access keys
 	form to request a new key
@@ -71,6 +66,8 @@ server migration
 
 IDEAS
 -----
+city card populations can go in their tooltips
+
 consider removing the special actions container
 	dispatch pawn and operations flight are movement actions
 	plan contingency is an other action

@@ -201,14 +201,14 @@
 						<h2>MENU</h2>
 					</div>
 					<div id='sideMenu'>
-						<div class='button'>HELP$chevron</div>
+						<div class='button primaryButton'>HELP$chevron</div>
 						<div class='secondaryButtonContainer hidden'>
 							<div id='howToPlay' class='button'>How to play$chevron</div>
 							<div id='importantInfo' class='button'>Where to find important info$chevron</div>
 							<div id='whatJustHappened' class='button'>What just happened?$chevron</div>
 							<div id='mistakes' class='button'>Made a mistake?$chevron</div>
 						</div>
-						<div class='button'>RULES$chevron</div>
+						<div class='button primaryButton'>RULES$chevron</div>
 						<div class='secondaryButtonContainer hidden'>
 							<div id='objectives' class='button'>Objectives$chevron</div>
 							<div id='playSteps' class='button'>Play steps$chevron</div>
@@ -220,7 +220,7 @@
 							<div id='outbreakInfo' class='button'>Outbreaks$chevron</div>
 						</div>
 						<div class='button'>GIVE UP</div>
-						<div class='button'>RETURN TO <span class='nowrap'>MAIN MENU</span></div>
+						<div id='btnReturnToMainMenu' class='button'>RETURN TO <span class='nowrap'>MAIN MENU</span></div>
 					</div>
 
 					<div id='rightPanel'>

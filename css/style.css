@@ -2282,6 +2282,7 @@ a:hover { cursor: pointer }
 {
 	background-color: var(--button-background-bright);
 	padding-left: 8px;
+	padding-right: 12px;
 }
 #sideMenu .button, #sideMenu .button:hover
 { transition: padding .2s }
@@ -2302,7 +2303,10 @@ a:hover { cursor: pointer }
 .tertiaryButtonContainer > .button > .buttonChevron.rightChevron
 { right: 24px }
 #sideMenu > .button:hover
-{ padding-left: 15px }
+{
+	padding-left: 15px;
+	padding-right: 5px;
+}
 
 .sideMenuContent
 {
@@ -2705,7 +2709,6 @@ a:hover { cursor: pointer }
 		padding: 5px 0 0 10px;
 		font-size: 24px;
 	}
-	#sideMenuTitle h2
 	#sideMenu > .button
 	{ font-size: 20px }
 	#sideMenu > .button .buttonChevron
@@ -2723,7 +2726,9 @@ a:hover { cursor: pointer }
 	.tertiaryButtonContainer .button
 	{ font-size: 16px }
 	.secondaryButtonContainer .button
-	{ padding-right: 5px }
+	{ padding-right: 12px }
+	.secondaryButtonContainer .button:hover
+	{ padding-right: 4px }
 	.tertiaryButtonContainer .button
 	{ padding-right: 32px }
 	.tertiaryButtonContainer > .button > .buttonChevron

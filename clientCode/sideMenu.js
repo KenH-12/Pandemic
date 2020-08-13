@@ -13,6 +13,7 @@ export default class sideMenu
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
         this.$hamburgerButton.click(() => this.toggle());
+        $("#btnReturnToMainMenu").click(() => window.location.replace("index.php"));
     }
 
     toggle()
@@ -36,7 +37,7 @@ export default class sideMenu
         const self = this,
             $boardContainer = $("#boardContainer");
 
-        this.$menu.children(".button")
+        this.$menu.children(".primaryButton")
             .off("click")
             .click(function() { self.toggleContent($(this)) });
         
@@ -51,7 +52,7 @@ export default class sideMenu
 
     close()
     {
-        this.$menu.children(".button").off("click");
+        this.$menu.children(".primaryButton").off("click");
         $("#boardContainer").off("mousedown");
     }
 
@@ -73,7 +74,7 @@ export default class sideMenu
             return this.hideSecondaryButtons($buttonContainer);
         }
         
-        flipChevrons($menu.children(".button").not($menuItem));
+        flipChevrons($menu.children(".primaryButton").not($menuItem));
         unflipChevrons($menuItem);
         this.showSecondaryButtons($buttonContainer);
     }
