@@ -220,7 +220,7 @@
 							<div id='outbreakInfo' class='button'>Outbreaks$chevron</div>
 						</div>
 						<div class='button'>GIVE UP</div>
-						<div class='button'>RETURN TO MAIN MENU</div>
+						<div class='button'>RETURN TO <span class='nowrap'>MAIN MENU</span></div>
 					</div>
 
 					<div id='rightPanel'>

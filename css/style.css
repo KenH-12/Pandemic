@@ -2186,7 +2186,7 @@ a:hover { cursor: pointer }
 	font-family: 'Exo 2', sans-serif;
 	overflow-y: scroll;
 	overflow-x: hidden;
-	margin-top: 34px;
+	margin-top: 28px;
 }
 #sideMenu,
 #sideMenuTitle
@@ -2207,23 +2207,20 @@ a:hover { cursor: pointer }
 #sideMenuTitle
 {
 	z-index: 41;
-	padding: 5px 0 0 10px;
-	font-size: 24px;
+	padding: 3px 0 3px 10px;
+	font-size: 18px;
 	font-family: "Audiowide", sans-serif;
 	background-color: var(--dark-grey-background);
 	border-left: 2px solid #fff;
 	border-bottom: 2px solid #fff;
 }
 #sideMenuTitle h2
-{
-	display: inline-block;
-	padding-bottom: -2px;
-}
+{ display: inline-block }
 #sideMenu > .button
 {
 	width: 100%;
 	margin: 3px 0 0 0;
-	font-size: 20px;
+	font-size: 17px;
 	text-align: left;
 	padding: 10px;
 	z-index: 42;
@@ -2248,34 +2245,15 @@ a:hover { cursor: pointer }
 }
 #sideMenu > .button .buttonChevron
 {
-	right: 15px;
+	right: 12px;
 	font-size: 32px;
-	line-height: 10px;
+	line-height: 6px;
 }
 #sideMenu > .button .buttonChevron.rightChevron
 {
 	right: 20px;
-	line-height: 25px;
+	line-height: 22px;
 }
-.secondaryButtonContainer .buttonChevron
-{
-	right: 1px;
-	margin-left: 3px;
-	font-size: 24px;
-	line-height: 8px;
-}
-.secondaryButtonContainer .buttonChevron.rightChevron
-{
-	right: 6px;
-	line-height: 20px;
-}
-.tertiaryButtonContainer > .button > .buttonChevron
-{ right: 22px }
-.tertiaryButtonContainer > .button > .buttonChevron.rightChevron
-{ right: 28px }
-#sideMenu > .button:hover
-{ padding-left: 15px }
-
 .secondaryButtonContainer,
 .tertiaryButtonContainer
 {
@@ -2287,7 +2265,8 @@ a:hover { cursor: pointer }
 {
 	width: 97%;
 	margin: 1px 0 0 3%;
-	font-size: 16px;
+	padding-right: 20px;
+	font-size: 14px;
 	text-align: left;
 	background-color: #0b668d;
 	position: relative;
@@ -2306,16 +2285,37 @@ a:hover { cursor: pointer }
 }
 #sideMenu .button, #sideMenu .button:hover
 { transition: padding .2s }
+.secondaryButtonContainer .buttonChevron
+{
+	right: 1px;
+	margin-left: 3px;
+	font-size: 24px;
+	line-height: 4px;
+}
+.secondaryButtonContainer .buttonChevron.rightChevron
+{
+	right: 6px;
+	line-height: 18px;
+}
+.tertiaryButtonContainer > .button > .buttonChevron
+{ right: 18px }
+.tertiaryButtonContainer > .button > .buttonChevron.rightChevron
+{ right: 24px }
+#sideMenu > .button:hover
+{ padding-left: 15px }
 
 .sideMenuContent
 {
 	margin: 2px 2px 0 6%;
 	font-family: "Ropa sans", sans-serif;
-	line-height: 18px;
+	font-size: 14px;
+	line-height: 15px;
 }
+.tertiaryButtonContainer .sideMenuContent
+{ margin-left: 9% }
 .sideMenuContent h5,
 .sideMenuContent .subheading
-{ font-size: 17px }
+{ font-size: 16px }
 .sideMenuContent h5
 {
 	font-family: 'Exo 2', sans-serif;
@@ -2323,18 +2323,18 @@ a:hover { cursor: pointer }
 	display: inline-block;
 }
 .sideMenuContent p
-{ margin-bottom: 5px }
+{ margin-bottom: 4px }
 .sideMenuContent .subheading
 {
 	text-decoration: underline;
 	display: block;
 }
 .sideMenuContent .hoverInfo
-{ font-size: 15px }
+{ font-size: 13px }
 #metaInfo.info
 {
 	font-size: 14px;
-	line-height: 16px;
+	line-height: 14px;
 	vertical-align: text-top;
 }
 
@@ -2697,6 +2697,53 @@ a:hover { cursor: pointer }
 
 	#btnSideMenu
 	{ width: 2.9% }
+
+	#sideMenu
+	{ margin-top: 34px }
+	#sideMenuTitle
+	{
+		padding: 5px 0 0 10px;
+		font-size: 24px;
+	}
+	#sideMenuTitle h2
+	{ padding-bottom: -2px }
+	#sideMenu > .button
+	{ font-size: 20px }
+	#sideMenu > .button .buttonChevron
+	{
+		right: 15px;
+		line-height: 10px;
+	}
+	#sideMenu > .button .buttonChevron.rightChevron
+	{ line-height: 25px }
+	.secondaryButtonContainer .buttonChevron
+	{ line-height: 8px }
+	.secondaryButtonContainer .buttonChevron.rightChevron
+	{ line-height: 20px }
+	.secondaryButtonContainer .button,
+	.tertiaryButtonContainer .button
+	{ font-size: 16px }
+	.secondaryButtonContainer .button
+	{ padding-right: 5px }
+	.tertiaryButtonContainer .button
+	{ padding-right: 32px }
+	.tertiaryButtonContainer > .button > .buttonChevron
+	{ right: 22px }
+	.tertiaryButtonContainer > .button > .buttonChevron.rightChevron
+	{ right: 28px }
+
+	.sideMenuContent
+	{
+		font-size: 16px;
+		line-height: 18px;
+	}
+	.sideMenuContent h5,
+	.sideMenuContent .subheading
+	{ font-size: 17px }
+	.sideMenuContent p
+	{ margin-bottom: 5px }
+	.sideMenuContent .hoverInfo
+	{ font-size: 15px }
 }
 
 @media screen and (min-width: 1400px)
