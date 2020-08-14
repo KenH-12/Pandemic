@@ -10,10 +10,12 @@ export default class sideMenu
         this.$hamburgerButton = $("#btnSideMenu");
         this.$menu = $("#sideMenu");
         this.$title = $("#sideMenuTitle");
+        this.$btnAbandon = $("#btnAbandon");
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
         this.$hamburgerButton.click(() => this.toggle());
         $("#btnReturnToMainMenu").click(() => window.location.replace("index.php"));
+        this.resetAbandonButton();
     }
 
     toggle()
@@ -54,6 +56,7 @@ export default class sideMenu
     {
         this.$menu.children(".primaryButton").off("click");
         $("#boardContainer").off("mousedown");
+        this.resetAbandonButton();
     }
 
     closeIfOpen()
@@ -73,6 +76,7 @@ export default class sideMenu
             flipChevrons($menuItem);
             return this.hideSecondaryButtons($buttonContainer);
         }
+        this.resetAbandonButton();
         
         flipChevrons($menu.children(".primaryButton").not($menuItem));
         unflipChevrons($menuItem);
@@ -140,6 +144,7 @@ export default class sideMenu
             buttonIsTertiary = $clickedBtn.parent().hasClass(tertiaryButtonContainerClass),
             contentIsAlreadyExpanded = $clickedBtn.next().hasClass(contentClass) || $clickedBtn.next().hasClass(tertiaryButtonContainerClass);
         
+        this.resetAbandonButton();
         if (contentIsAlreadyExpanded)
         {
             flipChevrons($clickedBtn);
@@ -246,6 +251,31 @@ export default class sideMenu
         });
 
         return Promise.resolve();
+    }
+
+    resetAbandonButton()
+    {
+        const { $btnAbandon } = this;
+        
+        $btnAbandon.html("ABANDON GAME")
+            .off("click")
+            .removeClass("confirming")
+            .click(() => this.promptAbandonGameConfirmation());
+    }
+
+    promptAbandonGameConfirmation()
+    {
+        const { $btnAbandon } = this;
+
+        $btnAbandon.off("click")
+            .addClass("confirming")
+            .html(`<p>ABANDON GAME?</p>
+                    <div id='btnConfirmAbandon' class='button'>CONFIRM</div>
+                    <div id='btnCancelAbandon' class='button'>CANCEL</div>`)
+            .children()
+            .click((e) => e.stopPropagation())
+            .filter("#btnConfirmAbandon").click(() => alert("abandon!"))
+            .siblings("#btnCancelAbandon").click(() => this.resetAbandonButton());
     }
 
     showHamburgerButton()

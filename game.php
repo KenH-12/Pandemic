@@ -219,7 +219,7 @@
 							<div id='epidemicInfo' class='button'>Epidemics$chevron</div>
 							<div id='outbreakInfo' class='button'>Outbreaks$chevron</div>
 						</div>
-						<div class='button'>GIVE UP</div>
+						<div id='btnAbandon' class='button'>ABANDON GAME</div>
 						<div id='btnReturnToMainMenu' class='button'>RETURN TO <span class='nowrap'>MAIN MENU</span></div>
 					</div>
 
