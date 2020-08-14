@@ -283,6 +283,8 @@ function promptRefresh(error)
 		recommendedAction = `To continue your game, ${refreshString}.`;
 	}
 
+	$("#sideMenu").add("#sideMenuTitle").addClass("hidden");
+
 	if ($container.is($curtain))
 		$curtain.empty();
 	else

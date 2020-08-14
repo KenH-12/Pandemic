@@ -2220,6 +2220,17 @@ a:hover { cursor: pointer }
 }
 #sideMenuTitle h2
 { display: inline-block }
+#sideMenuTitle p
+{
+	font-family: "Exo 2", sans-serif;
+	font-size: 17px;
+}
+#sideMenuTitle img
+{
+	display: block;
+	width: 15%;
+	margin: 10px;
+}
 #sideMenu > .button
 {
 	width: 100%;
@@ -2727,6 +2738,8 @@ a:hover { cursor: pointer }
 		padding: 5px 0 0 10px;
 		font-size: 24px;
 	}
+	#sideMenuTitle p
+	{ font-size: 20px }
 	#sideMenu > .button
 	{ font-size: 20px }
 	#sideMenu > .button .buttonChevron
@@ -2987,6 +3000,9 @@ a:hover { cursor: pointer }
 	{
 		font-size: 12px;
 	}
+
+	#sideMenuTitle p
+	{ font-size: 24px }
 }
 
 @media screen and (min-width: 1920px)
@@ -3449,6 +3465,8 @@ a:hover { cursor: pointer }
 		padding: 5px 10px;
 		font-size: 36px;
 	}
+	#sideMenuTitle p
+	{ font-size: 32px }
 	#sideMenu > .button
 	{ font-size: 26px }
 	#sideMenu > .button .buttonChevron

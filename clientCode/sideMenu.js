@@ -2,6 +2,8 @@
 
 import { strings } from "./strings.js";
 import { eventTypes } from "./event.js";
+import { postData } from "./utilities/fetchUtils.js";
+import { promptRefresh } from "./utilities/pandemicUtils.js";
 
 export default class sideMenu
 {
@@ -14,7 +16,7 @@ export default class sideMenu
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
         this.$hamburgerButton.click(() => this.toggle());
-        $("#btnReturnToMainMenu").click(() => window.location.replace("index.php"));
+        $("#btnReturnToMainMenu").click(() => this.navigateToMainMenu());
         this.resetAbandonButton();
     }
 
@@ -274,13 +276,44 @@ export default class sideMenu
                     <div id='btnCancelAbandon' class='button'>CANCEL</div>`)
             .children()
             .click((e) => e.stopPropagation())
-            .filter("#btnConfirmAbandon").click(() => alert("abandon!"))
+            .filter("#btnConfirmAbandon").click(() => this.abandonGame())
             .siblings("#btnCancelAbandon").click(() => this.resetAbandonButton());
+    }
+
+    abandonGame()
+    {
+        const { $menu, $hamburgerButton, $title } = this,
+            $boardContainer = $("#boardContainer");
+
+        $hamburgerButton
+            .add($menu.css("overflow-y", "hidden").children())
+            .add($boardContainer)
+            .add($boardContainer.children())
+            .css("pointer-events", "none")
+            .add(".pawnArrow")
+            .addClass("hidden");
+        
+        $title.html(`<p>ABANDONING GAME...</p><img src='images/loading.gif' alt='Abandoning game...' />`);
+        
+        postData("serverCode/actionPages/abandonGame.php", {})
+            .then(response =>
+            {
+                if (response.failure)
+                    return promptRefresh(response.failure);
+                
+                this.navigateToMainMenu()
+            })
+            .catch(e => promptRefresh(e.message));
+    }
+
+    navigateToMainMenu()
+    {
+        window.location.replace("index.php");
     }
 
     showHamburgerButton()
     {
-        $("#btnSideMenu").removeClass("hidden");
+        this.$hamburgerButton.removeClass("hidden");
     }
 }
 
