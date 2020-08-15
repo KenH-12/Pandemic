@@ -28,7 +28,7 @@ strings = {
         ["h5", "Turns"],
         turnInfo,
         ["h5", "<span id='actionsHeading'>Actions</span>"],
-        `During the "Do 4 actions" step, use the action buttons in the right panel to work toward discovering cures to all 4 diseases while preventing global catastrophy. Mouse over an action button's info icon (&#9432;) to view that action's rules.`,
+        `During the "Do 4 actions" step, use the action buttons in the right panel to work toward discovering cures to all 4 diseases while preventing global catastrophe. Mouse over an action button's info icon (&#9432;) to view that action's rules.`,
         "NOTE: you can perform movement actions by dragging and dropping an active pawn onto a <span class='hoverInfo validDestinationInfo'>valid destination</span>, and you can do the <span class='hoverInfo eventTypeInfo' data-eventType='td'>Treat Disease</span> action by clicking a disease cube at the active role's current location.",
         ["h5", "Event cards"],
         "Event cards can be <span class='hoverInfo eventCardInfo'>played</span> at any time (with a few <span class='hoverInfo eventCardExceptions'>exceptions</span>). Playing an Event card does not take an action.",

@@ -3,9 +3,6 @@ BUGS
 
 TO DO
 -----
-side menu
-	give up
-
 access keys
 	form to request a new key
 		details of request:
@@ -37,6 +34,8 @@ account creation
 last active
 
 main menu
+	rules / how to play
+	
 	if the user has won a game, the default difficulty should be normal (or perhaps the last selected difficulty)
 	role selection -- perhaps this can be saved for last since random roles is fine
 		use + / - buttons to add and remove roles
@@ -44,12 +43,6 @@ main menu
 		when 'randomize roles' is checked, show pawns with "?" on them
 
 load other js files only when necessary
-
-menu
-	rules / instructions / FAQ
-		describe info icons and .hoverInfo elements
-		mention the trophy and warning icons
-	resign button
 
 cross-browser compatabililty
 	animations

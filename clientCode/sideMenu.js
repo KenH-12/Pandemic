@@ -5,7 +5,7 @@ import { eventTypes } from "./event.js";
 import { postData } from "./utilities/fetchUtils.js";
 import { promptRefresh } from "./utilities/pandemicUtils.js";
 
-export default class sideMenu
+export default class SideMenu
 {
     constructor()
     {
