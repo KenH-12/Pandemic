@@ -22,7 +22,8 @@ import {
 	useRoleColorForRelatedActionButtons,
 	showLoadingGif,
 	updateConfirmButtonText,
-	promptRefresh
+	promptRefresh,
+	abandonGame
 } from "./utilities/pandemicUtils.js";
 import { strings } from "./strings.js";
 import getDimension from "./dimensions.js";
@@ -119,7 +120,7 @@ import instantiateTooltips, {
 	disableTooltipsWhileDragging,
 	enableTooltipsAfterDragging
 } from "./tooltipInstantiation.js";
-import SideMenu from "./sideMenu.js";
+import SideMenu, { SideMenuButton, ConfirmationButton } from "./sideMenu.js";
 
 $(function(){
 const playerDeckImgManager = new DeckImageManager({
@@ -128,7 +129,39 @@ const playerDeckImgManager = new DeckImageManager({
 		numImages: 7,
 		maxCardCount: false // to be set once gameData is retrieved
 	}),
-	sideMenu = new SideMenu();
+	sideMenu = new SideMenu([
+		new SideMenuButton("HELP",
+		{
+			isPrimaryButton: true,
+			descendantButtons: [
+				new SideMenuButton("How to play", { buttonID: "howToPlay" }),
+				new SideMenuButton("Where to find important info", { buttonID: "importantInfo" }),
+				new SideMenuButton("What just happened?", { buttonID: "whatJustHappened" }),
+				new SideMenuButton("Made a mistake?", { buttonID: "mistakes" })
+			]
+		}),
+		new SideMenuButton("RULES",
+		{
+			isPrimaryButton: true,
+			descendantButtons: [
+				new SideMenuButton("Objectives", { buttonID: "objectives" }),
+				new SideMenuButton("Play steps", { buttonID: "playSteps" }),
+				new SideMenuButton("Actions", { buttonID: "actionRules" }),
+				new SideMenuButton("Roles", { buttonID: "roleInfo" }),
+				new SideMenuButton("Cards", { buttonID: "cardInfo" }),
+				new SideMenuButton("Diseases", { buttonID: "diseaseInfo" }),
+				new SideMenuButton("Epidemics", { buttonID: "epidemicInfo" }),
+				new SideMenuButton("Outbreaks", { buttonID: "outbreakInfo" })
+			]
+		}),
+		new ConfirmationButton("btnAbandon", "ABANDON GAME", "ABANDON GAME?", abandonGame),
+		new SideMenuButton("RETURN TO <span class='nowrap'>MAIN MENU</span>",
+		{
+			buttonID: "btnReturnToMainMenu",
+			isExpandable: false,
+			onClick: () => window.location.replace("index.php")
+		})
+	]);
 
 function parseEvents(events)
 {

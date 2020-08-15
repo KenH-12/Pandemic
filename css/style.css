@@ -275,13 +275,13 @@ select
 	font-size: 20px;
 }
 #btnResumeGame,
-#btnConfirmAbandon
+#btnAbandon > .confirmationButton
 { margin-right: 2% }
 #btnAbandonGame,
-#btnConfirmAbandon
+#btnAbandon > .confirmationButton
 { background-color: rgb(204, 26, 29) }
 #btnAbandonGame:hover,
-#btnConfirmAbandon:hover
+#btnAbandon > .confirmationButton:hover
 { background-color: #ef282a }
 
 .smallText { font-size: 12px }

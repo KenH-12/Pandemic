@@ -5,6 +5,7 @@ import { eventTypes } from "../event.js";
 import { eventCards } from "../eventCard.js";
 import { getCity } from "../city.js";
 import { gameData, getPlayer, getActivePlayer } from "../gameData.js";
+import { postData } from "./fetchUtils.js";
 
 // Returns the Infection Rate (as seen on the Infection Rate Track on the game board)
 // which corresponds to the number of Epidemic cards drawn thus far.
@@ -299,6 +300,31 @@ function promptRefresh(error)
 	$("#boardImg").fadeTo(1000, 0.4);
 }
 
+function abandonGame()
+{
+	const $boardContainer = $("#boardContainer");
+
+	$("#btnSideMenu")
+		.add($("#sideMenu").css("overflow-y", "hidden").children())
+		.add($boardContainer)
+		.add($boardContainer.children())
+		.css("pointer-events", "none")
+		.add(".pawnArrow")
+		.addClass("hidden");
+	
+	$("#sideMenuTitle").html(`<p>ABANDONING GAME...</p><img src='images/loading.gif' alt='Abandoning game...' />`);
+	
+	postData("serverCode/actionPages/abandonGame.php", {})
+		.then(response =>
+		{
+			if (response.failure)
+				return promptRefresh(response.failure);
+			
+			window.location.replace("index.php");
+		})
+		.catch(e => promptRefresh(e.message));
+}
+
 export {
 	getInfectionRate,
 	getColorClass,
@@ -312,5 +338,6 @@ export {
 	activePlayerCanTakeFromResearcher,
 	showLoadingGif,
 	updateConfirmButtonText,
-	promptRefresh
+	promptRefresh,
+	abandonGame
 }

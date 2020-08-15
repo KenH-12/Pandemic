@@ -2,22 +2,28 @@
 
 import { strings } from "./strings.js";
 import { eventTypes } from "./event.js";
-import { postData } from "./utilities/fetchUtils.js";
-import { promptRefresh } from "./utilities/pandemicUtils.js";
 
 export default class SideMenu
 {
-    constructor()
+    constructor(sideMenuButtons)
     {
         this.$hamburgerButton = $("#btnSideMenu");
         this.$menu = $("#sideMenu");
         this.$title = $("#sideMenuTitle");
-        this.$btnAbandon = $("#btnAbandon");
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
+        this.confirmationButtons = [];
+        for (let menuButton of sideMenuButtons)
+        {
+            this.$menu.append(menuButton.$btn);
+
+            if (menuButton instanceof ConfirmationButton)
+                this.confirmationButtons.push(menuButton);
+            else if (menuButton.$secondaryButtonContainer)
+                menuButton.$secondaryButtonContainer.insertAfter(menuButton.$btn);
+        }
+
         this.$hamburgerButton.click(() => this.toggle());
-        $("#btnReturnToMainMenu").click(() => this.navigateToMainMenu());
-        this.resetAbandonButton();
     }
 
     toggle()
@@ -58,7 +64,7 @@ export default class SideMenu
     {
         this.$menu.children(".primaryButton").off("click");
         $("#boardContainer").off("mousedown");
-        this.resetAbandonButton();
+        this.resetConfirmationButtons();
     }
 
     closeIfOpen()
@@ -78,7 +84,7 @@ export default class SideMenu
             flipChevrons($menuItem);
             return this.hideSecondaryButtons($buttonContainer);
         }
-        this.resetAbandonButton();
+        this.resetConfirmationButtons();
         
         flipChevrons($menu.children(".primaryButton").not($menuItem));
         unflipChevrons($menuItem);
@@ -146,7 +152,7 @@ export default class SideMenu
             buttonIsTertiary = $clickedBtn.parent().hasClass(tertiaryButtonContainerClass),
             contentIsAlreadyExpanded = $clickedBtn.next().hasClass(contentClass) || $clickedBtn.next().hasClass(tertiaryButtonContainerClass);
         
-        this.resetAbandonButton();
+        this.resetConfirmationButtons();
         if (contentIsAlreadyExpanded)
         {
             flipChevrons($clickedBtn);
@@ -255,65 +261,85 @@ export default class SideMenu
         return Promise.resolve();
     }
 
-    resetAbandonButton()
+    resetConfirmationButtons()
     {
-        const { $btnAbandon } = this;
-        
-        $btnAbandon.html("ABANDON GAME")
-            .off("click")
-            .removeClass("confirming")
-            .click(() => this.promptAbandonGameConfirmation());
-    }
-
-    promptAbandonGameConfirmation()
-    {
-        const { $btnAbandon } = this;
-
-        $btnAbandon.off("click")
-            .addClass("confirming")
-            .html(`<p>ABANDON GAME?</p>
-                    <div id='btnConfirmAbandon' class='button'>CONFIRM</div>
-                    <div id='btnCancelAbandon' class='button'>CANCEL</div>`)
-            .children()
-            .click((e) => e.stopPropagation())
-            .filter("#btnConfirmAbandon").click(() => this.abandonGame())
-            .siblings("#btnCancelAbandon").click(() => this.resetAbandonButton());
-    }
-
-    abandonGame()
-    {
-        const { $menu, $hamburgerButton, $title } = this,
-            $boardContainer = $("#boardContainer");
-
-        $hamburgerButton
-            .add($menu.css("overflow-y", "hidden").children())
-            .add($boardContainer)
-            .add($boardContainer.children())
-            .css("pointer-events", "none")
-            .add(".pawnArrow")
-            .addClass("hidden");
-        
-        $title.html(`<p>ABANDONING GAME...</p><img src='images/loading.gif' alt='Abandoning game...' />`);
-        
-        postData("serverCode/actionPages/abandonGame.php", {})
-            .then(response =>
-            {
-                if (response.failure)
-                    return promptRefresh(response.failure);
-                
-                this.navigateToMainMenu()
-            })
-            .catch(e => promptRefresh(e.message));
-    }
-
-    navigateToMainMenu()
-    {
-        window.location.replace("index.php");
+        for (let btn of this.confirmationButtons)
+            btn.reset();
     }
 
     showHamburgerButton()
     {
         this.$hamburgerButton.removeClass("hidden");
+    }
+}
+
+export class SideMenuButton
+{
+    constructor(buttonText,
+        {
+            buttonID,
+            isPrimaryButton,
+            isExpandable = true,
+            descendantButtons,
+            onClick
+        } = {})
+    {
+        let cssClasses = "button";
+        
+        if (isPrimaryButton && Array.isArray(descendantButtons))
+        {
+            cssClasses += " primaryButton"
+            this.$secondaryButtonContainer = $("<div class='secondaryButtonContainer hidden'></div>");
+            
+            for (let descendant of descendantButtons)
+                this.$secondaryButtonContainer.append(descendant.$btn);
+        }
+        
+        this.$btn = $(`<div${ buttonID ? ` id='${buttonID}'` : "" } class='${cssClasses}'>
+                        ${buttonText}
+                        ${ isExpandable ? "<span class='buttonChevron rightChevron'>^</span>" : "" }
+                    </div>`);
+        
+        if (typeof onClick === "function")
+            this.$btn.click(onClick);
+    }
+}
+
+export class ConfirmationButton
+{
+    constructor(buttonID, buttonText, confirmationPromptText, onConfirm)
+    {
+        this.buttonText = buttonText;
+        this.confirmationPromptText = confirmationPromptText;
+        this.onConfirm = onConfirm;
+
+        this.$btn = new SideMenuButton(buttonText,
+            {
+                buttonID,
+                isExpandable: false,
+                onClick: () => this.promptConfirmation()
+            }).$btn;
+    }
+
+    promptConfirmation()
+    {
+        this.$btn.off("click")
+            .addClass("confirming")
+            .html(`<p>${this.confirmationPromptText}</p>
+                    <div class='button confirmationButton'>CONFIRM</div>
+                    <div class='button cancelButton'>CANCEL</div>`)
+            .children()
+            .click((e) => e.stopPropagation())
+            .filter(".confirmationButton").click(() => this.onConfirm())
+            .siblings(".cancelButton").click(() => this.reset());
+    }
+
+    reset()
+    {
+        this.$btn.html(this.buttonText)
+            .off("click")
+            .removeClass("confirming")
+            .click(() => this.promptConfirmation());
     }
 }
 
