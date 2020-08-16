@@ -129,7 +129,7 @@ const playerDeckImgManager = new DeckImageManager({
 		numImages: 7,
 		maxCardCount: false // to be set once gameData is retrieved
 	}),
-	sideMenu = new SideMenu([
+	sideMenu = new SideMenu($("button.hamburger"), [
 		new SideMenuButton("HELP",
 		{
 			isPrimaryButton: true,
@@ -161,7 +161,7 @@ const playerDeckImgManager = new DeckImageManager({
 			isExpandable: false,
 			onClick: () => window.location.replace("index.php")
 		})
-	]);
+	], { $closeMenuOnMousedown: $("#boardContainer") });
 
 function parseEvents(events)
 {

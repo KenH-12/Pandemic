@@ -304,7 +304,7 @@ function abandonGame()
 {
 	const $boardContainer = $("#boardContainer");
 
-	$("#btnSideMenu")
+	$("button.hamburger")
 		.add($("#sideMenu").css("overflow-y", "hidden").children())
 		.add($boardContainer)
 		.add($boardContainer.children())

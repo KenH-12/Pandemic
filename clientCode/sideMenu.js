@@ -5,11 +5,12 @@ import { eventTypes } from "./event.js";
 
 export default class SideMenu
 {
-    constructor(sideMenuButtons)
+    constructor($hamburgerButton, sideMenuButtons, { $closeMenuOnMousedown } = {})
     {
-        this.$hamburgerButton = $("#btnSideMenu");
+        this.$hamburgerButton = $hamburgerButton;
         this.$menu = $("#sideMenu");
         this.$title = $("#sideMenuTitle");
+        this.$closeMenuOnMousedown = $closeMenuOnMousedown;
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
         this.confirmationButtons = [];
@@ -44,20 +45,22 @@ export default class SideMenu
 
     open()
     {
-        const self = this,
-            $boardContainer = $("#boardContainer");
+        const { $menu, $closeMenuOnMousedown } = this,
+            self = this;
 
-        this.$menu.children(".primaryButton")
+        $menu.children(".primaryButton")
             .off("click")
             .click(function() { self.toggleContent($(this)) });
         
-        // Close the menu if the user clicks anywhere else
-        $boardContainer.off("mousedown")
-            .mousedown(function()
-            {
-                $boardContainer.off("mousedown");
-                self.toggle();
-            });
+        if ($closeMenuOnMousedown)
+        {
+            $closeMenuOnMousedown.off("mousedown")
+                .mousedown(function()
+                {
+                    $closeMenuOnMousedown.off("mousedown");
+                    self.toggle();
+                });
+        }
     }
 
     close()
