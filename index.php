@@ -33,6 +33,7 @@
                     <meta name='viewport' content='width=device-width, initial-scale=1'>
                     <link href='https://fonts.googleapis.com/css?family=Exo+2:800|Electrolize|Audiowide|Oswald:400,700|B612+Mono|Ropa+Sans&display=swap' rel='stylesheet'>
                     <link rel='stylesheet' type='text/css' href='css/style.css'>
+                    <link type='text/css' href='css/hamburgers.css' rel='stylesheet'>
                     <script src='clientCode/jquery-1.11.2.min.js'></script>
                     <script src='clientCode/jquery.easing.1.3.js'></script>
                     <script src='clientCode/utilities/miscUtils.js'></script>

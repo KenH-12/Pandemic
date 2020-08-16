@@ -1,6 +1,7 @@
 import ValidationError from "./utilities/validationError.js";
 import { postData, fetchHtml } from "./utilities/fetchUtils.js";
 import { strings } from "./strings.js";
+import SideMenu, { SideMenuButton } from "./sideMenu.js";
 
 const selectors = {
     lobbySelector: "#lobby",
@@ -126,13 +127,56 @@ function attemptLogin()
         .catch(e => serverOperationFailed(e.message));
 }
 
-function showMainMenu({ animate } = {})
+async function showMainMenu({ animate } = {})
 {
+    const $lobby = $(selectors.lobbySelector),
+        $hamburgerButton = $(`<button class='hamburger hamburger--spin' type='button'>
+                                <span class='hamburger-box'>
+                                    <span class='hamburger-inner'></span>
+                                </span>
+                            </button>`);
+
     if (animate !== false)
         animate = true;
     
-    removeAllDataAttributes($(selectors.lobbySelector).removeAttr("class"));
-    transitionPageContentTo("mainMenu.php", { animate, beforeShow: bindMainMenuEventListeners });
+    removeAllDataAttributes($lobby.removeAttr("class"));
+    await transitionPageContentTo("mainMenu.php", { animate, beforeShow: bindMainMenuEventListeners });
+
+    $hamburgerButton.add($("<div id='sideMenuTitle'>MENU</div><div id='sideMenu'></div>")).appendTo($lobby);
+    const sideMenu = new SideMenu($hamburgerButton, [
+        new SideMenuButton("HELP",
+		{
+			isPrimaryButton: true,
+			descendantButtons: [
+                new SideMenuButton("Overview", { buttonID: "overview" }),
+                new SideMenuButton("How to play", { buttonID: "mmHowToPlay" })
+			]
+        }),
+        new SideMenuButton("RULES",
+		{
+			isPrimaryButton: true,
+			descendantButtons: [
+                new SideMenuButton("Objectives", { buttonID: "objectives" }),
+				new SideMenuButton("Play steps", { buttonID: "playSteps" }),
+				new SideMenuButton("Actions", { buttonID: "actionRules" }),
+				new SideMenuButton("Roles", { buttonID: "roleInfo" }),
+				new SideMenuButton("Cards", { buttonID: "cardInfo" }),
+				new SideMenuButton("Diseases", { buttonID: "diseaseInfo" }),
+				new SideMenuButton("Epidemics", { buttonID: "epidemicInfo" }),
+				new SideMenuButton("Outbreaks", { buttonID: "outbreakInfo" })
+			]
+        }),
+        new SideMenuButton("LOGOUT",
+        {
+            buttonID: "btnLogout",
+            isExpandable: false
+        })
+    ]);
+
+    const resizeSideMenu = () => { sideMenu.$menu.height($(window).height()) }
+
+    $(window).off("resize").resize(resizeSideMenu);
+    resizeSideMenu();
 }
 
 function bindMainMenuEventListeners()

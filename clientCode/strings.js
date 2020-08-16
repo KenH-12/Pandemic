@@ -39,6 +39,11 @@ strings = {
         "Event cards can be <span class='hoverInfo eventCardInfo'>played</span> at any time (with a few <span class='hoverInfo eventCardExceptions'>exceptions</span>). Playing an Event card does not take an action.",
         eventCardDiscardRule
     ],
+    mmHowToPlay: [
+        "It is recommended that first time players begin a game on Introductory difficulty and learn as you go.",
+        "There is plenty of useful information that you can access via the in-game menu button in the top-right of the screen. Use the rules for assistance and clarification — feel free to consult whichever section is of interest to you (or just wing it).",
+        "Keep the objectives in mind and have fun!"
+    ],
     importantInfo: [
         ["h5", "General Information"],
         "Look for info icons (<span class='info' id='metaInfo'>&#9432;</span>) and words with a <span class='hoverInfo' id='metaHoverInfo'>blue underline</span> -- they can be moused over to see a tooltip containing more detailed information about something.",

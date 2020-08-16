@@ -3,6 +3,25 @@ BUGS
 
 TO DO
 -----
+main menu
+	side menu
+		help
+		logout button
+
+		determine content to include
+			remove references to the position of things on the board
+			fix/remove tooltips
+			fix/remove broken links
+		
+		instead of having a max-width set on the body, set it on the page header and contents
+			this will prevent the side menu from being hidden
+	
+	if the user has won a game, the default difficulty should be normal (or perhaps the last selected difficulty)
+	role selection -- perhaps this can be saved for last since random roles is fine
+		use + / - buttons to add and remove roles
+		show a pawn for each role
+		when 'randomize roles' is checked, show pawns with "?" on them
+
 access keys
 	form to request a new key
 		details of request:
@@ -32,15 +51,6 @@ account creation
 		forgot your password? process
 
 last active
-
-main menu
-	rules / how to play
-	
-	if the user has won a game, the default difficulty should be normal (or perhaps the last selected difficulty)
-	role selection -- perhaps this can be saved for last since random roles is fine
-		use + / - buttons to add and remove roles
-		show a pawn for each role
-		when 'randomize roles' is checked, show pawns with "?" on them
 
 load other js files only when necessary
 
