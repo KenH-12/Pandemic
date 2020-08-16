@@ -22,6 +22,11 @@ const turnInfo = `Each of the 3 "PLAY" steps (top-right of the screen behind thi
     ],
     dragAndDropInfo = "* You can do this action by dragging and dropping a pawn onto a <span class='hoverInfo validDestinationInfo abbrev'>valid destination</span>.",
 strings = {
+    overview: [
+        "Do you have what it takes to save humanity? As skilled members of a disease-fighting team, you must keep four deadly diseases at bay while discovering their cures.",
+        "Travel across the globe, treating infections while finding resources for cures. Your team must work together, using the individual strengths of each role, to succeed.",
+        "The clock is ticking as outbreaks and epidemics fuel the spreading plagues. Can you find all four cures in time? The fate of humanity is in your hands!"
+    ],
     howToPlay: [
         "If you are ever unsure of how to proceed, look to the right panel (behind this menu) for prompts or clues.",
         "Keep the <a data-section='objectives'>objectives</a> in mind when you are deciding what to do next.",

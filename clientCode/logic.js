@@ -134,6 +134,7 @@ const playerDeckImgManager = new DeckImageManager({
 		{
 			isPrimaryButton: true,
 			descendantButtons: [
+				new SideMenuButton("Overview", { buttonID: "overview" }),
 				new SideMenuButton("How to play", { buttonID: "howToPlay" }),
 				new SideMenuButton("Where to find important info", { buttonID: "importantInfo" }),
 				new SideMenuButton("What just happened?", { buttonID: "whatJustHappened" }),
