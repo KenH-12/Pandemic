@@ -109,12 +109,13 @@ export default class SideMenu
         this.resetConfirmationButtons();
         
         flipChevrons($menu.children(".primaryButton").not($menuItem));
-        unflipChevrons($menuItem);
         this.showSecondaryButtons($buttonContainer);
     }
 
     async showSecondaryButtons($containerToShow, { $contentToShow } = {})
     {
+        unflipChevrons($containerToShow.prev());
+
         await Promise.all([
             this.hideSecondaryButtons($(this.buttonContainerSelector).not(".hidden").not($containerToShow)),
             expand($containerToShow)
@@ -258,10 +259,19 @@ export default class SideMenu
             sectionID = $clickedLink.attr("data-section"),
             scrollToID = $clickedLink.attr("data-scrollToId"),
             $secondaryButton = $menu.find(`#${sectionID}`),
-            $containerToShow = $secondaryButton.parent();
+            $containerToShow = $secondaryButton.parent(),
+            $currentContent = $(".sideMenuContent");
 
         if ($containerToShow.hasClass("hidden"))
+        {
+            if ($currentContent.length && $currentContent.prev().hasClass("primaryButton"))
+            {
+                flipChevrons($currentContent.prev());
+                await this.hideContent($currentContent);
+            }
+
             await this.showSecondaryButtons($containerToShow, { $contentToShow: $secondaryButton });
+        }
         else
             await this.showContent($secondaryButton, { navigatingViaLink: true });
         
