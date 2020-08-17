@@ -129,7 +129,8 @@ function attemptLogin()
 
 async function showMainMenu({ animate } = {})
 {
-    const $lobby = $(selectors.lobbySelector);
+    const $lobby = $(selectors.lobbySelector),
+        $sideMenu = $("#sideMenu");
 
     if (animate !== false)
         animate = true;
@@ -137,7 +138,40 @@ async function showMainMenu({ animate } = {})
     removeAllDataAttributes($lobby.removeAttr("class"));
     await transitionPageContentTo("mainMenu.php", { animate, beforeShow: bindMainMenuEventListeners });
 
-    $("<div id='sideMenu'></div>").appendTo($lobby);
+    if (!$sideMenu.length)
+        appendSideMenu();
+}
+
+function bindMainMenuEventListeners()
+{
+    if ($("#gameInProgress").length)
+    {
+        let $this;
+        $(".roleTag").each(function()
+        {
+            $this = $(this);
+            $this.addClass(toCamelCase($this.html()));
+        });
+
+        $("#btnResumeGame").click(() => window.location.replace("game.php"));
+        $("#btnAbandonGame").click(promptAbandonGame);
+
+        return false;
+    }
+    
+    $("#btnPlay").click(function()
+    {
+        $(this).off("click").addClass("btnDisabled")
+            .html("CREATING GAME...")
+            .append(strings.loadingGifHtml);
+        createGame();
+    });
+}
+
+function appendSideMenu()
+{
+    $(selectors.lobbySelector).append("<div id='sideMenu'></div>");
+
     const sideMenu = new SideMenu([
         new SideMenuButton("OVERVIEW",
 		{
@@ -174,32 +208,6 @@ async function showMainMenu({ animate } = {})
 
     $(window).off("resize").resize(resizeSideMenu);
     resizeSideMenu();
-}
-
-function bindMainMenuEventListeners()
-{
-    if ($("#gameInProgress").length)
-    {
-        let $this;
-        $(".roleTag").each(function()
-        {
-            $this = $(this);
-            $this.addClass(toCamelCase($this.html()));
-        });
-
-        $("#btnResumeGame").click(() => window.location.replace("game.php"));
-        $("#btnAbandonGame").click(promptAbandonGame);
-
-        return false;
-    }
-    
-    $("#btnPlay").click(function()
-    {
-        $(this).off("click").addClass("btnDisabled")
-            .html("CREATING GAME...")
-            .append(strings.loadingGifHtml);
-        createGame();
-    });
 }
 
 function attemptAccess()
