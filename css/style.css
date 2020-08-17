@@ -2197,6 +2197,8 @@ button.hamburger:not(.is-active)
 	top: 0;
 	margin-top: 0;
 	filter: drop-shadow(-5px 0px 5px #000);
+	border: none;
+	width: 25%;
 }
 #sideMenu,
 #sideMenuTitle
@@ -2207,6 +2209,8 @@ button.hamburger:not(.is-active)
 #sideMenu.is-active,
 #sideMenuTitle.is-active
 { left: var(--board-width-percentage) }
+#lobby #sideMenu.is-active
+{ left: 75% }
 #sideMenu.is-active,
 #sideMenu:not(.is-active),
 #sideMenuTitle.is-active,

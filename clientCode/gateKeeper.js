@@ -144,9 +144,9 @@ async function showMainMenu({ animate } = {})
             buttonID: "overview",
             isPrimaryButton: true
         }),
-        new SideMenuButton("HOW TO PLAY",
+        new SideMenuButton("GETTING STARTED",
         {
-            buttonID: "mmHowToPlay",
+            buttonID: "gettingStarted",
             isPrimaryButton: true
         }),
         new SideMenuButton("RULES",
