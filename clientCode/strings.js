@@ -40,9 +40,9 @@ strings = {
         eventCardDiscardRule
     ],
     mmHowToPlay: [
-        "It is recommended that first time players begin a game on Introductory difficulty and learn as you go.",
+        "It is recommended that first-time players begin a game with only 2 roles on Introductory difficulty and learn as they go.",
         "There is plenty of useful information that you can access via the in-game menu button in the top-right of the screen. Use the rules for assistance and clarification — feel free to consult whichever section is of interest to you (or just wing it).",
-        "Keep the objectives in mind and have fun!"
+        "Keep the <a data-section='objectives'>objectives</a> in mind and have fun!"
     ],
     importantInfo: [
         ["h5", "General Information"],

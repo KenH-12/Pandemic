@@ -5,11 +5,11 @@ import { eventTypes } from "./event.js";
 
 export default class SideMenu
 {
-    constructor($hamburgerButton, sideMenuButtons, { $closeMenuOnMousedown } = {})
+    constructor(sideMenuButtons, { $hamburgerButton, $closeMenuOnMousedown } = {})
     {
-        this.$hamburgerButton = $hamburgerButton;
         this.$menu = $("#sideMenu");
         this.$title = $("#sideMenuTitle");
+        this.$hamburgerButton = $hamburgerButton;
         this.$closeMenuOnMousedown = $closeMenuOnMousedown;
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
@@ -24,33 +24,51 @@ export default class SideMenu
                 menuButton.$secondaryButtonContainer.insertAfter(menuButton.$btn);
         }
 
-        this.$hamburgerButton.click(() => this.toggle());
+        if ($hamburgerButton)
+            $hamburgerButton.click(() => this.toggle());
+        else
+            this.toggle();
     }
 
     toggle()
     {
         const { $hamburgerButton, $menu, $title } = this,
-            active = "is-active";
+            active = "is-active",
+            toggle = $menu.hasClass(active) ? "close" : "open";
         
-        let method = "open";
-        if ($hamburgerButton.hasClass(active))
-            method = "close";
+        let $elementsToToggle = $menu.add($title)
         
-        $hamburgerButton.add($menu)
-            .add($title)
-            .toggleClass(active);
+        if ($hamburgerButton)
+            $elementsToToggle = $elementsToToggle.add($hamburgerButton);
         
-        this[method]();
+        
+        $elementsToToggle.toggleClass(active);
+        this[toggle]();
     }
 
     open()
     {
-        const { $menu, $closeMenuOnMousedown } = this,
+        const {
+                $menu,
+                buttonContainerSelector,
+                $closeMenuOnMousedown
+            } = this,
             self = this;
 
+        let $this;
         $menu.children(".primaryButton")
             .off("click")
-            .click(function() { self.toggleContent($(this)) });
+            .click(function()
+            {
+                $this = $(this);
+                
+                if ($this.next().filter(buttonContainerSelector).length)
+                    return self.toggleContent($this);
+
+                flipChevrons($(".primaryButton").not($this));
+                self.hideSecondaryButtons($(buttonContainerSelector).not(".hidden"));
+                self.showContent($this);
+            });
         
         if ($closeMenuOnMousedown)
         {
@@ -81,12 +99,13 @@ export default class SideMenu
         const { buttonContainerSelector, $menu } = this,
             $buttonContainer = $menuItem.next(buttonContainerSelector).stop(),
             isExpanded = $menuItem.next().not(".hidden").length;
-        
+
         if (isExpanded)
         {
             flipChevrons($menuItem);
             return this.hideSecondaryButtons($buttonContainer);
         }
+        this.hideContent($(".sideMenuContent"));
         this.resetConfirmationButtons();
         
         flipChevrons($menu.children(".primaryButton").not($menuItem));
@@ -272,6 +291,9 @@ export default class SideMenu
 
     showHamburgerButton()
     {
+        if (!this.$hamburgerButton)
+            return false;
+        
         this.$hamburgerButton.removeClass("hidden");
     }
 }
@@ -289,13 +311,17 @@ export class SideMenuButton
     {
         let cssClasses = "button";
         
-        if (isPrimaryButton && Array.isArray(descendantButtons))
+        if (isPrimaryButton)
         {
-            cssClasses += " primaryButton"
-            this.$secondaryButtonContainer = $("<div class='secondaryButtonContainer hidden'></div>");
+            cssClasses += " primaryButton";
+
+            if (Array.isArray(descendantButtons))
+            {
+                this.$secondaryButtonContainer = $("<div class='secondaryButtonContainer hidden'></div>");
             
-            for (let descendant of descendantButtons)
-                this.$secondaryButtonContainer.append(descendant.$btn);
+                for (let descendant of descendantButtons)
+                    this.$secondaryButtonContainer.append(descendant.$btn);
+            }
         }
         
         this.$btn = $(`<div${ buttonID ? ` id='${buttonID}'` : "" } class='${cssClasses}'>

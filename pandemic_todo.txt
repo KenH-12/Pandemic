@@ -5,6 +5,8 @@ TO DO
 -----
 main menu
 	side menu
+		auto-scrolling to section titles needs to be fixed for the main menu
+
 		help
 		logout button
 

@@ -2168,11 +2168,6 @@ button.hamburger
 	border-bottom: 1px solid #fff;
 	background-color: var(--button-background);
 }
-#lobby button.hamburger
-{
-	top: -1px;
-	right: 0;
-}
 button.hamburger:hover,
 .hamburger:hover
 { background-color: var(--button-background-bright) }
@@ -2197,10 +2192,10 @@ button.hamburger:not(.is-active)
 	overflow-x: hidden;
 	margin-top: 28px;
 }
-#lobby #sideMenu,
-#lobby #sideMenuTitle
+#lobby #sideMenu
 {
 	top: 0;
+	margin-top: 0;
 	filter: drop-shadow(-5px 0px 5px #000);
 }
 #sideMenu,

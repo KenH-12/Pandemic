@@ -129,12 +129,7 @@ function attemptLogin()
 
 async function showMainMenu({ animate } = {})
 {
-    const $lobby = $(selectors.lobbySelector),
-        $hamburgerButton = $(`<button class='hamburger hamburger--spin' type='button'>
-                                <span class='hamburger-box'>
-                                    <span class='hamburger-inner'></span>
-                                </span>
-                            </button>`);
+    const $lobby = $(selectors.lobbySelector);
 
     if (animate !== false)
         animate = true;
@@ -142,15 +137,17 @@ async function showMainMenu({ animate } = {})
     removeAllDataAttributes($lobby.removeAttr("class"));
     await transitionPageContentTo("mainMenu.php", { animate, beforeShow: bindMainMenuEventListeners });
 
-    $hamburgerButton.add($("<div id='sideMenuTitle'>MENU</div><div id='sideMenu'></div>")).appendTo($lobby);
-    const sideMenu = new SideMenu($hamburgerButton, [
-        new SideMenuButton("HELP",
+    $("<div id='sideMenu'></div>").appendTo($lobby);
+    const sideMenu = new SideMenu([
+        new SideMenuButton("OVERVIEW",
 		{
-			isPrimaryButton: true,
-			descendantButtons: [
-                new SideMenuButton("Overview", { buttonID: "overview" }),
-                new SideMenuButton("How to play", { buttonID: "mmHowToPlay" })
-			]
+            buttonID: "overview",
+            isPrimaryButton: true
+        }),
+        new SideMenuButton("HOW TO PLAY",
+        {
+            buttonID: "mmHowToPlay",
+            isPrimaryButton: true
         }),
         new SideMenuButton("RULES",
 		{
