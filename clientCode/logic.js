@@ -162,7 +162,12 @@ const playerDeckImgManager = new DeckImageManager({
 			isExpandable: false,
 			onClick: () => window.location.replace("index.php")
 		})
-	], { $hamburgerButton: $("button.hamburger"), $closeMenuOnMousedown: $("#boardContainer") });
+	],
+	{
+		$hamburgerButton: $("button.hamburger"),
+		$title: $("#sideMenuTitle"),
+		$closeMenuOnMousedown: $("#boardContainer")
+	});
 
 function parseEvents(events)
 {

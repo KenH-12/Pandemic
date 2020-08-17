@@ -5,11 +5,11 @@ import { eventTypes } from "./event.js";
 
 export default class SideMenu
 {
-    constructor(sideMenuButtons, { $hamburgerButton, $closeMenuOnMousedown } = {})
+    constructor(sideMenuButtons, { $hamburgerButton, $title, $closeMenuOnMousedown } = {})
     {
         this.$menu = $("#sideMenu");
-        this.$title = $("#sideMenuTitle");
         this.$hamburgerButton = $hamburgerButton;
+        this.$title = $title;
         this.$closeMenuOnMousedown = $closeMenuOnMousedown;
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
@@ -32,17 +32,11 @@ export default class SideMenu
 
     toggle()
     {
-        const { $hamburgerButton, $menu, $title } = this,
+        const { $menu, $hamburgerButton, $title } = this,
             active = "is-active",
             toggle = $menu.hasClass(active) ? "close" : "open";
         
-        let $elementsToToggle = $menu.add($title)
-        
-        if ($hamburgerButton)
-            $elementsToToggle = $elementsToToggle.add($hamburgerButton);
-        
-        
-        $elementsToToggle.toggleClass(active);
+        $menu.add($title).add($hamburgerButton).toggleClass(active);
         this[toggle]();
     }
 
