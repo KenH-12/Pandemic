@@ -2342,22 +2342,22 @@ button.hamburger:not(.is-active)
 }
 .tertiaryButtonContainer .sideMenuContent
 { margin-left: 9% }
-.sideMenuContent h5,
-.sideMenuContent .subheading
-{ font-size: 16px }
+.sideMenuContent h4,
 .sideMenuContent h5
+{ font-size: 16px }
+.sideMenuContent h4
 {
 	font-family: 'Exo 2', sans-serif;
 	border-bottom: 1px solid #fff;
 	display: inline-block;
 }
+.sideMenuContent h5
+{
+	font-weight: 400;
+	text-decoration: underline;
+}
 .sideMenuContent p
 { margin-bottom: 4px }
-.sideMenuContent .subheading
-{
-	text-decoration: underline;
-	display: block;
-}
 .sideMenuContent .hoverInfo
 { font-size: 13px }
 #metaInfo.info
@@ -2782,8 +2782,8 @@ button.hamburger:not(.is-active)
 		font-size: 16px;
 		line-height: 18px;
 	}
-	.sideMenuContent h5,
-	.sideMenuContent .subheading
+	.sideMenuContent h4,
+	.sideMenuContent h5
 	{ font-size: 17px }
 	.sideMenuContent p
 	{ margin-bottom: 5px }
@@ -3525,8 +3525,8 @@ button.hamburger:not(.is-active)
 		font-size: 18px;
 		line-height: 22px;
 	}
-	.sideMenuContent h5,
-	.sideMenuContent .subheading
+	.sideMenuContent h4,
+	.sideMenuContent h5
 	{ font-size: 20px }
 	.sideMenuContent p
 	{ margin-bottom: 8px }

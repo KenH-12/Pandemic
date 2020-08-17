@@ -168,7 +168,7 @@ async function showMainMenu({ animate } = {})
             buttonID: "btnLogout",
             isExpandable: false
         })
-    ]);
+    ], { omitContentSelector: ".inGameOnly" });
 
     const resizeSideMenu = () => { sideMenu.$menu.height($(window).height()) }
 

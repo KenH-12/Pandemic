@@ -5,12 +5,19 @@ import { eventTypes } from "./event.js";
 
 export default class SideMenu
 {
-    constructor(sideMenuButtons, { $hamburgerButton, $title, $closeMenuOnMousedown } = {})
+    constructor(sideMenuButtons,
+        {
+            $hamburgerButton,
+            $title,
+            $closeMenuOnMousedown,
+            omitContentSelector
+        } = {})
     {
         this.$menu = $("#sideMenu");
         this.$hamburgerButton = $hamburgerButton;
         this.$title = $title;
         this.$closeMenuOnMousedown = $closeMenuOnMousedown;
+        this.omitContentSelector = omitContentSelector;
         this.buttonContainerSelector = ".secondaryButtonContainer";
 
         this.confirmationButtons = [];
@@ -215,12 +222,13 @@ export default class SideMenu
             for (let key in content)
             {
                 member = content[key];
-                tagName = key.includes("Heading") ? "h5" : "p";
+                tagName = key.includes("Heading") ? "h4" : key.includes("Subheading") ? "h5" : "p";
                     
                 for (let string of ensureIsArray(member))
                     appendHtmlToContainer($container, tagName, string);
             }
 
+            this.removeOmittableContent($container);
             return false;
         }
         
@@ -236,6 +244,14 @@ export default class SideMenu
             
             appendHtmlToContainer($container, tagName, p);
         }
+
+        this.removeOmittableContent($container);
+    }
+
+    removeOmittableContent($container)
+    {
+        if (this.omitContentSelector)
+            $container.find(this.omitContentSelector).remove();
     }
 
     bindLinkClicks()
