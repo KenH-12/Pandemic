@@ -275,6 +275,7 @@ select
 	font-size: 20px;
 }
 #btnResumeGame,
+#btnConfirmAbandon,
 #btnAbandon > .confirmationButton
 { margin-right: 2% }
 #btnAbandonGame,

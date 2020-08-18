@@ -4,10 +4,9 @@ BUGS
 TO DO
 -----
 main menu
-	side menu
-		fix the abandon game ok/cancel button spacing
+	tooltips for difficulty and number of roles
 
-		help
+	side menu
 		logout button
 
 		determine content to include
