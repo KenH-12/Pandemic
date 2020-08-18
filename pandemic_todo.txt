@@ -3,14 +3,11 @@ BUGS
 
 TO DO
 -----
-main menu
-	tooltip shadows should match the heading shadow
+fullscreen recommendation
 
+main menu
 	side menu
 		logout button
-		
-		instead of having a max-width set on the body, set it on the page header and contents
-			this will prevent the side menu from being hidden
 	
 	if the user has won a game, the default difficulty should be normal (or perhaps the last selected difficulty)
 	role selection -- perhaps this can be saved for last since random roles is fine

@@ -46,9 +46,10 @@ body
 	-moz-user-select: none;      /* Firefox */
 	-ms-user-select: none;       /* Internet Explorer/Edge */
 
-	min-width: 1024px;
 	max-width: 1920px;
 }
+body:not(#index)
+{ min-width: 1024px }
 input, select { background-color: #fff }
 input[type='text'],
 input[type='password']
@@ -2216,6 +2217,7 @@ button.hamburger:not(.is-active)
 	filter: drop-shadow(-2px 0px 4px #000);
 	border: none;
 	width: 25%;
+	min-width: 210px;
 }
 #sideMenu,
 #sideMenuTitle
@@ -2366,7 +2368,6 @@ button.hamburger:not(.is-active)
 {
 	font-family: 'Exo 2', sans-serif;
 	border-bottom: 1px solid #fff;
-	display: inline-block;
 }
 .sideMenuContent h5
 {

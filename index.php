@@ -42,7 +42,7 @@
                     <script src='clientCode/utilities/tooltipUtils.js'></script>
                     <script src='clientCode/gateKeeper.js' type='module'></script>
                 </head>
-                <body>
+                <body id='index'>
                     <div id='lobby' class='hidden'
                         data-loggedIn='$loggedIn'
                         data-verified='$verified'
