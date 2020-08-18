@@ -72,8 +72,15 @@ input[type='password']
 }
 #header,
 #lobby .tooltip,
-#lobby .roleCard
+#lobby .roleCard,
+#btnPlay:not(.btnDisabled):hover,
+#gameInProgress .button:not(.btnDisabled):hover
 { filter: drop-shadow(5px 5px 5px #000) }
+#btnPlay:not(:hover),
+#btnPlay:hover,
+#gameInProgress .button:not(:hover),
+#gameInProgress .button:hover
+{ transition: filter .2s }
 #header p { padding-bottom: 4px }
 #header *
 { margin-left: var(--lobby-padding) }
@@ -289,7 +296,6 @@ select
 #btnAbandonGame,
 #btnAbandon > .confirmationButton
 { background-color: rgb(204, 26, 29) }
-#btnAbandonGame:hover,
 #btnAbandon > .confirmationButton:hover
 { background-color: #ef282a }
 
@@ -1619,8 +1625,8 @@ span.r, p.r {color: #ef282a; background: none !important }
 .button.flashing,
 .button-secondary-color { transition: background-color 0.6s }
 
-.button:hover,
-.button:focus,
+.button:not(#btnPlay):not(#gameInProgress .button):hover,
+.button:not(#btnPlay):not(#gameInProgress .button):focus,
 .btnSkip:hover,
 #btnUndo:hover
 { background-color: var(--button-background-bright) }
