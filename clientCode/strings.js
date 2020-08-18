@@ -20,7 +20,7 @@ const turnInfo = `Each of the 3 Play steps <span class='inGameOnly'>(top-right o
         "When cities of an eradicated disease are infected, no new disease cubes are placed there.",
         "Eradicating a disease is not needed to win; once all diseases are cured, the game ends and your team wins immediately!"
     ],
-    dragAndDropInfo = "* You can do this action by dragging and dropping a pawn onto a <span class='hoverInfo validDestinationInfo abbrev'>valid destination</span>.",
+    dragAndDropInfo = "<span class='inGameOnly'>* You can do this action by dragging and dropping a pawn onto a <span class='hoverInfo validDestinationInfo abbrev'>valid destination</span>.</span>",
 strings = {
     overview: [
         "Do you have what it takes to save humanity? As skilled members of a disease-fighting team, you must keep four deadly diseases at bay while discovering their cures.",
@@ -99,7 +99,7 @@ strings = {
         tertiaryButtons: true,
         driveFerry: [
             "Move to a city connected by a white line to the one you are in.",
-            "NOTE: San Francisco is connected Tokyo and Manila, and Los Angeles is connected to Sydney.",
+            "<span class='inGameOnly'>NOTE: San Francisco is connected Tokyo and Manila, and Los Angeles is connected to Sydney.</span>",
             dragAndDropInfo
         ],
         directFlight: [
@@ -121,7 +121,7 @@ strings = {
         treatDisease: [
             "Remove 1 disease cube from the city you are in, returning it to the Disease Cube Supply.",
             "If the disease has been cured, remove all cubes of that colour from the city you are in.",
-            "* You can do this action by clicking a disease cube at the active role's current location.",
+            "<span class='inGameOnly'>* You can do this action by clicking a disease cube at the active role's current location.</span>",
             "Learn more about diseases here: <a data-section='diseaseInfo' data-scrollToId='diseaseInfo' class='nowrap'>Rules -> Diseases</a>"
         ],
         shareKnowledge: [
