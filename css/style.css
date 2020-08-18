@@ -64,7 +64,7 @@ input[type='password']
 	background: transparent;
 }
 #lobby,
-#lobby .content .button
+#lobby > .content .button
 { font-family: 'Ropa sans', sans-serif }
 #header
 {
@@ -97,16 +97,16 @@ input[type='password']
 #lobby input:not([type='radio']),
 .inlineButton
 { height: 24px }
-#lobby .content > h1, #lobby h2
+#lobby > .content > h1, #lobby h2
 {
 	font-family: 'Audiowide';
 	font-weight: 400;
 }
-#lobby .content > h1
+#lobby > .content > h1
 {
 	font-size: 30px;
 }
-#lobby .content > p
+#lobby > .content > p
 {
 	margin-bottom: calc(var(--lobby-padding)/2);
 }
@@ -131,7 +131,7 @@ input[type='password']
 {
 	margin-top: 8px;
 }
-#lobby .content .button:not(#btnAttemptAccess):not(#btnVerify)
+#lobby > .content .button:not(#btnAttemptAccess):not(#btnVerify)
 {
 	font-size: 26px;
 	line-height: 26px;
@@ -227,14 +227,14 @@ select
 	margin-left: 0;
 	border-radius: var(--lobby-control-border-radius);
 }
-#lobby .content .button .loadingGif
+#lobby > .content .button .loadingGif
 {
 	width: 80%;
 	margin-left: 10%;
 	margin-top: 16px;
 }
-#lobby .content .button .loadingGif img { width: 30px }
-#lobby .content .button.btnDisabled
+#lobby > .content .button .loadingGif img { width: 30px }
+#lobby > .content .button.btnDisabled
 {
 	background-color: #0a597a;
 	color: #aaa;

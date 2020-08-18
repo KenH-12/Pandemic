@@ -5,9 +5,8 @@ TO DO
 -----
 main menu
 	side menu
-		tooltips
-			fix warning icon spacing
-
+		role card style
+		
 		help
 		logout button
 
