@@ -55,7 +55,16 @@ function bindSideMenuHoverEvents({ mainMenu } = {})
 {
 	const containerSelector = mainMenu ? "#lobby" : "#container";
 
-	if (!mainMenu)
+	if (mainMenu)
+	{
+		new Tooltip({
+			hoverElementSelector: "#lobby .info",
+			getContent: ({ $hoveredElement }) => strings[$hoveredElement.attr("id")],
+			containerSelector,
+			juxtaposition: "right"
+		}).bindHoverEvents();
+	}
+	else
 	{
 		new Tooltip({
 			content: "Info icons are littered throughout the interface. Use them to familiarize yourself with the rules!",

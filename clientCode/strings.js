@@ -22,6 +22,10 @@ const turnInfo = `Each of the 3 Play steps <span class='inGameOnly'>(top-right o
     ],
     dragAndDropInfo = "<span class='inGameOnly'>* You can do this action by dragging and dropping a pawn onto a <span class='hoverInfo validDestinationInfo abbrev'>valid destination</span>.</span>",
 strings = {
+    introductoryInfo: "<p>[4 Epidemics]</p><p>Recommended for first-time players.</p>",
+    standardInfo: "<p>[5 Epidemics]</p><p>Recommended for players who have some familiarity with the rules.</p>",
+    heroicInfo: "<p>[6 Epidemics]</p><p>Recommended for players who have mastered the standard game.</p>",
+    numberOfRolesInfo: "<p>If you are playing alone, it is recommended that you play with only 2 roles for your first game.</p><p>With more roles, there are more special abilities available to you, but it will be more difficult to keep track of everything.</p>",
     overview: [
         "Do you have what it takes to save humanity? As skilled members of a disease-fighting team, you must keep four deadly diseases at bay while discovering their cures.",
         "Travel across the globe, treating infections while finding resources for cures. Your team must work together, using the individual strengths of each role, to succeed.",

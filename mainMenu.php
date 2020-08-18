@@ -82,18 +82,18 @@
         else
         {
             $content = "<div class='divInputControl'>
-                            <label for='radDifficulty' class='subtitle'>Select Difficulty:</label>
+                            <label for='radDifficulty' class='subtitle'>Difficulty:</label>
                             <div>
                                 <input type='radio' name='radDifficulty' id='radIntroductory' value='4' checked='checked'>
-                                <label for='radIntroductory'>Introductory</label>
+                                <label for='radIntroductory'>Introductory</label><span id='introductoryInfo' class='info'>&#9432;</span>
                             </div>
                             <div>
                                 <input type='radio' name='radDifficulty' id='radStandard' value='5'>
-                                <label for='radStandard'>Standard</label>
+                                <label for='radStandard'>Standard</label><span id='standardInfo' class='info'>&#9432;</span>
                             </div>
                             <div>
                                 <input type='radio' name='radDifficulty' id='radHeroic' value='6'>
-                                <label for='radHeroic'>Heroic</label>
+                                <label for='radHeroic'>Heroic</label><span id='heroicInfo' class='info'>&#9432;</span>
                             </div>
                         </div>
         
@@ -104,6 +104,7 @@
                                 <option value='3'>3</option>
                                 <option value='4'>4</option>
                             </select>
+                            <span id='numberOfRolesInfo' class='info'>&#9432;</span>
                         </div>
         
                         <div id='btnPlay' class='button'>PLAY</div>";
