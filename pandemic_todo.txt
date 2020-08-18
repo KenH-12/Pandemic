@@ -5,8 +5,8 @@ TO DO
 -----
 main menu
 	side menu
-		role card style
-		
+		fix the abandon game ok/cancel button spacing
+
 		help
 		logout button
 

@@ -223,7 +223,6 @@ function bindRoleCardHoverEvents()
     {
         $this = $(this);
         role = $this.html();
-        console.log(role);
         camelCaseRole = toCamelCase(role);
         offset = $this.offset();
 

@@ -1522,6 +1522,8 @@ span.r, p.r {color: #ef282a; background: none !important }
 	width: 20%;
 	border-radius: 8px;
 }
+#lobby .roleCard
+{ width: 16% }
 .roleCard,
 #boardContainer > .eventCardFull,
 #boardContainer > .epidemicFull,
@@ -3012,6 +3014,9 @@ button.hamburger:not(.is-active)
 
 	#sideMenuTitle p
 	{ font-size: 24px }
+
+	#lobby .roleCard
+	{ width: 14% }
 }
 
 @media screen and (min-width: 1920px)
@@ -3304,14 +3309,12 @@ button.hamburger:not(.is-active)
 	}
 
 	.roleCard
-	{
-		width: 16%;
-	}
+	{ width: 16% }
+	#lobby .roleCard
+	{ width: 13% }
 	.roleCard,
 	.eventCardFull
-	{
-		font-size: 18px;
-	}
+	{ font-size: 18px }
 	.roleCard h3,
 	.eventCardFull h3,
 	#actionPrompt > .eventCardFull h3
