@@ -69,8 +69,11 @@ input[type='password']
 #header
 {
 	width: var(--lobby-full-width);
-	filter: drop-shadow(5px 5px 5px #000);
 }
+#header,
+#lobby .tooltip,
+#lobby .roleCard
+{ filter: drop-shadow(5px 5px 5px #000) }
 #header p { padding-bottom: 4px }
 #header *
 { margin-left: var(--lobby-padding) }
@@ -2204,7 +2207,7 @@ button.hamburger:not(.is-active)
 {
 	top: 0;
 	margin-top: 0;
-	filter: drop-shadow(-5px 0px 5px #000);
+	filter: drop-shadow(-2px 0px 4px #000);
 	border: none;
 	width: 25%;
 }
