@@ -51,21 +51,24 @@ export default function instantiateTooltips()
 
 const containerSelector = "#boardContainer";
 
-function bindSideMenuHoverEvents()
+function bindSideMenuHoverEvents({ mainMenu } = {})
 {
-	const containerSelector = "#container";
+	const containerSelector = mainMenu ? "#lobby" : "#container";
 
-	new Tooltip({
-		content: "Info icons are littered throughout the interface. Use them to familiarize yourself with the rules!",
-		hoverElementSelector: "#metaInfo",
-		containerSelector
-	}).bindHoverEvents();
-
-	new Tooltip({
-		content: "Words or phrases underlined in blue require a bit of explanation. Mouse over them to learn more!",
-		hoverElementSelector: "#metaHoverInfo",
-		containerSelector
-	}).bindHoverEvents();
+	if (!mainMenu)
+	{
+		new Tooltip({
+			content: "Info icons are littered throughout the interface. Use them to familiarize yourself with the rules!",
+			hoverElementSelector: "#metaInfo",
+			containerSelector
+		}).bindHoverEvents();
+	
+		new Tooltip({
+			content: "Words or phrases underlined in blue require a bit of explanation. Mouse over them to learn more!",
+			hoverElementSelector: "#metaHoverInfo",
+			containerSelector
+		}).bindHoverEvents();
+	}
 
 	new Tooltip({
 		getContent: ({ $hoveredElement }) =>
@@ -905,7 +908,8 @@ function enableTooltipsAfterDragging()
 }
 
 export {
-    bindPlayerDeckHoverEvents,
+	bindSideMenuHoverEvents,
+	bindPlayerDeckHoverEvents,
 	decrementInfectionDeckSize,
 	eventHistoryButtonTooltip,
 	eventDetailsTooltip,

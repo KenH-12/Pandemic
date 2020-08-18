@@ -185,7 +185,7 @@ strings = {
         ["h5", "3. Intensify"],
         "The Infection Discard Pile is shuffled and then placed on top of the Infection Deck.",
         ["h4", "Double Epidemics"],
-        `It is rare but possible for 2 Epidemics to be drawn at once. In this case, the second Epidemic's Infection card will be the only card to "shuffle", ending on top of the Infection Deck. An ${outbreakHoverInfo} will then occur in that city during <span class='hoverInfo eventTypeInfo' data-eventType='ic'>Infections</span> unless an <span class='hoverInfo eventCardInfo'>Event card</span> is played to prevent this.`,
+        `It is rare but possible for 2 Epidemics to be drawn at once. In this case, the second Epidemic's Infection card will be the only card to "shuffle", ending on top of the Infection Deck. An ${outbreakHoverInfo} will then occur in that city during <span class='hoverInfo eventTypeInfo' data-eventType='ic'>Infections</span> unless an <span class='inGameOnly'><span class='hoverInfo eventCardInfo'>Event card</span></span><span class='mainMenuOnly'>Event card</span> is played to prevent this.`,
         "In the case of a Double Epidemic, Event cards can be played after resolving the first Epidemic (but before starting to resolve the second)."
     ],
     outbreakInfo: {

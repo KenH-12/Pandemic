@@ -5,6 +5,9 @@ TO DO
 -----
 main menu
 	side menu
+		tooltips
+			fix warning icon spacing
+
 		help
 		logout button
 

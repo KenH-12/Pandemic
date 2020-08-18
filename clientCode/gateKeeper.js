@@ -2,6 +2,7 @@ import ValidationError from "./utilities/validationError.js";
 import { postData, fetchHtml } from "./utilities/fetchUtils.js";
 import { strings } from "./strings.js";
 import SideMenu, { SideMenuButton } from "./sideMenu.js";
+import { bindSideMenuHoverEvents } from "./tooltipInstantiation.js";
 
 const selectors = {
     lobbySelector: "#lobby",
@@ -146,12 +147,7 @@ function bindMainMenuEventListeners()
 {
     if ($("#gameInProgress").length)
     {
-        let $this;
-        $(".roleTag").each(function()
-        {
-            $this = $(this);
-            $this.addClass(toCamelCase($this.html()));
-        });
+        bindRoleCardHoverEvents();
 
         $("#btnResumeGame").click(() => window.location.replace("game.php"));
         $("#btnAbandonGame").click(promptAbandonGame);
@@ -208,6 +204,43 @@ function appendSideMenu()
 
     $(window).off("resize").resize(resizeSideMenu);
     resizeSideMenu();
+    bindSideMenuHoverEvents({ mainMenu: true });
+}
+
+function bindRoleCardHoverEvents()
+{
+    let $this,
+        role,
+        camelCaseRole,
+        offset;
+    
+    $(".roleTag").each(function()
+    {
+        $this = $(this);
+        $this.addClass(toCamelCase($this.html()));
+    })
+    .hover(function()
+    {
+        $this = $(this);
+        role = $this.html();
+        console.log(role);
+        camelCaseRole = toCamelCase(role);
+        offset = $this.offset();
+
+        offset.top -= $this.height() / 2;
+        offset.left += $this.outerWidth() + 2;
+
+        $(`<div class='roleCard ${camelCaseRole}'>
+            <h3>${role}</h3>
+            <img	class='rolePortrait'
+                    src='images/cards/roles/${camelCaseRole}.jpg'
+                    alt='${role} Role Card' />
+            <ul>${strings[`${camelCaseRole}CardText`]}</ul>
+        </div>`)
+            .appendTo(".content")
+            .offset(offset);
+    },
+    () => $(".roleCard").remove());
 }
 
 function attemptAccess()

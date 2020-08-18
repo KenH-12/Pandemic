@@ -166,7 +166,8 @@ const playerDeckImgManager = new DeckImageManager({
 	{
 		$hamburgerButton: $("button.hamburger"),
 		$title: $("#sideMenuTitle"),
-		$closeMenuOnMousedown: $("#boardContainer")
+		$closeMenuOnMousedown: $("#boardContainer"),
+		omitContentSelector: ".mainMenuOnly"
 	});
 
 function parseEvents(events)
