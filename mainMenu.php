@@ -73,8 +73,8 @@
                                 $numTurns
                             </div>
 
-                            <div id='btnResumeGame' class='button'>RESUME</div>
-                            <div id='btnAbandonGame' class='button'>ABANDON</div>
+                            <div id='btnResumeGame' class='button materialButton'>RESUME</div>
+                            <div id='btnAbandonGame' class='button materialButton'>ABANDON</div>
                         </div>";
             
             $_SESSION["game"] = $game;
@@ -107,7 +107,7 @@
                             <span id='numberOfRolesInfo' class='info'>&#9432;</span>
                         </div>
         
-                        <div id='btnPlay' class='button'>PLAY</div>";
+                        <div id='btnPlay' class='button materialButton'>PLAY</div>";
         }
     }
     catch(PDOException $e)

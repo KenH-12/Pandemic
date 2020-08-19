@@ -782,8 +782,8 @@ function promptAbandonGame()
         $title = $container.children("h3").first(),
         originalTitle = $title.html(),
         $originalButtons = $container.find(".button").addClass("hidden"),
-        $btnConfirm = $("<div class='button' id='btnConfirmAbandon'>OK</div>").appendTo($container),
-        $btnCancel = $("<div class='button' id='btnCancelAbandon'>CANCEL</div>").appendTo($container);
+        $btnConfirm = $("<div class='button materialButton' id='btnConfirmAbandon'>OK</div>").appendTo($container),
+        $btnCancel = $("<div class='button materialButton' id='btnCancelAbandon'>CANCEL</div>").appendTo($container);
     
     $title.html("ABANDON GAME?");
 
