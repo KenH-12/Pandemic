@@ -325,6 +325,19 @@ function abandonGame()
 		.catch(e => promptRefresh(e.message));
 }
 
+function logout()
+{
+    postData("serverCode/logout.php", {})
+        .then(response => 
+        {
+            if (response.failure)
+                return promptRefresh(response.failure);
+            
+            window.location.reload(false);
+        })
+        .catch(e => promptRefresh(e.message));
+}
+
 export {
 	getInfectionRate,
 	getColorClass,
@@ -339,5 +352,6 @@ export {
 	showLoadingGif,
 	updateConfirmButtonText,
 	promptRefresh,
-	abandonGame
+	abandonGame,
+	logout
 }

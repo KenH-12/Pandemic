@@ -23,7 +23,8 @@ import {
 	showLoadingGif,
 	updateConfirmButtonText,
 	promptRefresh,
-	abandonGame
+	abandonGame,
+	logout
 } from "./utilities/pandemicUtils.js";
 import { strings } from "./strings.js";
 import getDimension from "./dimensions.js";
@@ -156,6 +157,12 @@ const playerDeckImgManager = new DeckImageManager({
 			]
 		}),
 		new ConfirmationButton("btnAbandon", "ABANDON GAME", "ABANDON GAME?", abandonGame),
+		new SideMenuButton("LOGOUT",
+        {
+            buttonID: "btnLogout",
+            isExpandable: false,
+            onClick: logout
+        }),
 		new SideMenuButton("RETURN TO <span class='nowrap'>MAIN MENU</span>",
 		{
 			buttonID: "btnReturnToMainMenu",
