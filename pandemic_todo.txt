@@ -6,9 +6,6 @@ TO DO
 fullscreen recommendation
 
 main menu
-	side menu
-		logout button
-	
 	if the user has won a game, the default difficulty should be normal (or perhaps the last selected difficulty)
 	role selection -- perhaps this can be saved for last since random roles is fine
 		use + / - buttons to add and remove roles

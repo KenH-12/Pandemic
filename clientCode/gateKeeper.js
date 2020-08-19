@@ -196,7 +196,8 @@ function appendSideMenu()
         new SideMenuButton("LOGOUT",
         {
             buttonID: "btnLogout",
-            isExpandable: false
+            isExpandable: false,
+            onClick: logout
         })
     ], { omitContentSelector: ".inGameOnly" });
 
@@ -813,6 +814,19 @@ function abandonGame()
                 return serverOperationFailed(response.failure);
             
             showMainMenu();
+        })
+        .catch(e => serverOperationFailed(e.message));
+}
+
+function logout()
+{
+    postData("serverCode/logout.php", {})
+        .then(response => 
+        {
+            if (response.failure)
+                return serverOperationFailed(response.failure);
+            
+            window.location.reload(false);
         })
         .catch(e => serverOperationFailed(e.message));
 }
