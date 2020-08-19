@@ -338,6 +338,49 @@ function logout()
         .catch(e => promptRefresh(e.message));
 }
 
+function checkBrowserCompatability()
+{
+	const browser = getBrowser();
+
+	if (browser !== "Chrome")
+		showBrowserCompatabilityWarning(browser);
+}
+
+function showBrowserCompatabilityWarning(browserName)
+{
+	const $curtain = $("#curtain"),
+		hidden = "hidden";
+	
+	$curtain.children().addClass(hidden)
+		.filter("#warningsContainer").removeClass(hidden)
+		.children(".browserCompatWarning").removeClass(hidden)
+		.find("#browserName").html(browserName === "unknown" ? "browser you are using" : `${browserName} browser`)
+		.parent().siblings(".button")
+		.click(hideCurtain);
+	
+	animationPromise({
+		$elements: $curtain.removeClass("hidden"),
+		initialProperties: { opacity: 0 },
+		desiredProperties: { opacity: 0.95 }
+	});
+}
+
+async function hideCurtain()
+{
+	const $curtain = $("#curtain"),
+		hidden = "hidden";
+	
+	await animationPromise({
+		$elements: $curtain,
+		desiredProperties: { opacity: 0 },
+	});
+
+	$curtain.addClass(hidden).removeAttr("style")
+		.children().addClass(hidden);
+	
+	return Promise.resolve();
+}
+
 export {
 	getInfectionRate,
 	getColorClass,
@@ -353,5 +396,7 @@ export {
 	updateConfirmButtonText,
 	promptRefresh,
 	abandonGame,
-	logout
+	logout,
+	hideCurtain,
+	checkBrowserCompatability
 }

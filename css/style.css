@@ -340,6 +340,11 @@ html,
 	margin: 3% 37%;
 	font-size: 20px;
 }
+#warningsContainer .button
+{
+	font-size: 30px;
+	padding: 8px 0;
+}
 .pinpointRect,
 .infectionRateHighlight,
 .outbreaksHighlight,

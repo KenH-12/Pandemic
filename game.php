@@ -37,6 +37,12 @@
 					<p>loading game...</p>
 					<h2 id='skippingSetupMsg' class='hidden'>Skipping setup...</h2>
 
+					<div id='warningsContainer' class='hidden'>
+						<h2 class='browserCompatWarning hidden'>WARNING: This application has not been tested on the <span id='browserName'></span>. Some features may not function as intended.</h2>
+						<h2 class='browserCompatWarning hidden'>Please use the <a href='https://www.google.com/intl/en_ca/chrome/'>Google Chrome</a> browser for a smoother experience.</h2>
+						<div class='button'>OK</div>
+					</div>
+
 					<div id='victory' class='hidden'>
 						<h1>V I C T O R Y</h1>
 						<h2>Your team discovered cures for all 4 diseases!</h2>

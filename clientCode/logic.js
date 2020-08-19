@@ -24,7 +24,9 @@ import {
 	updateConfirmButtonText,
 	promptRefresh,
 	abandonGame,
-	logout
+	logout,
+	hideCurtain,
+	checkBrowserCompatability
 } from "./utilities/pandemicUtils.js";
 import { strings } from "./strings.js";
 import getDimension from "./dimensions.js";
@@ -6980,7 +6982,8 @@ async function setup()
 	
 	managePlayerPanelOcclusion();
 
-	await removeCurtain();
+	await sleep(75);
+	await hideCurtain();
 
 	instantiateTooltips();
 	bindEventCardHoverEvents();
@@ -7005,6 +7008,8 @@ async function setup()
 		else
 			proceed();
 	}
+
+	checkBrowserCompatability();
 }
 
 async function animateRoleDetermination()
@@ -8029,23 +8034,6 @@ function highlightNextSetupStep()
 	}
 	else
 		$procedureContainer.children(".step").first().addClass(highlighted);	
-}
-
-function removeCurtain()
-{
-	return new Promise((resolve) => {
-		sleep(75)
-		.then(() => {
-			const curtain = $("#curtain");
-			curtain.fadeOut(function()
-			{
-				curtain.addClass("hidden").removeAttr("style")
-					.children().addClass("hidden");
-				
-				resolve();
-			});
-		});
-	});
 }
 
 function expandInfectionDiscardPile({ showRemovedCardsContainer } = {})
