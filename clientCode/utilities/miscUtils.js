@@ -293,17 +293,20 @@ function getFullscreenKeyboardShortcut()
 		browser = getBrowser();
 	
 	if ((os === "Windows" || os === "Linux")
-		&& ["Chrome", "Firefox", "Opera"].includes(browser))
+		&& ["Chrome", "Firefox", "Opera", "Chromium", "Internet Explorer"].includes(browser))
 		return "f11";
 
 	if (os === "Mac OS")
 	{
-		if (["Chrome", "Firefox"].includes(browser))
+		if (["Chrome", "Firefox", "Chromium"].includes(browser))
 			return "command + shift + f";
 		
-		if (["Safari", "Opera"].includes(browser))
+		if (["Safari", "Opera", "Edge"].includes(browser))
 			return "command + control + f";
 	}
+
+	if (os === "Windows" && browser === "Edge")
+		return "Windows key + shift + enter";
 
 	return false;
 }

@@ -356,15 +356,21 @@ function gameIsFullscreen()
 function recommendFullscreen()
 {
 	const $curtain = $("#curtain"),
-		hidden = "hidden";
+		hidden = "hidden",
+		$fullscreenShortcut = $curtain.find("#fullscreenShortcut"),
+		shortcut = getFullscreenKeyboardShortcut();
 	
 	$curtain.children().addClass(hidden)
 		.filter("#warningsContainer").removeClass(hidden)
 		.children().not(".button").addClass(hidden)
 		.filter(".fullscreenWarning").removeClass(hidden)
-		.find("#fullscreenShortcut").html(getFullscreenKeyboardShortcut())
-		.parent().siblings(".button")
+		.siblings(".button")
 		.off("click").click(hideCurtain);
+	
+	if (shortcut)
+		$fullscreenShortcut.html(shortcut);
+	else
+		$fullscreenShortcut.parent().addClass(hidden);
 	
 	animationPromise({
 		$elements: $curtain.removeClass(hidden),
