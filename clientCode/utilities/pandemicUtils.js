@@ -343,7 +343,7 @@ function checkFullscreen()
 	if (!$("#warningsContainer").hasClass("hidden")
 		|| $("#chkFullscreenNotice").prop("checked")
 		|| gameIsFullscreen())
-		return false;
+		return hideCurtain();
 	
 	recommendFullscreen();
 }
@@ -367,7 +367,7 @@ function recommendFullscreen()
 		.off("click").click(hideCurtain);
 	
 	animationPromise({
-		$elements: $curtain.removeClass("hidden"),
+		$elements: $curtain.removeClass(hidden),
 		initialProperties: { opacity: 0 },
 		desiredProperties: { opacity: 0.95 }
 	});
@@ -404,7 +404,7 @@ function showBrowserCompatibilityWarning(browserName)
 		});
 	
 	animationPromise({
-		$elements: $curtain.removeClass("hidden"),
+		$elements: $curtain.removeClass(hidden),
 		initialProperties: { opacity: 0 },
 		desiredProperties: { opacity: 0.95 }
 	});
