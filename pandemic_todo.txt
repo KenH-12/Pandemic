@@ -3,7 +3,10 @@ BUGS
 
 TO DO
 -----
-fullscreen recommendation
+firefox testing
+
+set cookie when the user checks "don't show this again" for the fullscreen notice
+	check this cookie when loading the page, and set the checked attribute accordingly
 
 main menu
 	if the user has won a game, the default difficulty should be normal (or perhaps the last selected difficulty)

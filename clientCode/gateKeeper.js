@@ -141,6 +141,8 @@ async function showMainMenu({ animate } = {})
 
     if (!$sideMenu.length)
         appendSideMenu();
+    
+    showBrowserCompatabilityWarning();
 }
 
 function bindMainMenuEventListeners()
@@ -852,4 +854,20 @@ function tooManyFailedAttempts()
     $(selectors.btnVerifySelector).prev().off("keypress");
 
     $(".loadingGif").remove();
+}
+
+function showBrowserCompatabilityWarning()
+{
+    const browserName = getBrowser();
+    
+    if (browserName === "Chrome")
+        return false;
+
+    $("#lobby > .content").append(`<div id='warningsContainer'>
+                                        <h3 class='browserCompatWarning'>— Compatibility Warning —</h3>
+                                        <p class='browserCompatWarning'>This application has not been tested on the <span id='browserName'></span>. Some features may not function as intended.</p>
+                                        <p class='browserCompatWarning'>Please use the <a href='https://www.google.com/intl/en_ca/chrome/'>Google Chrome</a> browser for a smoother experience.</p>
+                                        <p class='browserCompatWarning'>Sorry for the inconvenience — I am only one man, and this project was <i>massive</i>.</p>
+                                    </div>`)
+        .find("#browserName").html(browserName === "unknown" ? "browser you are using" : `${browserName} browser`);
 }
