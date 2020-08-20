@@ -231,6 +231,29 @@ function bindKeypressEventListeners($elements, keyCode, fn)
 	});
 }
 
+function getOS()
+{
+	var userAgent = window.navigator.userAgent,
+		platform = window.navigator.platform,
+		macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"],
+		windowsPlatforms = ["Win32", "Win64", "Windows", "WinCE"],
+		iosPlatforms = ["iPhone", "iPad", "iPod"],
+		os = null;
+  
+	if (macosPlatforms.indexOf(platform) !== -1)
+		os = "Mac OS";
+	else if (iosPlatforms.indexOf(platform) !== -1)
+	  os = "iOS";
+	else if (windowsPlatforms.indexOf(platform) !== -1)
+	  os = "Windows";
+	else if (/Android/.test(userAgent))
+	  os = "Android";
+	else if (!os && /Linux/.test(platform))
+	  os = "Linux";
+  
+	return os;
+}
+
 function getBrowser()
 {
 	// Firefox 1.0+
@@ -262,4 +285,25 @@ function getBrowser()
 		return "Opera";
 	
 	return "unknown";
+}
+
+function getFullscreenKeyboardShortcut()
+{	
+	const os = getOS(),
+		browser = getBrowser();
+	
+	if ((os === "Windows" || os === "Linux")
+		&& ["Chrome", "Firefox", "Opera"].includes(browser))
+		return "f11";
+
+	if (os === "Mac OS")
+	{
+		if (["Chrome", "Firefox"].includes(browser))
+			return "command + shift + f";
+		
+		if (["Safari", "Opera"].includes(browser))
+			return "command + control + f";
+	}
+
+	return false;
 }

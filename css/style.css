@@ -323,16 +323,19 @@ html,
 	z-index: 50;
 	padding: 5px;
 }
-#curtain h1,
-#curtain h2,
-#curtain h3
+#curtain *:not(#loading)
 { text-align: center }
 #curtain h2,
-#curtain h3
+#curtain h3,
+#curtain h4	,
+#curtain label
 { font-family: 'Oswald', sans-serif }
 #curtain h1 { font-size: 60px }
 #curtain h2 { font-size: 26px }
-#curtain h3 { font-size: 16px; font-weight: 400; }
+#curtain h3,
+#curtain h4
+{ font-weight: 400 }
+#curtain h3 { font-size: 16px }
 #curtain .button
 {
 	width: 26%;
@@ -344,7 +347,16 @@ html,
 {
 	font-size: 30px;
 	padding: 8px 0;
+	margin-top: 10px;
 }
+#warningsContainer h3
+{ font-size: 22px }
+#warningsContainer h4
+{ font-size: 18px }
+#warningsContainer div.fullscreenWarning
+{ margin-top: 30px;}
+#warningsContainer label
+{ font-size: 18px }
 .pinpointRect,
 .infectionRateHighlight,
 .outbreaksHighlight,

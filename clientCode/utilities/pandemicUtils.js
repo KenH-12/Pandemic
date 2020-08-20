@@ -338,25 +338,70 @@ function logout()
         .catch(e => promptRefresh(e.message));
 }
 
-function checkBrowserCompatability()
+function checkFullscreen()
 {
-	const browser = getBrowser();
-
-	if (browser !== "Chrome")
-		showBrowserCompatabilityWarning(browser);
+	if (!$("#warningsContainer").hasClass("hidden")
+		|| $("#chkFullscreenNotice").prop("checked")
+		|| gameIsFullscreen())
+		return false;
+	
+	recommendFullscreen();
 }
 
-function showBrowserCompatabilityWarning(browserName)
+function gameIsFullscreen()
+{
+	return $(window).height() >= gameData.boardHeight - 8;
+}
+
+function recommendFullscreen()
 {
 	const $curtain = $("#curtain"),
 		hidden = "hidden";
 	
 	$curtain.children().addClass(hidden)
 		.filter("#warningsContainer").removeClass(hidden)
-		.children(".browserCompatWarning").removeClass(hidden)
+		.children().not(".button").addClass(hidden)
+		.filter(".fullscreenWarning").removeClass(hidden)
+		.find("#fullscreenShortcut").html(getFullscreenKeyboardShortcut())
+		.parent().siblings(".button")
+		.off("click").click(hideCurtain);
+	
+	animationPromise({
+		$elements: $curtain.removeClass("hidden"),
+		initialProperties: { opacity: 0 },
+		desiredProperties: { opacity: 0.95 }
+	});
+}
+
+function checkBrowserCompatibility()
+{
+	const browser = getBrowser();
+
+	if (browser !== "Chrome")
+		showBrowserCompatibilityWarning(browser);
+}
+
+function showBrowserCompatibilityWarning(browserName)
+{
+	const $curtain = $("#curtain"),
+		hidden = "hidden";
+	
+	$curtain.children().addClass(hidden)
+		.filter("#warningsContainer").removeClass(hidden)
+		.children().not(".button").addClass(hidden)
+		.filter(".browserCompatWarning").removeClass(hidden)
 		.find("#browserName").html(browserName === "unknown" ? "browser you are using" : `${browserName} browser`)
 		.parent().siblings(".button")
-		.click(hideCurtain);
+		.off("click").click(() =>
+		{
+			if (gameIsFullscreen())
+			{
+				hideCurtain();
+				return false;
+			}
+			
+			recommendFullscreen();
+		});
 	
 	animationPromise({
 		$elements: $curtain.removeClass("hidden"),
@@ -398,5 +443,6 @@ export {
 	abandonGame,
 	logout,
 	hideCurtain,
-	checkBrowserCompatability
+	checkBrowserCompatibility,
+	checkFullscreen
 }

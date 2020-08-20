@@ -26,7 +26,8 @@ import {
 	abandonGame,
 	logout,
 	hideCurtain,
-	checkBrowserCompatability
+	checkBrowserCompatibility,
+	checkFullscreen
 } from "./utilities/pandemicUtils.js";
 import { strings } from "./strings.js";
 import getDimension from "./dimensions.js";
@@ -3394,6 +3395,8 @@ async function resizeAll()
 	repositionSpecialEventBanner();
 
 	gameData.windowWidth = gameData.boardWidth + gameData.panelWidth;
+
+	checkFullscreen();
 	
 	return Promise.resolve();
 }
@@ -6982,8 +6985,11 @@ async function setup()
 	
 	managePlayerPanelOcclusion();
 
-	await sleep(75);
-	await hideCurtain();
+	if ($("#warningsContainer").hasClass("hidden"))
+	{
+		await sleep(75);
+		await hideCurtain();
+	}
 
 	instantiateTooltips();
 	bindEventCardHoverEvents();
@@ -7009,7 +7015,7 @@ async function setup()
 			proceed();
 	}
 
-	checkBrowserCompatability();
+	checkBrowserCompatibility();
 }
 
 async function animateRoleDetermination()
