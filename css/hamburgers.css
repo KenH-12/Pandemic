@@ -14,7 +14,6 @@ Copyright (c) 2016 Jonathan Suh <hello@jonsuh.com> (jonsuh.com)
 .hamburger {
   padding: 0 0 8px 0;
   display: inline-block;
-  cursor: pointer;
   transition-property: opacity, filter;
   transition-duration: 0.15s;
   transition-timing-function: linear;
@@ -29,6 +28,10 @@ Copyright (c) 2016 Jonathan Suh <hello@jonsuh.com> (jonsuh.com)
   .hamburger.is-active .hamburger-inner::before,
   .hamburger.is-active .hamburger-inner::after {
     background-color: #fff; }
+
+.hamburger,
+.hamburger *
+{ cursor: pointer }
 
 .hamburger-box {
   width: 60%;
