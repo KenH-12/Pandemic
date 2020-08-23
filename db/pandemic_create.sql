@@ -327,8 +327,10 @@ CREATE TABLE roleRecord
 (
 	recordID INT NOT NULL,
 	roleID TINYINT NOT NULL,
+	userID INT NOT NULL,
 	
 	CONSTRAINT pk_roleRecord_recordID_roleID PRIMARY KEY (recordID, roleID),
 	CONSTRAINT fk_gameRecord_roleRecord FOREIGN KEY (recordID) REFERENCES gameRecord (recordID),
-	CONSTRAINT fk_role_roleRecord FOREIGN KEY (roleID) REFERENCES role (roleID)
+	CONSTRAINT fk_role_roleRecord FOREIGN KEY (roleID) REFERENCES role (roleID),
+	CONSTRAINT fk_user_roleRecord FOREIGN KEY (userID) REFERENCES `user` (userID)
 );

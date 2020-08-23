@@ -1182,14 +1182,14 @@ function recordCompletedGame($pdo, $game)
 
     $recordID = $pdo->lastInsertId();
 
-    $stmt = $pdo->prepare("SELECT rID FROM vw_player WHERE game = ?");
+    $stmt = $pdo->prepare("SELECT rID, uID FROM vw_player WHERE game = ?");
     $stmt->execute([$game]);
     $roles = $stmt->fetchAll();
 
-    $stmt = $pdo->prepare("INSERT INTO roleRecord (recordID, roleID) VALUES ($recordID, ?)");
+    $stmt = $pdo->prepare("INSERT INTO roleRecord (recordID, roleID, userID) VALUES ($recordID, ?, ?)");
     foreach ($roles as $row)
     {
-        $stmt->execute([$row["rID"]]);
+        $stmt->execute([$row["rID"], $row["uID"]]);
 
         if ($stmt->rowCount() !== 1)
             throwException($pdo, "failed to record role of completed game.");
