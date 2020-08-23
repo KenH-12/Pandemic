@@ -81,28 +81,53 @@
         }
         else
         {
+            // Set the selected difficulty and number of roles to the last settings that were used.
+            $stmt = $pdo->prepare("SELECT numEpidemics, COUNT(*) AS 'numRoles'
+                                    FROM gameRecord
+                                    INNER JOIN roleRecord ON gameRecord.recordID = roleRecord.recordID
+                                    WHERE userID = ?
+                                    GROUP BY (gameRecord.recordID)
+                                    ORDER BY gameRecord.recordID DESC
+                                    LIMIT 1");
+            $stmt->execute([$uID]);
+
+            if ($stmt->rowCount() === 1)
+            {
+                $result = $stmt->fetch();
+                $lastNumEpidemics = $result["numEpidemics"];
+                $lastNumRoles = $result["numRoles"];
+            }
+
+            $difficulties = array("Introductory", "Standard", "Heroic");
+            $difficultyRadioButtons = "";
+            for ($i = 0; $i < count($difficulties); $i++)
+            {
+                $difName = $difficulties[$i];
+                $numEpidemics = $i + 4;
+                $checked = $numEpidemics == $lastNumEpidemics ? " checked='checked'" : "";
+
+                $difficultyRadioButtons .= "<div>
+                        <input type='radio' name='radDifficulty' id='rad$difName' value='$numEpidemics'$checked>
+                        <label for='rad$difName'>$difName</label><span id='" . strtolower($difName) . "Info' class='info'>&#9432;</span>
+                    </div>";
+            }
+
+            $numRolesOptions = "";
+            for ($i = 2; $i <= 4; $i++)
+            {
+                $selected = $i == $lastNumRoles ? " selected" : "";
+                $numRolesOptions .= "<option value='$i'$selected>$i</option>";
+            }
+            
             $content = "<div class='divInputControl'>
                             <label for='radDifficulty' class='subtitle'>Difficulty:</label>
-                            <div>
-                                <input type='radio' name='radDifficulty' id='radIntroductory' value='4' checked='checked'>
-                                <label for='radIntroductory'>Introductory</label><span id='introductoryInfo' class='info'>&#9432;</span>
-                            </div>
-                            <div>
-                                <input type='radio' name='radDifficulty' id='radStandard' value='5'>
-                                <label for='radStandard'>Standard</label><span id='standardInfo' class='info'>&#9432;</span>
-                            </div>
-                            <div>
-                                <input type='radio' name='radDifficulty' id='radHeroic' value='6'>
-                                <label for='radHeroic'>Heroic</label><span id='heroicInfo' class='info'>&#9432;</span>
-                            </div>
+                            $difficultyRadioButtons
                         </div>
         
                         <div class='divInputControl'>
                             <label for='ddlNumRoles' class='subtitle'>Number of Roles:</label>
                             <select id='ddlNumRoles'>
-                                <option value='2'>2</option>
-                                <option value='3'>3</option>
-                                <option value='4'>4</option>
+                                $numRolesOptions
                             </select>
                             <span id='numberOfRolesInfo' class='info'>&#9432;</span>
                         </div>
