@@ -340,9 +340,15 @@ function logout()
 
 function checkFullscreen()
 {
-	if (!$("#warningsContainer").hasClass("hidden")
-		|| $("#chkFullscreenNotice").prop("checked")
-		|| gameIsFullscreen())
+	const $warningsContainer = $("#warningsContainer"),
+		showingBrowserCompatWarning = $warningsContainer.children(".browserCompatWarning").not(".hidden").length
+	
+	if (showingBrowserCompatWarning)
+		return false;
+
+	const dismissedFullscreenRecommendation = $warningsContainer.find("#chkFullscreenNotice").prop("checked");
+
+	if (dismissedFullscreenRecommendation || gameIsFullscreen())
 		return hideCurtain();
 	
 	recommendFullscreen();
@@ -390,16 +396,19 @@ function checkBrowserCompatibility()
 function showBrowserCompatibilityWarning(browserName)
 {
 	const $curtain = $("#curtain"),
+		compatWarningSelector = ".browserCompatWarning",
 		hidden = "hidden";
 	
 	$curtain.children().addClass(hidden)
 		.filter("#warningsContainer").removeClass(hidden)
 		.children().not(".button").addClass(hidden)
-		.filter(".browserCompatWarning").removeClass(hidden)
+		.filter(compatWarningSelector).removeClass(hidden)
 		.find("#browserName").html(browserName === "unknown" ? "browser you are using" : `${browserName} browser`)
 		.parent().siblings(".button")
 		.off("click").click(() =>
 		{
+			$(compatWarningSelector).addClass(hidden);
+			
 			if (gameIsFullscreen())
 			{
 				hideCurtain();
@@ -432,6 +441,17 @@ async function hideCurtain()
 	return Promise.resolve();
 }
 
+async function anyWarnings()
+{
+	const $curtain = $("#curtain"),
+		warningsAreDisplayed = () => !$curtain.hasClass("hidden");
+
+	while (warningsAreDisplayed())
+		await sleep(500);
+	
+	return Promise.resolve();
+}
+
 export {
 	getInfectionRate,
 	getColorClass,
@@ -450,5 +470,6 @@ export {
 	logout,
 	hideCurtain,
 	checkBrowserCompatibility,
-	checkFullscreen
+	checkFullscreen,
+	anyWarnings
 }

@@ -27,7 +27,8 @@ import {
 	logout,
 	hideCurtain,
 	checkBrowserCompatibility,
-	checkFullscreen
+	checkFullscreen,
+	anyWarnings
 } from "./utilities/pandemicUtils.js";
 import { strings } from "./strings.js";
 import getDimension from "./dimensions.js";
@@ -6994,10 +6995,13 @@ async function setup()
 	instantiateTooltips();
 	bindEventCardHoverEvents();
 	enablePlayerDiscardHoverEvents();
+
+	checkBrowserCompatibility();
 	
 	if (isNewGame)
 	{
 		gameData.allRoles = allRoles;
+		await anyWarnings();
 		animateNewGameSetup();
 	}
 	else
@@ -7014,8 +7018,6 @@ async function setup()
 		else
 			proceed();
 	}
-
-	checkBrowserCompatibility();
 }
 
 async function animateRoleDetermination()
