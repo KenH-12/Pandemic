@@ -101,7 +101,7 @@ input[type='password']
 {
 	margin-bottom: var(--lobby-padding);
 }
-#lobby form > label, .inlineButton
+#lobby form > label, .button.inlineButton
 {
 	font-size: 20px;
 }
