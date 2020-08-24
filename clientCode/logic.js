@@ -160,6 +160,11 @@ const playerDeckImgManager = new DeckImageManager({
 				new SideMenuButton("Outbreaks", { buttonID: "outbreakInfo" })
 			]
 		}),
+		new SideMenuButton("ABOUT",
+        {
+            buttonID: "about",
+            isPrimaryButton: true
+        }),
 		new ConfirmationButton("btnAbandon", "ABANDON GAME", "ABANDON GAME?", abandonGame),
 		new SideMenuButton("LOGOUT",
         {

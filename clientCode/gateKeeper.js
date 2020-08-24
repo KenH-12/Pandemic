@@ -62,6 +62,8 @@ function bindLoginPageEventListeners()
     bindKeypressEventListeners($elementsToBind.off("keypress"), 13, attemptAccess);
 
     $("form").submit(() => false);
+
+    $("#disclaimer").html(strings.disclaimer);
 }
 
 function unbindLoginPageEventListeners()
@@ -194,6 +196,11 @@ function appendSideMenu()
 				new SideMenuButton("Epidemics", { buttonID: "epidemicInfo" }),
 				new SideMenuButton("Outbreaks", { buttonID: "outbreakInfo" })
 			]
+        }),
+        new SideMenuButton("ABOUT",
+        {
+            buttonID: "about",
+            isPrimaryButton: true
         }),
         new SideMenuButton("LOGOUT",
         {

@@ -73,9 +73,7 @@
                                 <div id='btnAttemptAccess' class='button inlineButton' tabindex='0'>&#x2B9E;</div>
                             </form>
 
-                            <p id='disclaimer' class='smallText'>DISCLAIMER: <span class='italics'>this is a fan-made re-creation which is intended to be a portfolio piece and is not available to the general public.
-                            It cannot be played without an access key, which are granted exclusively to potential employers and a few close friends.
-                            This project is not intended for sale of any kind and is in no way affiliated with or sponsored by the creators of the original game.</span></p>
+                            <p id='disclaimer' class='smallText'></p>
                         </content>
                     </div>
                 </body>

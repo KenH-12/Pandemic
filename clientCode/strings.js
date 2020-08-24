@@ -1,6 +1,9 @@
 "use strict";
 
-const turnInfo = `Each of the 3 Play steps <span class='inGameOnly'>(top-right of the screen behind this menu)</span> must be completed on each role's turn. <span class='inGameOnly'>The current step is always highlighted.</span>`,
+const disclaimer = `DISCLAIMER: <span class='italics'>this is a fan-made re-creation which is intended to be a portfolio piece and is not available to the general public.
+It cannot be played without an access key, which are granted exclusively to potential employers and a few close friends.
+This project is not intended for sale of any kind and is in no way affiliated with or sponsored by the creators of the original game.</span>`,
+    turnInfo = `Each of the 3 Play steps <span class='inGameOnly'>(top-right of the screen behind this menu)</span> must be completed on each role's turn. <span class='inGameOnly'>The current step is always highlighted.</span>`,
     trophySymbol = "<span class='warning'>🏆</span>",
     warningSymbol = "<span class='warning'>⚠️</span>",
     outbreakHoverInfo = "<span class='hoverInfo eventTypeInfo' data-eventType='ob'>outbreak</span>",
@@ -235,6 +238,12 @@ strings = {
     eventCardPlayabilityExceptions: `<p>${eventCardPlayabilityExceptions}</p>`,
     forecastTopInfo: "The top card will be put back on the deck last (and drawn from the deck first).",
     forcastBottomInfo: "The bottom card will be put back on the deck first (and drawn from the deck sixth).",
+
+    about: [
+        "This is a portfolio piece by web developer Ken Henderson. It's an adaptation of the award-winning board game, <i>Pandemic</i>, in the form of a Web application. The functionality is true to the original ruleset in every respect.",
+        disclaimer
+    ],
+    disclaimer
 };
 
 function abbreviateWarning(warning)
