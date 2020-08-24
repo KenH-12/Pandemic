@@ -42,12 +42,6 @@
 						<h2 class='browserCompatWarning hidden'>This application has not been tested on the <span id='browserName'></span>. Some features may not function as intended.</h2>
 						<h2 class='browserCompatWarning hidden'>Please use the <a href='https://www.google.com/intl/en_ca/chrome/'>Google Chrome</a> browser for a smoother experience.</h2>
 						<h4 class='browserCompatWarning hidden'>Sorry for the inconvenience — I am only one man, and this project was <i>massive</i>.</h4>
-						<h2 class='fullscreenWarning hidden'>This game is intended to be played in fullscreen mode.</h2>
-						<h3 class='fullscreenWarning hidden'>Press [<span id='fullscreenShortcut'></span>] to enter fullscreen.</h3>
-						<div class='fullscreenWarning hidden'>
-							<input type='checkbox' id='chkFullscreenNotice' name='chkFullscreenNotice' />
-							<label for='chkFullscreenNotice'>don't show this message again</label>
-						</div>
 						<div class='button'>OK</div>
 					</div>
 
@@ -68,6 +62,17 @@
 					</div>
 					<div id='btnMainMenu' class='button hidden'>RETURN TO MAIN MENU</div>
 				</div>
+
+				<div id='fullscreenRecommendation' class='hidden'>
+					<h2>This game is intended to be played in fullscreen mode.</h2>
+					<h3>Press [<span id='fullscreenShortcut'></span>] to enter fullscreen.</h3>
+					<div>
+						<input type='checkbox' id='chkFullscreenNotice' name='chkFullscreenNotice' />
+						<label for='chkFullscreenNotice'>don't show this message again</label>
+					</div>
+					<div class='button'>OK</div>
+				</div>
+
 				<div id='container'>
 
 					<div id='specialEventBanner' class='hidden'>

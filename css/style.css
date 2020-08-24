@@ -127,7 +127,6 @@ input[type='password']
 #lobby #warningsContainer h3
 { 
 	font-size: 30px;
-	
 }
 #lobby > .content > h1
 {
@@ -365,14 +364,38 @@ html,
 	padding: 8px 0;
 	margin-top: 10px;
 }
-#warningsContainer h3
-{ font-size: 22px }
 #warningsContainer h4
 { font-size: 18px }
-#warningsContainer div.fullscreenWarning
-{ margin-top: 30px;}
 #warningsContainer label
 { font-size: 18px }
+
+#fullscreenRecommendation
+{
+	z-index: 39;
+	position: fixed;
+	width: 100%;
+	top: 36%;
+	filter: drop-shadow(0px 0px 10px #fff);
+	text-align: center;
+	padding: 10px 0;
+}
+#fullscreenRecommendation h2
+{ font-size: 30px }
+#fullscreenRecommendation h3
+{
+	font-size: 24px;
+	margin-bottom: 20px;
+}
+#fullscreenRecommendation label
+{ font-size: 20px }
+#fullscreenRecommendation .button
+{
+	width: 25%;
+	margin: 0 37.5%;
+	font-size: 28px;
+	padding: 5px 0;
+}
+
 .pinpointRect,
 .infectionRateHighlight,
 .outbreaksHighlight,
@@ -577,7 +600,8 @@ html,
 .white{background-color:#fff}
 .black{background-color:#000}
 .epidemic:not(.substep),
-.epidemicFull
+.epidemicFull,
+#fullscreenRecommendation
 {
 	background: linear-gradient(to right,
 		#007738,	
@@ -716,7 +740,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #undoingIndicator
 {
 	text-align: right;
-	font-family: 'Ropa sans';
+	font-family: 'Ropa sans', sans-serif;
 	font-size: 18px;
 }
 #undoingIndicator > *
@@ -1777,7 +1801,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 	border-radius: 15%;
 }
 .actionTitle + .instructions { border-top: 2px solid #fff }
-#actionInterface { font-family: 'Ropa Sans' }
+#actionInterface { font-family: 'Ropa Sans', sans-serif }
 #actionInterface > .rules
 {
 	padding: 5px 2% 0 2%;

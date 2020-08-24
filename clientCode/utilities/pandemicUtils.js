@@ -340,16 +340,10 @@ function logout()
 
 function checkFullscreen()
 {
-	const $warningsContainer = $("#warningsContainer"),
-		showingBrowserCompatWarning = $warningsContainer.children(".browserCompatWarning").not(".hidden").length
-	
-	if (showingBrowserCompatWarning)
-		return false;
-
-	const dismissedFullscreenRecommendation = $warningsContainer.find("#chkFullscreenNotice").prop("checked");
+	const dismissedFullscreenRecommendation = $("#chkFullscreenNotice").prop("checked");
 
 	if (dismissedFullscreenRecommendation || gameIsFullscreen())
-		return hideCurtain();
+		return hideFullscreenRecommendation();
 	
 	recommendFullscreen();
 }
@@ -361,28 +355,35 @@ function gameIsFullscreen()
 
 function recommendFullscreen()
 {
-	const $curtain = $("#curtain"),
-		hidden = "hidden",
-		$fullscreenShortcut = $curtain.find("#fullscreenShortcut"),
+	const $fullscreenRecommendation = $("#fullscreenRecommendation"),
+		$fullscreenShortcut = $fullscreenRecommendation.find("#fullscreenShortcut"),
 		shortcut = getFullscreenKeyboardShortcut();
-	
-	$curtain.children().addClass(hidden)
-		.filter("#warningsContainer").removeClass(hidden)
-		.children().not(".button").addClass(hidden)
-		.filter(".fullscreenWarning").removeClass(hidden)
-		.siblings(".button")
-		.off("click").click(hideCurtain);
 	
 	if (shortcut)
 		$fullscreenShortcut.html(shortcut);
 	else
-		$fullscreenShortcut.parent().addClass(hidden);
+		$fullscreenShortcut.parent().addClass("hidden");
 	
 	animationPromise({
-		$elements: $curtain.removeClass(hidden),
+		$elements: $fullscreenRecommendation.removeClass("hidden"),
 		initialProperties: { opacity: 0 },
-		desiredProperties: { opacity: 0.95 }
+		desiredProperties: { opacity: 1 }
 	});
+
+	$fullscreenRecommendation.find(".button")
+		.off("click")
+		.click(hideFullscreenRecommendation);
+}
+
+async function hideFullscreenRecommendation()
+{
+	const $fullscreenRecommendation = $("#fullscreenRecommendation");
+
+	await animationPromise({
+		$elements: $fullscreenRecommendation,
+		desiredProperties: { opacity: 0 }
+	});
+	$fullscreenRecommendation.addClass("hidden").removeAttr("style");
 }
 
 function checkBrowserCompatibility()
@@ -405,18 +406,7 @@ function showBrowserCompatibilityWarning(browserName)
 		.filter(compatWarningSelector).removeClass(hidden)
 		.find("#browserName").html(browserName === "unknown" ? "browser you are using" : `${browserName} browser`)
 		.parent().siblings(".button")
-		.off("click").click(() =>
-		{
-			$(compatWarningSelector).addClass(hidden);
-			
-			if (gameIsFullscreen())
-			{
-				hideCurtain();
-				return false;
-			}
-			
-			recommendFullscreen();
-		});
+		.off("click").click(hideCurtain);
 	
 	animationPromise({
 		$elements: $curtain.removeClass(hidden),
@@ -444,7 +434,9 @@ async function hideCurtain()
 async function anyWarnings()
 {
 	const $curtain = $("#curtain"),
-		warningsAreDisplayed = () => !$curtain.hasClass("hidden");
+		$fullscreenRecommendation = $("#fullscreenRecommendation"),
+		hidden = "hidden",
+		warningsAreDisplayed = () => !$curtain.hasClass(hidden) || !$fullscreenRecommendation.hasClass(hidden);
 
 	while (warningsAreDisplayed())
 		await sleep(500);
