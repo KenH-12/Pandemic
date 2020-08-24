@@ -325,17 +325,17 @@ function abandonGame()
 		.catch(e => promptRefresh(e.message));
 }
 
-function logout()
+function logOut(failureCallback)
 {
     postData("serverCode/logout.php", {})
         .then(response => 
         {
             if (response.failure)
-                return promptRefresh(response.failure);
+                return failureCallback(response.failure);
             
             window.location.reload(false);
         })
-        .catch(e => promptRefresh(e.message));
+        .catch(e => failureCallback(e.message));
 }
 
 function checkFullscreen()
@@ -459,7 +459,7 @@ export {
 	updateConfirmButtonText,
 	promptRefresh,
 	abandonGame,
-	logout,
+	logOut,
 	hideCurtain,
 	checkBrowserCompatibility,
 	checkFullscreen,

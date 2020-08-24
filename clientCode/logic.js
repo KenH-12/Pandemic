@@ -24,7 +24,7 @@ import {
 	updateConfirmButtonText,
 	promptRefresh,
 	abandonGame,
-	logout,
+	logOut,
 	hideCurtain,
 	checkBrowserCompatibility,
 	checkFullscreen,
@@ -166,18 +166,18 @@ const playerDeckImgManager = new DeckImageManager({
             isPrimaryButton: true
         }),
 		new ConfirmationButton("btnAbandon", "ABANDON GAME", "ABANDON GAME?", abandonGame),
-		new SideMenuButton("LOGOUT",
-        {
-            buttonID: "btnLogout",
-            isExpandable: false,
-            onClick: logout
-        }),
 		new SideMenuButton("RETURN TO <span class='nowrap'>MAIN MENU</span>",
 		{
 			buttonID: "btnReturnToMainMenu",
 			isExpandable: false,
 			onClick: () => window.location.replace("index.php")
-		})
+		}),
+		new SideMenuButton("LOG OUT",
+        {
+            buttonID: "btnLogOut",
+            isExpandable: false,
+            onClick: () => logOut(promptRefresh)
+        })
 	],
 	{
 		$hamburgerButton: $("button.hamburger"),

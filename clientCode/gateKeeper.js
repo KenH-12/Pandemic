@@ -3,6 +3,7 @@ import { postData, fetchHtml } from "./utilities/fetchUtils.js";
 import { strings } from "./strings.js";
 import SideMenu, { SideMenuButton } from "./sideMenu.js";
 import { bindSideMenuHoverEvents } from "./tooltipInstantiation.js";
+import { logOut } from "./utilities/pandemicUtils.js";
 
 const selectors = {
     lobbySelector: "#lobby",
@@ -202,11 +203,11 @@ function appendSideMenu()
             buttonID: "about",
             isPrimaryButton: true
         }),
-        new SideMenuButton("LOGOUT",
+        new SideMenuButton("LOG OUT",
         {
-            buttonID: "btnLogout",
+            buttonID: "btnlogOut",
             isExpandable: false,
-            onClick: logout
+            onClick: () => logOut(serverOperationFailed)
         })
     ], { omitContentSelector: ".inGameOnly" });
 
@@ -823,19 +824,6 @@ function abandonGame()
                 return serverOperationFailed(response.failure);
             
             showMainMenu();
-        })
-        .catch(e => serverOperationFailed(e.message));
-}
-
-function logout()
-{
-    postData("serverCode/logout.php", {})
-        .then(response => 
-        {
-            if (response.failure)
-                return serverOperationFailed(response.failure);
-            
-            window.location.reload(false);
         })
         .catch(e => serverOperationFailed(e.message));
 }
