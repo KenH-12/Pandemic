@@ -164,6 +164,11 @@ const playerDeckImgManager = new DeckImageManager({
         {
             buttonID: "about",
             isPrimaryButton: true
+		}),
+		new SideMenuButton("CONTACT",
+        {
+            buttonID: "contact",
+            isPrimaryButton: true
         }),
 		new ConfirmationButton("btnAbandon", "ABANDON GAME", "ABANDON GAME?", abandonGame),
 		new SideMenuButton("RETURN TO <span class='nowrap'>MAIN MENU</span>",

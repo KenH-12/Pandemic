@@ -240,8 +240,14 @@ strings = {
     forcastBottomInfo: "The bottom card will be put back on the deck first (and drawn from the deck sixth).",
 
     about: [
-        "This is a portfolio piece by web developer Ken Henderson. It's an adaptation of the award-winning board game, <i>Pandemic</i>, in the form of a Web application. The functionality is true to the original ruleset in every respect.",
+        "This is an adaptation of the award-winning board game, <i>Pandemic</i>, in the form of a Web application. The functionality is true to the original ruleset in every respect.",
         disclaimer
+    ],
+    contact: [
+        "<span class='copyable'>Developer: Ken Henderson</span>",
+        "<span class='copyable'>Email: kenthecoder@outlook.com</span>",
+        "<span class='copyable'>Website: <a href='http://kenthecoder.com'>kenthecoder.com</a></span>",
+        "<span class='copyable'>GitHub: <a href='https://github.com/KenH-12/Pandemic'>KenH-12/Pandemic</a></span>"
     ],
     disclaimer
 };

@@ -319,6 +319,16 @@ select
 .largeText { font-size: 18px }
 .whiteText { color: #fff !important }
 .italics { font-style: italic }
+.copyable
+{
+	-webkit-touch-callout: text; /* iOS Safari */
+	-webkit-user-select: text;   /* Chrome/Safari/Opera */
+	-khtml-user-select: text;    /* Konqueror */
+	-moz-user-select: text;      /* Firefox */
+	-ms-user-select: text;       /* Internet Explorer/Edge */
+	
+	cursor: text;
+}
 #container
 {
 	min-width: 1024px;

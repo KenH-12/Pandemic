@@ -203,6 +203,11 @@ function appendSideMenu()
             buttonID: "about",
             isPrimaryButton: true
         }),
+        new SideMenuButton("CONTACT",
+        {
+            buttonID: "contact",
+            isPrimaryButton: true
+        }),
         new SideMenuButton("LOG OUT",
         {
             buttonID: "btnlogOut",
