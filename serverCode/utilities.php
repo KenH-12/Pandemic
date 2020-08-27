@@ -29,6 +29,12 @@ function callDbFunctionSafe($pdo, $fnName, $args)
 
 function sendVerificationCode($pdo, $userID)
 {
+    $stmt = $pdo->prepare("DELETE FROM verificationCode WHERE userID = ?");
+    $stmt->execute([$userID]);
+    
+    if (queryCausedError($pdo))
+        throwException($pdo, "failed to delete expired verification code(s)");
+    
     $vCode = callDbFunctionSafe($pdo, "udf_generateVerificationCode", $userID);
 
     if ($vCode == "0")
@@ -49,18 +55,10 @@ function sendVerificationCode($pdo, $userID)
     $username = $result["username"];
     $to = $result["email"];
     $subject = "Pandemic Account Verification";
-    $message = "<html>
-                <head>
-                    <title>Pandemic Account Verification</title>
-                </head>
-                <body>
-                    <h3>Hello, $username.</h3>
-                    <h5>Ready to save the world?!</h5>
-                    <p>Verify your Pandemic account using this code: $vCode</p>
-                    <p>(code will expire after 1 hour)</p>
-                </body>
-                </html>";
-    $headers = "MIME-Version: 1.0\r\nContent-type: text/html; charset=iso-8859-1";
+    $message = "Hello, $username.\nVerify your Pandemic account using this code: $vCode\n(code will expire after 1 hour)";
+    $headers = "From: ken@kenhenderson.site";
+    
+    mail($to, $subject, $message, $headers);
 }
 
 function recordFailedLoginAttempt($pdo, $usernameOrId, $ipAddress)
