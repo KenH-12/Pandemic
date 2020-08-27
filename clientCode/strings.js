@@ -246,8 +246,8 @@ strings = {
     contact: [
         "<span class='copyable'>Developer: Ken Henderson</span>",
         "<span class='copyable'>Email: kenthecoder@outlook.com</span>",
-        "<span class='copyable'>Website: <a href='http://kenthecoder.com'>kenthecoder.com</a></span>",
-        "<span class='copyable'>GitHub: <a href='https://github.com/KenH-12/Pandemic'>KenH-12/Pandemic</a></span>"
+        "<span class='copyable'>Website: <a href='https://kenhenderson.site'>kenhenderson.site</a></span>",
+        "<span class='copyable'>GitHub: <a href='https://github.com/KenH-12'>github.com/KenH-12</a></span>"
     ],
     disclaimer
 };
