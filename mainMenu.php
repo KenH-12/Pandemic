@@ -97,6 +97,11 @@
                 $lastNumEpidemics = $result["numEpidemics"];
                 $lastNumRoles = $result["numRoles"];
             }
+            else // default settings
+            {
+                $lastNumEpidemics = 4;
+                $lastNumRoles = 2;
+            }
 
             $difficulties = array("Introductory", "Standard", "Heroic");
             $difficultyRadioButtons = "";
