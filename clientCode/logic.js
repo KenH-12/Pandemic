@@ -1907,7 +1907,7 @@ function forecastDraw({ forecastEventToLoad, $btnConfirm } = {})
 			if (!forecastEventToLoad)
 			{
 				await discardOrRemoveEventCard(forecastEvent, $btnConfirm);
-				$btnConfirm.remove();
+				$btnConfirm.add($btnConfirm.siblings(".specialAbilityTag")).remove();
 			}
 
 			actionInterfacePopulator.$actionInterface.children(".eventCardFull").add(".discardSelections").remove();
