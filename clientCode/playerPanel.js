@@ -125,7 +125,7 @@ export default class PlayerPanel
         this.$panel.find(`.playerCard[data-key='${cardKey}']`).remove();
     }
     
-    animateReceiveCard($card, { targetProperties, isContingencyCard } = {})
+    async animateReceiveCard($card, { targetProperties, isContingencyCard } = {})
 	{
 		targetProperties = targetProperties || this.getCardTargetProperties({ isContingencyCard });
 		
@@ -153,26 +153,29 @@ export default class PlayerPanel
             $insertAfterElement = this.$panel.children(".role, .playerCard").last();
         
         $card.appendTo("#rightPanel") // The animation is smoother if the $card is first appended to #rightPanel.
-            .addClass("drawing")
-            .css(
-            {
+            .addClass("drawing");
+        
+        await animationPromise({
+            $elements: $card,
+            initialProperties: {
                 ...{
                     position: "absolute",
                     zIndex: "5",
                     width: initialWidth
                 },
                 ...initialOffset
-            })
-            .animate(targetProperties, getDuration("dealCard"),
-            function()
-            {
-                $card.removeAttr("style")
-                    .insertAfter($insertAfterElement)
-                    .removeClass("drawing");
-                
-                panel.checkOcclusion();
-                return Promise.resolve();
-            });
+            },
+            desiredProperties: targetProperties,
+            duration: getDuration("dealCard"),
+            easing: "easeOutSine"
+        });
+
+        $card.removeAttr("style")
+            .insertAfter($insertAfterElement)
+            .removeClass("drawing");
+        
+        panel.checkOcclusion();
+        return Promise.resolve();
     }
     
     getCardTargetProperties({ isContingencyCard } = {})
