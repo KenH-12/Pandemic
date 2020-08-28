@@ -1306,7 +1306,7 @@ function undoEradicationEvent($pdo, $game, $event)
     $eventID = $event["id"];
 
     $stmt = $pdo->prepare("UPDATE pandemic
-                            SET $column = getDiseaseStatusID('cured')
+                            SET $column = udf_getDiseaseStatusID('cured')
                             WHERE gameID = ?");
     $stmt->execute([$game]);
 

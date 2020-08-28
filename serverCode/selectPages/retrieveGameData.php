@@ -17,7 +17,7 @@
 										numEpidemics,
 										epidemicCount,
 										outbreakCount
-								FROM pandemic.vw_gameState
+								FROM pandemic.vw_gamestate
 								WHERE game = ?");
 		$stmt->execute([$game]);
 		$response["gamestate"] = $stmt->fetch();

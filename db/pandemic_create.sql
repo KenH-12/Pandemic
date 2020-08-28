@@ -1,3 +1,5 @@
+
+
 DROP VIEW IF EXISTS vw_location;
 DROP VIEW IF EXISTS vw_event;
 DROP VIEW IF EXISTS vw_playerCard;
@@ -220,7 +222,7 @@ SELECT	gameID AS game,
 			playerCardIndex AS cardIndex
 FROM location
 INNER JOIN city ON location.cityKey = city.cityKey
-INNER JOIN cardpile ON location.playerCardPileID = cardpile.ID;
+INNER JOIN cardPile ON location.playerCardPileID = cardPile.ID;
 
 CREATE VIEW vw_infectionCard
 AS
@@ -232,7 +234,7 @@ SELECT	gameID AS game,
 			infectionCardIndex AS cardIndex
 FROM location
 INNER JOIN city ON location.cityKey = city.cityKey
-INNER JOIN cardpile ON location.infectionCardPileID = cardpile.ID;
+INNER JOIN cardPile ON location.infectionCardPileID = cardPile.ID;
 
 CREATE TABLE player
 (
