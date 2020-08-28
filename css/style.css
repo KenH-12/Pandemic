@@ -1282,7 +1282,13 @@ span.r, p.r {color: #ef282a; background: none !important }
 	color: #000;
 	font-family: 'Audiowide', 'Electrolize', sans-serif;
 	font-weight: 700;
+	transition: background-color .4s;
 }
+.cityName.concealed
+{ color: var(--main-background-color) }
+#forecastCards .cityName.concealed
+{ color: var(--dark-grey-background) }
+
 .veil
 {
 	width: 89.52%;
