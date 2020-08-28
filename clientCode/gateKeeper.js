@@ -643,6 +643,8 @@ class UserAccountCreator
                 new ValidationError(emailSelector, "That email address is already associated with an account.").show();
                 hideValidationErrorsOnChangeEvent(emailSelector);
             }
+
+            this.bindEventListeners();
         }
         else
             serverOperationFailed(reason);
