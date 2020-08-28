@@ -1265,7 +1265,7 @@ function isCityKey(cardKey)
 
 function bindCityLocatorClickEvents({ $containingElement } = {})
 {
-	const selector = ".infectionCard, .playerCard:not(.eventCard, .epidemic), .locatable",
+	const selector = ".infectionCard, .playerCard:not(.eventCard):not(.epidemic), .locatable",
 		$locatable = $containingElement ? $containingElement.find(selector) : $(selector);
 	
 	$locatable.off("click")
@@ -1286,7 +1286,7 @@ function pinpointCityFromCard($card)
 async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 {
 	if (gameData.skipping)
-		return;
+		return Promise.resolve();
 	
 	const city = getCity(cityKey),
 		cityOffset = city.getOffset(),
@@ -1334,6 +1334,8 @@ async function pinpointCity(cityKey, { pinpointColor, pinpointClass } = {})
 			easing
 		})
 	]);
+	
+	Promise.resolve();
 
 	await sleep(750);
 
