@@ -3,6 +3,10 @@ BUGS
 
 TO DO
 -----
+error messages should be sent to me via email
+
+load fonts directly from site?
+
 firefox testing
 
 main menu
@@ -98,6 +102,10 @@ split data.currentStep into an object containing 'next' and 'current' keys
 
 SMALL FIXES
 -----------
+when resilient population is undone, the index of the card when it's placed back in the discard pile seems random
+
+figure out how to remove the "on behalf of" email header
+
 when the operations expert has only one city card, operations flight should have a "confirm" button instead of asking them to select a card
 
 perhaps the "PLAY" info icon should have its own small tooltip
