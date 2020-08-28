@@ -213,8 +213,6 @@ function devToolsIsOpen()
 		get: () => isOpen = true
 	});
 
-	console.log(element);
-
 	return isOpen;
 }
 

@@ -2664,7 +2664,6 @@ function requestAction(eventType, dataToPost, { isDispatchRequest } = {})
 		else
 			indicateActionsLeft({ zeroRemaining: true });
 		
-		console.log(`requestAction(${eventType.code})`);
 		const { $loadingGif, resetActionButtonImg } = showLoadingGif(isDispatchRequest ? eventTypes.dispatchPawn : eventType);
 	
 		postData(`serverCode/actionPages/${eventType.actionPathName}.php`, {
@@ -2681,8 +2680,6 @@ function requestAction(eventType, dataToPost, { isDispatchRequest } = {})
 				resetActionButtonImg();
 			else if ($loadingGif.length)
 				$loadingGif.remove();
-			
-			console.log(response);
 
 			if (response.failure)
 				return reject(new Error(response.failure));
