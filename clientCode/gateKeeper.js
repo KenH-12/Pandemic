@@ -761,14 +761,29 @@ function accountVerificationFailed(reason)
 
 function resendVerificationCode()
 {
-    // TODO: show loading gif
+    const $container = $("#resendCode"),
+        $link = $container.find("#lnkResendCode").parent(),
+        $msg = $link.addClass("hidden").siblings("p").html("Sending another code...").removeClass("hidden"),
+        $loadingGif = $(strings.loadingGifHtml).appendTo($container);
+
     postData("serverCode/actionPages/resendVerificationCode.php")
-        .then(response =>
+        .then(async response =>
         {
+            $loadingGif.remove();
+
             if (response.failure)
                 return serverOperationFailed(response.failure);
             
-            // TODO: change instructions to reflect that a new code has been sent
+            $msg.html("Sent another code!");
+            await sleep(2500);
+        
+            await animationPromise({
+                $elements: $msg,
+                desiredProperties: { opacity: 0 }
+            });
+        
+            $msg.addClass("hidden").removeAttr("style");
+            $link.removeClass("hidden");
         })
         .catch(e => serverOperationFailed(e.message));
 }

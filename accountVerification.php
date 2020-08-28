@@ -8,7 +8,10 @@
                 <div id='btnVerify' class='button inlineButton'>Verify</div>
             </form>
 
-            <u><a id='lnkResendCode'>Resend Code</a></u>";
+            <div id='resendCode'>
+                <u><a id='lnkResendCode'>Resend Code</a></u>
+                <p class='largeText hidden'>Sent another code!</p>
+            </div>";
     
     echo $html;
 ?>

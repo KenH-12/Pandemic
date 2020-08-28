@@ -229,6 +229,13 @@ input[type='password']
 #txtVerificationCode,
 #btnVerify
 { width: 100px }
+#resendCode .loadingGif
+{
+	width: 20%;
+	text-align: left;
+	margin-top: 5px;
+}
+
 .divInputControl
 {
 	display: block;
