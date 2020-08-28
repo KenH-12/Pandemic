@@ -80,7 +80,30 @@
         }
 
         $pdo->query("CALL proc_insert_locations($gID)");
-        $pdo->query("CALL proc_arrangePlayerCards($gID)");
+
+        $noEpidemics = true;
+        $epidemicInsertionAttempts = 0;
+        while ($noEpidemics && $epidemicInsertionAttempts < 3)
+        {
+            $pdo->query("CALL proc_arrangePlayerCards($gID)");
+
+            $epidemics = $pdo->query("SELECT cardKey
+                                        FROM vw_playerCard
+                                        WHERE game = $gID
+                                        AND cardKey LIKE 'epi%'");
+            
+            if ($epidemics->rowCount() == $numEpidemics)
+                $noEpidemics = false;
+            else
+            {
+                $pdo->query("DELETE FROM location WHERE gameID = $gID");
+                $epidemicInsertionAttempts++;
+            }
+        }
+        
+        if ($noEpidemics)
+            throw new Exception("failed to insert epidemic cards.");
+
         $pdo->query("CALL proc_infectNineCities($gID)");
 
         $_SESSION["game"] = $gID;
