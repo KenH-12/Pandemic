@@ -123,6 +123,7 @@ input[type='password']
 	border: 2px solid rgb(204, 26, 29);
 	border-radius: 8px;
 	margin-top: var(--lobby-padding);
+	max-width: 70%;
 }
 #lobby #warningsContainer h3
 { 
