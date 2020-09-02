@@ -28,7 +28,8 @@ BEGIN
 		AND pile = 'deck'
 		AND cardIndex =	(SELECT MAX(cardIndex)
 								FROM vw_infectioncard
-								WHERE pile = 'deck');
+								WHERE game = gID
+								AND pile = 'deck');
 		
 		-- Decrease the number of disease cubes by one for every 3 cities updated
 		IF (i > 0 AND MOD(i, infectionGroupSize) = 0)
