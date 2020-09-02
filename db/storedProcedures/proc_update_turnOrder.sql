@@ -22,7 +22,7 @@ BEGIN
 	FROM city
 	INNER JOIN location
 	ON city.cityKey = location.cityKey
-	WHERE game = gID
+	WHERE gameID = gID
 	AND playerCardPileID = pileID)
 	ORDER BY pop DESC;
 	
