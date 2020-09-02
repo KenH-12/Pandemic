@@ -22,7 +22,8 @@ BEGIN
 	FROM city
 	INNER JOIN location
 	ON city.cityKey = location.cityKey
-	WHERE playerCardPileID = pileID)
+	WHERE game = gID
+	AND playerCardPileID = pileID)
 	ORDER BY pop DESC;
 	
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
