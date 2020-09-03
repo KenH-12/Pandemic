@@ -224,10 +224,10 @@ input[type='password']
 	margin-left: 2px;
 }
 .inlineForm .loadingGif img { width: 100%; padding: 0 }
-#btnAttemptAccess
+#btnAttemptAccess img
 {
-	font-size: 22px;
-	line-height: 22px;
+	width: 32%;
+	max-height: 100%;
 }
 #disclaimer { width: var(--lobby-content-width) }
 

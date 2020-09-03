@@ -72,7 +72,9 @@
                             <form id='frmAccessKey' class='inlineForm'>    
                                 <label for='txtAccessKey'>Enter Access Key:</label>
                                 <input id='txtAccessKey' type='text' />
-                                <div id='btnAttemptAccess' class='button inlineButton' tabindex='0'>&#x2B9E;</div>
+                                <div id='btnAttemptAccess' class='button inlineButton' tabindex='0'>
+                                    <img src='images/icons/rightArrow.png' alt='Attempt Access'/>
+                                </div>
                             </form>
 
                             <p id='disclaimer' class='smallText'></p>
