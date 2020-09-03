@@ -7,6 +7,8 @@
 		die();
 	}
 
+	$fullscreenNoticeChecked = isset($_COOKIE["fullscreenNotice"]) ? " checked" : "";
+
 	$MAX_RESEARCH_STATION_COUNT = 6;
 	$MAX_CUBE_SUPPLY_COUNT = 24;
 
@@ -69,7 +71,7 @@
 					<h2>This game is intended to be played in fullscreen mode.</h2>
 					<h3>Press [<span id='fullscreenShortcut'></span>] to enter fullscreen.</h3>
 					<div>
-						<input type='checkbox' id='chkFullscreenNotice' name='chkFullscreenNotice' />
+						<input type='checkbox' id='chkFullscreenNotice' name='chkFullscreenNotice'$fullscreenNoticeChecked/>
 						<label for='chkFullscreenNotice'>don't show this message again</label>
 					</div>
 					<div class='button'>OK</div>

@@ -6,6 +6,7 @@ import { eventCards } from "../eventCard.js";
 import { getCity } from "../city.js";
 import { gameData, getPlayer, getActivePlayer } from "../gameData.js";
 import { postData } from "./fetchUtils.js";
+import { setCookie, unsetCookie, cookieExists } from "./cookieUtils.js";
 
 // Returns the Infection Rate (as seen on the Infection Rate Track on the game board)
 // which corresponds to the number of Epidemic cards drawn thus far.
@@ -340,9 +341,7 @@ function logOut(failureCallback)
 
 function checkFullscreen()
 {
-	const dismissedFullscreenRecommendation = $("#chkFullscreenNotice").prop("checked");
-
-	if (dismissedFullscreenRecommendation || gameIsFullscreen())
+	if (cookieExists("fullscreenNotice") || gameIsFullscreen())
 		return hideFullscreenRecommendation();
 	
 	recommendFullscreen();
@@ -373,6 +372,18 @@ function recommendFullscreen()
 	$fullscreenRecommendation.find(".button")
 		.off("click")
 		.click(hideFullscreenRecommendation);
+	
+	$fullscreenRecommendation.find("#chkFullscreenNotice")
+		.off("click")
+		.click(function()
+		{
+			const cookieName = "fullscreenNotice";
+
+			if ($(this).prop("checked"))
+				setCookie("fullscreenNotice", 1);
+			else
+				unsetCookie(cookieName);
+		});
 }
 
 async function hideFullscreenRecommendation()
