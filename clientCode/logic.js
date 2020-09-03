@@ -3491,10 +3491,10 @@ function resizeBottomPanelElements()
 		ehHeight = $eventHistoryContainer.children("#eventHistory").width()*.15,
 		ehContainerHeight = ehHeight*2.05,
 		boardHeightForgiveness = 3;
+	
 	$eventHistoryContainer.height(ehContainerHeight)
 		.offset({ top: boardHeight - ehContainerHeight })
-		.children().height(ehHeight)
-		.not("#undoingIndicator").css("line-height", ehHeight*1.1 + "px");
+		.children().height(ehHeight);
 	
 	if (boardHeight - boardHeightForgiveness <= $(window).height())
 		ensureDivPositionIsWithinWindowHeight($eventHistoryContainer, { windowPadding: 0 });

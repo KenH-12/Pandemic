@@ -180,10 +180,16 @@
 						<div id='eventHistoryContainer'>
 							<div id='undoingIndicator'></div>
 
-							<div class='eventHistoryButton btnBack btnDisabled'>&#x2B9C;</div>
+							<div class='eventHistoryButton btnBack btnDisabled'>
+								<img src='images/icons/eventHistory_leftArrow.png' alt='scroll left'/>
+							</div>
 							<div id='eventHistory'></div>
-							<div class='eventHistoryButton btnForward btnDisabled'>&#x2B9E;</div>
-							<div id='btnUndo' class='eventHistoryButton btnDisabled'>&#x2B8C;</div>
+							<div class='eventHistoryButton btnForward btnDisabled'>
+								<img src='images/icons/eventHistory_rightArrow.png' alt='scroll right'/>
+							</div>
+							<div id='btnUndo' class='eventHistoryButton btnDisabled'>
+								<img src='images/icons/undo.png' alt='undo last action'/>
+							</div>
 						</div>
 						
 						<div id='cureMarkerContainer' class='bottomPanelDiv'>
