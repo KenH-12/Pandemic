@@ -7,6 +7,10 @@
 		die();
 	}
 
+	require "serverCode/resourceDirectoryManager.php";
+	$res = getResourceDirectory();
+	$versionNumber = substr($res, 4);
+
 	$fullscreenNoticeChecked = isset($_COOKIE["fullscreenNotice"]) ? " checked" : "";
 
 	$MAX_RESEARCH_STATION_COUNT = 6;
@@ -22,21 +26,21 @@
 				<title>Pandemic</title>
 				<meta name='viewport' content='width=device-width, initial-scale=1'>
 				<link href='https://fonts.googleapis.com/css?family=Exo+2:800|Electrolize|Audiowide|Oswald:400,700|B612+Mono|Ropa+Sans&display=swap' rel='stylesheet'>
-				<link type='text/css' href='css/style.css' rel='stylesheet'>
-				<link type='text/css' href='css/hamburgers.css' rel='stylesheet'>
-				<link rel='icon' type='image/x-icon' sizes='16x16' href='images/icons/favicon-16x16.png' />
-				<link rel='icon' type='image/x-icon' sizes='32x32' href='images/icons/favicon-32x32.png' />
-				<script src='clientCode/jquery-1.11.2.min.js'></script>
-				<script src='clientCode/jquery-ui.min.js'></script>
-				<script src='clientCode/jquery.easing.1.3.js'></script>
-				<script src='clientCode/utilities/miscUtils.js'></script>
-				<script src='clientCode/utilities/stringUtils.js'></script>
-				<script src='clientCode/utilities/tooltipUtils.js'></script>
-				<script src='clientCode/utilities/geometryUtils.js'></script>
-				<script src='clientCode/utilities/animationUtils.js'></script>
-				<script type='module' src='clientCode/logic.js'></script>
+				<link type='text/css' href='$res/css/style.css' rel='stylesheet'>
+				<link type='text/css' href='$res/css/hamburgers.css' rel='stylesheet'>
+				<link rel='icon' type='image/x-icon' sizes='16x16' href='$res/images/icons/favicon-16x16.png' />
+				<link rel='icon' type='image/x-icon' sizes='32x32' href='$res/images/icons/favicon-32x32.png' />
+				<script src='$res/clientCode/jquery-1.11.2.min.js'></script>
+				<script src='$res/clientCode/jquery-ui.min.js'></script>
+				<script src='$res/clientCode/jquery.easing.1.3.js'></script>
+				<script src='$res/clientCode/utilities/miscUtils.js'></script>
+				<script src='$res/clientCode/utilities/stringUtils.js'></script>
+				<script src='$res/clientCode/utilities/tooltipUtils.js'></script>
+				<script src='$res/clientCode/utilities/geometryUtils.js'></script>
+				<script src='$res/clientCode/utilities/animationUtils.js'></script>
+				<script type='module' src='$res/clientCode/logic.js'></script>
 			</head>
-			<body>
+			<body data-version='$versionNumber'>
 				<div id='curtain'>
 					<p id='loading'>loading game...</p>
 					<h2 id='skippingSetupMsg' class='hidden'>Skipping setup...</h2>
@@ -89,14 +93,14 @@
 						<div class='pinpointRect hidden'></div>
 						
 						<div id='demoCube' class='diseaseCube hidden'></div>
-						<img id='demoPawn' src='images/pieces/pawns/medic.png' class='pawn hidden'/>
+						<img id='demoPawn' src='$res/images/pieces/pawns/medic.png' class='pawn hidden'/>
 						<div id='demoStation' class='researchStation hidden'>
-							<img src='images/pieces/researchStation.png' />
+							<img src='$res/images/pieces/researchStation.png' />
 						</div>
 
 						<img id='placeholderPawn' class='pawn hidden'/>
 						<div id='placeholderStation' class='researchStation hidden'>
-							<img src='images/pieces/researchStation.png' />
+							<img src='$res/images/pieces/researchStation.png' />
 						</div>
 						
 						<div id='playerPanelContainer'></div>
@@ -145,7 +149,7 @@
 							
 							<div id='infectionDeckContainer'>
 								<p class='title'>INFECTION DECK</p>
-								<img src='images/cards/infectionCardback.png' alt='Infection Deck' />
+								<img src='$res/images/cards/infectionCardback.png' alt='Infection Deck' />
 							</div>
 
 						</div>
@@ -168,7 +172,7 @@
 						<div class='infectionRateHighlight bottom hidden'></div>
 						<div class='infectionRateHighlight left hidden'></div>
 						<div id='infectionRateMarker' class='marker'>
-							<img src='images/pieces/infectionRateMarker.png' alt='Infection Rate Marker'/>
+							<img src='$res/images/pieces/infectionRateMarker.png' alt='Infection Rate Marker'/>
 						</div>
 						
 						<div id='outbreaksTrackHighlight' class='hidden'></div>
@@ -176,21 +180,21 @@
 						<div class='outbreaksHighlight right hidden'></div>
 						<div class='outbreaksHighlight bottom hidden'></div>
 						<div id='outbreaksMarker' class='marker'>
-							<img src='images/pieces/outbreaksMarker.png' alt='Outbreaks Marker'/>
+							<img src='$res/images/pieces/outbreaksMarker.png' alt='Outbreaks Marker'/>
 						</div>
 
 						<div id='eventHistoryContainer'>
 							<div id='undoingIndicator'></div>
 
 							<div class='eventHistoryButton btnBack btnDisabled'>
-								<img src='images/icons/eventHistory_leftArrow.png' alt='scroll left'/>
+								<img src='$res/images/icons/eventHistory_leftArrow.png' alt='scroll left'/>
 							</div>
 							<div id='eventHistory'></div>
 							<div class='eventHistoryButton btnForward btnDisabled'>
-								<img src='images/icons/eventHistory_rightArrow.png' alt='scroll right'/>
+								<img src='$res/images/icons/eventHistory_rightArrow.png' alt='scroll right'/>
 							</div>
 							<div id='btnUndo' class='eventHistoryButton btnDisabled'>
-								<img src='images/icons/undo.png' alt='undo last action'/>
+								<img src='$res/images/icons/undo.png' alt='undo last action'/>
 							</div>
 						</div>
 						
@@ -208,12 +212,12 @@
 							<p class='title'>RESEARCH STATION SUPPLY <span class='info'>&#9432;</span></p>
 							<p id='researchStationSupplyCount'>$MAX_RESEARCH_STATION_COUNT</p>
 							<div class='researchStation'>
-								<img src='images/pieces/researchStation.png' id='imgResearchStationSupply' alt='Research Station' />
+								<img src='$res/images/pieces/researchStation.png' id='imgResearchStationSupply' alt='Research Station' />
 							</div>
 						</div>
 						<div id='playerDeckContainer' class='bottomPanelDiv'>
 							<p class='title'>PLAYER DECK <span class='info hidden'>&#9432;</span></p>
-							<img id='imgPlayerDeck' src='images/cards/playerDeck_6.png' alt='Player Deck'/>
+							<img id='imgPlayerDeck' src='$res/images/cards/playerDeck_6.png' alt='Player Deck'/>
 						</div>
 						<div id='playerDiscardContainer' class='bottomPanelDiv'>
 							<p class='title'>PLAYER DISCARDS</p>
@@ -224,7 +228,7 @@
 
 					</div>
 
-					<img id='boardImg' src='images/pandemic_board.png' alt='Game Board'>
+					<img id='boardImg' src='$res/images/pandemic_board.png' alt='Game Board'>
 					
 					<div id='sideMenuTitle'>
 						<h2>MENU</h2>
@@ -314,28 +318,28 @@
 								<h2>MOVEMENT ACTIONS</h2>
 								<div class='button actionButton' id='btnDriveFerry'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/driveFerry.png' />
+										<img src='$res/images/eventIcons/driveFerry.png' />
 									</div>
 									<div class='actionName'>DRIVE / FERRY</div>
 									<div class='actionInfo'>&#9432;</div>
 								</div>
 								<div class='button actionButton' id='btnDirectFlight'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/directFlight.png' />
+										<img src='$res/images/eventIcons/directFlight.png' />
 									</div>
 									<div class='actionName'>DIRECT FLIGHT</div>
 									<div class='actionInfo'>&#9432;</div>
 								</div>
 								<div class='button actionButton' id='btnCharterFlight'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/charterFlight.png' />
+										<img src='$res/images/eventIcons/charterFlight.png' />
 									</div>
 									<div class='actionName'>CHARTER FLIGHT</div>
 									<div class='actionInfo'>&#9432;</div>
 								</div>
 								<div class='button actionButton' id='btnShuttleFlight'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/shuttleFlight.png' />
+										<img src='$res/images/eventIcons/shuttleFlight.png' />
 									</div>
 									<div class='actionName'>SHUTTLE FLIGHT</div>
 									<div class='actionInfo'>&#9432;</div>
@@ -346,35 +350,35 @@
 								<h2>OTHER ACTIONS</h2>
 								<div class='button actionButton' id='btnBuildResearchStation'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/buildResearchStation.png' />
+										<img src='$res/images/eventIcons/buildResearchStation.png' />
 									</div>
 									<div class='actionName'>BUILD RESEARCH STATION</div>
 									<div class='actionInfo'>&#9432;</div>
 								</div>
 								<div class='button actionButton' id='btnTreatDisease'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/treatDisease.png' />
+										<img src='$res/images/eventIcons/treatDisease.png' />
 									</div>
 									<div class='actionName'>TREAT DISEASE</div>
 									<div class='actionInfo'>&#9432;</div>
 								</div>
 								<div class='button actionButton' id='btnShareKnowledge'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/shareKnowledge.png' />
+										<img src='$res/images/eventIcons/shareKnowledge.png' />
 									</div>
 									<div class='actionName'>SHARE KNOWLEDGE</div>
 									<div class='actionInfo'>&#9432;</div>
 								</div>
 								<div class='button actionButton' id='btnDiscoverACure'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/discoverACure.png' />
+										<img src='$res/images/eventIcons/discoverACure.png' />
 									</div>
 									<div class='actionName'>DISCOVER A CURE</div>
 									<div class='actionInfo'>&#9432;</div>
 								</div>
 								<div class='button actionButton' id='btnPass'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/pass.png' />
+										<img src='$res/images/eventIcons/pass.png' />
 									</div>
 									<div class='actionName'>PASS</div>
 									<div class='actionInfo'>&#9432;</div>
@@ -384,21 +388,21 @@
 								<h2>SPECIAL ACTIONS</h2>
 								<div class='button actionButton operationsExpert' id='btnPlanContingency'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/planContingency.png' />
+										<img src='$res/images/eventIcons/planContingency.png' />
 									</div>
 									<div class='actionName'>PLAN CONTINGENCY</div>
 									<div class='actionInfo'>&#9432;</div>
 								</div>
 								<div class='button actionButton dispatcher' id='btnDispatchPawn'>
 									<div class='actionIcon'>
-									<img src='images/eventIcons/dispatchPawn.png' />
+									<img src='$res/images/eventIcons/dispatchPawn.png' />
 								</div>
 								<div class='actionName'>DISPATCH PAWN</div>
 								<div class='actionInfo'>&#9432;</div>
 							</div>
 								<div class='button actionButton operationsExpert' id='btnOperationsFlight'>
 									<div class='actionIcon'>
-										<img src='images/eventIcons/operationsFlight.png' />
+										<img src='$res/images/eventIcons/operationsFlight.png' />
 									</div>
 									<div class='actionName'>OPERATIONS FLIGHT</div>
 									<div class='actionInfo'>&#9432;</div>

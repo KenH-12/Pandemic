@@ -3,7 +3,7 @@ import { postData, fetchHtml } from "./utilities/fetchUtils.js";
 import { strings } from "./strings.js";
 import SideMenu, { SideMenuButton } from "./sideMenu.js";
 import { bindSideMenuHoverEvents } from "./tooltipInstantiation.js";
-import { logOut } from "./utilities/pandemicUtils.js";
+import { getVersionNumber, logOut, getLoadingGifHtml } from "./utilities/pandemicUtils.js";
 
 const selectors = {
     lobbySelector: "#lobby",
@@ -24,6 +24,8 @@ data = {}
 $(function()
 {
     const $lobby = $(selectors.lobbySelector);
+
+    data.imagesDir = `res_${getVersionNumber()}/images`;
 
     if ($lobby.attr("data-loggedIn"))
     {
@@ -107,7 +109,7 @@ function attemptLogin()
    if (usernameOrPasswordIsEmpty(credentials))
         return false;
 
-    const $loadingGif = $(strings.loadingGifHtml);
+    const $loadingGif = $(getLoadingGifHtml());
 
     $(btnLogInSelector).html("Logging In...").append($loadingGif);
     
@@ -166,7 +168,7 @@ function bindMainMenuEventListeners()
     {
         $(this).off("click").addClass("btnDisabled")
             .html("CREATING GAME...")
-            .append(strings.loadingGifHtml);
+            .append(getLoadingGifHtml());
         createGame();
     });
 }
@@ -250,7 +252,7 @@ function bindRoleCardHoverEvents()
         $(`<div class='roleCard ${camelCaseRole}'>
             <h3>${role}</h3>
             <img	class='rolePortrait'
-                    src='images/cards/roles/${camelCaseRole}.jpg'
+                    src='${data.imagesDir}/cards/roles/${camelCaseRole}.jpg'
                     alt='${role} Role Card' />
             <ul>${strings[`${camelCaseRole}CardText`]}</ul>
         </div>`)
@@ -274,7 +276,7 @@ function attemptAccess()
     }
 
     unbindLoginPageEventListeners();
-    const $loadingGif = $(strings.loadingGifHtml).insertAfter(btnAttemptAccessSelector);
+    const $loadingGif = $(getLoadingGifHtml()).insertAfter(btnAttemptAccessSelector);
     
     postData("serverCode/actionPages/verifyAccessKey.php", { accessKey })
         .then(async response =>
@@ -611,7 +613,7 @@ class UserAccountCreator
         const $btnCreateAccount = $(selectors.btnCreateAccountSelector)
                 .addClass("btnDisabled")
                 .html("Creating Account..."),
-            $loadingGif = $(strings.loadingGifHtml).appendTo($btnCreateAccount);
+            $loadingGif = $(getLoadingGifHtml()).appendTo($btnCreateAccount);
 
         postData("serverCode/actionPages/createAccount.php", this.details)
             .then(response =>
@@ -708,7 +710,7 @@ function verifyAccount()
     if (!verificationCode.length)
         return accountVerificationFailed("no code");
 
-    const $loadingGif = $(strings.loadingGifHtml).insertAfter($btnVerify);
+    const $loadingGif = $(getLoadingGifHtml()).insertAfter($btnVerify);
     postData("serverCode/actionPages/verifyAccount.php", { verificationCode })
         .then(async response =>
         {
@@ -766,7 +768,7 @@ function resendVerificationCode()
     const $container = $("#resendCode"),
         $link = $container.find("#lnkResendCode").parent(),
         $msg = $link.addClass("hidden").siblings("p").html("Sending another code...").removeClass("hidden"),
-        $loadingGif = $(strings.loadingGifHtml).appendTo($container);
+        $loadingGif = $(getLoadingGifHtml()).appendTo($container);
 
     postData("serverCode/actionPages/resendVerificationCode.php")
         .then(async response =>
@@ -825,7 +827,7 @@ function promptAbandonGame()
     {
         $btnConfirm.off("click")
             .addClass("btnDisabled")
-            .append(strings.loadingGifHtml);
+            .append(getLoadingGifHtml());
         
         $btnCancel.remove();
 

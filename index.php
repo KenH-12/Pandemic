@@ -4,6 +4,10 @@
     $verified = false;
     $email = false;
 
+    require "serverCode/resourceDirectoryManager.php";
+    $res = getResourceDirectory();
+    $versionNumber = substr($res, 4);
+    
     if ($loggedIn)
     {
         require "serverCode/connect.php";
@@ -32,19 +36,19 @@
                     <title>Pandemic</title>
                     <meta name='viewport' content='width=device-width, initial-scale=1'>
                     <link href='https://fonts.googleapis.com/css?family=Exo+2:800|Electrolize|Audiowide|Oswald:400,700|B612+Mono|Ropa+Sans&display=swap' rel='stylesheet'>
-                    <link rel='stylesheet' type='text/css' href='css/style.css'>
-                    <link type='text/css' href='css/hamburgers.css' rel='stylesheet'>
-                    <link rel='icon' type='image/x-icon' sizes='16x16' href='images/icons/favicon-16x16.png' />
-                    <link rel='icon' type='image/x-icon' sizes='32x32' href='images/icons/favicon-32x32.png' />
-                    <script src='clientCode/jquery-1.11.2.min.js'></script>
-                    <script src='clientCode/jquery.easing.1.3.js'></script>
-                    <script src='clientCode/utilities/miscUtils.js'></script>
-                    <script src='clientCode/utilities/animationUtils.js'></script>
-                    <script src='clientCode/utilities/stringUtils.js'></script>
-                    <script src='clientCode/utilities/tooltipUtils.js'></script>
-                    <script src='clientCode/gateKeeper.js' type='module'></script>
+                    <link rel='stylesheet' type='text/css' href='$res/css/style.css'>
+                    <link type='text/css' href='$res/css/hamburgers.css' rel='stylesheet'>
+                    <link rel='icon' type='image/x-icon' sizes='16x16' href='$res/images/icons/favicon-16x16.png' />
+                    <link rel='icon' type='image/x-icon' sizes='32x32' href='$res/images/icons/favicon-32x32.png' />
+                    <script src='$res/clientCode/jquery-1.11.2.min.js'></script>
+                    <script src='$res/clientCode/jquery.easing.1.3.js'></script>
+                    <script src='$res/clientCode/utilities/miscUtils.js'></script>
+                    <script src='$res/clientCode/utilities/animationUtils.js'></script>
+                    <script src='$res/clientCode/utilities/stringUtils.js'></script>
+                    <script src='$res/clientCode/utilities/tooltipUtils.js'></script>
+                    <script src='$res/clientCode/gateKeeper.js' type='module'></script>
                 </head>
-                <body id='index'>
+                <body id='index' data-version='$versionNumber'>
                     <div id='lobby' class='hidden'
                         data-loggedIn='$loggedIn'
                         data-verified='$verified'
@@ -73,7 +77,7 @@
                                 <label for='txtAccessKey'>Enter Access Key:</label>
                                 <input id='txtAccessKey' type='text' />
                                 <div id='btnAttemptAccess' class='button inlineButton' tabindex='0'>
-                                    <img src='images/icons/rightArrow.png' alt='Attempt Access'/>
+                                    <img src='$res/images/icons/rightArrow.png' alt='Attempt Access'/>
                                 </div>
                             </form>
 

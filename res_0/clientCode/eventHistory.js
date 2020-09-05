@@ -299,7 +299,7 @@ class EventHistory
 
     async indicateUndoIsInProgress()
     {
-        const $elements = $("<span>Undoing last action...</span><img src='images/loading.gif' />").css("opacity", 0.01);
+        const $elements = $(`<span>Undoing last action...</span><img src='${gameData.imagesDir}/loading.gif' />`).css("opacity", 0.01);
         this.$undoingIndicator.append($elements);
 
         await animationPromise({
@@ -346,7 +346,7 @@ function getEventIconHtml(eventType, { event } = {})
 	
 	let iconHtml = event ? `<div id='icon${event.id}' ${classAttribute}>` : "";
 
-	iconHtml += `<img	src='images/eventIcons/${fileName}.${fileExtension}'
+	iconHtml += `<img	src='${gameData.imagesDir}/eventIcons/${fileName}.${fileExtension}'
 						alt='${name}'
 						${ !event ? classAttribute : ""} />`;
 	

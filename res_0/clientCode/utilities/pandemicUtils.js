@@ -165,6 +165,11 @@ function activePlayerCanTakeFromResearcher()
 		researcher.cityKey === getActivePlayer().cityKey;
 }
 
+function getLoadingGifHtml()
+{
+	return `<div class='loadingGif'><img src='${gameData.imagesDir}/loading.gif' alt='loading' /></div>`;
+}
+
 function showLoadingGif(eventType)
 {
 	let $anchor = $(".actionButton:visible");
@@ -218,7 +223,7 @@ function showLoadingGif(eventType)
 		if ($anchor.length)
 		{
 			const isForEpidemic = $anchor.closest(".epidemicFull").length,
-				$img = $(`<img src='images/loading${ isForEpidemic ? "_epidemic" : "" }.gif' alt='loading' />`),
+				$img = $(`<img src='${gameData.imagesDir}/loading${ isForEpidemic ? "_epidemic" : "" }.gif' alt='loading' />`),
 				$loadingGif = isForEpidemic ? $img : $(`<div class='loadingGif'></div>`).append($img);
 			
 			$loadingGif.insertAfter($anchor);
@@ -240,7 +245,7 @@ function showActionButtonLoadingGifAfterMs($actionButton, ms = 1000)
 		showGifIfStillWaiting = () =>
 		{
 			if ($actionButton.hasClass(loading))
-				$img.attr("src", "images/loading.gif");
+				$img.attr("src", `${gameData.imagesDir}/loading.gif`);
 		},
 		resetImg = () => {
 			$actionButton.removeClass(loading);
@@ -313,7 +318,7 @@ function abandonGame()
 		.add(".pawnArrow")
 		.addClass("hidden");
 	
-	$("#sideMenuTitle").html(`<p>ABANDONING GAME...</p><img src='images/loading.gif' alt='Abandoning game...' />`);
+	$("#sideMenuTitle").html(`<p>ABANDONING GAME...</p><img src='${gameData.imagesDir}/loading.gif' alt='Abandoning game...' />`);
 	
 	postData("serverCode/actionPages/abandonGame.php", {})
 		.then(response =>
@@ -455,6 +460,16 @@ async function anyWarnings()
 	return Promise.resolve();
 }
 
+function getVersionNumber()
+{
+	const $body = $("body"),
+		versionNumber = $body.attr("data-version");
+
+	$body.removeAttr("data-version");
+
+	return versionNumber;
+}
+
 export {
 	getInfectionRate,
 	getColorClass,
@@ -466,6 +481,7 @@ export {
 	getInfectionCardTextStyle,
 	useRoleColorForRelatedActionButtons,
 	activePlayerCanTakeFromResearcher,
+	getLoadingGifHtml,
 	showLoadingGif,
 	updateConfirmButtonText,
 	promptRefresh,
@@ -474,5 +490,6 @@ export {
 	hideCurtain,
 	checkBrowserCompatibility,
 	checkFullscreen,
-	anyWarnings
+	anyWarnings,
+	getVersionNumber
 }

@@ -3,11 +3,19 @@ BUGS
 
 TO DO
 -----
+password recovery
+
+quick play option
+
+firefox testing
+	setup animations
+		role slot machines appearance
+	
+	role card bullet points
+
 error messages should be sent to me via email
 
 load fonts directly from site?
-
-firefox testing
 
 main menu
 	role selection -- perhaps this can be saved for last since random roles is fine
