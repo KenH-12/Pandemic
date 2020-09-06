@@ -3,7 +3,7 @@
     {
         $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
         require "$rootDir/Pandemic/serverCode/connect.php";
-        require "$rootDir/Pandemic/serverCode/utilities.php";
+        require "$rootDir/Pandemic/serverCode/accountUtils.php";
 
         $ipAddress = getClientIpAddress();
         $failedAttemptCount = countFailedAttempts($pdo, $ipAddress);
