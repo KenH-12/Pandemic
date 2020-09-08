@@ -107,6 +107,8 @@ function newVerificationOrSecurityCode($pdo, $userID)
 
     if ($vCode == "0")
         throwException($pdo, "Failed to set verification code");
+    
+    return $vCode;
 }
 
 function callDbFunctionSafe($pdo, $fnName, $args)
