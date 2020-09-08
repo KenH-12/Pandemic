@@ -72,17 +72,6 @@ function clearFailedLoginAttempts($pdo)
 
 function sendVerificationCode($pdo, $userID)
 {
-    $stmt = $pdo->prepare("DELETE FROM verificationCode WHERE userID = ?");
-    $stmt->execute([$userID]);
-    
-    if (queryCausedError($pdo))
-        throwException($pdo, "failed to delete expired verification code(s)");
-    
-    $vCode = callDbFunctionSafe($pdo, "udf_generateVerificationCode", $userID);
-
-    if ($vCode == "0")
-        throwException($pdo, "Failed to set verification code");
-    
     $stmt = $pdo->prepare("SELECT username, email FROM `user` WHERE userID = ?");
     $stmt->execute([$userID]);
 
@@ -93,15 +82,31 @@ function sendVerificationCode($pdo, $userID)
         throw new Exception("user not logged in");
     }
 
-    $result = $stmt->fetch();
+    $userDetails = $stmt->fetch();
+    $username = $userDetails["username"];
+    $to = $userDetails["email"];
 
-    $username = $result["username"];
-    $to = $result["email"];
+    $code = newVerificationOrSecurityCode($pdo, $userID);
+
     $subject = "Pandemic Account Verification";
-    $message = "Hello, $username.\nVerify your Pandemic account using this code: $vCode\n(code will expire after 1 hour)";
+    $message = "Hello, $username.\nVerify your Pandemic account using this code: $code\n(code will expire after 1 hour)";
     $headers = "From: ken@kenhenderson.site";
-    
+
     mail($to, $subject, $message, $headers);
+}
+
+function newVerificationOrSecurityCode($pdo, $userID)
+{
+    $stmt = $pdo->prepare("DELETE FROM verificationCode WHERE userID = ?");
+    $stmt->execute([$userID]);
+    
+    if (queryCausedError($pdo))
+        throwException($pdo, "failed to delete expired verification code");
+    
+    $vCode = callDbFunctionSafe($pdo, "udf_generateVerificationCode", $userID);
+
+    if ($vCode == "0")
+        throwException($pdo, "Failed to set verification code");
 }
 
 function callDbFunctionSafe($pdo, $fnName, $args)
@@ -120,6 +125,16 @@ function callDbFunctionSafe($pdo, $fnName, $args)
     $stmt->execute($args);
 
     return $stmt->fetch()["returnVal"];
+}
+
+function queryCausedError($pdo)
+{
+    return $pdo->errorInfo()[0] != "00000";
+}
+
+function throwException($pdo, $msg)
+{
+    throw new Exception("$msg: " . implode(", ", $pdo->errorInfo()));
 }
 
 ?>

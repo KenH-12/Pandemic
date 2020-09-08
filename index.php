@@ -64,12 +64,13 @@
                         <div class='content'>
                             <form id='frmLogIn'>
                                 <label for='txtUsername'>Username or Email:</label>
-                                <input id='txtUsername' type='text' maxlength='20' />
+                                <input id='txtUsername' type='text' />
 
                                 <label for='txtPassword'>Password:</label>
                                 <input id='txtPassword' type='password' />
 
                                 <div id='btnLogIn' class='button' tabindex='0'>Log In</div>
+                                <a id='btnForgotPassword'>Forgot password?</a>
                             </form>
                             
                             <h2>Don't Have an Account?</h2>

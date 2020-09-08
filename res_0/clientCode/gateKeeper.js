@@ -17,7 +17,9 @@ const selectors = {
     btnCreateAccountSelector: "#btnCreateAccount",
     verificationCodeSelector: "#txtVerificationCode",
     btnVerifySelector: "#btnVerify",
-    lnkResendCodeSelector: "#lnkResendCode"
+    lnkResendCodeSelector: "#lnkResendCode",
+    btnForgotPasswordSelector: "#btnForgotPassword",
+    btnCancelSelector: ".btnCancel"
 },
 data = {}
 
@@ -50,6 +52,7 @@ function bindLoginPageEventListeners()
             btnLogInSelector,
             usernameSelector,
             passwordSelector,
+            btnForgotPasswordSelector,
             btnAttemptAccessSelector,
             accessKeySelector
         } = selectors,
@@ -66,6 +69,8 @@ function bindLoginPageEventListeners()
     $elementsToBind = $btnAttemptAccess.click(attemptAccess).add(accessKeySelector);
     bindKeypressEventListeners($elementsToBind.off("keypress"), 13, attemptAccess);
 
+    $(btnForgotPasswordSelector).off("click").click(forgotPassword).removeClass("hidden");
+
     $("form").submit(() => false);
 
     $("#disclaimer").html(strings.disclaimer);
@@ -77,12 +82,15 @@ function unbindLoginPageEventListeners()
         btnLogInSelector,
         usernameSelector,
         passwordSelector,
+        btnForgotPasswordSelector,
         btnAttemptAccessSelector,
         accessKeySelector
     } = selectors;
 
     $(btnLogInSelector).add(btnAttemptAccessSelector)
-        .off("click").addClass("btnDisabled")
+        .addClass("btnDisabled")
+        .add(btnForgotPasswordSelector)
+        .off("click")
         .add(usernameSelector)
         .add(passwordSelector)
         .add(accessKeySelector)
@@ -99,7 +107,8 @@ function attemptLogin()
     const {
             usernameSelector,
             passwordSelector,
-            btnLogInSelector
+            btnLogInSelector,
+            btnForgotPasswordSelector
         } = selectors,
         credentials = {
             username: $(usernameSelector).val(),
@@ -111,6 +120,7 @@ function attemptLogin()
 
     const $loadingGif = $(getLoadingGifHtml());
 
+    $(btnForgotPasswordSelector).addClass("hidden");
     $(btnLogInSelector).html("Logging In...").append($loadingGif);
     
     postData("serverCode/actionPages/login.php", credentials)
@@ -133,6 +143,228 @@ function attemptLogin()
             showMainMenu();
         })
         .catch(e => serverOperationFailed(e.message));
+}
+
+async function forgotPassword()
+{
+    await transitionPageContentTo(`forgotPassword.php?usernameOrEmail=${ $(selectors.usernameSelector).val() }`);
+    bindForgotPasswordPageEventListeners();
+}
+
+function bindForgotPasswordPageEventListeners()
+{
+    const $txtEmailOrUsername = $("#txtEmailOrUsername").select().focus(),
+        $btnSendCode = $("#btnSendSecurityCode"),
+        $btnCancel = $(selectors.btnCancelSelector),
+        sendCode = () =>
+        {
+            const emailOrUsername = $txtEmailOrUsername.val(),
+                $loadingGif = $(getLoadingGifHtml()).insertAfter($btnCancel);
+
+            $btnSendCode.html("Sending Code...")
+                .add($btnCancel)
+                .off("click")
+                .addClass("btnDisabled");
+
+            postData("serverCode/actionPages/sendSecurityCode.php", { emailOrUsername })
+                .then(response =>
+                {
+                    $loadingGif.remove();
+
+                    if (response.failure)
+                    {
+                        $btnSendCode.removeClass("btnDisabled").html("Send Code");
+                        return this.serverOperationFailed(response.failure);
+                    }
+
+                    promptSecurityCode();
+                })
+                .catch(e => serverOperationFailed(e.message));
+        },
+        cancel = () => {
+            unbindForgotPasswordPageEventListeners();
+            window.location.reload();
+        }
+    
+    $btnSendCode.off("click").click(sendCode);
+    bindKeypressEventListeners($btnSendCode.add($txtEmailOrUsername).off("keypress"), 13, sendCode);
+    
+    $btnCancel.off("click").click(cancel);
+    bindKeypressEventListeners($btnCancel.off("keypress"), 13, cancel);
+
+    $("form").submit(() => false);
+}
+
+function unbindForgotPasswordPageEventListeners()
+{
+    $("#btnSendSecurityCode").add(selectors.btnCancelSelector).off("click keypress");
+}
+
+async function promptSecurityCode()
+{
+    await transitionPageContentTo(`accountVerification.php?resettingPassword=1`);
+    bindVerificationPageEventListeners(true);
+}
+
+function verifySecurityCode()
+{
+    unbindVerificationPageEventListeners();
+    
+    if (data.lockedOut)
+        return false;
+    
+    const {
+        verificationCodeSelector,
+        btnVerifySelector,
+        btnCancelSelector
+    } = selectors,
+        verificationCode = $(verificationCodeSelector).val(),
+        $btnVerify = $(btnVerifySelector).html("Verifying...");
+
+    if (!verificationCode.length)
+        return securityCodeVerificationFailed("no code");
+
+    const $loadingGif = $(getLoadingGifHtml()).insertAfter(btnCancelSelector);
+    postData("serverCode/actionPages/verifySecurityCode.php", { verificationCode })
+        .then(async response =>
+        {
+            $loadingGif.remove();
+
+            if (response.failure)
+                return securityCodeVerificationFailed(response.failure);
+            
+            $btnVerify.html("Verified!").css({ color: "#fff", backgroundColor: "#00a94f" })
+                .siblings(".btnCancel").remove();
+                
+            await sleep(1000);
+            promptNewPassword();
+        })
+        .catch(e => serverOperationFailed(e.message));
+}
+
+function securityCodeVerificationFailed(reason)
+{
+    let errorMsg;
+
+    if (reason === "no code")
+        errorMsg = "Please enter the security code you received.";
+    else if (reason.includes("invalid code"))
+        errorMsg = "Invalid code.";
+    else if (reason.includes("code expired"))
+    {
+        errorMsg = "Code expired.";
+
+        const $instructions = $(".content").children("p").first();
+        
+        $instructions.html(`Click "Cancel" to return to the home page and try again.`);
+    }
+    else if (reason.includes("too many failed attempts"))
+    {
+        tooManyFailedAttempts();
+        errorMsg = "Too many failed attempts — try again in 15 minutes."
+    }
+    else
+        return serverOperationFailed(reason);
+    
+    const { verificationCodeSelector } = selectors;
+
+    new ValidationError(verificationCodeSelector, errorMsg).show();
+
+    if (!data.lockedOut)
+    {
+        hideValidationErrorsOnChangeEvent(verificationCodeSelector);
+        bindVerificationPageEventListeners(true);
+    }
+}
+
+async function promptNewPassword()
+{
+    await transitionPageContentTo("newPassword.php");
+
+    bindNewPasswordPageEventListeners();
+}
+
+function bindNewPasswordPageEventListeners()
+{
+    const $elements = $("#btnConfirmNewPassword").removeClass("btnDisabled").html("Confirm")
+        .off("click").click(changePassword)
+        .add("#txtPassword")
+        .add("#txtConfirmPassword");
+
+    bindKeypressEventListeners($elements.off("keypress"), 13, changePassword);
+}
+
+function unbindNewPasswordPageEventListeners()
+{
+    $("#btnConfirmNewPassword").off("click").addClass("btnDisabled")
+        .add("#txtPassword")
+        .add("#txtConfirmPassword")
+        .off("keypress");
+}
+
+function changePassword()
+{
+    unbindNewPasswordPageEventListeners();
+
+    const $btnConfirm = $("#btnConfirmNewPassword").html("Confirming..."),
+        txtPasswordSelector = "#txtPassword",
+        txtConfirmPasswordSelector = "#txtConfirmPassword",
+        password = $(txtPasswordSelector).val(),
+        passwordConfirmation = $(txtConfirmPasswordSelector).val(),
+        $loadingGif = $(getLoadingGifHtml()).appendTo($btnConfirm);
+    
+    let errorMsg = getPasswordValidationError(password),
+        selector = txtPasswordSelector;
+
+    if (!errorMsg)
+    {
+        selector = txtConfirmPasswordSelector;
+        
+        if (!passwordConfirmation.length)
+            errorMsg = "Please confirm your new password.";
+        else if (password !== passwordConfirmation)
+            errorMsg = "Passwords do not match.";
+    }
+
+    if (errorMsg)
+    {
+        $loadingGif.remove();
+        
+        new ValidationError(selector, errorMsg).show();
+        hideValidationErrorsOnChangeEvent(selector);
+
+        bindNewPasswordPageEventListeners();
+        return false;
+    }
+    
+    postData("serverCode/actionPages/updatePassword.php", { password })
+        .then(async response =>
+        {
+            $loadingGif.remove();
+
+            if (response.failure)
+                return serverOperationFailed(response.failure);
+            
+            $btnConfirm.html("Success!").css({ color: "#fff", backgroundColor: "#00a94f" });
+                
+            await sleep(1000);
+            showMainMenu();
+        })
+        .catch(e => serverOperationFailed(e.message));
+}
+
+function getPasswordValidationError(password)
+{
+    if (!password.length)
+        return "Password is required.";
+    else if (containsWhitespace(password))
+        return "Password cannot include spaces.";
+    else if (password.length < 8)
+        return "Password must include at least 8 characters.";
+    else if (!(containsCapitalLetter(password) && containsNumber(password)))
+        return "Password must include at least one capital letter and one number.";
+    
+    return false;
 }
 
 async function showMainMenu({ animate } = {})
@@ -565,18 +797,10 @@ class UserAccountCreator
         const { password, passwordConfirmation } = this.details,
             { passwordSelector, confirmPasswordSelector } = selectors;
         
-        let errorMsg,
+        let errorMsg = getPasswordValidationError(password),
             selector = passwordSelector;
 
-        if (!password.length)
-            errorMsg = "Password is required.";
-        else if (containsWhitespace(password))
-            errorMsg = "Password cannot include spaces.";
-        else if (password.length < 8)
-            errorMsg = "Password must include at least 8 characters.";
-        else if (!(containsCapitalLetter(password) && containsNumber(password)))
-            errorMsg = "Password must include at least one capital letter and one number.";
-        else
+        if (!errorMsg)
         {
             selector = confirmPasswordSelector;
 
@@ -668,17 +892,42 @@ async function promptAccountVerification(emailAddress, { animate } = {})
     removeAllDataAttributes($(selectors.lobbySelector).removeAttr("class"));
 }
 
-function bindVerificationPageEventListeners()
+function bindVerificationPageEventListeners(resettingPassword = false)
 {
     const {
-        verificationCodeSelector,
-        btnVerifySelector,
-        lnkResendCodeSelector
-    } = selectors;
+            verificationCodeSelector,
+            btnVerifySelector,
+            lnkResendCodeSelector,
+            btnCancelSelector
+        } = selectors,
+        $btnVerify = $(btnVerifySelector);
 
-    $(btnVerifySelector).off("click").click(verifyAccount).removeClass("btnDisabled").html("Verify");
-    bindKeypressEventListeners($(verificationCodeSelector).off("keypress"), 13, verifyAccount);
-    $(lnkResendCodeSelector).off("click").click(resendVerificationCode);
+    let verificationFn;
+
+    if (resettingPassword)
+    {
+        const $btnCancel = $(btnCancelSelector),
+            cancel = () =>
+            {
+                unbindVerificationPageEventListeners();
+                window.location.reload();
+            }
+
+        verificationFn = verifySecurityCode;
+        $btnCancel.off("click keypress").click(cancel).removeClass("btnDisabled");
+        bindKeypressEventListeners($btnCancel, 13, cancel);
+    }
+    else
+    {
+        verificationFn = verifyAccount;
+        $(lnkResendCodeSelector).off("click").click(resendVerificationCode);
+    }
+
+    $btnVerify.off("click")
+        .click(verificationFn)
+        .removeClass("btnDisabled").html("Verify");
+    
+    bindKeypressEventListeners($(verificationCodeSelector).focus().add($btnVerify).off("keypress"), 13, verificationFn);
 
     $("form").submit(() => false);
 }
@@ -688,10 +937,12 @@ function unbindVerificationPageEventListeners()
     const {
         verificationCodeSelector,
         btnVerifySelector,
-        lnkResendCodeSelector
+        lnkResendCodeSelector,
+        btnCancelSelector
     } = selectors;
 
-    $(btnVerifySelector).addClass("btnDisabled").html("Verifying...")
+    $(btnVerifySelector).add(btnCancelSelector)
+        .addClass("btnDisabled")
         .add(lnkResendCodeSelector).off("click")
         .add(verificationCodeSelector).off("keypress");
 }
@@ -705,7 +956,7 @@ function verifyAccount()
     
     const { verificationCodeSelector, btnVerifySelector } = selectors,
         verificationCode = $(verificationCodeSelector).val(),
-        $btnVerify = $(btnVerifySelector);
+        $btnVerify = $(btnVerifySelector).html("Verifying...");
 
     if (!verificationCode.length)
         return accountVerificationFailed("no code");
@@ -871,9 +1122,7 @@ function tooManyFailedAttempts()
     unbindLoginPageEventListeners();
     unbindVerificationPageEventListeners();
 
-    
     $(selectors.btnVerifySelector).prev().off("keypress");
-
     $(".loadingGif").remove();
 }
 

@@ -116,6 +116,8 @@ input[type='password']
 #lobby h2,
 #lobby h3
 { font-weight: 400 }
+#lobby .roleCard h3
+{ font-weight: 700 }
 #lobby > .content > h1,
 #lobby h2
 { font-family: 'Audiowide' }
@@ -146,10 +148,12 @@ input[type='password']
 	font-size: 22px;
 	margin: calc(var(--lobby-padding)*2) 0 6px 0;
 }
-#lobby form:not(.inlineForm) > *
+#lobby form:not(.inlineForm) > *:not(a)
 {
 	display: block;
 }
+#lobby a
+{ display: inline-block }
 #lobby form:not(.inlineForm) *:not(label)
 {
 	border-radius: var(--lobby-control-border-radius);
@@ -162,7 +166,7 @@ input[type='password']
 {
 	margin-top: 8px;
 }
-#lobby > .content .button:not(#btnAttemptAccess):not(#btnVerify)
+#lobby > .content .button:not(.inlineButton)
 {
 	font-size: 26px;
 	line-height: 26px;
@@ -170,10 +174,17 @@ input[type='password']
 	overflow: visible;
 	padding: 10px 0;
 }
-#btnLogIn, #btnCreateAccount
+#btnLogIn,
+#btnCreateAccount
 {
 	font-size: 26px;
 	padding: 4px 0;
+}
+#btnLogIn,
+#btnCreateAccount,
+#btnForgotPassword,
+#btnConfirmNewPassword
+{
 	margin: 16px 0 0 0;
 }
 .inlineForm,
@@ -207,6 +218,8 @@ input[type='password']
 	padding: 0 2px;
 	text-align: center;
 }
+#frmPasswordRecovery #txtEmailOrUsername
+{ text-align: left }
 .inlineForm .inlineButton
 {
 	display: inline-block;
@@ -215,6 +228,11 @@ input[type='password']
 	margin-left: -3px;
 	border-top-right-radius: var(--lobby-control-border-radius);
 	border-bottom-right-radius: var(--lobby-control-border-radius);
+}
+.inlineForm .inlineButton:nth-last-of-type(2)
+{
+	margin-right: 3px;
+	border-radius: unset;
 }
 .inlineForm .loadingGif
 {
