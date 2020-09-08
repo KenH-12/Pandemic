@@ -8,25 +8,18 @@ CONTAINS SQL
 SQL SECURITY DEFINER
 COMMENT ''
 BEGIN
-	DECLARE vCode INT DEFAULT 0;
+	DECLARE newCode INT DEFAULT 0;
 	
-	WHILE vCode = 0
-	DO
-		SET vCode = udf_getRandBetween(10000, 99999);
-		
-		IF vCode IN (SELECT vCode FROM verificationCode) THEN
-			SET vCode = 0;
-		END IF;
-	END WHILE;
+	SET newCode = udf_getRandBetween(10000, 99999);
 	
 	INSERT INTO verificationCode
 		(vCode, expiry, userID)
 	VALUES
-		(vCode, DATE_ADD(NOW(), INTERVAL 1 HOUR), uID);
+		(newCode, DATE_ADD(NOW(), INTERVAL 1 HOUR), uID);
 	
 	IF ROW_COUNT() != 1 THEN
-		SET vCode = 0;
+		SET newCode = 0;
 	END IF;
 	
-	RETURN vCode;
+	RETURN newCode;
 END
