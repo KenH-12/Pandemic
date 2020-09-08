@@ -26,6 +26,7 @@
         $_SESSION["uID"] = $uID;
         unset($_SESSION["tmpID"]);
         unset($_SESSION["tmpUsername"]);
+        unset($_SESSION["emailOrUsername"]);
 
         $response["success"] = true;
     }

@@ -3,8 +3,6 @@ BUGS
 
 TO DO
 -----
-password recovery
-
 quick play option
 
 firefox testing
