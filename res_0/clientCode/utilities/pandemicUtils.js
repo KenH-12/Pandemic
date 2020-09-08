@@ -465,8 +465,6 @@ function getVersionNumber()
 	const $body = $("body"),
 		versionNumber = $body.attr("data-version");
 
-	$body.removeAttr("data-version");
-
 	return versionNumber;
 }
 
