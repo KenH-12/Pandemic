@@ -1,11 +1,6 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_arrangePlayerCards`(
-	IN `gID` INT
-)
-LANGUAGE SQL
-NOT DETERMINISTIC
-CONTAINS SQL
-SQL SECURITY DEFINER
-COMMENT ''
+DELIMITER //
+
+CREATE PROCEDURE `proc_arrangePlayerCards`(IN `gID` INT)
 BEGIN
     DECLARE startingHandSize TINYINT;
     DECLARE playersNeedCards BOOL DEFAULT TRUE;
@@ -153,4 +148,4 @@ BEGIN
 	
 	CALL proc_insert_startingHands(gID);
 	CALL proc_update_turnOrder(gID);
-END
+END //

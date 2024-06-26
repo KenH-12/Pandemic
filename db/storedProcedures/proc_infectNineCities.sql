@@ -1,11 +1,8 @@
+DELIMITER //
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_infectNineCities`(
 	IN `gID` INT
 )
-LANGUAGE SQL
-NOT DETERMINISTIC
-CONTAINS SQL
-SQL SECURITY DEFINER
-COMMENT ''
 BEGIN
 	-- This procedure infects 9 random cities (the infectionCardIndex is already randomized)
 	-- as per the 'infect 9 cities' setup step.
@@ -65,4 +62,4 @@ BEGIN
 		
 		SET i = i + 1;
 	END WHILE;
-END
+END //

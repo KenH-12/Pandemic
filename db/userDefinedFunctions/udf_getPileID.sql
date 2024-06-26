@@ -1,12 +1,9 @@
+DELIMITER //
+
 CREATE DEFINER=`root`@`localhost` FUNCTION `udf_getPileID`(
 	`p_pileName` VARCHAR(21)
 )
 RETURNS tinyint(4)
-LANGUAGE SQL
-NOT DETERMINISTIC
-CONTAINS SQL
-SQL SECURITY DEFINER
-COMMENT ''
 BEGIN
 	DECLARE pileID TINYINT;
 	
@@ -15,4 +12,4 @@ BEGIN
 	WHERE pileName = p_pileName;
 	
 	RETURN pileID;
-END
+END //

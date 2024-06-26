@@ -1,12 +1,9 @@
+DELIMITER //
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_create_testGame`(
 	IN `numPlayers` TINYINT,
 	IN `numEpidemics` TINYINT
 )
-LANGUAGE SQL
-NOT DETERMINISTIC
-CONTAINS SQL
-SQL SECURITY DEFINER
-COMMENT ''
 BEGIN
 	DECLARE gID INT;
 	DECLARE playerCounter TINYINT DEFAULT 0;
@@ -45,4 +42,4 @@ BEGIN
 	CALL proc_update_turnOrder(gID);
 	
 	END IF;
-END
+END //

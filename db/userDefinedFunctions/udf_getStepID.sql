@@ -1,12 +1,9 @@
+DELIMITER //
+
 CREATE DEFINER=`root`@`localhost` FUNCTION `udf_getStepID`(
 	`stepDescription` VARCHAR(13)
 )
 RETURNS tinyint(4)
-LANGUAGE SQL
-NOT DETERMINISTIC
-CONTAINS SQL
-SQL SECURITY DEFINER
-COMMENT ''
 BEGIN
 	DECLARE v_stepID TINYINT;
 	
@@ -15,4 +12,4 @@ BEGIN
 	WHERE description = stepDescription;
 	
 	RETURN v_stepID;
-END
+END //

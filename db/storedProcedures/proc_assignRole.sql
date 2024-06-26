@@ -1,12 +1,9 @@
+DELIMITER //
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_assignRole`(
 	IN `p_gameID` INT,
 	IN `p_userID` INT
 )
-LANGUAGE SQL
-NOT DETERMINISTIC
-CONTAINS SQL
-SQL SECURITY DEFINER
-COMMENT ''
 BEGIN
 	-- This procedure randomly assigns a role to a single player for a single game.
 	-- Note: A single user can assume and control more than one player role for a single game.
@@ -22,4 +19,4 @@ BEGIN
 	SET roleID = v_roleID
 	WHERE gameID = p_gameID
 	AND userID = p_userID;
-END
+END //

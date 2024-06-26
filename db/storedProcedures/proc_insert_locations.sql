@@ -1,11 +1,8 @@
+DELIMITER //
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_insert_locations`(
 	IN `gID` INT
 )
-LANGUAGE SQL
-NOT DETERMINISTIC
-CONTAINS SQL
-SQL SECURITY DEFINER
-COMMENT ''
 BEGIN
 	DECLARE done BOOL DEFAULT FALSE;
 	DECLARE cKey CHAR(4);
@@ -37,4 +34,4 @@ BEGIN
 	SET hasResearchStation = 1
 	WHERE gameID = gID
 	AND cityKey = 'atla';
-END
+END //

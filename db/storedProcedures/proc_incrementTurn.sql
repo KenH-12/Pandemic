@@ -1,12 +1,9 @@
+DELIMITER //
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_incrementTurn`(
 	IN `gID` INT,
 	IN `nextTurnID` TINYINT
 )
-LANGUAGE SQL
-NOT DETERMINISTIC
-CONTAINS SQL
-SQL SECURITY DEFINER
-COMMENT ''
 BEGIN
 	-- get the nextTurnID from the player whose turn it is
 	SELECT nextRoleID INTO nextTurnID
@@ -25,4 +22,4 @@ BEGIN
 	IF ROW_COUNT() != 1 THEN
 		SET nextTurnID = 0;
 	END IF;
-END
+END //

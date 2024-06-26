@@ -1,11 +1,8 @@
+DELIMITER //
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_generateAccessKey`(
 	IN `keyCreatedFor` VARCHAR(50)
 )
-LANGUAGE SQL
-NOT DETERMINISTIC
-CONTAINS SQL
-SQL SECURITY DEFINER
-COMMENT ''
 BEGIN
 	DECLARE characters CHAR(62) DEFAULT '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	DECLARE newKey VARCHAR(10) DEFAULT '';
@@ -19,4 +16,4 @@ BEGIN
 		(keyCode, createdFor)
 	VALUES
 		(newKey, keyCreatedFor);
-END
+END //
