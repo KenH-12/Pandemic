@@ -753,7 +753,7 @@ function enablePawnEvents()
 		player = players[rID];
 
 		if (airlifting
-			|| (actionStep && (dispatcherIsActive || rID === activePlayer.rID)))
+			|| (actionStep && (dispatcherIsActive || parseInt(rID) === activePlayer.rID)))
 		{
 			player.enablePawn();
 			pawnsAreEnabled = true;
