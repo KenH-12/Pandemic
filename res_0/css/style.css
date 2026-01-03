@@ -58,6 +58,8 @@ input, select { background-color: #fff }
 input[type='text'],
 input[type='password']
 { cursor: text }
+.text-green
+{ color: var(--epidemic-green) }
 #lobby {
 	--lobby-padding: 30px;
 	--lobby-full-width: 560px;
@@ -321,14 +323,37 @@ select
 	margin-top: 5px;
 	border-bottom: 2px solid #fff;
 }
+#lobby .roleTag
+{
+	padding: 2px 5px;
+	margin-top: 5px;
+}
 #gameInProgress .roleTag
 {
 	display: inline-block;
-	padding: 2px 5px;
-	margin-top: 5px;
 	cursor: default;
 }
-#gameInProgress .roleTag:hover { text-decoration: none }
+#roleSelector .roleTag
+{
+	cursor: pointer;
+	text-align: center;
+}
+#roleSelector
+{
+	width: var(--lobby-content-width);
+	display: flex;
+}
+.roleBucket
+{
+	width: 50%;
+}
+.roleBucket:first-of-type
+{
+	border-right: 1px solid #fff;
+	padding-right: 5px;
+	margin-right: 5px;
+}
+#lobby .roleTag:hover { text-decoration: none }
 #gameInProgress .button
 {
 	display: inline-block;

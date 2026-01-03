@@ -53,8 +53,8 @@
             recordFailedAttemptAndThrowException($pdo, $emailOrUsername, $ipAddress, $failedAttemptCount);
         
         // Verify the code's expiry date.
-        $now = new DateTime(null, new DateTimeZone("America/Toronto"));
-        if (strtotime($now->format("Y-m-d H:i:s")) > strtotime($row["expiry"]))
+        $utcNow = new DateTime("now", new DateTimeZone("UTC"));
+        if (strtotime($utcNow->format("Y-m-d H:i:s")) > strtotime($row["expiry"]))
             throw new Exception("code expired");
 
         // Clear the user's codes,

@@ -18,15 +18,31 @@
         if (!isset($data["numRoles"]))
             throw new Exception("required value not set: number of roles");
         
+        if (!isset($data["randomRoleSelection"]))
+            throw new Exception("required value not set: random role selection");
+        
         $uID = $_SESSION["uID"];
         $numEpidemics = $data["numEpidemics"];
         $numRoles = $data["numRoles"];
+        $randomRoleSelection = $data["randomRoleSelection"];
 
         if ($numEpidemics < 4 || $numEpidemics > 6)
             throw new Exception("Invalid number of epidemics: $numEpidemics");
         
         if (is_nan($numRoles) || $numRoles < 2 || $numRoles > 4)
             throw new Exception("Invalid number of roles: $numRoles");
+
+        if ($randomRoleSelection)
+            $selectedRoleIDs = [];
+        else
+        {
+            if (!isset($data["selectedRoleIDs"]))
+                throw new Exception("required value not set: selected roles");
+            
+            $selectedRoleIDs = $data["selectedRoleIDs"];
+            if (count($selectedRoleIDs) != $numRoles)
+                throw new Exception("invalid number of roles selected");
+        }
         
         $stmt = $pdo->prepare("SELECT DISTINCT gameID FROM game
                                 INNER JOIN vw_player ON game.gameID = vw_player.game
@@ -46,65 +62,79 @@
             deleteGame($pdo, $gID);
         }
         
-        $stmt = $pdo->prepare("INSERT INTO game (epidemicCards) VALUES (?)");
-        $stmt->execute([$numEpidemics]);
+        $stmt = $pdo->prepare("INSERT INTO game (epidemicCards, randomRoleSelection) VALUES (?, ?)");
+        $stmt->execute([$numEpidemics, $randomRoleSelection]);
 
         if ($stmt->rowCount() !== 1)
             throwException($pdo, "Failed to insert game");
         
         $gID = $pdo->lastInsertId();
 
-        $stmt = $pdo->query("INSERT INTO pandemic (gameID) VALUES ($gID)");
+        $stmt = $pdo->prepare("INSERT INTO pandemic (gameID) VALUES (?)");
+        $stmt->execute([$gID]);
 
         if ($stmt->rowCount() !== 1)
             throwException($pdo, "Failed to insert pandemic");
 
-        $stmt = $pdo->query("SELECT roleID
-                            FROM role
-                            ORDER BY RAND()
-                            LIMIT $numRoles");
-
-        if ($stmt->rowCount() != $numRoles)
-            throw new Exception("Failed to retrieve the necessary number of roles ($numRoles)");
-
-        $roles = $stmt->fetchAll();
-
-        $stmt = $pdo->prepare("INSERT INTO player (gameID, userID, roleID) VALUES ($gID, ?, ?)");
-
-        foreach ($roles as $row)
+        if ($randomRoleSelection)
         {
-            $stmt->execute([$uID, $row["roleID"]]);
+            $stmt = $pdo->prepare("SELECT roleID
+                                FROM role
+                                ORDER BY RAND()
+                                LIMIT ?");
+            $stmt->execute([$numRoles]);
+            
+            if ($stmt->rowCount() != $numRoles)
+                throw new Exception("Failed to retrieve the necessary number of roles ($numRoles)");
+
+            $roles = $stmt->fetchAll();
+            $selectedRoleIDs = [];
+            foreach ($roles as $row)
+                $selectedRoleIDs[] = $row["roleID"];
+        }
+        
+        $stmt = $pdo->prepare("INSERT INTO player (gameID, userID, roleID) VALUES (?, ?, ?)");
+
+        foreach ($selectedRoleIDs as $roleID)
+        {
+            $stmt->execute([$gID, $uID, $roleID]);
 
             if ($stmt->rowCount() !== 1)
                 throwException($pdo, "Failed to insert player");
         }
 
-        $pdo->query("CALL proc_insert_locations($gID)");
+        $stmt = $pdo->prepare("CALL proc_insert_locations(?)");
+        $stmt->execute([$gID]);
 
         $noEpidemics = true;
         $epidemicInsertionAttempts = 0;
         while ($noEpidemics && $epidemicInsertionAttempts < 3)
         {
-            $pdo->query("CALL proc_arrangePlayerCards($gID)");
+            $stmt = $pdo->prepare("CALL proc_arrangePlayerCards(?)");
+            $stmt->execute([$gID]);
 
-            $epidemics = $pdo->query("SELECT cardKey
+            $stmt = $pdo->prepare("SELECT cardKey
                                         FROM vw_playerCard
-                                        WHERE game = $gID
+                                        WHERE game = ?
                                         AND cardKey LIKE 'epi%'");
+            $stmt->execute([$gID]);
+            $epidemics = $stmt;
             
             if ($epidemics->rowCount() == $numEpidemics)
                 $noEpidemics = false;
             else
             {
-                $pdo->query("DELETE FROM location WHERE gameID = $gID");
+                $stmt = $pdo->prepare("DELETE FROM location WHERE gameID = ?");
+                $stmt->execute([$gID]);
                 $epidemicInsertionAttempts++;
             }
         }
         
         if ($noEpidemics)
-            throw new Exception("failed to insert epidemic cards.");
+            throw new Exception("failed to insert epidemic cards. Attempts: " . $epidemicInsertionAttempts);
 
-        $pdo->query("CALL proc_infectNineCities($gID)");
+        $stmt = $pdo->prepare("CALL proc_infectNineCities(?)");
+        $stmt->execute([$gID]);
 
         $_SESSION["game"] = $gID;
 

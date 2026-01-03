@@ -6,6 +6,7 @@ import WarningLevelManager from "./warningLevelManager.js";
 const gameData = {
 	imagesDir: `res_${getVersionNumber()}/images`,
 	players: {},
+	randomRoles: true,
     turn: -1,
     steps: {},
     currentStep: -1,

@@ -230,7 +230,7 @@ strings = {
     researcherCardText: `<li><span>You may give any 1 of your City cards when you Share Knowledge. It need not match your city. A player who Shares Knowledge with you on their turn can take any 1 of your City cards.</span></li>`,
     scientistCardText: `<li><span>You need only 4 cards of the same colour to do the Discover a Cure action.</span></li>`,
 
-    dispatchDiscardRule: "When moving another role's pawn as if it were his own, any necessary discards must come from the Dispatcher's hand.",
+    dispatchDiscardRule: "When moving another role's pawn, any necessary discards must come from the Dispatcher's hand.",
 
     eventCardPlayabilityRule: "<span>Play at any time. Not an action.</span>",
     eventCardInfo: `<p>${eventCardInfo}</p><span style='white-space:nowrap'>Event cards look like this:</span>`,

@@ -2,12 +2,10 @@
 
 function getClientIpAddress()
 {
-    if (isset($_SERVER['HTTP_CLIENT_IP']))
-        return $_SERVER['HTTP_CLIENT_IP'];
-    
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-        return $_SERVER['HTTP_X_FORWARDED_FOR'];
-    
+    // SECURITY: Only use REMOTE_ADDR which is set by the server and cannot be spoofed.
+    // HTTP_CLIENT_IP and HTTP_X_FORWARDED_FOR can be spoofed by clients and should not be trusted
+    // for security-critical operations like rate limiting.
+    // If behind a trusted proxy, configure the proxy to set REMOTE_ADDR directly.
     return $_SERVER['REMOTE_ADDR'];
 }
 

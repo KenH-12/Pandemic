@@ -134,7 +134,7 @@ The card must come from the Dispatcher&#39;s hand.`,
 		rules: [
 			"The Dispatcher may, as an action, either:",
 			"<li>move any pawn to any city containing another pawn, or</li>",
-			"<li>move another role's pawn <span class='hoverInfo dispatchInfo'>as if it were his own</span>.</li>",
+			"<li>move another role's pawn <span class='hoverInfo dispatchInfo'>as if it were their own</span>.</li>",
 			`${strings.dispatchDiscardRule} A card discarded for a Charter Flight must match the city the pawn is moving from.`
 		],
 		driveFerryRules: ["Dispatch a pawn to a city connected by a white line to the one it is in."],

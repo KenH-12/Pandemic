@@ -48,6 +48,7 @@ CREATE TABLE gameendcause
 CREATE TABLE game
 (
 	gameID				INT AUTO_INCREMENT,
+	randomRoleSelection BOOLEAN NOT NULL,
 	epidemicCards		TINYINT DEFAULT 4,
 	epidemicsDrawn		TINYINT DEFAULT 0,
 	infectionRate		TINYINT DEFAULT 2,
@@ -306,6 +307,7 @@ SELECT	game.gameID AS game,
 			turnRoleID AS turn,
 			game.stepID AS step,
 			step.description AS stepName,
+			game.randomRoleSelection as randomRoleSelection,
 			epidemicCards AS numEpidemics,
 			infectionRate AS infRate,
 			epidemicsDrawn AS epidemicCount,
@@ -318,6 +320,7 @@ WHERE turnRoleID = roleID;
 CREATE TABLE gameRecord
 (
 	recordID			INT AUTO_INCREMENT,
+	randomRoleSelection BOOLEAN NOT NULL,
 	numEpidemics	TINYINT NOT NULL,
 	endCauseID		TINYINT NOT NULL,
 	

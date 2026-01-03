@@ -30,7 +30,8 @@
         $userID = $user["userID"];
         $accountNeedsVerification = $user["accountVerified"] != "1";
 
-        $stmt = $pdo->query("SELECT pass FROM user WHERE userID = $userID");
+        $stmt = $pdo->prepare("SELECT pass FROM user WHERE userID = ?");
+        $stmt->execute([$userID]);
         $hash = $stmt->fetch()["pass"];
 
         if (!password_verify($data["password"], $hash))

@@ -23,6 +23,13 @@ const selectors = {
 },
 data = {}
 
+// SECURITY: Escape HTML to prevent XSS attacks
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 $(function()
 {
     const $lobby = $(selectors.lobbySelector);
@@ -39,8 +46,6 @@ $(function()
     
     removeAllDataAttributes($lobby.removeAttr("class"));
     bindLoginPageEventListeners();
-
-    showBrowserCompatabilityWarning();
 });
 
 function bindLoginPageEventListeners()
@@ -130,6 +135,9 @@ function attemptLogin()
             {
                 if (invalidCredentials(response.failure))
                 {
+                    if (response.failure.includes("Invalid password"))
+                        $(passwordSelector).select();
+
                     bindLoginPageEventListeners();
                     return false;
                 }
@@ -380,29 +388,101 @@ async function showMainMenu({ animate } = {})
 
     if (!$sideMenu.length)
         appendSideMenu();
+}
+
+function enableBtnPlay()
+{
+    $("#btnPlay").off("click").click(function()
+    {
+        disableBtnPlay();
+        $(this).html("CREATING GAME...")
+            .append(getLoadingGifHtml());
+        createGame();
+    }).removeClass("btnDisabled hidden");
+}
+
+function disableBtnPlay()
+{
+    $("#btnPlay").off("click").addClass("btnDisabled hidden");
+}
+
+function numSelectedRoles()
+{
+    return $("#selectedRoles").children(".roleTag").length;
+}
+
+function updateSelectedRoles()
+{
+    const numSelected = numSelectedRoles(),
+        numRequired = parseInt($("#ddlNumRoles").val()),
+        $indicator = $("#selectedRolesIndicator");
     
-    showBrowserCompatabilityWarning();
+    $indicator.html(numSelected + " of " + numRequired + " roles selected:");
+
+    if ($("#ddlRoleSelection").val() === "random")
+        enableBtnPlay();
+    else if (numSelected === numRequired)
+    {
+        $indicator.addClass("text-green");
+        enableBtnPlay();
+    }
+    else
+    {
+        disableBtnPlay();
+        $indicator.removeClass("text-green");
+    }
 }
 
 function bindMainMenuEventListeners()
 {
+    bindRoleCardHoverEvents();
+
     if ($("#gameInProgress").length)
     {
-        bindRoleCardHoverEvents();
-
         $("#btnResumeGame").click(() => window.location.replace("game.php"));
         $("#btnAbandonGame").click(promptAbandonGame);
 
         return false;
     }
-    
-    $("#btnPlay").click(function()
+
+    $("#ddlNumRoles").change(function()
     {
-        $(this).off("click").addClass("btnDisabled")
-            .html("CREATING GAME...")
-            .append(getLoadingGifHtml());
-        createGame();
+        const numRoles = parseInt($(this).val());
+
+        $("#selectedRoles").children(".roleTag").each(function()
+        {
+            if (numSelectedRoles() > numRoles)
+                $(this).appendTo($(this).parent().siblings(".roleBucket"));
+            else
+                return;
+        });
+        updateSelectedRoles();
     });
+
+    $("#ddlRoleSelection").change(function()
+    {
+        const $roleSelector = $("#roleSelector");
+
+        if ($(this).val() === "choose")
+            $roleSelector.removeClass("hidden");
+        else
+            $roleSelector.addClass("hidden");
+
+        updateSelectedRoles();
+    });
+
+    $("#roleSelector").find(".roleTag").click(function()
+    {
+        if (
+            $(this).parent().attr("id") === "selectedRoles"
+            || numSelectedRoles() < parseInt($("#ddlNumRoles").val())
+        ) {
+            $(this).appendTo($(this).parent().siblings(".roleBucket"));
+            updateSelectedRoles();
+        }
+    });
+
+    enableBtnPlay();
 }
 
 function appendSideMenu()
@@ -481,15 +561,16 @@ function bindRoleCardHoverEvents()
         offset.top -= $this.height() / 2;
         offset.left += $this.outerWidth() + 2;
 
-        $(`<div class='roleCard ${camelCaseRole}'>
+        const $roleCard = $(`<div class='roleCard ${camelCaseRole}'>
             <h3>${role}</h3>
             <img	class='rolePortrait'
                     src='${data.imagesDir}/cards/roles/${camelCaseRole}.jpg'
                     alt='${role} Role Card' />
             <ul>${strings[`${camelCaseRole}CardText`]}</ul>
-        </div>`)
-            .appendTo(".content")
-            .offset(offset);
+        </div>`);
+        
+        $roleCard.appendTo(".content").offset(offset);
+        ensureDivPositionIsWithinWindowHeight($roleCard);
     },
     () => $(".roleCard").remove());
 }
@@ -885,7 +966,7 @@ async function promptAccountVerification(emailAddress, { animate } = {})
         animate = true;
     
     const beforeShow = () => $(".content").children("p").first()
-        .html(`A verification code has been sent to ${emailAddress}.`);
+        .html(`A verification code has been sent to ${escapeHtml(emailAddress)}.`);
     
     await transitionPageContentTo("accountVerification.php", { beforeShow, animate });
     bindVerificationPageEventListeners();
@@ -991,9 +1072,9 @@ function accountVerificationFailed(reason)
         errorMsg = "Code expired. Try resending a new code.";
 
         const $instructions = $(".content").children("p").first(),
-            emailAddress = $instructions.html().substring($instructions.html().lastIndexOf(" "));
+            emailAddress = $instructions.text().substring($instructions.text().lastIndexOf(" "));
         
-        $instructions.html(`Click the "Resend Code" link below to send a new verification code to ${emailAddress}`);
+        $instructions.html(`Click the "Resend Code" link below to send a new verification code to ${escapeHtml(emailAddress)}`);
     }
     else if (reason.includes("too many failed attempts"))
     {
@@ -1045,14 +1126,25 @@ function resendVerificationCode()
 
 function createGame()
 {
-    const numEpidemics = $("[name='radDifficulty']:checked").val(),
-        numRoles = $("#ddlNumRoles").val();
+    const roleSelection = $("#ddlRoleSelection").val(),
+        data = {
+            numEpidemics: $("[name='radDifficulty']:checked").val(),
+            numRoles: $("#ddlNumRoles").val(),
+            randomRoleSelection: roleSelection === "random"
+        };
     
-    postData("serverCode/actionPages/createGame.php",
+    if (roleSelection !== "random")
+    {
+        let selectedRoleIDs = [];
+        $("#selectedRoles").children(".roleTag").each(function()
         {
-            numEpidemics,
-            numRoles
-        })
+            selectedRoleIDs.push(parseInt($(this).attr("role-id")));
+        });
+
+        data["selectedRoleIDs"] = selectedRoleIDs;
+    }
+    
+    postData("serverCode/actionPages/createGame.php", data)
         .then(response =>
         {
             if (response.failure)

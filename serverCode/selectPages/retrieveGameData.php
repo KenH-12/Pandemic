@@ -14,6 +14,7 @@
 										turnNum,
 										stepName,
 										infRate AS 'infectionRate',
+										randomRoleSelection,
 										numEpidemics,
 										epidemicCount,
 										outbreakCount

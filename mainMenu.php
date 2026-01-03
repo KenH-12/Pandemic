@@ -123,6 +123,19 @@
                 $selected = $i == $lastNumRoles ? " selected" : "";
                 $numRolesOptions .= "<option value='$i'$selected>$i</option>";
             }
+
+            $stmt = $pdo->prepare("SELECT roleID, roleName FROM `role`");
+            $stmt->execute();
+
+            if ($stmt->rowCount() === 0)
+                throw new Exception("Failed to retrieve role options");
+
+            $result = $stmt->fetchAll();
+            $roleSelectorOptions = "";
+            foreach ($result as $row)
+            {
+                $roleSelectorOptions .= "<div role-id='" . $row["roleID"] . "' class='roleTag'>" . $row["roleName"] . "</div>";
+            }
             
             $content = "<div class='divInputControl'>
                             <label for='radDifficulty' class='subtitle'>Difficulty:</label>
@@ -136,7 +149,23 @@
                             </select>
                             <span id='numberOfRolesInfo' class='info'>&#9432;</span>
                         </div>
-        
+
+                        <div class='divInputControl'>
+                            <label for='ddlRoleSelection' class='subtitle'>Role Selection:</label>
+                            <select id='ddlRoleSelection'>
+                                <option value='random' selected>Random</option>
+                                <option value='choose'>Choose Roles</option>
+                            </select>
+                        </div>
+                        <div id='roleSelector' class='divInputControl hidden'>
+                            <div id='selectedRoles' class='roleBucket'>
+                                <label id='selectedRolesIndicator' class='subtitle'>0 of 2 roles selected</label>
+                            </div>
+                            <div id='deselectedRoles' class='roleBucket'>
+                                $roleSelectorOptions
+                            </div>
+                        </div>
+
                         <div id='btnPlay' class='button materialButton'>PLAY</div>";
         }
     }

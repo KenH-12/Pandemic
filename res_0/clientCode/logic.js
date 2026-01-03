@@ -127,7 +127,7 @@ import instantiateTooltips, {
 import SideMenu, { SideMenuButton, ConfirmationButton } from "./sideMenu.js";
 
 $(function(){
-const playerDeckImgManager = new DeckImageManager({
+	const playerDeckImgManager = new DeckImageManager({
 		$deck: $("#playerDeckContainer img"),
 		imageUrlWithoutNumber: `${gameData.imagesDir}/cards/playerDeck_.png`,
 		numImages: 7,
@@ -2650,7 +2650,7 @@ function getDispatchInstructionTooltip(eventType)
 	if (validEventTypeCodes.includes(eventType.code))
 		return `<span class='hoverInfo dispatchTypeInfo' data-eventType='${eventType.code}'>${eventType.name}</span>`;
 	
-	console.error("Failed not fetch dispatch instuctions: invalid event type.");
+	console.error("Failed to fetch dispatch instuctions: invalid event type.");
 	return "";
 }
 
@@ -6967,6 +6967,7 @@ async function setup()
 	const isNewGame = currentStepIs("setup");
 	loadCityStates(cities);
 
+	gameData.randomRoleSelection = gamestate.randomRoleSelection;
 	gameData.startingHandPopulations = startingHandPopulations;
 	instantiatePlayers(players);
 	attachPlayersToEvents(eventHistory.events);
@@ -7036,27 +7037,37 @@ async function animateRoleDetermination()
 		slotMachines.push(new RoleSlotMachine(player, $roleContainer));
 	}
 	
-	for (let slotMachine of slotMachines)
+	if (gameData.randomRoleSelection)
 	{
-		slotMachine.pull();
-		await sleep(getDuration(400));
-	}
-
-	const DOUBLE_SLOT_MACHINE_DURATION = getDuration(slotMachines[0].duration * 2);
-	await Promise.race([
-		sleep(DOUBLE_SLOT_MACHINE_DURATION),
-		detectSkipping(DOUBLE_SLOT_MACHINE_DURATION)
-	]);
-
-	let slotMachine;
-	for (let i = 0; i < slotMachines.length; i++)
-	{
-		slotMachine = slotMachines[i];
+		for (let slotMachine of slotMachines)
+		{
+			slotMachine.pull();
+			await sleep(getDuration(400));
+		}
 		
-		if (i < slotMachines.length - 1)
-			slotMachine.extractResult();
-		else
-			await slotMachine.extractResult();
+		const DOUBLE_SLOT_MACHINE_DURATION = getDuration(slotMachines[0].duration * 2);
+		await Promise.race([
+			sleep(DOUBLE_SLOT_MACHINE_DURATION),
+			detectSkipping(DOUBLE_SLOT_MACHINE_DURATION)
+		]);
+		
+		let slotMachine;
+		for (let i = 0; i < slotMachines.length; i++)
+		{
+			slotMachine = slotMachines[i];
+			
+			if (i < slotMachines.length - 1)
+				slotMachine.extractResult();
+			else
+				await slotMachine.extractResult();
+		}
+	}
+	else
+	{
+		for (let i = 0; i < slotMachines.length; i++)
+			slotMachines[i].extractResult(false);
+		
+		await sleep(getDuration(800));
 	}
 
 	finishedSetupStep();
@@ -7110,6 +7121,7 @@ class RoleSlotMachine
 		
 		this.$optionGroups = this.$slotMachine.children(".optionGroup");
 		this.$options = this.$slotMachine.find(".slotMachineOption");
+		this.$role = this.$options.filter(`.${this.player.camelCaseRole}`).first();
 		
 		this.$slotMachine.appendTo(this.$container);
 		this.resizeElements();
@@ -7271,16 +7283,15 @@ class RoleSlotMachine
 
 	async extractResult()
 	{
-		const $role = this.$options.filter(`.${this.player.camelCaseRole}`).first(),
-			roleOffset = $role.offset(),
+		const roleOffset = this.$role.offset(),
 			self = this;
 		
 		roleOffset.top += this.optionHeight * this.numOptions;
 		
 		if (gameData.skipping)
-			$role.addClass("hidden");
+			this.$role.addClass("hidden");
 		
-		$role.appendTo(this.$container.parent())
+		this.$role.appendTo(this.$container.parent())
 			.offset(roleOffset)
 			.addClass("role")
 			.removeClass("hidden");
@@ -7288,14 +7299,15 @@ class RoleSlotMachine
 		await animationPromise(
 		{
 			$elements: this.$slotMachine,
-			desiredProperties: { opacity: 0 }
+			desiredProperties: { opacity: 0 },
+			duration: gameData.randomRoleSelection ? 400 : 0
 		});
 
 		await animationPromise(
 		{
-			$elements: $role,
+			$elements: this.$role,
 			desiredProperties: { top: "-=" + (this.optionHeight * this.MIDDLE_OPTION_INDEX) },
-			duration: getDuration(600),
+			duration: gameData.randomRoleSelection ? getDuration(600) : 0,
 			easing: "easeOutBounce"
 		});
 
@@ -7304,16 +7316,28 @@ class RoleSlotMachine
 			.attr("data-role", this.player.rID);
 		this.$slotMachine.remove();
 
-		$role.prependTo(this.$container)
+		this.$role.prependTo(this.$container)
 			.removeAttr("style")
 			.hover(function()
 			{
-				self.player.showRoleCard($role);
+				self.player.showRoleCard(self.$role);
 			},
 			function()
 			{
 				$(".roleCard").remove();
 			});
+		
+		if (!gameData.randomRoleSelection)
+		{
+			await animationPromise(
+			{
+				$elements: this.$role,
+				initialProperties: { marginLeft: "-500px" },
+				desiredProperties: { marginLeft: "0px" },
+				duration: getDuration(400),
+				easing: "easeOutQuad"
+			});
+		}
 	}
 }
 
