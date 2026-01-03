@@ -402,35 +402,6 @@ async function hideFullscreenRecommendation()
 	$fullscreenRecommendation.addClass("hidden").removeAttr("style");
 }
 
-function checkBrowserCompatibility()
-{
-	const browser = getBrowser();
-
-	if (browser !== "Chrome")
-		showBrowserCompatibilityWarning(browser);
-}
-
-function showBrowserCompatibilityWarning(browserName)
-{
-	const $curtain = $("#curtain"),
-		compatWarningSelector = ".browserCompatWarning",
-		hidden = "hidden";
-	
-	$curtain.children().addClass(hidden)
-		.filter("#warningsContainer").removeClass(hidden)
-		.children().not(".button").addClass(hidden)
-		.filter(compatWarningSelector).removeClass(hidden)
-		.find("#browserName").html(browserName === "unknown" ? "browser you are using" : `${browserName} browser`)
-		.parent().siblings(".button")
-		.off("click").click(hideCurtain);
-	
-	animationPromise({
-		$elements: $curtain.removeClass(hidden),
-		initialProperties: { opacity: 0 },
-		desiredProperties: { opacity: 0.95 }
-	});
-}
-
 async function hideCurtain()
 {
 	const $curtain = $("#curtain"),
@@ -486,7 +457,6 @@ export {
 	abandonGame,
 	logOut,
 	hideCurtain,
-	checkBrowserCompatibility,
 	checkFullscreen,
 	anyWarnings,
 	getVersionNumber

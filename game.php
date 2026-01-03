@@ -45,14 +45,6 @@
 					<p id='loading'>loading game...</p>
 					<h2 id='skippingSetupMsg' class='hidden'>Skipping setup...</h2>
 
-					<div id='warningsContainer' class='hidden'>
-						<h1 class='browserCompatWarning hidden'>— Compatibility Warning —</h1>
-						<h2 class='browserCompatWarning hidden'>This application has not been tested on the <span id='browserName'></span>. Some features may not function as intended.</h2>
-						<h2 class='browserCompatWarning hidden'>Please use the <a href='https://www.google.com/intl/en_ca/chrome/'>Google Chrome</a> browser for a smoother experience.</h2>
-						<h4 class='browserCompatWarning hidden'>Sorry for the inconvenience — I am only one man, and this project was <i>massive</i>.</h4>
-						<div class='button'>OK</div>
-					</div>
-
 					<div id='victory' class='hidden'>
 						<h1>V I C T O R Y</h1>
 						<h2>Your team discovered cures for all 4 diseases!</h2>

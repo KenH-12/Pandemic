@@ -1126,23 +1126,3 @@ function tooManyFailedAttempts()
     $(".loadingGif").remove();
 }
 
-function showBrowserCompatabilityWarning()
-{
-    const browserName = getBrowser();
-    
-    if (browserName === "Chrome")
-        return false;
-
-    const $warning = $(`<div id='warningsContainer'>
-                            <h3 class='browserCompatWarning'>— Compatibility Warning —</h3>
-                            <p class='browserCompatWarning'>This application has not been tested on the <span id='browserName'></span>. Some features may not function as intended.</p>
-                            <p class='browserCompatWarning'>Please use the <a href='https://www.google.com/intl/en_ca/chrome/'>Google Chrome</a> browser for a smoother experience.</p>
-                            <br/>
-                            <p class='browserCompatWarning'>Also note that this application was intended to run on desktop computers and will not render correctly for screens less than 1024 pixels wide.</p>
-                            <br/>
-                            <p class='browserCompatWarning'>Sorry for the inconvenience — I am only one man, and this project was <i>massive</i>.</p>
-                        </div>`);
-    
-    $("#lobby > .content").append($warning)
-        .find("#browserName").html(browserName === "unknown" ? "browser you are using" : `${browserName} browser`);
-}

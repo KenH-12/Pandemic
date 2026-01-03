@@ -26,7 +26,6 @@ import {
 	abandonGame,
 	logOut,
 	hideCurtain,
-	checkBrowserCompatibility,
 	checkFullscreen,
 	anyWarnings
 } from "./utilities/pandemicUtils.js";
@@ -6993,20 +6992,13 @@ async function setup()
 	
 	managePlayerPanelOcclusion();
 
-	if ($("#warningsContainer").hasClass("hidden"))
-	{
-		await sleep(75);
-		await hideCurtain();
-	}
-
 	instantiateTooltips();
 	bindEventCardHoverEvents();
 	enablePlayerDiscardHoverEvents();
-
-	checkBrowserCompatibility();
 	
 	if (isNewGame)
 	{
+		await hideCurtain();
 		gameData.allRoles = allRoles;
 		await anyWarnings();
 		animateNewGameSetup();
