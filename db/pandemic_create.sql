@@ -170,7 +170,7 @@ CREATE TABLE cityConnection
 	CONSTRAINT fk_city_cityConnection_cityKeyB FOREIGN KEY(cityKeyB) REFERENCES city(cityKey)
 ) ENGINE=InnoDB;
 
-CREATE TABLE CARDPILE
+CREATE TABLE cardPile
 (
 	ID			TINYINT AUTO_INCREMENT,
 	pileName	VARCHAR(21) NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE CARDPILE
 	CONSTRAINT pk_cardPile_ID PRIMARY KEY(ID)
 ) ENGINE=InnoDB;
 
-CREATE TABLE LOCATION
+CREATE TABLE location
 (
 	cityKey					CHAR(4) NOT NULL,
 	gameID					INT NOT NULL,
@@ -195,10 +195,10 @@ CREATE TABLE LOCATION
 	CONSTRAINT pk_location_cityKey_gameID PRIMARY KEY(cityKey, gameID),
 	
 	CONSTRAINT fk_location_infectionCardPileID FOREIGN KEY(infectionCardPileID)
-		REFERENCES CARDPILE(ID),
+		REFERENCES cardPile(ID),
 	
 	CONSTRAINT fk_location_playerCardPileID FOREIGN KEY(playerCardPileID)
-		REFERENCES CARDPILE(ID)
+		REFERENCES cardPile(ID)
 ) ENGINE=InnoDB;
 
 CREATE VIEW vw_location

@@ -33,18 +33,18 @@ INSERT INTO ROLE (roleName) VALUES ('Researcher');
 INSERT INTO ROLE (roleName) VALUES ('Scientist');
 
 -- Player hands are treated as card piles, and the cardPile.IDs are parallel to the roleIDs
-INSERT INTO CARDPILE (pileName) VALUES ('Contingency Planner');
-INSERT INTO CARDPILE (pileName) VALUES ('Dispatcher');
-INSERT INTO CARDPILE (pileName) VALUES ('Medic');
-INSERT INTO CARDPILE (pileName) VALUES ('Operations Expert');
-INSERT INTO CARDPILE (pileName) VALUES ('Quarantine Specialist');
-INSERT INTO CARDPILE (pileName) VALUES ('Researcher');
-INSERT INTO CARDPILE (pileName) VALUES ('Scientist');
+INSERT INTO cardPile (pileName) VALUES ('Contingency Planner');
+INSERT INTO cardPile (pileName) VALUES ('Dispatcher');
+INSERT INTO cardPile (pileName) VALUES ('Medic');
+INSERT INTO cardPile (pileName) VALUES ('Operations Expert');
+INSERT INTO cardPile (pileName) VALUES ('Quarantine Specialist');
+INSERT INTO cardPile (pileName) VALUES ('Researcher');
+INSERT INTO cardPile (pileName) VALUES ('Scientist');
 -- Other possible card piles:
-INSERT INTO CARDPILE (pileName) VALUES ('deck');
-INSERT INTO CARDPILE (pileName) VALUES ('discard');
-INSERT INTO CARDPILE (pileName) VALUES ('contingency'); -- Contingency Planner's special ability
-INSERT INTO CARDPILE (pileName) VALUES ('removed');
+INSERT INTO cardPile (pileName) VALUES ('deck');
+INSERT INTO cardPile (pileName) VALUES ('discard');
+INSERT INTO cardPile (pileName) VALUES ('contingency'); -- Contingency Planner's special ability
+INSERT INTO cardPile (pileName) VALUES ('removed');
 
 INSERT INTO CITY (cityKey, diseaseColor, population) VALUES ('losa', 'y', 4000000);
 INSERT INTO CITY (cityKey, diseaseColor, population) VALUES ('mexi', 'y', 8851000);
