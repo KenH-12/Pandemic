@@ -210,7 +210,7 @@ SELECT	gameID AS game,
 			blueCubes AS uCubes,
 			blackCubes AS bCubes,
 hasResearchStation AS researchStation
-FROM LOCATION;
+FROM location;
 
 CREATE VIEW vw_playerCard
 AS
