@@ -7,27 +7,27 @@ DROP VIEW IF EXISTS vw_infectionCard;
 DROP VIEW IF EXISTS vw_player;
 DROP VIEW IF EXISTS vw_gamestate;
 DROP VIEW IF EXISTS vw_disease;
-DROP TABLE IF EXISTS rolerecord;
-DROP TABLE IF EXISTS gamerecord;
-DROP TABLE IF EXISTS epidemicintensify;
-DROP TABLE IF EXISTS eventhistory;
+DROP TABLE IF EXISTS roleRecord;
+DROP TABLE IF EXISTS gameRecord;
+DROP TABLE IF EXISTS epidemicIntensify;
+DROP TABLE IF EXISTS eventHistory;
 DROP TABLE IF EXISTS player;
 DROP TABLE IF EXISTS location;
 DROP TABLE IF EXISTS pandemic;
 DROP TABLE IF EXISTS diseaseStatus;
 DROP TABLE IF EXISTS game;
 DROP TABLE IF EXISTS step;
-DROP TABLE IF EXISTS gameendcause;
+DROP TABLE IF EXISTS gameEndCause;
 DROP TABLE IF EXISTS verificationCode;
 DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS accessKey;
 DROP TABLE IF EXISTS failedLoginAttempt;
 DROP TABLE IF EXISTS role;
-DROP TABLE IF EXISTS cardpile;
-DROP TABLE IF EXISTS cityconnection;
+DROP TABLE IF EXISTS cardPile;
+DROP TABLE IF EXISTS cityConnection;
 DROP TABLE IF EXISTS city;
 
-SET GLOBAL time_zone = '-4:00'; -- Toronto
+SET GLOBAL time_zone = 'UTC';
 
 CREATE TABLE step
 (
@@ -35,15 +35,15 @@ CREATE TABLE step
 	description VARCHAR(13) NOT NULL,
 	
 	CONSTRAINT pk_step_stepID PRIMARY KEY(stepID)
-);
+) ENGINE=InnoDB;
 
-CREATE TABLE gameendcause
+CREATE TABLE gameEndCause
 (
 	endCauseID	TINYINT AUTO_INCREMENT,
 	description	VARCHAR(9) NOT NULL, -- 'victory', 'outbreak', 'cubes', or 'cards'
 	
 	CONSTRAINT pk_gameEndCause_endCauseID PRIMARY KEY(endCauseID)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE game
 (
@@ -66,7 +66,7 @@ CREATE TABLE game
 	CONSTRAINT pk_game_gameID PRIMARY KEY(gameID),
 	CONSTRAINT fk_step_game FOREIGN KEY(stepID) REFERENCES step(stepID),
 	CONSTRAINT fk_gameEndCause_game FOREIGN KEY(endCauseID) REFERENCES gameEndCause(endCauseID)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE diseaseStatus
 (
@@ -74,7 +74,7 @@ CREATE TABLE diseaseStatus
 	description VARCHAR(10) NOT NULL,
 	
 	CONSTRAINT pk_diseaseStatus_statusID PRIMARY KEY(statusID)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE pandemic
 (
@@ -86,7 +86,7 @@ CREATE TABLE pandemic
 	
 	CONSTRAINT pk_pandemic_gameID PRIMARY KEY(gameID),
 	CONSTRAINT fk_game_pandemic FOREIGN KEY(gameID) REFERENCES game(gameID)
-);
+) ENGINE=InnoDB;
 
 CREATE VIEW vw_disease
 AS
@@ -107,7 +107,7 @@ CREATE TABLE accessKey
 	usesRemaining TINYINT DEFAULT 4,
 	
 	CONSTRAINT pk_accessKey_keyCode PRIMARY KEY(keyCode)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE `user`
 (
@@ -121,7 +121,7 @@ CREATE TABLE `user`
 	
 	CONSTRAINT pk_user_userID PRIMARY KEY(userID),
 	CONSTRAINT fk_user_accessKey FOREIGN KEY(accessKeyUsed) REFERENCES accessKey(keyCode)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE verificationCode
 (
@@ -131,7 +131,7 @@ CREATE TABLE verificationCode
 	
 	CONSTRAINT pk_verificationCode_vCode PRIMARY KEY(vCode),
 	CONSTRAINT fk_user_verificationCode FOREIGN KEY(userID) REFERENCES `user`(userID)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE failedLoginAttempt
 (
@@ -141,7 +141,7 @@ CREATE TABLE failedLoginAttempt
 	timeOfAttempt	DATETIME NOT NULL,
 	
 	CONSTRAINT pk_failedLoginAttempt_attemptID PRIMARY KEY(attemptID)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE role
 (
@@ -149,7 +149,7 @@ CREATE TABLE role
 	roleName		VARCHAR(21) NOT NULL,
 
 	CONSTRAINT pk_role_roleID PRIMARY KEY(roleID)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE city
 (
@@ -158,25 +158,25 @@ CREATE TABLE city
 	diseaseColor	CHAR(1) NOT NULL,
 	
 	CONSTRAINT pk_city_cityKey PRIMARY KEY(cityKey)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE cityConnection
 (
 	cityKeyA CHAR(4) NOT NULL,
 	cityKeyB CHAR(4) NOT NULL,
 	
-	CONSTRAINT pk_cityconnection PRIMARY KEY(cityKeyA, cityKeyB),
+	CONSTRAINT pk_cityConnection PRIMARY KEY(cityKeyA, cityKeyB),
 	CONSTRAINT fk_city_cityConnection_cityKeyA FOREIGN KEY(cityKeyA) REFERENCES city(cityKey),
 	CONSTRAINT fk_city_cityConnection_cityKeyB FOREIGN KEY(cityKeyB) REFERENCES city(cityKey)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE CARDPILE
 (
 	ID			TINYINT AUTO_INCREMENT,
 	pileName	VARCHAR(21) NOT NULL,
 	
-	CONSTRAINT pk_cardpile_ID PRIMARY KEY(ID)
-);
+	CONSTRAINT pk_cardPile_ID PRIMARY KEY(ID)
+) ENGINE=InnoDB;
 
 CREATE TABLE LOCATION
 (
@@ -199,7 +199,7 @@ CREATE TABLE LOCATION
 	
 	CONSTRAINT fk_location_playerCardPileID FOREIGN KEY(playerCardPileID)
 		REFERENCES CARDPILE(ID)
-);
+) ENGINE=InnoDB;
 
 CREATE VIEW vw_location
 AS
@@ -250,7 +250,7 @@ CREATE TABLE player
 	CONSTRAINT fk_user_player FOREIGN KEY(userID) REFERENCES `USER`(userID),
 	CONSTRAINT fk_game_player FOREIGN KEY(gameID) REFERENCES GAME(gameID),
 	CONSTRAINT fk_player_city FOREIGN KEY(cityKey) REFERENCES CITY(cityKey)
-);
+) ENGINE=InnoDB;
 
 CREATE VIEW vw_player
 AS
@@ -266,7 +266,7 @@ FROM player
 INNER JOIN user ON player.userID = user.userID
 INNER JOIN role ON player.roleID = role.roleID;
 
-CREATE TABLE eventhistory
+CREATE TABLE eventHistory
 (
 	eventID			INT AUTO_INCREMENT,
 	eventAbbrev		CHAR(2) NOT NULL,
@@ -275,9 +275,9 @@ CREATE TABLE eventhistory
 	roleID			TINYINT, -- Nullable because some event do not pertain to any role.
 	gameID			INT NOT NULL,
 	
-	CONSTRAINT pk_eventhistory_eventID PRIMARY KEY(eventID),
-	CONSTRAINT fk_game_eventhistory_gameID FOREIGN KEY(gameID) REFERENCES GAME(gameID)
-);
+	CONSTRAINT pk_eventHistory_eventID PRIMARY KEY(eventID),
+	CONSTRAINT fk_game_eventHistory_gameID FOREIGN KEY(gameID) REFERENCES GAME(gameID)
+) ENGINE=InnoDB;
 
 CREATE VIEW vw_event
 AS
@@ -287,7 +287,7 @@ SELECT	eventID AS id,
 			turnNumber AS turnNum,
 			roleID AS role,
 			gameID AS game
-FROM eventhistory;
+FROM eventHistory;
 
 CREATE TABLE epidemicIntensify
 (
@@ -298,7 +298,7 @@ CREATE TABLE epidemicIntensify
 	CONSTRAINT pk_epidemicIntensify_eventID_cityKey PRIMARY KEY (eventID, cityKey),
 	CONSTRAINT fk_eventHistory_epidemicIntensify_eventID FOREIGN KEY(eventID) REFERENCES EVENTHISTORY(eventID),
 	CONSTRAINT fk_city_epidemicIntensify_cityKey FOREIGN KEY(cityKey) REFERENCES CITY(cityKey)
-);
+) ENGINE=InnoDB;
 
 CREATE VIEW vw_gamestate
 AS
@@ -326,7 +326,7 @@ CREATE TABLE gameRecord
 	
 	CONSTRAINT pk_gameRecord_recordID PRIMARY KEY (recordID),
 	CONSTRAINT fk_gameEndCause_gameRecord FOREIGN KEY (endCauseID) REFERENCES gameEndCause (endCauseID)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE roleRecord
 (
@@ -338,4 +338,4 @@ CREATE TABLE roleRecord
 	CONSTRAINT fk_gameRecord_roleRecord FOREIGN KEY (recordID) REFERENCES gameRecord (recordID),
 	CONSTRAINT fk_role_roleRecord FOREIGN KEY (roleID) REFERENCES role (roleID),
 	CONSTRAINT fk_user_roleRecord FOREIGN KEY (userID) REFERENCES `user` (userID)
-);
+) ENGINE=InnoDB;

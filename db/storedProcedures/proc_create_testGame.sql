@@ -11,8 +11,8 @@ BEGIN
 	IF numPlayers >= 2 AND numPlayers <= 4
 		AND numEpidemics >= 4 AND numEpidemics <= 6
 	THEN
-		DELETE FROM epidemicintensify;
-		DELETE FROM eventhistory;
+		DELETE FROM epidemicIntensify;
+		DELETE FROM eventHistory;
 		DELETE FROM player;
 		DELETE FROM location;
 		DELETE FROM pandemic;

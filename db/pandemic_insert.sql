@@ -32,7 +32,7 @@ INSERT INTO ROLE (roleName) VALUES ('Quarantine Specialist');
 INSERT INTO ROLE (roleName) VALUES ('Researcher');
 INSERT INTO ROLE (roleName) VALUES ('Scientist');
 
--- Player hands are treated as card piles, and the cardpile.IDs are parallel to the roleIDs
+-- Player hands are treated as card piles, and the cardPile.IDs are parallel to the roleIDs
 INSERT INTO CARDPILE (pileName) VALUES ('Contingency Planner');
 INSERT INTO CARDPILE (pileName) VALUES ('Dispatcher');
 INSERT INTO CARDPILE (pileName) VALUES ('Medic');
