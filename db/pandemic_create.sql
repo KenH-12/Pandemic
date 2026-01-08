@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS cardPile;
 DROP TABLE IF EXISTS cityConnection;
 DROP TABLE IF EXISTS city;
 
-SET GLOBAL time_zone = 'UTC';
+SET GLOBAL time_zone = '+00:00';
 
 CREATE TABLE step
 (
