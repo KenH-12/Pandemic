@@ -210,7 +210,7 @@ SELECT	gameID AS game,
 			blueCubes AS uCubes,
 			blackCubes AS bCubes,
 hasResearchStation AS researchStation
-FROM location;
+FROM LOCATION;
 
 CREATE VIEW vw_playerCard
 AS
@@ -247,9 +247,9 @@ CREATE TABLE player
 	cityKey		CHAR(4) NOT NULL DEFAULT "atla", -- pawns begin in Atlanta
 	
 	CONSTRAINT pk_player_playerID PRIMARY KEY(playerID),
-	CONSTRAINT fk_user_player FOREIGN KEY(userID) REFERENCES `USER`(userID),
-	CONSTRAINT fk_game_player FOREIGN KEY(gameID) REFERENCES GAME(gameID),
-	CONSTRAINT fk_player_city FOREIGN KEY(cityKey) REFERENCES CITY(cityKey)
+	CONSTRAINT fk_user_player FOREIGN KEY(userID) REFERENCES `user`(userID),
+	CONSTRAINT fk_game_player FOREIGN KEY(gameID) REFERENCES game(gameID),
+	CONSTRAINT fk_player_city FOREIGN KEY(cityKey) REFERENCES city(cityKey)
 ) ENGINE=InnoDB;
 
 CREATE VIEW vw_player
@@ -276,7 +276,7 @@ CREATE TABLE eventHistory
 	gameID			INT NOT NULL,
 	
 	CONSTRAINT pk_eventHistory_eventID PRIMARY KEY(eventID),
-	CONSTRAINT fk_game_eventHistory_gameID FOREIGN KEY(gameID) REFERENCES GAME(gameID)
+	CONSTRAINT fk_game_eventHistory_gameID FOREIGN KEY(gameID) REFERENCES game(gameID)
 ) ENGINE=InnoDB;
 
 CREATE VIEW vw_event
@@ -296,8 +296,8 @@ CREATE TABLE epidemicIntensify
 	cardIndex	TINYINT NOT NULL,
 	
 	CONSTRAINT pk_epidemicIntensify_eventID_cityKey PRIMARY KEY (eventID, cityKey),
-	CONSTRAINT fk_eventHistory_epidemicIntensify_eventID FOREIGN KEY(eventID) REFERENCES EVENTHISTORY(eventID),
-	CONSTRAINT fk_city_epidemicIntensify_cityKey FOREIGN KEY(cityKey) REFERENCES CITY(cityKey)
+	CONSTRAINT fk_eventHistory_epidemicIntensify_eventID FOREIGN KEY(eventID) REFERENCES eventHistory(eventID),
+	CONSTRAINT fk_city_epidemicIntensify_cityKey FOREIGN KEY(cityKey) REFERENCES city(cityKey)
 ) ENGINE=InnoDB;
 
 CREATE VIEW vw_gamestate

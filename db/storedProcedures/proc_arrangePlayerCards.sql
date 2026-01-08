@@ -36,7 +36,7 @@ BEGIN
 	SET epidemicsToInsert = (SELECT epidemicCards FROM game WHERE gameID = gID);
 	
 	-- We need to know how many cards are in the deck when it's time to insert the epidemics.
-	-- Player cards are derived from CITY (event cards included).
+	-- Player cards are derived from the city table (event cards included).
 	SET cardsLeftInDeck = (SELECT COUNT(*)
 									FROM city
 									WHERE diseaseColor != 'x') + epidemicsToInsert;
