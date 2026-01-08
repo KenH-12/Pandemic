@@ -1,9 +1,8 @@
 <?php
     try
     {
-        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
-        require "$rootDir/Pandemic/serverCode/connect.php";
-        require "$rootDir/Pandemic/serverCode/accountUtils.php";
+        require "../connect.php";
+        require "../accountUtils.php";
 
         $data = json_decode(file_get_contents("php://input"), true);
         $emailOrUsername = isset($data["emailOrUsername"]) ? $data["emailOrUsername"] : false;

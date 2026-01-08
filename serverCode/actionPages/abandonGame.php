@@ -1,9 +1,8 @@
 <?php
     try
     {
-        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
-        require "$rootDir/Pandemic/serverCode/connect.php";
-        require "$rootDir/Pandemic/serverCode/utilities.php";
+        require "../connect.php";
+        require "../utilities.php";
 
         session_start();
         

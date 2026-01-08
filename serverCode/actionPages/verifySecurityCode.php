@@ -9,9 +9,8 @@
     
     try
     {
-        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
-        require "$rootDir/Pandemic/serverCode/connect.php";
-        require "$rootDir/Pandemic/serverCode/accountUtils.php";
+        require "../connect.php";
+        require "../accountUtils.php";
 
         $ipAddress = getClientIpAddress();
         $failedAttemptCount = countFailedAttempts($pdo, $ipAddress);
