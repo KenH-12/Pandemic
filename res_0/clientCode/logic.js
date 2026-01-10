@@ -7010,6 +7010,7 @@ async function setup()
 		$(".playerPanel .role").addClass("locatable");
 		bindPlayerDeckHoverEvents();
 		
+		await hideCurtain();
 		if (forecastInProgress())
 		{
 			gameData.currentStep.indicate();
