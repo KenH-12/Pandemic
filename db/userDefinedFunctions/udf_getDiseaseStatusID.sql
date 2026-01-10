@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `udf_getDiseaseStatusID`(
+CREATE FUNCTION `udf_getDiseaseStatusID`(
 	`diseaseStatusDescription` VARCHAR(10)
 )
 RETURNS tinyint(4)

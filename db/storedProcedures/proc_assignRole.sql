@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_assignRole`(
+CREATE PROCEDURE `proc_assignRole`(
 	IN `p_gameID` INT,
 	IN `p_userID` INT
 )

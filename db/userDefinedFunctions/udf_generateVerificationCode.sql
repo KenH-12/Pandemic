@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `udf_generateVerificationCode`(
+CREATE FUNCTION `udf_generateVerificationCode`(
 	`uID` INT
 )
 RETURNS int(11)

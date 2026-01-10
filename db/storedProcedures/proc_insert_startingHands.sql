@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_insert_startingHands`(
+CREATE PROCEDURE `proc_insert_startingHands`(
 	IN `gID` INT
 )
 BEGIN

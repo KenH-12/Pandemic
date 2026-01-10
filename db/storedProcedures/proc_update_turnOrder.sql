@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_update_turnOrder`(
+CREATE PROCEDURE `proc_update_turnOrder`(
 	IN `gID` INT
 )
 BEGIN

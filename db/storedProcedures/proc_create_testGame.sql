@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_create_testGame`(
+CREATE PROCEDURE `proc_create_testGame`(
 	IN `numPlayers` TINYINT,
 	IN `numEpidemics` TINYINT
 )

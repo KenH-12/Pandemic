@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_generateAccessKey`(
+CREATE PROCEDURE `proc_generateAccessKey`(
 	IN `keyCreatedFor` VARCHAR(50)
 )
 BEGIN

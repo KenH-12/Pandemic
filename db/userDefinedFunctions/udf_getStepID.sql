@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `udf_getStepID`(
+CREATE FUNCTION `udf_getStepID`(
 	`stepDescription` VARCHAR(13)
 )
 RETURNS tinyint(4)

@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `udf_getPileID`(
+CREATE FUNCTION `udf_getPileID`(
 	`p_pileName` VARCHAR(21)
 )
 RETURNS tinyint(4)

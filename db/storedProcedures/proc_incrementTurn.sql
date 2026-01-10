@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_incrementTurn`(
+CREATE PROCEDURE `proc_incrementTurn`(
 	IN `gID` INT,
 	IN `nextTurnID` TINYINT
 )

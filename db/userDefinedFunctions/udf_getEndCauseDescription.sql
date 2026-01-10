@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `udf_getEndCauseDescription`(
+CREATE FUNCTION `udf_getEndCauseDescription`(
 	`p_endCauseID` TINYINT
 )
 RETURNS varchar(9) CHARSET utf8

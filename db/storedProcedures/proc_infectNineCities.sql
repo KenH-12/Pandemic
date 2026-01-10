@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_infectNineCities`(
+CREATE PROCEDURE `proc_infectNineCities`(
 	IN `gID` INT
 )
 BEGIN

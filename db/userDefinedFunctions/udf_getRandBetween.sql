@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `udf_getRandBetween`(
+CREATE FUNCTION `udf_getRandBetween`(
 	`min` INT,
 	`max` INT
 )

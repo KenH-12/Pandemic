@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `udf_getEndCauseID`(
+CREATE FUNCTION `udf_getEndCauseID`(
 	`endCauseDescription` VARCHAR(9)
 )
 RETURNS tinyint(4)

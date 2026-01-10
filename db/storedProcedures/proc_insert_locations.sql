@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_insert_locations`(
+CREATE PROCEDURE `proc_insert_locations`(
 	IN `gID` INT
 )
 BEGIN
