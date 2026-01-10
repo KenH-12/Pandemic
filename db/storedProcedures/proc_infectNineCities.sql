@@ -20,11 +20,11 @@ BEGIN
 		-- Get the cityKey and color of the top card
 		SELECT cardKey, color
 		INTO cKey, clr
-		FROM vw_infectioncard
+		FROM vw_infectionCard
 		WHERE game = gID
 		AND pile = 'deck'
 		AND cardIndex =	(SELECT MAX(cardIndex)
-								FROM vw_infectioncard
+								FROM vw_infectionCard
 								WHERE game = gID
 								AND pile = 'deck');
 		

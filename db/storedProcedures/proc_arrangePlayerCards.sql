@@ -93,7 +93,7 @@ BEGIN
 				FROM vw_player
 				WHERE game = gID
 				AND rID NOT IN (SELECT pileID
-									FROM vw_playercard
+									FROM vw_playerCard
 									WHERE game = gID
 									AND pile != 'deck'
 									GROUP BY pileID
@@ -107,7 +107,7 @@ BEGIN
 					WHERE game = gID
 					AND pileID = handID) + 1;
 					-- Put the card in the player's hand.
-					UPDATE vw_playercard
+					UPDATE vw_playerCard
 					SET pileID = handID,
 						cardIndex = handIdx
 					WHERE game = gID

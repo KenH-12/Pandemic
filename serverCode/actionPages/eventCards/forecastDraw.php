@@ -35,7 +35,7 @@
         $discardingRole = convertRoleFromPossibleContingency($pdo, $discardingRole);
 
         $stmt = $pdo->prepare("SELECT cardKey
-                                FROM vw_infectioncard
+                                FROM vw_infectionCard
                                 WHERE game = ?
                                 AND pile = 'deck'
                                 ORDER BY cardIndex DESC

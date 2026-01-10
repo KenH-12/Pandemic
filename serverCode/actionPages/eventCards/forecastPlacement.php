@@ -39,7 +39,7 @@
             throw new Exception("Incorrect number of cards.");
         
         $stmt = $pdo->prepare("SELECT cardKey, cardIndex
-                                FROM vw_infectioncard
+                                FROM vw_infectionCard
                                 WHERE game = ?
                                 AND pile = 'deck'
                                 ORDER BY cardIndex DESC

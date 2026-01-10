@@ -12,7 +12,7 @@ BEGIN
 	-- Select the roleIDs (pileID) for this game
 	-- ordered by the single highest population playerCard held by each role.
 	SELECT pileID
-	FROM vw_playercard
+	FROM vw_playerCard
 	WHERE game = gID
 	AND pile != 'deck'
 	AND pop =	(SELECT MAX(population)

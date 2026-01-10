@@ -23,7 +23,7 @@ BEGIN
 			-- Get a concatenated string of the cardKeys in the player's starting hand ('sh')
 			SELECT pileID, GROUP_CONCAT(cardKey)
 			INTO @pileID, @cardKeys
-			FROM vw_playercard
+			FROM vw_playerCard
 			WHERE game = gID
 			AND pileID = rID
 			GROUP BY pileID;

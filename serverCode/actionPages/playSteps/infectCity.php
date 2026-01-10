@@ -57,7 +57,7 @@
 		
 		// Get the top card from the infection deck
 		$stmt = $pdo->prepare("SELECT cardKey, color
-								FROM vw_infectioncard
+								FROM vw_infectionCard
 								WHERE game = ?
 								AND pile = 'deck'
 								ORDER BY cardIndex DESC

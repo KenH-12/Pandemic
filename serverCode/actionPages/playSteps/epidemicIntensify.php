@@ -90,7 +90,7 @@
         
         // Get the epidemic cardKey and discard it
         $stmt = $pdo->prepare("SELECT cardKey
-                                FROM vw_playercard
+                                FROM vw_playerCard
                                 WHERE game = ?
                                 AND pile = 'deck'
                                 AND cardKey LIKE 'epi%'
