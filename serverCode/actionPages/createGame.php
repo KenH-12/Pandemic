@@ -23,7 +23,7 @@
         $uID = $_SESSION["uID"];
         $numEpidemics = $data["numEpidemics"];
         $numRoles = $data["numRoles"];
-        $randomRoleSelection = $data["randomRoleSelection"];
+        $randomRoleSelection = (int)$data["randomRoleSelection"];
 
         if ($numEpidemics < 4 || $numEpidemics > 6)
             throw new Exception("Invalid number of epidemics: $numEpidemics");
