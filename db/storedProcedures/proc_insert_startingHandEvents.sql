@@ -34,3 +34,4 @@ BEGIN
 		END LOOP role_loop;
 	CLOSE role_cursor;
 END //
+DELIMITER ;

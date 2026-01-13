@@ -104,33 +104,27 @@
 
         $stmt = $pdo->prepare("CALL proc_insert_locations(?)");
         $stmt->execute([$gID]);
-
-        $noEpidemics = true;
-        $epidemicInsertionAttempts = 0;
-        while ($noEpidemics && $epidemicInsertionAttempts < 3)
-        {
-            $stmt = $pdo->prepare("CALL proc_arrangePlayerCards(?)");
-            $stmt->execute([$gID]);
-
-            $stmt = $pdo->prepare("SELECT cardKey
-                                        FROM vw_playerCard
-                                        WHERE game = ?
-                                        AND cardKey LIKE 'epi%'");
-            $stmt->execute([$gID]);
-            $epidemics = $stmt;
-            
-            if ($epidemics->rowCount() == $numEpidemics)
-                $noEpidemics = false;
-            else
-            {
-                $stmt = $pdo->prepare("DELETE FROM location WHERE gameID = ?");
-                $stmt->execute([$gID]);
-                $epidemicInsertionAttempts++;
-            }
-        }
         
-        if ($noEpidemics)
-            throw new Exception("failed to insert epidemic cards. Attempts: " . $epidemicInsertionAttempts);
+        $stmt = $pdo->prepare("CALL proc_dealPlayerCards(?)");
+        $stmt->execute([$gID]);
+
+        $stmt = $pdo->prepare("CALL proc_preparePlayerDeck(?, ?)");
+        $stmt->execute([
+            $gID,
+            join(",", generateRandomEpidemicIndices($pdo, $gID, $numEpidemics))
+        ]);
+
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*) AS insertedEpidemicCount
+            FROM vw_playerCard
+            WHERE game = ?
+            AND pile = 'deck'
+            AND cardKey LIKE 'epi%'"
+        );
+        $stmt->execute([$gID]);
+        $insertedEpidemicCount = $stmt->fetch()["insertedEpidemicCount"];
+        if ($numEpidemics != $numEpidemics)
+            throw new Exception("Failed to prepare player deck");
 
         $stmt = $pdo->prepare("CALL proc_infectNineCities(?)");
         $stmt->execute([$gID]);

@@ -1316,4 +1316,48 @@ function goToStepBeforeOneQuietNight($pdo, $game, $prevStepName)
     
     return $prevTurnRoleID;
 }
+
+function generateRandomEpidemicIndices($pdo, $gID, $numEpidemics) {
+    /* From the official rules:
+        [After dealing the appropriate number of player cards to each role...]
+        "Divide the remaining player cards into face down piles, as equal in size as
+        you can, so that the number of piles matches the number of Epidemic cards
+        you are using. Shuffle 1 Epidemic card into each pile, face down. Stack these
+        piles to form the Player Deck, placing smaller piles on the bottom."
+    */
+
+    $stmt = $pdo->prepare(
+        "SELECT COUNT(*)
+		FROM vw_playerCard
+		WHERE game = ?
+		AND pileID = udf_getPileID('deck')"
+    );
+    $stmt->execute([$gID]);
+    $deckSizeWithoutEpidemics = $stmt->fetchColumn();
+
+    $chunkSize = floor($deckSizeWithoutEpidemics / $numEpidemics);
+	$remainder = $deckSizeWithoutEpidemics % $numEpidemics;
+
+	// Disperse remainder amongst chunks
+    $chunkSizes = [];
+    for ($i = 0; $i < $numEpidemics; $i++) {
+        $chunkSizes[] = $chunkSize + ($i < $remainder ? 1 : 0);
+    }
+    // Cards are drawn from the top of the deck (highest index first),
+    // so "placing smaller piles on the bottom" means
+    // the largest chunks (that include the remainder)
+    // must be at higher indices.
+    $chunkSizes = array_reverse($chunkSizes);
+    
+    $i = 1;
+    $epidemicIndices = [];
+    foreach ($chunkSizes as $chunkSize) {
+        // Set epidemic index to a random number between $i and $i + $chunkSize
+        // keeping in mind that chunkSize does not include the epidemic itself
+        $epidemicIndices[] = rand($i, $i + $chunkSize);
+        $i += $chunkSize + 1; // +1 to account for the epidemic
+    }
+    
+	return $epidemicIndices;
+}
 ?>
