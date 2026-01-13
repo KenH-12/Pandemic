@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE PROCEDURE `proc_insert_startingHands`(
+CREATE PROCEDURE `proc_insert_startingHandEvents`(
 	IN `gID` INT
 )
 BEGIN
