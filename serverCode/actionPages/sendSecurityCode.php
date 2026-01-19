@@ -3,6 +3,7 @@
     {
         require "../connect.php";
         require "../accountUtils.php";
+        require "../email.php";
 
         $data = json_decode(file_get_contents("php://input"), true);
         $emailOrUsername = isset($data["emailOrUsername"]) ? $data["emailOrUsername"] : false;
@@ -26,10 +27,9 @@
                 $code = newVerificationOrSecurityCode($pdo, $userID);
     
                 $subject = "Pandemic Security Code";
-                $message = "Hello, $username.\nHere is your security code: $code\n(code will expire after 1 hour)";
-                $headers = "From: ken@kenhenderson.site";
+                $message = "Hello, $username.\nHere is your security code: $code\n(code will expire in 10 minutes)";
     
-                mail($to, $subject, $message, $headers);
+                sendEmail($to, $subject, $message);
             }
         }
         

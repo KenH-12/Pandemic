@@ -2,7 +2,7 @@
     try
     {
         require "../connect.php";
-        require "../accountUtils.php";
+        require "../email.php";
 
         session_start();
         

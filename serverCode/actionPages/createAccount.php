@@ -2,7 +2,7 @@
     try
     {
         require "../connect.php";
-        require "../accountUtils.php";
+        require "../email.php";
         
         session_start();
         if (!isset($_SESSION["accessKey"]))
@@ -39,13 +39,13 @@
         $stmt->execute([$username]);
 
         if ($stmt->rowCount() > 0)
-            throw new Exception("Username already exists");
+            throw new Exception("That username is not available");
         
         $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ?");
         $stmt->execute([$email]);
 
         if ($stmt->rowCount() > 0)
-            throw new Exception("Email already exists");
+            throw new Exception("That email address is already associated with an account");
         
         $pdo->beginTransaction();
 

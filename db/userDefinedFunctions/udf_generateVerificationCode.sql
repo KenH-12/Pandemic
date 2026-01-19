@@ -12,7 +12,7 @@ BEGIN
 	INSERT INTO verificationCode
 		(vCode, expiry, userID)
 	VALUES
-		(newCode, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 HOUR), uID);
+		(newCode, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 10 MINUTE), uID);
 	
 	IF ROW_COUNT() != 1 THEN
 		SET newCode = 0;

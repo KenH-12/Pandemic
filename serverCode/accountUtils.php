@@ -68,31 +68,6 @@ function clearFailedLoginAttempts($pdo)
     $stmt->execute([$ip]);
 }
 
-function sendVerificationCode($pdo, $userID)
-{
-    $stmt = $pdo->prepare("SELECT username, email FROM `user` WHERE userID = ?");
-    $stmt->execute([$userID]);
-
-    if ($stmt->rowCount() === 0)
-    {
-        session_start();
-        unset($_SESSION["uID"]);
-        throw new Exception("user not logged in");
-    }
-
-    $userDetails = $stmt->fetch();
-    $username = $userDetails["username"];
-    $to = $userDetails["email"];
-
-    $code = newVerificationOrSecurityCode($pdo, $userID);
-
-    $subject = "Pandemic Account Verification";
-    $message = "Hello, $username.\nVerify your Pandemic account using this code: $code\n(code will expire after 1 hour)";
-    $headers = "From: ken@kenhenderson.site";
-
-    mail($to, $subject, $message, $headers);
-}
-
 function newVerificationOrSecurityCode($pdo, $userID)
 {
     $stmt = $pdo->prepare("DELETE FROM verificationCode WHERE userID = ?");
