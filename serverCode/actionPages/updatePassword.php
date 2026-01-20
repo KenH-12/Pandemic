@@ -2,7 +2,7 @@
     try
     {
         require "../connect.php";
-        require "../accountUtils.php";
+        require_once "../accountUtils.php";
         
         session_start();
         if (!isset($_SESSION["tmpID"]))

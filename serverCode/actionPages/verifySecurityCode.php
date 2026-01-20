@@ -10,7 +10,7 @@
     try
     {
         require "../connect.php";
-        require "../accountUtils.php";
+        require_once "../accountUtils.php";
 
         $ipAddress = getClientIpAddress();
         $failedAttemptCount = countFailedAttempts($pdo, $ipAddress);

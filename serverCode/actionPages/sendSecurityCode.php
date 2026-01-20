@@ -2,7 +2,7 @@
     try
     {
         require "../connect.php";
-        require "../accountUtils.php";
+        require_once "../accountUtils.php";
         require "../email.php";
 
         $data = json_decode(file_get_contents("php://input"), true);
