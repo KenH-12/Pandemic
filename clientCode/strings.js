@@ -244,8 +244,8 @@ strings = {
     ],
     contact: [
         "<span class='copyable'>Developer: Ken Henderson</span>",
-        "<span class='copyable'>Email: kenthecoder@outlook.com</span>",
-        "<span class='copyable'>Website: <a href='https://kenhenderson.site'>kenhenderson.site</a></span>",
+        "<span class='copyable'>Email: kenhenderson12@hotmail.com</span>",
+        "<span class='copyable'>Portfolio: <a href='https://kenhenderson.ca'>kenhenderson.ca</a></span>",
         "<span class='copyable'>GitHub: <a href='https://github.com/KenH-12'>github.com/KenH-12</a></span>"
     ],
     disclaimer

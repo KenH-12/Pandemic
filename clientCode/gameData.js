@@ -1,10 +1,8 @@
 "use strict";
 
-import { getVersionNumber } from "./utilities/pandemicUtils.js"
 import WarningLevelManager from "./warningLevelManager.js";
 
 const gameData = {
-	imagesDir: `res_${getVersionNumber()}/images`,
 	players: {},
 	randomRoles: true,
     turn: -1,

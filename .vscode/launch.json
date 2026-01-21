@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Launch Chrome",
             "url": "http://localhost/Pandemic/game.php",
-            "webRoot": "${workspaceFolder}\\clientCode\\logic.js"
+            "webRoot": "clientCode\\logic.js"
         }
     ]
 }

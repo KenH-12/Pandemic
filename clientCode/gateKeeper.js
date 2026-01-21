@@ -1,9 +1,9 @@
 import ValidationError from "./utilities/validationError.js";
 import { postData, fetchHtml } from "./utilities/fetchUtils.js";
-import { strings } from "./strings.js";
+import { strings } from "./strings.js?v=aa0206301663";
 import SideMenu, { SideMenuButton } from "./sideMenu.js";
 import { bindSideMenuHoverEvents } from "./tooltipInstantiation.js";
-import { getVersionNumber, logOut, getLoadingGifHtml } from "./utilities/pandemicUtils.js";
+import { logOut, getLoadingGifHtml } from "./utilities/pandemicUtils.js";
 
 const selectors = {
     lobbySelector: "#lobby",
@@ -33,8 +33,6 @@ function escapeHtml(text) {
 $(function()
 {
     const $lobby = $(selectors.lobbySelector);
-
-    data.imagesDir = `res_${getVersionNumber()}/images`;
 
     if ($lobby.attr("data-loggedIn"))
     {
@@ -564,7 +562,7 @@ function bindRoleCardHoverEvents()
         const $roleCard = $(`<div class='roleCard ${camelCaseRole}'>
             <h3>${role}</h3>
             <img	class='rolePortrait'
-                    src='${data.imagesDir}/cards/roles/${camelCaseRole}.jpg'
+                    src='images/cards/roles/${camelCaseRole}.jpg'
                     alt='${role} Role Card' />
             <ul>${strings[`${camelCaseRole}CardText`]}</ul>
         </div>`);

@@ -1,6 +1,6 @@
 "use strict";
 
-import { strings } from "./strings.js";
+import { strings } from "./strings.js?v=aa0206301663";
 import { eventTypes } from "./event.js";
 
 export default class SideMenu

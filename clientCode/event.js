@@ -1,6 +1,6 @@
 "use strict";
 
-import { strings } from "./strings.js";
+import { strings } from "./strings.js?v=aa0206301663";
 import { eventCards, bindEventCardHoverEvents } from "./eventCard.js";
 import {
 	gameData,
@@ -929,7 +929,7 @@ class Eradication extends Event
 	{
 		return new Promise(resolve =>
 		{
-			$(`#cureMarker${this.diseaseColor.toUpperCase()}`).attr("src", `${gameData.imagesDir}/pieces/cureMarker_${this.diseaseColor}.png`);
+			$(`#cureMarker${this.diseaseColor.toUpperCase()}`).attr("src", `images/pieces/cureMarker_${this.diseaseColor}.png`);
 			resolve();
 		});
 	}

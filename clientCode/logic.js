@@ -29,7 +29,7 @@ import {
 	checkFullscreen,
 	anyWarnings
 } from "./utilities/pandemicUtils.js";
-import { strings } from "./strings.js";
+import { strings } from "./strings.js?v=aa0206301663";
 import getDimension from "./dimensions.js";
 import { getDuration, setDuration } from "./durations.js";
 import { easings } from "./easings.js";
@@ -129,7 +129,7 @@ import SideMenu, { SideMenuButton, ConfirmationButton } from "./sideMenu.js";
 $(function(){
 	const playerDeckImgManager = new DeckImageManager({
 		$deck: $("#playerDeckContainer img"),
-		imageUrlWithoutNumber: `${gameData.imagesDir}/cards/playerDeck_.png`,
+		imageUrlWithoutNumber: `images/cards/playerDeck_.png`,
 		numImages: 7,
 		maxCardCount: false // to be set once gameData is retrieved
 	}),
@@ -2066,7 +2066,7 @@ async function animateForecastPlacement($cardContainer)
 	$(".tooltip.forecastedCardTooltip").remove();
 
 	$cards.prepend($(`<img	class='forecastCardback'
-							src='${gameData.imagesDir}/cards/infectionCardback.png'
+							src='images/cards/infectionCardback.png'
 							alt='Infection Card' />`));
 	
 	const $cardbacks = $cardContainer.find(".forecastCardback").width(getDimension("diseaseIcon")),
@@ -2392,7 +2392,7 @@ async function appendGrantStation()
 	let $grantStation = $boardContainer.find(".researchStation.grantStation");
 	
 	if (!$grantStation.length)
-		$grantStation = $(`<img class='researchStation grantStation' src='${gameData.imagesDir}/pieces/researchStation.png' />`)
+		$grantStation = $(`<img class='researchStation grantStation' src='images/pieces/researchStation.png' />`)
 			.appendTo("#boardContainer");
 
 	researchStationKeys.add("grantStation");
@@ -2800,7 +2800,7 @@ function promptResearchStationRelocation()
 		if (city.hasResearchStation)
 		{
 			$actionInterface.append(`<div class='button btnRelocateStation' data-key='${key}'>
-										<img class='researchStation' src='${gameData.imagesDir}/pieces/researchStation.png' />
+										<img class='researchStation' src='images/pieces/researchStation.png' />
 										<p>${city.name}</p>
 									</div>`);
 		}
@@ -3103,7 +3103,7 @@ function flipCureMarkerToEradicated(diseaseColor, $cureMarker)
 	
 	$cureMarker = $cureMarker ? $cureMarker : $(`#cureMarker${diseaseColor.toUpperCase()}`)
 	
-	$cureMarker.prop("src", `${gameData.imagesDir}/pieces/cureMarker_${diseaseColor}_eradicated.png`);
+	$cureMarker.prop("src", `images/pieces/cureMarker_${diseaseColor}_eradicated.png`);
 }
 
 function finishActionStep()
@@ -3324,7 +3324,7 @@ function dealFaceDownPlayerCard($container, deckProperties, { zIndex } = {})
 
 function newFacedownPlayerCard()
 {
-	return $(`<img src='${gameData.imagesDir}/cards/playerCardback.png' alt='Player Card'/>`);
+	return $(`<img src='images/cards/playerCardback.png' alt='Player Card'/>`);
 }
 
 async function revealPlayerCard(cardKey, $container)
@@ -3658,7 +3658,7 @@ class Player
 			$roleCard = $(`<div class='roleCard ${camelCaseRole}'>
 							<h3>${role}</h3>
 							<img	class='rolePortrait'
-									src='${gameData.imagesDir}/cards/roles/${camelCaseRole}.jpg'
+									src='images/cards/roles/${camelCaseRole}.jpg'
 									alt='${role} Role Card' />
 							<ul>${strings[`${camelCaseRole}CardText`]}</ul>
 						</div>`).appendTo("#boardContainer"),
@@ -4295,7 +4295,7 @@ function appendPawnToBoard(player)
 {
 	const { camelCaseRole, role, cityKey } = player;
 
-	player.$pawn = $(`<img	src='${gameData.imagesDir}/pieces/pawns/${camelCaseRole}.png'
+	player.$pawn = $(`<img	src='images/pieces/pawns/${camelCaseRole}.png'
 							alt='${role} pawn'
 							class='pawn ${cityKey}${currentStepIs("setup") ? " hidden" : ""}'
 							id='${camelCaseRole}Pawn'
@@ -5286,7 +5286,7 @@ async function animateEpidemicIntensify()
 		}
 	
 	$cards.prepend($(`<img	class='infDiscardCardback'
-							src='${gameData.imagesDir}/cards/infectionCardback.png'
+							src='images/cards/infectionCardback.png'
 							alt='Infection Card' />`));
 	
 	const $cardbacks = $(".infDiscardCardback"),
@@ -5998,7 +5998,7 @@ function loadInfCardsDrawnThisTurn()
 				.click(function() { pinpointCityFromCard($card) })
 				.removeClass("template")
 				.find(".infectionCardImg")
-				.attr("src", `${gameData.imagesDir}/cards/infectionCard_${city.color}.png`)
+				.attr("src", `images/cards/infectionCard_${city.color}.png`)
 				.siblings(".cityName")
 				.html(city.name.toUpperCase())
 				.siblings(".veil").remove();
@@ -6243,7 +6243,7 @@ function dealFaceDownInfCard({ infectionIndex }, { dealFromBottomOfDeck } = {})
 		
 		const containerTop = $container.offset().top,
 			$cardback = $(`<img class='drawnInfectionCard' data-index='${infectionIndex}'
-								src='${gameData.imagesDir}/cards/infectionCardback.png'
+								src='images/cards/infectionCardback.png'
 								alt='Infection Card' />`),
 			{ infectionDeckOffset, boardWidth } = gameData;
 		
@@ -6315,7 +6315,7 @@ async function revealInfectionCard({ city, cityKey, infectionIndex }, { forecast
 		
 		$card.attr("data-key", cityKey)
 			.find(".infectionCardImg")
-			.attr("src", `${gameData.imagesDir}/cards/infectionCard_${city.color}.png`)
+			.attr("src", `images/cards/infectionCard_${city.color}.png`)
 			.siblings(".cityName")
 			.html(city.name.toUpperCase());
 		
@@ -6427,7 +6427,7 @@ function newCureMarker(diseaseColor, diseaseStatus, { isForReveal, isForMedicAut
 		className = "cureMarker";
 	}
 
-	const $cureMarker = $(`<img	src='${gameData.imagesDir}/pieces/${fileName}.png'
+	const $cureMarker = $(`<img	src='images/pieces/${fileName}.png'
 								${idAttr}
 								class='${className}' />`);
 
@@ -6791,7 +6791,7 @@ function loadInfectionDiscards(cards)
 		$card = $(`<div class='infectionCard' data-key='${city.key}'>
 					<div class='infectionCardContents'>
 						<img	class='infectionCardImg'
-								src='${gameData.imagesDir}/cards/infectionCard_${city.color}.png'/>
+								src='images/cards/infectionCard_${city.color}.png'/>
 						<p class='cityName'>${city.name.toUpperCase()}</p>
 					</div>
 				</div>`);
@@ -7660,7 +7660,7 @@ function shuffleEpidemicIntoPile($div)
 		$cardbacks = $cardbacks.add($epidemicCardback);
 		await shuffleAnimation($div, $cardbacks);
 
-		const $pile = $cardbacks.first().attr("src", `${gameData.imagesDir}/cards/playerDeck_3.png`);
+		const $pile = $cardbacks.first().attr("src", `images/cards/playerDeck_3.png`);
 		$cardbacks.not($pile).remove();
 		resolve();
 	});

@@ -3,7 +3,7 @@
 import { eventTypes } from "./event.js";
 import { gameData, eventTypeIsBeingPrompted, getPlayer } from "./gameData.js";
 import Tooltip from "./tooltip.js";
-import { strings } from "./strings.js";
+import { strings } from "./strings.js?v=aa0206301663";
 
 export default class EventCard
 {
@@ -23,7 +23,7 @@ export default class EventCard
         const $fullCard = $(`<div class='eventCardFull' data-key='${this.key}'>
                                 <h5>EVENT</h5>
                                 <h3>${this.name.toUpperCase()}</h3>
-                                <img src='${gameData.imagesDir}/cards/event/${toCamelCase(this.name)}.jpg' alt='${this.name}' />
+                                <img src='images/cards/event/${toCamelCase(this.name)}.jpg' alt='${this.name}' />
                                 ${this.getRules()}
                             </div>`);
         

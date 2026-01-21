@@ -510,7 +510,7 @@ export default class City
 		return `<div class='infectionCard' data-key='${this.key}'>
 					<div class='infectionCardContents'>
 						${ toReveal ? "<div class='veil'></div>" : "" }
-						<img class='infectionCardImg' src='${gameData.imagesDir}/cards/infectionCard_${this.color}.png' />
+						<img class='infectionCardImg' src='images/cards/infectionCard_${this.color}.png' />
 						<p class='cityName'>${this.name.toUpperCase()}</p>
 					</div>
 				</div>`;
@@ -1363,7 +1363,7 @@ const researchStationKeys = new Set();
 function newResearchStationElement(cityKey, promptAction)
 {
 	const $rs = $(`<div class='researchStation' data-key='${cityKey}'>
-					<img src='${gameData.imagesDir}/pieces/researchStation.png' alt='Research Station' />
+					<img src='images/pieces/researchStation.png' alt='Research Station' />
 				</div>`),
 		$boardContainer = $("#boardContainer"),
 		$window = $(window),

@@ -1,7 +1,7 @@
 "use strict";
 
 import Tooltip from "./tooltip.js";
-import { strings } from "./strings.js";
+import { strings } from "./strings.js?v=aa0206301663";
 import {
     gameData,
     getPlayer,
