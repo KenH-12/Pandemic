@@ -104,8 +104,46 @@
 
         $stmt = $pdo->prepare("CALL proc_insert_locations(?)");
         $stmt->execute([$gID]);
+
+        // Simple formula determines starting hand size
+        $startingHandSize = 6 - count($selectedRoleIDs);
+
+        // Deal starting hands
+        foreach ($selectedRoleIDs as $roleID)
+        {
+            $stmt = $pdo->prepare("
+                SELECT cardKey
+                FROM vw_playerCard
+                WHERE game = ?
+                AND pile = 'deck'
+                ORDER BY RAND()
+                LIMIT ?;
+            ");
+            $stmt->execute([$gID, $startingHandSize]);
+            $drawnCards = $stmt->fetchAll();
+            
+            $cardIndex = 0;
+            foreach ($drawnCards as $drawnCard)
+            {
+                $status[] = $drawnCard["cardKey"];
+                $stmt = $pdo->prepare("
+                    UPDATE vw_playerCard
+                    SET pileID = ?,
+                        cardIndex = ?
+                    WHERE game = ?
+                    AND cardKey = ?;
+                ");
+                $stmt->execute([$roleID, $cardIndex, $gID, $drawnCard["cardKey"]]);
+                $cardIndex++;
+            }
+        }
         
-        $stmt = $pdo->prepare("CALL proc_dealPlayerCards(?)");
+        $stmt = $pdo->prepare("CALL proc_insert_startingHandEvents(?)");
+        $stmt->execute([$gID]);
+
+        // Turn order is determined by the highest population
+        // playerCard held by each role.
+        $stmt = $pdo->prepare("CALL proc_update_turnOrder(?)");
         $stmt->execute([$gID]);
 
         $stmt = $pdo->prepare("CALL proc_preparePlayerDeck(?, ?)");
