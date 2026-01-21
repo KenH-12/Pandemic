@@ -6,19 +6,19 @@ use Mailgun\Mailgun;
 
 function sendEmail($to, $subject, $text)
 {
-	$mg = Mailgun::create(getenv('MAILGUN_API_KEY'));
+    $mg = Mailgun::create(getenv('MAILGUN_API_KEY'));
 
-	$result = $mg->messages()->send(
-		'kenhenderson.ca',
-		[
-			'from' => 'KenBot <mail@kenhenderson.ca>',
-			'to' => $to,
-			'subject' => $subject,
-			'text' => $text
-		]
-	);
+    $result = $mg->messages()->send(
+        'pandemic.kenhenderson.ca',
+        [
+            'from' => 'Pandemic <no-reply@pandemic.kenhenderson.ca>',
+            'to' => $to,
+            'subject' => $subject,
+            'text' => $text
+        ]
+    );
 
-	return $result;
+    return $result;
 }
 
 function sendVerificationCode($pdo, $userID)
