@@ -389,6 +389,16 @@ select
 	min-width: 1024px;
 	max-width: 1920px;
 }
+#rightPanelEdgeLine
+{
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 100vh;
+	width: 1px;
+	background-color: #fff;
+	z-index: 10;
+}
 html,
 #curtain,
 .veil,
@@ -399,7 +409,8 @@ html,
 {
 	position: fixed;
 	width: 100%;
-	height: 1080px;
+	max-width: 1920px;
+	height: 100vh;
 	z-index: 50;
 	padding: 5px;
 }
@@ -1258,6 +1269,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 {
 	float: right;
 	border-left: 1px solid #fff;
+	border-bottom: 1px solid #fff;
 }
 #rightPanel .tooltip
 { max-width: 180px }
@@ -1325,7 +1337,7 @@ span.r, p.r {color: #ef282a; background: none !important }
 #infectCitiesContainer > .infectionCard,
 #infectCitiesContainer > .btnContinue
 { margin-top: 20px }
-.infectionCardContents { position: relative }
+.infectionCardContents { position: relative; }
 .infectionCard *
 {
 	position: absolute;
@@ -2369,6 +2381,34 @@ button.hamburger:not(.is-active)
 {
 	transition: left 0.15s;
 }
+
+@media (min-width: 1920px)
+{
+	#sideMenu,
+	#sideMenuTitle
+	{
+		left: var(--board-width-percentage);
+		transition: opacity 0.15s;
+	}
+	#sideMenu:not(.is-active),
+	#sideMenuTitle:not(.is-active)
+	{
+		opacity: 0;
+		pointer-events: none;
+	}
+	#sideMenu.is-active,
+	#sideMenuTitle.is-active
+	{
+		opacity: 1;
+		pointer-events: auto;
+	}
+	#lobby #sideMenu,
+	#lobby #sideMenu.is-active
+	{
+		left: 75%;
+	}
+}
+
 #sideMenuTitle
 {
 	z-index: 41;

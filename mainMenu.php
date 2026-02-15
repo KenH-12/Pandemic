@@ -112,7 +112,7 @@
 
                 $difficultyRadioButtons .= "<div>
                         <input type='radio' name='radDifficulty' id='rad$difName' value='$numEpidemics'$checked>
-                        <label for='rad$difName'>$difName</label><span id='" . strtolower($difName) . "Info' class='info'>&#9432;</span>
+                        <label for='rad$difName'>$difName</label><span id='" . strtolower($difName) . "Info' class='info'>&#128712;</span>
                     </div>";
             }
 
@@ -146,7 +146,7 @@
                             <select id='ddlNumRoles'>
                                 $numRolesOptions
                             </select>
-                            <span id='numberOfRolesInfo' class='info'>&#9432;</span>
+                            <span id='numberOfRolesInfo' class='info'>&#128712;</span>
                         </div>
 
                         <div class='divInputControl'>

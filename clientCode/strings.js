@@ -40,7 +40,7 @@ strings = {
         ["h4", "Turns"],
         turnInfo,
         ["h4", "<span id='actionsHeading'>Actions</span>"],
-        `During the "Do 4 actions" step, use the action buttons in the right panel to work toward discovering cures to all 4 diseases while preventing global catastrophe. Mouse over an action button's info icon (&#9432;) to view that action's rules.`,
+        `During the "Do 4 actions" step, use the action buttons in the right panel to work toward discovering cures to all 4 diseases while preventing global catastrophe. Mouse over an action button's info icon (&#128712;) to view that action's rules.`,
         "NOTE: you can perform movement actions by dragging and dropping an active pawn onto a <span class='hoverInfo validDestinationInfo'>valid destination</span>, and you can do the <span class='hoverInfo eventTypeInfo' data-eventType='td'>Treat Disease</span> action by clicking a disease cube at the active role's current location.",
         ["h4", "Event cards"],
         "Event cards can be <span class='hoverInfo eventCardInfo'>played</span> at any time (with a few <span class='hoverInfo eventCardExceptions'>exceptions</span>). Playing an Event card does not take an action.",
@@ -53,7 +53,7 @@ strings = {
     ],
     importantInfo: [
         ["h4", "General Information"],
-        "Look for info icons (<span class='info' id='metaInfo'>&#9432;</span>) and words with a <span class='hoverInfo' id='metaHoverInfo'>blue underline</span> -- they can be moused over to see a tooltip containing more detailed information about something.",
+        "Look for info icons (<span class='info' id='metaInfo'>&#128712;</span>) and words with a <span class='hoverInfo' id='metaHoverInfo'>blue underline</span> -- they can be moused over to see a tooltip containing more detailed information about something.",
         eventHistoryInfo,
         ["h4", "Objectives"],
         "The full list of objectives can be found here: <a data-section='objectives' class='nowrap'>Rules -> Objectives</a>",
@@ -66,7 +66,7 @@ strings = {
     ],
     whatJustHappened: [
         eventHistoryInfo,
-        "Mouse over an icon in the Event History to see the details of that particular event. Try hovering over the tooltip that appears to get more information about its contents. Use the tooltip's info icon (&#9432;) to learn more about the rules regarding that type of event."
+        "Mouse over an icon in the Event History to see the details of that particular event. Try hovering over the tooltip that appears to get more information about its contents. Use the tooltip's info icon (&#128712;) to learn more about the rules regarding that type of event."
     ],
     mistakes: [
         "Try using the Event History's undo button (&#x2B8C;). The Event History is located in the bottom-left corner of the screen.",

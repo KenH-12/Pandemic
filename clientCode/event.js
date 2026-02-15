@@ -453,7 +453,7 @@ export default class Event
 	{
 		const name = (this.displayName || this.name).toUpperCase();
 		
-		return `<p class='title'>${name}<span class='eventTypeInfo'>&#9432;</span></p>
+		return `<p class='title'>${name}<span class='eventTypeInfo'>&#128712;</span></p>
 				${ this.player ? `<p>Role: ${this.player.newRoleTag()}</p>` : "" }`;
 	}
 }

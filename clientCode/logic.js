@@ -513,7 +513,7 @@ Hand Limit Exceeded!<br/>`;
 	steps[stepName] = new Step(stepName, [infectionStep])
 	steps[stepName].setDescription = function()
 	{
-		this.description = `<span class='info'>&#9432;</span><span>Infection Rate: ${gameData.infectionRate}</span>`
+		this.description = `<span class='info'>&#128712;</span><span>Infection Rate: ${gameData.infectionRate}</span>`
 	};
 })();
 
@@ -3507,6 +3507,7 @@ function resizeRightPanelElements()
 		{ boardHeight } = gameData;
 	
 	rightPanel.height(boardHeight);
+	$("#rightPanelEdgeLine").height(boardHeight);
 	gameData.panelWidth = rightPanel.width();
 	
 	if ($("#infectCitiesContainer, #initialInfectionsContainer, #forecastContainer").not(".hidden").length)
@@ -6324,7 +6325,7 @@ async function revealInfectionCard({ city, cityKey, infectionIndex }, { forecast
 		else
 			$card.click(() => pinpointCityFromCard($card));
 		
-		$veil.animate({ left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
+		$veil.animate({left: "+=" + getDimension("diseaseIcon", { compliment: true }) },
 			getDuration("revealInfCard"),
 			easings.revealCard,
 			() =>

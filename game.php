@@ -96,7 +96,7 @@
 						<div id='topPanel'>
 
 							<div id='cubeSupplies'>
-								<p class='title'>DISEASE CUBE SUPPLY <span class='info'>&#9432;</span></p>
+								<p class='title'>DISEASE CUBE SUPPLY <span class='info'>&#128712;</span></p>
 								<div class='cubeSupply'>
 									<p id='ySupply'>$MAX_CUBE_SUPPLY_COUNT</p>
 									<div id='ySupplyCube' class='diseaseCube y'>
@@ -189,7 +189,7 @@
 						<div id='cureMarkerContainer' class='bottomPanelDiv'>
 							<p class='title'>
 								<span class='infoContainer'>
-									<span class='info' id='curedDiseasesInfo'>&#9432;</span>
+									<span class='info' id='curedDiseasesInfo'>&#128712;</span>
 								</span>
 								<span class='lightGreen'>—</span> CURED DISEASES <span class='lightGreen'>—</span>
 							</p>
@@ -197,14 +197,14 @@
 
 						<div id='governmentGrantArrow' class='hidden'><div></div></div>
 						<div id='researchStationSupplyContainer' class='bottomPanelDiv'>
-							<p class='title'>RESEARCH STATION SUPPLY <span class='info'>&#9432;</span></p>
+							<p class='title'>RESEARCH STATION SUPPLY <span class='info'>&#128712;</span></p>
 							<p id='researchStationSupplyCount'>$MAX_RESEARCH_STATION_COUNT</p>
 							<div class='researchStation'>
 								<img src='images/pieces/researchStation.png' id='imgResearchStationSupply' alt='Research Station' />
 							</div>
 						</div>
 						<div id='playerDeckContainer' class='bottomPanelDiv'>
-							<p class='title'>PLAYER DECK <span class='info hidden'>&#9432;</span></p>
+							<p class='title'>PLAYER DECK <span class='info hidden'>&#128712;</span></p>
 							<img id='imgPlayerDeck' src='images/cards/playerDeck_6.png' alt='Player Deck'/>
 						</div>
 						<div id='playerDiscardContainer' class='bottomPanelDiv'>
@@ -270,26 +270,26 @@
 						</button>
 
 						<div id='turnProcedureContainer' class='procedureContainer hidden'>
-							<p class='title'>PLAY<span class='info' id='turnProcedureInfo'>&#9432;</span></p>
+							<p class='title'>PLAY<span class='info' id='turnProcedureInfo'>&#128712;</span></p>
 							<p class='step action'>
 								<span>1. Do 4 actions</span>
-								<span class='info playStepInfo hidden' data-eventType='ac'>&#9432;</span>
+								<span class='info playStepInfo hidden' data-eventType='ac'>&#128712;</span>
 							</p>
 							<p class='step draw'>
 								<span>2. Draw 2 cards</span>
-								<span class='info playStepInfo hidden' data-eventType='cd'>&#9432;</span>
+								<span class='info playStepInfo hidden' data-eventType='cd'>&#128712;</span>
 							</p>
 							<li class='substep epidemic'>
 								<span>Resolve any epidemics</span>
-								<span class='info playStepInfo epidemicInfo hidden'>&#9432;</span>
+								<span class='info playStepInfo epidemicInfo hidden'>&#128712;</span>
 							</li>
 							<li class='substep discard'>
 								<span>Discard to 7 cards</span>
-								<span class='info playStepInfo hidden' data-eventType='ds'>&#9432;</span>
+								<span class='info playStepInfo hidden' data-eventType='ds'>&#128712;</span>
 							</li>
 							<p class='step infect'>
 								<span>3. Infect Cities</span>
-								<span class='info playStepInfo hidden' data-eventType='ic'>&#9432;</span>
+								<span class='info playStepInfo hidden' data-eventType='ic'>&#128712;</span>
 							</p>
 						</div>
 						
@@ -309,28 +309,28 @@
 										<img src='images/eventIcons/driveFerry.png' />
 									</div>
 									<div class='actionName'>DRIVE / FERRY</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 								<div class='button actionButton' id='btnDirectFlight'>
 									<div class='actionIcon'>
 										<img src='images/eventIcons/directFlight.png' />
 									</div>
 									<div class='actionName'>DIRECT FLIGHT</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 								<div class='button actionButton' id='btnCharterFlight'>
 									<div class='actionIcon'>
 										<img src='images/eventIcons/charterFlight.png' />
 									</div>
 									<div class='actionName'>CHARTER FLIGHT</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 								<div class='button actionButton' id='btnShuttleFlight'>
 									<div class='actionIcon'>
 										<img src='images/eventIcons/shuttleFlight.png' />
 									</div>
 									<div class='actionName'>SHUTTLE FLIGHT</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 							</div>
 
@@ -341,35 +341,35 @@
 										<img src='images/eventIcons/buildResearchStation.png' />
 									</div>
 									<div class='actionName'>BUILD RESEARCH STATION</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 								<div class='button actionButton' id='btnTreatDisease'>
 									<div class='actionIcon'>
 										<img src='images/eventIcons/treatDisease.png' />
 									</div>
 									<div class='actionName'>TREAT DISEASE</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 								<div class='button actionButton' id='btnShareKnowledge'>
 									<div class='actionIcon'>
 										<img src='images/eventIcons/shareKnowledge.png' />
 									</div>
 									<div class='actionName'>SHARE KNOWLEDGE</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 								<div class='button actionButton' id='btnDiscoverACure'>
 									<div class='actionIcon'>
 										<img src='images/eventIcons/discoverACure.png' />
 									</div>
 									<div class='actionName'>DISCOVER A CURE</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 								<div class='button actionButton' id='btnPass'>
 									<div class='actionIcon'>
 										<img src='images/eventIcons/pass.png' />
 									</div>
 									<div class='actionName'>PASS</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 							</div>
 							<div id='specialActionCategory' class='actionCategory'>
@@ -379,21 +379,21 @@
 										<img src='images/eventIcons/planContingency.png' />
 									</div>
 									<div class='actionName'>PLAN CONTINGENCY</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 								<div class='button actionButton dispatcher' id='btnDispatchPawn'>
 									<div class='actionIcon'>
 									<img src='images/eventIcons/dispatchPawn.png' />
 								</div>
 								<div class='actionName'>DISPATCH PAWN</div>
-								<div class='actionInfo'>&#9432;</div>
+								<div class='actionInfo'>&#128712;</div>
 							</div>
 								<div class='button actionButton operationsExpert' id='btnOperationsFlight'>
 									<div class='actionIcon'>
 										<img src='images/eventIcons/operationsFlight.png' />
 									</div>
 									<div class='actionName'>OPERATIONS FLIGHT</div>
-									<div class='actionInfo'>&#9432;</div>
+									<div class='actionInfo'>&#128712;</div>
 								</div>
 							</div>
 
@@ -449,6 +449,7 @@
 							<div class='button btnContinue hidden'>CONTINUE</div>
 						</div>
 					</div>
+					<div id='rightPanelEdgeLine'></div>
 				</div>
 			</body>
 			</html>";
